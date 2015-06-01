@@ -173,7 +173,7 @@ func (ar *Reservoir) AddAmorphs(newA []Amorph) {
 		lp := &ar.Amorphs[i]
 
 		if lp.IdxArticle == 0 {
-			lp.IdxArticle = lenPrev + i
+			lp.IdxArticle = i
 		}
 
 		if lp.AestheticValue == 0 {

@@ -173,10 +173,11 @@ func (ar *Reservoir) exactStairyEdge(x1, y, x2 int, limit int) (amorphs []Amorph
 	if _, ok := ar.Edge3[enc]; ok {
 		mp := ar.Edge3[enc]
 
-		for k, _ := range mp {
+		for amIdx, _ := range mp {
 
-			// pf("found %v \n", k)
-			lp := ar.Amorphs[k] // effects a copying of the amorph
+			// pf("found idx %v of %v \n", amIdx, len(ar.Amorphs))
+
+			lp := ar.Amorphs[amIdx] // effects a copying of the amorph
 			lp.Cols = x1 + x2
 			lp.Rows, lp.Slack = OtherSide(lp.NElements, lp.Cols)
 

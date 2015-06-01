@@ -4,6 +4,7 @@ import "github.com/pbberlin/tools/util"
 
 // mostAbundant seeks the largest slice.
 // It then returns the first amorph.
+// Should be replaced by abundantHeightMatch()
 func mostAbundant(amorphBlocks [][]Amorph) (chosen *Amorph) {
 
 	maxFound := 0
@@ -21,20 +22,31 @@ func mostAbundant(amorphBlocks [][]Amorph) (chosen *Amorph) {
 	return nil
 }
 
-func bestHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
-
-	// maxFound := 0
-	// for i := 0; i < len(amorphBlocks); i++ {
-	// 	maxFound = util.Max(maxFound, len(amorphBlocks[i]))
-	// }
+// abundantHeightMatch should replace mostAbundant()
+// for the selection of the most appropriate amorph.
+// It returns at least an amorph, complying to max height.
+// If there are *several* amorphs close to the optimal height,
+// then we return one of the most abundant in the interval plus-minus 2
+func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 	heightLim := fs.pm[2]
 	heightOpt := fs.FillHeightFloor()
 
 	pf("lim%v,opt%v ", heightLim, heightOpt)
 
+	// plus minus 2
+	// -2=>0  , -1=>1  , 0=>2  , 1=>3 , 2=>4
+	closest := [][]Amorph{[]Amorph{}, []Amorph{}, []Amorph{}, []Amorph{}, []Amorph{}}
+
 	for i := 0; i < len(amorphBlocks); i++ {
 		amorphs := amorphBlocks[i]
+
+		var curDist, newDist int
+
+		// Scan all blocks of amorphs.
+		// Extract one, which is closest to desired height.
+		// Also create a histogram of amorphs,
+		// which have a height of plus-minus 2
 		for j := 0; j < len(amorphs); j++ {
 
 			lp := amorphs[j]
@@ -45,20 +57,60 @@ func bestHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 			if chosen == nil {
 				chosen = &lp
-			} else {
-				curDist := util.Abs(lp.Rows - heightOpt)
-				newDist := util.Abs(chosen.Rows - heightOpt)
-				if newDist < curDist {
-					chosen = &lp
-				}
+			}
+			curDist = chosen.Rows - heightOpt
+			newDist = lp.Rows - heightOpt
+			if util.Abs(newDist) < util.Abs(curDist) {
+				chosen = &lp
+			}
+
+			if util.Abs(newDist) <= 2 {
+				closest[newDist+2] = append(closest[newDist+2], *chosen)
 			}
 
 		}
+
+		// How many amorphs were close to desired height
+		maxBatch := 0
+		for i := 0; i < len(closest); i++ {
+			if len(closest[i]) > maxBatch {
+				maxBatch = len(closest[i])
+			}
+		}
+
+		// Return one abundant amorph
+		// from the range +/- 2
+		if maxBatch > 0 {
+			for {
+				if len(closest[2]) == maxBatch {
+					chosen = &closest[2][0]
+					break
+				}
+				if len(closest[1]) == maxBatch {
+					chosen = &closest[1][0]
+					break
+				}
+				if len(closest[3]) == maxBatch {
+					chosen = &closest[3][0]
+					break
+				}
+				if len(closest[0]) == maxBatch {
+					chosen = &closest[0][0]
+					break
+				}
+				if len(closest[4]) == maxBatch {
+					chosen = &closest[4][0]
+					break
+				}
+				break
+			}
+		}
+
 	}
 	return
 }
 
-// exactStraightEdge returns amorphs with a given length.
+// exactStraightEdge returns amorphs with a requested width.
 // It singles out the most abundant of heights for
 // the return of "chosen"
 func exactStraightEdge(ar *Reservoir, x1 int) ([][]Amorph, *Amorph) {
@@ -133,8 +185,8 @@ func (ar *Reservoir) exactStairyEdge(x1, y, x2 int, limit int) (amorphs []Amorph
 	return
 }
 
-// moreThanXElements returns amorph closest to requested
-// number of elements.
+// moreThanXElements returns an amorph closest above
+// requested number of elements.
 // There is no effort to find the most abundant amorph
 // or the most height-appropriate among several.
 // Its for the most desperate heuristic anyway.

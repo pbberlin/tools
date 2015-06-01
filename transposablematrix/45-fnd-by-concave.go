@@ -16,7 +16,7 @@ func StairyPerfectConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, ch
 	var fitting [][]Amorph
 	fitting, _ = ar.ByStairyEdge(x1, y, x2, 0, westw, grow)
 
-	chosen = bestHeightMatch(fitting, fs)
+	chosen = abundantHeightMatch(fitting, fs)
 
 	// switch back
 	if stepdown && chosen != nil {

@@ -1,27 +1,5 @@
 package transposablematrix
 
-type SearchResult int
-
-const (
-	nothing SearchResult = iota
-	success
-	failure
-)
-
-var AmorphsExhaustedError = epf("Amorphs exhausted")
-
-func (c SearchResult) String() string {
-	switch c {
-	case nothing:
-		return "nothing"
-	case success:
-		return "success"
-	case failure:
-		return "failure"
-	}
-	return ""
-}
-
 // no receiver (*Reservoir)Find
 // dont know how to apply interface
 type AmorphFinder interface {
@@ -79,7 +57,7 @@ func (m *TransposableMatrix) HeuristicsApply(ar *Reservoir) (hits []int, err err
 	if len(ar.MElements) < 1 {
 		err = AmorphsExhaustedError
 	} else {
-		_, errTry := IterateFusedSections(m, ar, clns, l)
+		_, errTry := m.IterateFusedSections(ar, clns, l)
 		if errTry != nil {
 			err = errTry
 		}
@@ -88,7 +66,7 @@ func (m *TransposableMatrix) HeuristicsApply(ar *Reservoir) (hits []int, err err
 	return
 }
 
-func IterateFusedSections(m *TransposableMatrix, ar *Reservoir,
+func (m *TransposableMatrix) IterateFusedSections(ar *Reservoir,
 	clns [][]int, l []Point) (SearchResult, error) {
 
 	hits := make([]int, 2)

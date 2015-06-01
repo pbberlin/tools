@@ -29,18 +29,30 @@ func bestHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 	// }
 
 	heightLim := fs.pm[2]
-	heightOpt := (fs.w[0] + fs.e[0]) / 2
+	heightOpt := fs.FillHeightFloor()
+
 	pf("lim%v,opt%v ", heightLim, heightOpt)
 
 	for i := 0; i < len(amorphBlocks); i++ {
 		amorphs := amorphBlocks[i]
 		for j := 0; j < len(amorphs); j++ {
+
 			lp := amorphs[j]
-			if lp.Rows <= heightLim {
-				if chosen == nil || (chosen != nil && lp.Rows > chosen.Rows) {
+
+			if lp.Rows > heightLim {
+				continue
+			}
+
+			if chosen == nil {
+				chosen = &lp
+			} else {
+				curDist := util.Abs(lp.Rows - heightOpt)
+				newDist := util.Abs(chosen.Rows - heightOpt)
+				if newDist < curDist {
 					chosen = &lp
 				}
 			}
+
 		}
 	}
 	return

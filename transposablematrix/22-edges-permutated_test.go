@@ -1,3 +1,6 @@
+// +build edges
+// go test -tags=edges
+
 package transposablematrix
 
 import (
@@ -63,7 +66,7 @@ func Test_edges(t *testing.T) {
 		}
 
 	}
-	fmt.Println("test edges")
+	fmt.Println("test PermutateEdges")
 
 }
 

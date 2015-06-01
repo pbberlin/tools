@@ -1,4 +1,4 @@
-//x +build stairy
+// +build stairy
 // go test -tags=stairy
 
 package transposablematrix

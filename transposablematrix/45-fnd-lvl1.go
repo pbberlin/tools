@@ -29,7 +29,7 @@ func exactStraightEdge(ar *Reservoir, x1 int) ([][]Amorph, *Amorph) {
 		}
 	}
 
-	chosen := mostAbundant(fnd)
+	chosen := activeFilter.Filter(fnd, Fusion{})
 
 	return fnd, chosen
 }

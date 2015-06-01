@@ -97,5 +97,8 @@ func (f Fusion) Print() {
 
 // FillHeightFloor is the recommended minimal heigt of an amorph to fill in
 func (f Fusion) FillHeightFloor() int {
+	if f.w == nil || f.e == nil || len(f.w) < 1 || len(f.e) < 1 {
+		return 3
+	}
 	return (f.w[0] + f.e[0]) / 2
 }

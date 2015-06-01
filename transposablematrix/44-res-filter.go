@@ -2,10 +2,28 @@ package transposablematrix
 
 import "github.com/pbberlin/tools/util"
 
+type Filterer interface {
+	Filter([][]Amorph, Fusion) *Amorph
+}
+
+type MostAbundant struct{}
+type MostAbundantInProximity struct{}
+
+func (dummy MostAbundant) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
+	return mostAbundant(amorphBlocks, fs)
+}
+func (dummy MostAbundantInProximity) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
+	return abundantHeightMatch(amorphBlocks, fs)
+}
+
+var activeFilter Filterer = MostAbundantInProximity{}
+
+// var activeFilter Filterer = MostAbundant{}
+
 // mostAbundant seeks the largest slice.
 // It then returns the first amorph.
 // Should be replaced by abundantHeightMatch()
-func mostAbundant(amorphBlocks [][]Amorph) (chosen *Amorph) {
+func mostAbundant(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 	maxFound := 0
 	for i := 0; i < len(amorphBlocks); i++ {
@@ -33,7 +51,10 @@ func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 	defer func() { pf = pfTmp }()
 	pf = pfDevNull
 
-	heightLim := fs.pm[2]
+	heightLim := 1000
+	if fs.pm != nil && len(fs.pm) > 2 {
+		heightLim = fs.pm[2]
+	}
 	heightOpt := fs.FillHeightFloor()
 
 	pf("lim%v,opt%v ", heightLim, heightOpt)

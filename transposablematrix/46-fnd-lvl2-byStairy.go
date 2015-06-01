@@ -113,7 +113,7 @@ func (ar *Reservoir) ByStairyEdge(x1, y, x2 int,
 		printNL = true
 	}
 
-	chosen = mostAbundant(amorphBlocks)
+	chosen = activeFilter.Filter(amorphBlocks, Fusion{})
 
 	return
 }

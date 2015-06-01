@@ -29,6 +29,10 @@ func mostAbundant(amorphBlocks [][]Amorph) (chosen *Amorph) {
 // then we return one of the most abundant in the interval plus-minus 2
 func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
+	pfTmp := intermedPf(pf)
+	defer func() { pf = pfTmp }()
+	pf = pfDevNull
+
 	heightLim := fs.pm[2]
 	heightOpt := fs.FillHeightFloor()
 
@@ -36,18 +40,21 @@ func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 	// plus minus 2
 	// -2=>0  , -1=>1  , 0=>2  , 1=>3 , 2=>4
-	closest := [][]Amorph{[]Amorph{}, []Amorph{}, []Amorph{}, []Amorph{}, []Amorph{}}
+	closest := [][]Amorph{
+		[]Amorph{}, []Amorph{}, []Amorph{}, []Amorph{}, []Amorph{},
+	}
 
 	for i := 0; i < len(amorphBlocks); i++ {
-		amorphs := amorphBlocks[i]
 
-		var curDist, newDist int
+		amorphs := amorphBlocks[i]
 
 		// Scan all blocks of amorphs.
 		// Extract one, which is closest to desired height.
 		// Also create a histogram of amorphs,
 		// which have a height of plus-minus 2
 		for j := 0; j < len(amorphs); j++ {
+
+			var lastDist, lpDist int
 
 			lp := amorphs[j]
 
@@ -58,55 +65,68 @@ func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 			if chosen == nil {
 				chosen = &lp
 			}
-			curDist = chosen.Rows - heightOpt
-			newDist = lp.Rows - heightOpt
-			if util.Abs(newDist) < util.Abs(curDist) {
+			lastDist = chosen.Rows - heightOpt
+			lpDist = lp.Rows - heightOpt
+			if util.Abs(lpDist) < util.Abs(lastDist) {
 				chosen = &lp
 			}
 
-			if util.Abs(newDist) <= 2 {
-				closest[newDist+2] = append(closest[newDist+2], *chosen)
+			if util.Abs(lpDist) <= 2 {
+				closest[lpDist+2] = append(closest[lpDist+2], lp)
 			}
 
 		}
+	}
 
-		// How many amorphs were close to desired height
-		maxBatch := 0
+	// Debug output
+	if false {
+		pf("\n")
 		for i := 0; i < len(closest); i++ {
-			if len(closest[i]) > maxBatch {
-				maxBatch = len(closest[i])
+			sa := closest[i]
+			pf("h%v fnd%v:  ", heightOpt+i-2, len(sa))
+			for j := 0; j < len(sa); j++ {
+				pf("%2v %vx%v=%2v | ", sa[j].IdxArticle, sa[j].Rows, sa[j].Cols, sa[j].NElements)
 			}
+			pf("\n")
 		}
+	}
 
-		// Return one abundant amorph
-		// from the range +/- 2
-		if maxBatch > 0 {
-			for {
-				if len(closest[2]) == maxBatch {
-					chosen = &closest[2][0]
-					break
-				}
-				if len(closest[1]) == maxBatch {
-					chosen = &closest[1][0]
-					break
-				}
-				if len(closest[3]) == maxBatch {
-					chosen = &closest[3][0]
-					break
-				}
-				if len(closest[0]) == maxBatch {
-					chosen = &closest[0][0]
-					break
-				}
-				if len(closest[4]) == maxBatch {
-					chosen = &closest[4][0]
-					break
-				}
+	// How many amorphs were close to desired height
+	maxBatch := 0
+	for i := 0; i < len(closest); i++ {
+		if len(closest[i]) > maxBatch {
+			maxBatch = len(closest[i])
+		}
+	}
+
+	// Return one abundant amorph
+	// from the range +/- 2
+	if maxBatch > 0 {
+		for {
+			if len(closest[2]) == maxBatch {
+				chosen = &closest[2][0]
 				break
 			}
+			if len(closest[1]) == maxBatch {
+				chosen = &closest[1][0]
+				break
+			}
+			if len(closest[3]) == maxBatch {
+				chosen = &closest[3][0]
+				break
+			}
+			if len(closest[0]) == maxBatch {
+				chosen = &closest[0][0]
+				break
+			}
+			if len(closest[4]) == maxBatch {
+				chosen = &closest[4][0]
+				break
+			}
+			break
 		}
-
 	}
+
 	return
 }
 

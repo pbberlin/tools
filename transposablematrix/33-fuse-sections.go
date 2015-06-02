@@ -83,16 +83,16 @@ func (ar *Reservoir) FuseTwoSections(l []Point, clns [][]int, sct1 []int) (Fusio
 	switch {
 	case fs.pm[0] < 0 && fs.pm[1] < 0: // eastw, westw blocked, concave
 		fs.curveDesc = cncave
-		fs.dirIdx, fs.maxOffs = -1, 0
+		// fs.dirIdx, fs.maxOffs = -1, 0
 	case fs.pm[0] > 0 && fs.pm[1] < 0: //  westwards open
 		fs.curveDesc = stairW
-		fs.dirIdx, fs.maxOffs = 0, fs.pm[0]
+		// fs.dirIdx, fs.maxOffs = 0, fs.pm[0]
 	case fs.pm[0] < 0 && fs.pm[1] > 0: //  eastwards open
 		fs.curveDesc = stairE
-		fs.dirIdx, fs.maxOffs = 1, fs.pm[1]
+		// fs.dirIdx, fs.maxOffs = 1, fs.pm[1]
 	case fs.pm[0] > 0 && fs.pm[1] > 0: // utterly convex
 		fs.curveDesc = convex
-		fs.dirIdx, fs.maxOffs = 1, fs.pm[1] // wanton choice: grow east
+		// fs.dirIdx, fs.maxOffs = 1, fs.pm[1] // wanton choice: grow east
 	}
 
 	return fs, nil

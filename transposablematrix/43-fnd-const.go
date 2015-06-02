@@ -34,3 +34,5 @@ const (
 // how high the found amorphs may be.
 // Param mainly for performance tuning.
 const cMaxHeight = 8
+
+const cFusionHeightDefault = 3

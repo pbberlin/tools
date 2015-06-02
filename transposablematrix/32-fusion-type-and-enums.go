@@ -1,5 +1,7 @@
 package transposablematrix
 
+import "github.com/pbberlin/tools/util"
+
 type CurveDesc int
 
 const (
@@ -34,8 +36,6 @@ type Fusion struct {
 	w, e      []int     // the lengths of the west/eastward continuations edges: directions y-x-y
 	pm        []int     // permissiveness westwards/eastwards/northwards
 	curveDesc CurveDesc // strongly concave, weakly concave or convex surroundings
-
-	dirIdx, maxOffs int // direction to grow into, amount to grow
 }
 
 func NewFusion() Fusion {
@@ -72,30 +72,31 @@ func (f Fusion) Print() {
 
 	pf("%s | overgr w%v e%v n%v | ", f.curveDesc, pmd[0], pmd[1], pmd[2])
 
-	dir := "UNKNOWN"
-	switch f.dirIdx {
-	case -1:
-		dir = "blckd"
-	case 0:
-		dir = "westw"
-	case 1:
-		dir = "eastw"
-	}
-
-	if f.dirIdx > -1 {
-		pf("%v%v | ", dir, f.maxOffs)
-	} else {
-		pf("")
-	}
-
 	pf("\n")
 
 }
 
-// FillHeightFloor is the recommended minimal heigt of an amorph to fill in
+// FillHeightFloor is the recommended minimal height
+// of an amorph to fill in.
+//
 func (f Fusion) FillHeightFloor() int {
-	if f.w == nil || f.e == nil || len(f.w) < 1 || len(f.e) < 1 {
-		return 3
+
+	if f.xyx == nil || len(f.xyx) < 2 {
+		return cFusionHeightDefault
 	}
-	return (f.w[0] + f.e[0]) / 2
+
+	if f.xyx[1] > 0 {
+		// lower western flank => max of western or middle flank
+		if f.w == nil || len(f.w) < 1 {
+			return cFusionHeightDefault
+		}
+		return util.Max(f.xyx[1], f.w[0])
+	} else {
+		// lower eastern flank => max of eastern or middle flank
+		if f.e == nil || len(f.e) < 1 {
+			return cFusionHeightDefault
+		}
+		return util.Max(-f.xyx[1], f.e[0])
+	}
+
 }

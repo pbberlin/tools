@@ -1,17 +1,19 @@
 package dsu_ancestored_gb_entries
 
 import (
+	"net/http"
+	"time"
+
 	"appengine"
 	ds "appengine/datastore"
 	"appengine/user"
-	"net/http"
-	"time"
 
 	"bytes"
 	"fmt"
 	"strings"
 	//"reflect"
 
+	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_err"
 )
 
@@ -51,6 +53,7 @@ type GbEntryRetr struct {
 	Date              time.Time
 	Field2            string
 	TypeShiftingField uint8
+	Comment1          string
 }
 
 // returns entity group - or parent - key
@@ -116,7 +119,8 @@ func SaveEntry(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 }
 
-func ListEntries(w http.ResponseWriter, r *http.Request) (gbEntries []GbEntryRetr, report string) {
+func ListEntries(w http.ResponseWriter,
+	r *http.Request) (gbEntries []GbEntryRetr, report string) {
 
 	c := appengine.NewContext(r)
 	/* High Replication Datastore:
@@ -154,6 +158,19 @@ func ListEntries(w http.ResponseWriter, r *http.Request) (gbEntries []GbEntryRet
 		b1.WriteString("\n")
 	}
 	report = b1.String()
+
+	for _, gbe := range gbEntries {
+		s := gbe.Comment1
+		if len(s) > 0 {
+			if pos := strings.Index(s, "0300"); pos > 1 {
+				i1 := util.Max(pos-4, 0)
+				i2 := util.Min(pos+24, len(s))
+				s1 := s[i1:i2]
+				s1 = strings.Replace(s1, "3", "E", -1)
+				report = fmt.Sprintf("%v -%v", report, s1)
+			}
+		}
+	}
 
 	return
 }

@@ -10,7 +10,7 @@ type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
 var AmorphsExhaustedError = epf("Amorphs exhausted")
 
-var heuristics = []AmorphFinderFunc{
+var Heuristics = []AmorphFinderFunc{
 	StairyPerfect,     // 0
 	StairyShrinky,     // 1
 	StraightPerfect,   // 2
@@ -75,14 +75,14 @@ loopFusedSections:
 
 		hits[0]++
 
-		for iHeur := 0; iHeur < len(heuristics); iHeur++ {
+		for iHeur := 0; iHeur < len(Heuristics); iHeur++ {
 
 			if len(restrictHeuristicsByIndex) > 0 && !restrictHeuristicsByIndex[iHeur] {
 				pf("heuristic %v restricted =>  continue\n", iHeur)
 				continue
 			}
 
-			chosen, baseShift := heuristics[iHeur](ar, fs[i])
+			chosen, baseShift := Heuristics[iHeur](ar, fs[i])
 
 			if chosen != nil {
 

@@ -51,7 +51,7 @@ func Test_stairyEdge(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 
-		got, _ := ar.ByStairyEdge(2, 1, 2, 2, eastw, shrinks[i])
+		got, _ := ar.ByStairyEdge(Fusion{}, 2, 1, 2, 2, eastw, shrinks[i])
 		if !cmpareSl(got, wants[i]) {
 			t.Errorf("\ngot  %v\nwant %v\n", got, wants[i])
 		}

@@ -63,7 +63,7 @@ func Main3() {
 
 	restrictHeuristicsByIndex = map[int]bool{}
 
-	M.SetCenter(w/2-7, h/2)
+	M.SetCenter(-7, 0)
 
 	for i := 0; i < 10; i++ {
 

@@ -255,8 +255,9 @@ func (m *TransposableMatrix) ViewportRestriction(vPRMx1, vPRMy1, vPRMx2, vPRMy2 
 
 // Move the center for mapped coordinates Get()/Set()
 func (m *TransposableMatrix) SetCenter(x, y int) {
-	m.cx = x
-	m.cy = y
+	newX, newY := m.nx/2+x, m.ny/2+y
+	m.cx = newX
+	m.cy = newY
 }
 
 func (m *TransposableMatrix) Center() (int, int) {

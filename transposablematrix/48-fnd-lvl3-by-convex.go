@@ -2,16 +2,16 @@ package transposablematrix
 
 //
 // Find the perfect fit for a given edge x-y-x
-func StairyPerfect(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *Amorph, baseShift Point) {
+func StairyPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
 
-	_, chosen = ar.ByStairyEdge(x1, y, x2, maxOffs, VariDirection(directionIdx), grow)
-	return nil, chosen, Point{}
+	_, chosen = ar.ByStairyEdge(fs, x1, y, x2, maxOffs, VariDirection(directionIdx), grow)
+	return chosen, Point{}
 }
 
 //
-func StairyShrinky(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *Amorph, baseShift Point) {
+func StairyShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
 	_, _, _ = x1, y, x2
@@ -22,7 +22,7 @@ func StairyShrinky(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *A
 }
 
 // StraightPerfect tries a perfect fit
-func StraightPerfect(ar *Reservoir, fs Fusion) (amorphs [][]Amorph, chosen *Amorph, baseShift Point) {
+func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
 	_, _ = directionIdx, maxOffs
@@ -39,7 +39,7 @@ func StraightPerfect(ar *Reservoir, fs Fusion) (amorphs [][]Amorph, chosen *Amor
 // StraightShrinky tries to fill
 // a *wide* straight concave gap,
 // wider than double SmallestDesirableWidth.
-func StraightShrinky(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *Amorph, baseShift Point) {
+func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	// pfTmp := intermedPf(pf)
 	// defer func() { pf = pfTmp }()
@@ -71,7 +71,7 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen 
 			}
 		}
 		pf("\n")
-		return nil, chosen, baseShift
+		return chosen, baseShift
 	} else {
 		pf("gap%v narrower than%v => no StraightShrinky\n", x1, wideGapMin*ar.SmallestDesirableWidth)
 		return
@@ -81,7 +81,7 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen 
 
 // ByNumElementsWrap - find amorphs by number of elements,
 // search greater or equal (GTE) number than param x1
-func ByNumElementsWrap(ar *Reservoir, fs Fusion) (amorphs [][]Amorph, chosen *Amorph, baseShift Point) {
+func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
 	_, _ = directionIdx, maxOffs

@@ -42,3 +42,19 @@ func Test_abundantHeightMatch(t *testing.T) {
 
 	fmt.Println("Test_abundantHeightMatch")
 }
+
+func Test_SwitchHoriz(t *testing.T) {
+
+	w := westw
+	w.SwitchHoriz()
+	if w != eastw {
+		t.Errorf("\ngot  %v\nwant %v\n", w, eastw)
+	}
+
+	w1 := eastw
+	w1.SwitchHoriz()
+	if w1 != westw {
+		t.Errorf("\ngot  %v\nwant %v\n", w1, westw)
+	}
+
+}

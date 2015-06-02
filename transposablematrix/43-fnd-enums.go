@@ -28,8 +28,8 @@ const (
 	northw
 )
 
-func (gd VariDirection) String() string {
-	switch gd {
+func (dir VariDirection) String() string {
+	switch dir {
 	case westw:
 		return "westwd"
 	case eastw:
@@ -38,4 +38,14 @@ func (gd VariDirection) String() string {
 		return "northwd"
 	}
 	return ""
+}
+
+func (pdir *VariDirection) SwitchHoriz() {
+	dir := *pdir
+	if dir == westw {
+		dir = eastw
+	} else {
+		dir = westw
+	}
+	*pdir = dir
 }

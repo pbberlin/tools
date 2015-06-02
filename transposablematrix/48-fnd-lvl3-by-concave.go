@@ -2,7 +2,8 @@ package transposablematrix
 
 //
 // Find the perfect fit for a given edge x-y-x
-func StairyPerfectConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *Amorph, baseShift Point) {
+func StairyPerfectConcave(ar *Reservoir,
+	fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
 
@@ -13,10 +14,7 @@ func StairyPerfectConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, ch
 		y = -y
 	}
 
-	var fitting [][]Amorph
-	fitting, _ = ar.ByStairyEdge(x1, y, x2, 0, westw, grow)
-
-	chosen = activeFilter.Filter(fitting, fs)
+	_, chosen = ar.ByStairyEdge(fs, x1, y, x2, 0, westw, grow)
 
 	// switch back
 	if stepdown && chosen != nil {
@@ -26,43 +24,14 @@ func StairyPerfectConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, ch
 		y = -y
 	}
 
-	return nil, chosen, Point{}
+	return chosen, Point{}
 
 }
 
 // We need to distinguish four cases
 // 		stepup				or	stepdown
 //		LowStat-HighDyn		or	LowDyna-HighSta-
-// Todo: limit height
-func StairyShrinkyConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, chosen *Amorph, baseShift Point) {
-
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-	_, _ = directionIdx, maxOffs
-
-	if y < 0 {
-		chosen = AdapterStepdownAndDirection(ar, "LowStat-HighDyn-", x1, y, x2, 0)
-
-		if chosen == nil {
-			chosen = AdapterStepdownAndDirection(ar, "LowDyna-HighSta-", x1, y, x2, 1)
-		}
-
-	} else {
-		chosen = AdapterStepdownAndDirection(ar, "LowStat-HighDyn-", x1, y, x2, 1)
-
-		if chosen == nil {
-			chosen = AdapterStepdownAndDirection(ar, "LowDyna-HighSta-", x1, y, x2, 0)
-		}
-	}
-
-	if chosen != nil {
-		baseShift.x += x1 - chosen.Edge[0]
-		// baseShift.y--
-	}
-
-	return
-
-}
-
+//
 // First, recollect following equivalence:
 //
 //  XXXXX-<-                ->-XXXXX
@@ -71,7 +40,7 @@ func StairyShrinkyConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, ch
 //  3;2;2...               ...2;-2;3
 //  westw                      eastw
 //
-// The shrink *direction* is switched too
+// Then consider switching of the shrink *direction* too:
 //
 //  ->-XXXXX                  XXXXX-<-
 //  ->-X          equiv           X-<-
@@ -79,21 +48,39 @@ func StairyShrinkyConcave(ar *Reservoir, fs Fusion) (amorphBlocks [][]Amorph, ch
 //  3..1;2;4                  4;-2;3..1
 //  eastw                     westw
 //
-func AdapterStepdownAndDirection(ar *Reservoir, desc string, x1, y, x2 int, direction int) (chosen *Amorph) {
+func StairyShrinkyConcave(ar *Reservoir,
+	fs Fusion) (chosen *Amorph, baseShift Point) {
+
+	if fs.xyx[1] > 0 {
+		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", eastw)
+		if chosen == nil {
+			chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", westw)
+		}
+	} else {
+		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", westw)
+		if chosen == nil {
+			chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", eastw)
+		}
+	}
+
+	return
+
+}
+
+func (ar *Reservoir) AdapterStepdownAndDirection(fs Fusion,
+	desc string, direction VariDirection) (chosen *Amorph, baseShift Point) {
+
+	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
 
 	var stepdown bool
 	if y < 0 {
 		stepdown = true
 		x1, x2 = x2, x1
 		y = -y
-		if direction == 0 {
-			direction = 1
-		} else {
-			direction = 0
-		}
+		direction.SwitchHoriz()
 	}
 
-	if direction == 0 {
+	if direction == westw {
 		if x1 >= wideGapMin*ar.SmallestDesirableWidth {
 			pf("gap%v wider   than%v*%v =>    %vStairyShrinky ", x1, wideGapMin, ar.SmallestDesirableWidth, desc)
 			// leave at least SmallestDesirableWidth for further fill
@@ -107,7 +94,7 @@ func AdapterStepdownAndDirection(ar *Reservoir, desc string, x1, y, x2 int, dire
 			// we want to stop at narrowestStair, thus:
 			maxOffs := xdyn - narrowestStair
 			pf("%v...%v\n", xdyn, xdyn-maxOffs)
-			_, chosen = ar.ByStairyEdge(xdyn, y, x2, maxOffs, westw, shrink)
+			_, chosen = ar.ByStairyEdge(fs, xdyn, y, x2, maxOffs, westw, shrink)
 		} else {
 			pf("gap%v narrowr than%v*%v => no %vStairyShrinky \n", x1, wideGapMin, ar.SmallestDesirableWidth, desc)
 		}
@@ -126,7 +113,7 @@ func AdapterStepdownAndDirection(ar *Reservoir, desc string, x1, y, x2 int, dire
 			// we want to stop at narrowestStair, thus:
 			maxOffs := xdyn - narrowestStair
 			pf("%v...%v\n", xdyn, xdyn-maxOffs)
-			_, chosen = ar.ByStairyEdge(x1, y, xdyn, maxOffs, eastw, shrink)
+			_, chosen = ar.ByStairyEdge(fs, x1, y, xdyn, maxOffs, eastw, shrink)
 		} else {
 			pf("gap%v narrowr than%v*%v => no %vStairyShrinky \n", x2, wideGapMin, ar.SmallestDesirableWidth, desc)
 		}
@@ -139,11 +126,13 @@ func AdapterStepdownAndDirection(ar *Reservoir, desc string, x1, y, x2 int, dire
 		chosen.Edge[1] = -chosen.Edge[1]
 		x1, x2 = x2, x1
 		y = -y
-		if direction == 0 {
-			direction = 1
-		} else {
-			direction = 0
-		}
+		direction.SwitchHoriz()
+	}
+
+	// if stepdown && chosen != nil {
+	if chosen != nil {
+		baseShift.x += fs.xyx[0] - chosen.Edge[0]
+		// baseShift.y--
 	}
 
 	return

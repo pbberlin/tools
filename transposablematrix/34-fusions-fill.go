@@ -3,10 +3,10 @@ package transposablematrix
 // no receiver (*Reservoir)Find
 // dont know how to apply interface
 type AmorphFinder interface {
-	AmorphFind(*Reservoir, int, int, int, int, int) ([][]Amorph, *Amorph, Point)
+	AmorphFind(*Reservoir, Fusion) (*Amorph, Point)
 }
 
-type AmorphFinderFunc func(*Reservoir, Fusion) ([][]Amorph, *Amorph, Point)
+type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
 // Stack of heuristics - Stack No 1
 var concaveHeuristics = []AmorphFinderFunc{
@@ -105,7 +105,7 @@ loopFusedSections:
 				continue
 			}
 
-			_, chosen, baseShift := heuristics[iHeur](ar, fs[i])
+			chosen, baseShift := heuristics[iHeur](ar, fs[i])
 
 			if chosen != nil {
 

@@ -5,7 +5,7 @@ package transposablematrix
 // If variation > 0:
 // 		Change flankToVary by variation steps.
 // 		Change according to param growShrink => increase/decr/both
-func (ar *Reservoir) ByStairyEdge(x1, y, x2 int,
+func (ar *Reservoir) ByStairyEdge(fs Fusion, x1, y, x2 int,
 	variation int, flankToVary VariDirection,
 	growShrink GrowShrink) (amorphBlocks [][]Amorph, chosen *Amorph) {
 
@@ -113,7 +113,7 @@ func (ar *Reservoir) ByStairyEdge(x1, y, x2 int,
 		printNL = true
 	}
 
-	chosen = activeFilter.Filter(amorphBlocks, Fusion{})
+	chosen = activeFilter.Filter(amorphBlocks, fs)
 
 	return
 }

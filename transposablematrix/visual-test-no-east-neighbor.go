@@ -44,7 +44,7 @@ func MainTestNoEasternNeighbor() {
 	ar.GenerateRandomAmorphs(25)
 	ar.SmallestDesirableHeight = 3
 
-	M.SetCenter(w/2-7, h/2)
+	M.SetCenter(-7, 0)
 
 	// M.CastStitch( Point{ 1,  -5}, ar.Amorphs[5])
 	// M.CastStitch( Point{ 4,  -5}, ar.Amorphs[6])

@@ -35,6 +35,8 @@ func Main4() {
 		M.DrawLine(l1, "", false)
 	}
 
+	M.SetCenter(-7, 0)
+
 	M.ViewportRestriction(-7, -4, 14, 2)
 
 	M.SetAmorphSnapRightwise(Point{-5, 2}, ar.Amorphs[0])

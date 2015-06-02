@@ -51,10 +51,7 @@ func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 	defer func() { pf = pfTmp }()
 	pf = pfDevNull
 
-	heightLim := 1000
-	if fs.pm != nil && len(fs.pm) > 2 {
-		heightLim = fs.pm[2]
-	}
+	heightLim := fs.pm[2]
 	heightOpt := fs.FillHeightFloor()
 
 	pf("lim%v,opt%v ", heightLim, heightOpt)

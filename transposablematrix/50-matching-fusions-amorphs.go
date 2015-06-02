@@ -8,6 +8,8 @@ type AmorphFinder interface {
 
 type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
+var AmorphsExhaustedError = epf("Amorphs exhausted")
+
 var heuristics = []AmorphFinderFunc{
 	StairyPerfect,     // 0
 	StairyShrinky,     // 1
@@ -39,7 +41,8 @@ func (m *TransposableMatrix) HeuristicsApply(ar *Reservoir) (hits []int, err err
 	if len(ar.MElements) < 1 {
 		err = AmorphsExhaustedError
 	} else {
-		_, errTry := m.IterateFusedSections(ar, clns, l)
+		var errTry error
+		hits, errTry = m.IterateFusedSections(ar, clns, l)
 		if errTry != nil {
 			err = errTry
 		}
@@ -49,18 +52,14 @@ func (m *TransposableMatrix) HeuristicsApply(ar *Reservoir) (hits []int, err err
 }
 
 func (m *TransposableMatrix) IterateFusedSections(ar *Reservoir,
-	clns [][]int, l []Point) (SearchResult, error) {
+	clns [][]int, l []Point) ([]int, error) {
 
-	hits := make([]int, 2)
+	hits := make([]int, 2) // first: heuristics applied, second: number of results
 
 	fs, err := m.FuseAllSections(ar, clns, l)
 	if err != nil {
-		return nothing, err
+		return hits, err
 	}
-
-	// for i := 0; i < len(fs); i++ {
-	// 	fs[i].Print()
-	// }
 
 loopFusedSections:
 	for i := 0; i < len(fs); i++ {
@@ -111,11 +110,5 @@ loopFusedSections:
 
 	}
 
-	result := nothing
-	if hits[0] > 0 && hits[1] == 0 {
-		result = failure
-	} else if hits[0] > 0 && hits[1] > 0 {
-		result = success
-	}
-	return result, nil
+	return hits, nil
 }

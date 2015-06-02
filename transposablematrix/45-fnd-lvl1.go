@@ -5,7 +5,7 @@ import "github.com/pbberlin/tools/util"
 // exactStraightEdge returns amorphs with a requested width.
 // It singles out the most abundant of heights for
 // the return of "chosen"
-func exactStraightEdge(ar *Reservoir, x1 int) ([][]Amorph, *Amorph) {
+func exactStraightEdge(ar *Reservoir, fs Fusion, x1 int) ([][]Amorph, *Amorph) {
 
 	pfTmp := intermedPf(pf)
 	defer func() { pf = pfTmp }()
@@ -29,7 +29,7 @@ func exactStraightEdge(ar *Reservoir, x1 int) ([][]Amorph, *Amorph) {
 		}
 	}
 
-	chosen := activeFilter.Filter(fnd, Fusion{})
+	chosen := activeFilter.Filter(fnd, fs)
 
 	return fnd, chosen
 }

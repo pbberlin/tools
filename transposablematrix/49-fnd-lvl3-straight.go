@@ -7,7 +7,7 @@ func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
 
 	pf("srch perfect straight %v ", x1)
-	_, chosen = exactStraightEdge(ar, x1)
+	_, chosen = exactStraightEdge(ar, fs, x1)
 	pf("\n")
 	return
 
@@ -16,6 +16,7 @@ func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 // StraightShrinky tries to fill
 // a *wide* straight concave gap,
 // wider than double SmallestDesirableWidth.
+// Todo: We always snuggle westwards
 func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	// pfTmp := intermedPf(pf)
@@ -39,7 +40,7 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 		shrinkStart := x1 - ar.SmallestDesirableWidth
 		for i := shrinkStart; i >= ar.SmallestDesirableWidth; i-- {
 			pf("srch%v ", i)
-			_, chosen = exactStraightEdge(ar, i)
+			_, chosen = exactStraightEdge(ar, fs, i)
 			if chosen != nil {
 				// pf(" found %v", chosen)
 				break

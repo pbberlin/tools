@@ -4,7 +4,7 @@ package transposablematrix
 func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
-	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
+	x1, y, x2, baseShift = easterFlank(x1, y, x2, baseShift)
 
 	pf("srch perfect straight %v ", x1)
 	_, chosen = exactStraightEdge(ar, fs, x1)
@@ -23,7 +23,7 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 	// defer func() { pf = pfTmp }()
 
 	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
-	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
+	x1, y, x2, baseShift = easterFlank(x1, y, x2, baseShift)
 
 	if x1 > wideGapCap*ar.SmallestDesirableWidth {
 		x1 = wideGapMin * ar.SmallestDesirableWidth // worsens results
@@ -60,7 +60,7 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
-	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
+	x1, y, x2, baseShift = easterFlank(x1, y, x2, baseShift)
 
 	if x1 > wideGapCap*ar.SmallestDesirableWidth {
 		x1 = ar.SmallestDesirableWidth
@@ -111,10 +111,12 @@ func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Poin
 	return
 }
 
-func rightFlank(x1, y, x2 int, baseShift Point) (int, int, int, Point) {
+// easterFlank moves base point to start of eastern flank.
+// This is distinct AdapterStepdownAndDirection() for stairy matchings.
+func easterFlank(x1, y, x2 int, baseShift Point) (int, int, int, Point) {
 
 	if y < 0 {
-		baseShift.x += x1 // base towards the right flank
+		baseShift.x += x1 // move base to start the right flank
 		x1, x2 = x2, x1
 	}
 	return x1, y, x2, baseShift

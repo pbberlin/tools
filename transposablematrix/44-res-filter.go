@@ -9,21 +9,15 @@ type Filterer interface {
 type MostAbundant struct{}
 type MostAbundantInProximity struct{}
 
-func (dummy MostAbundant) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
-	return mostAbundant(amorphBlocks, fs)
-}
-func (dummy MostAbundantInProximity) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
-	return abundantHeightMatch(amorphBlocks, fs)
-}
+// May be changed from outside to any type transposablematrix.Filterer
+var ActiveFilter Filterer = MostAbundantInProximity{}
 
-var activeFilter Filterer = MostAbundantInProximity{}
-
-// var activeFilter Filterer = MostAbundant{}
+// var ActiveFilter Filterer = MostAbundant{}
 
 // mostAbundant seeks the largest slice.
 // It then returns the first amorph.
 // Should be replaced by abundantHeightMatch()
-func mostAbundant(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
+func (dummy MostAbundant) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 	maxFound := 0
 	for i := 0; i < len(amorphBlocks); i++ {
@@ -45,7 +39,7 @@ func mostAbundant(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 // It returns at least an amorph, complying to max height.
 // If there are *several* amorphs close to the optimal height,
 // then we return one of the most abundant in the interval plus-minus 2
-func abundantHeightMatch(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
+func (dummy MostAbundantInProximity) Filter(amorphBlocks [][]Amorph, fs Fusion) (chosen *Amorph) {
 
 	pfTmp := intermedPf(pf)
 	defer func() { pf = pfTmp }()

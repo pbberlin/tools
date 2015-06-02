@@ -113,7 +113,7 @@ func (ar *Reservoir) ByStairyEdge(fs Fusion, x1, y, x2 int,
 		printNL = true
 	}
 
-	chosen = activeFilter.Filter(amorphBlocks, fs)
+	chosen = ActiveFilter.Filter(amorphBlocks, fs)
 
 	return
 }

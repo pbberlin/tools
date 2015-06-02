@@ -138,8 +138,9 @@ func (ar *Reservoir) AdapterStepdownAndDirection(fs Fusion,
 		direction.SwitchHoriz()
 	}
 
-	// Adjustment: if western flank was dynamically reduced
-	// If flank was not reduced, then fs.xyx[0] == chosen.Edge[0]
+	// If western flank was dynamically reduced: Adjust.
+	// If flank was not reduced, then fs.xyx[0] == chosen.Edge[0].
+	// This is distinct to easterFlank() for straight matchings.
 	if chosen != nil {
 		baseShift.x += fs.xyx[0] - chosen.Edge[0]
 		// baseShift.y--

@@ -1,16 +1,15 @@
 package transposablematrix
 
-// no receiver (*Reservoir)Find
-// dont know how to apply interface
-type AmorphFinder interface {
+// unused, we use MatchFunc instead
+type Matcher interface {
 	AmorphFind(*Reservoir, Fusion) (*Amorph, Point)
 }
 
-type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
+type MatcherFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
 var AmorphsExhaustedError = epf("Amorphs exhausted")
 
-var Heuristics = []AmorphFinderFunc{
+var Heuristics = []MatcherFunc{
 	StairyPerfect,     // 0
 	StairyShrinky,     // 1
 	StraightPerfect,   // 2

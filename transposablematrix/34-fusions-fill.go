@@ -10,11 +10,11 @@ type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
 // Stack of heuristics - Stack No 1
 var concaveHeuristics = []AmorphFinderFunc{
-	StairyPerfectConcave, // 0
-	StairyShrinkyConcave, // 1
-	StraightPerfect,      // 2
-	StraightShrinky,      // 3
-	ByNumElementsWrap,    // 4
+	StairyPerfect,     // 0
+	StairyShrinky,     // 1
+	StraightPerfect,   // 2
+	StraightShrinky,   // 3
+	ByNumElementsWrap, // 4
 }
 
 // Stack of heuristics - Stack No 2
@@ -29,8 +29,8 @@ var allHeuristics = []AmorphFinderFunc{
 // Combinining the stacks, depending the curve description
 var applicable = map[CurveDesc][]AmorphFinderFunc{
 	cncave: concaveHeuristics,
-	stairW: allHeuristics,
-	stairE: allHeuristics,
+	stairW: concaveHeuristics,
+	stairE: concaveHeuristics,
 	convex: allHeuristics,
 }
 

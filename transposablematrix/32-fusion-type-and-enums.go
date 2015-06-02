@@ -4,9 +4,8 @@ type CurveDesc int
 
 const (
 	cncave CurveDesc = iota
-	// cncveCore  // basic indicator: do we have concave core somewhere
-	stairW
-	stairE
+	stairW           // open towards west
+	stairE           // open towards east
 	convex
 )
 
@@ -14,8 +13,6 @@ func (c CurveDesc) String() string {
 	switch c {
 	case cncave:
 		return "cncave"
-	// case cncveCore:
-	// 	return "cncveCore"
 	case stairW:
 		return "stairW"
 	case stairE:
@@ -34,11 +31,11 @@ type Fusion struct {
 	// x - western horizontal section, y - shared vertical, x - eastern horiz. sect
 	xyx []int
 
-	w, e            []int     // the lengths of the west/eastward continuations edges: directions y-x-y
-	pm              []int     // permissiveness westwards/eastwards/northwards
-	curveDesc       CurveDesc // strongly concave, weakly concave or convex surroundings
-	concaveCore     bool      // any concave y-x-y ? Turned out, the heuristics applicability depends on that
-	dirIdx, maxOffs int       // direction to grow into, amount to grow
+	w, e      []int     // the lengths of the west/eastward continuations edges: directions y-x-y
+	pm        []int     // permissiveness westwards/eastwards/northwards
+	curveDesc CurveDesc // strongly concave, weakly concave or convex surroundings
+
+	dirIdx, maxOffs int // direction to grow into, amount to grow
 }
 
 func NewFusion() Fusion {

@@ -253,11 +253,13 @@ func (m *TransposableMatrix) ViewportRestriction(vPRMx1, vPRMy1, vPRMx2, vPRMy2 
 	m.enforceVPR = true
 }
 
-// Move the center for mapped coordinates Get()/Set()
+// SetCenter moves the center for mapped coordinates Get()/Set()
+// SetCenter params are relative to middle of existing allocated slots.
+// Changes influence Render2Termbox().
+// Todo: m.nx != m.nx leads to wrong offset after perspective change
 func (m *TransposableMatrix) SetCenter(x, y int) {
-	newX, newY := m.nx/2+x, m.ny/2+y
-	m.cx = newX
-	m.cy = newY
+	m.cx = m.nx/2 + x
+	m.cy = m.ny/2 + y
 }
 
 func (m *TransposableMatrix) Center() (int, int) {

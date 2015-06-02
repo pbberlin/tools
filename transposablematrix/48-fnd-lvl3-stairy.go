@@ -2,7 +2,7 @@ package transposablematrix
 
 //
 // Find the perfect fit for a given edge x-y-x
-func StairyPerfectConcave(ar *Reservoir,
+func StairyPerfect(ar *Reservoir,
 	fs Fusion) (chosen *Amorph, baseShift Point) {
 
 	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
@@ -18,8 +18,7 @@ func StairyPerfectConcave(ar *Reservoir,
 
 	// switch back
 	if stepdown && chosen != nil {
-		chosen.Edge[0], chosen.Edge[2] = chosen.Edge[2], chosen.Edge[0]
-		chosen.Edge[1] = -chosen.Edge[1]
+		chosen.ReverseEdge()
 		x1, x2 = x2, x1
 		y = -y
 	}
@@ -48,19 +47,30 @@ func StairyPerfectConcave(ar *Reservoir,
 //  3..1;2;4                  4;-2;3..1
 //  eastw                     westw
 //
-func StairyShrinkyConcave(ar *Reservoir,
+func StairyShrinky(ar *Reservoir,
 	fs Fusion) (chosen *Amorph, baseShift Point) {
 
-	if fs.xyx[1] > 0 {
-		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", eastw)
-		if chosen == nil {
+	if fs.curveDesc == cncave {
+		if fs.xyx[1] > 0 {
 			chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", westw)
-		}
-	} else {
-		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", westw)
-		if chosen == nil {
+			if chosen == nil {
+				chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", eastw)
+			}
+		} else {
 			chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", eastw)
+			if chosen == nil {
+				chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", westw)
+			}
 		}
+	} else if fs.curveDesc == stairW { // westwards open
+		// => fs.xyx[1] > 0
+		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", eastw)
+		// if chosen == nil {
+		// 	chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowStat-HighDyn-", westw)
+		// }
+	} else if fs.curveDesc == stairE { // westwards open
+		// => fs.xyx[1] < 0
+		chosen, baseShift = ar.AdapterStepdownAndDirection(fs, "LowDyna-HighSta-", eastw)
 	}
 
 	return
@@ -122,14 +132,14 @@ func (ar *Reservoir) AdapterStepdownAndDirection(fs Fusion,
 
 	// switch back
 	if stepdown && chosen != nil {
-		chosen.Edge[0], chosen.Edge[2] = chosen.Edge[2], chosen.Edge[0]
-		chosen.Edge[1] = -chosen.Edge[1]
+		chosen.ReverseEdge()
 		x1, x2 = x2, x1
 		y = -y
 		direction.SwitchHoriz()
 	}
 
-	// if stepdown && chosen != nil {
+	// Adjustment: if western flank was dynamically reduced
+	// If flank was not reduced, then fs.xyx[0] == chosen.Edge[0]
 	if chosen != nil {
 		baseShift.x += fs.xyx[0] - chosen.Edge[0]
 		// baseShift.y--

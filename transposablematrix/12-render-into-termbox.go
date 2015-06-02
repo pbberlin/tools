@@ -14,6 +14,12 @@ var margT = 3
 // xoo ... output coords plus header margins
 func (m *TransposableMatrix) Render2Termbox(x1, x2, y1, y2 int) {
 
+	// Offset from SetCenter
+	centerOffsX, centerOffsY := (m.nx/2)-m.cx, (m.ny/2)-m.cy
+	// pf("coxy%v %v\n", centerOffsX, centerOffsY)
+
+	x1, x2, y1, y2 = x1+centerOffsX, x2+centerOffsX, y1+centerOffsY, y2+centerOffsY
+
 	m.renderHeaderTB(x1, y1)
 
 	xo1 := RectOutp2.X1

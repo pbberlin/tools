@@ -386,6 +386,13 @@ func (ar *Reservoir) PrintAmorphSummary(label string) {
 
 }
 
+func (f *Amorph) ReverseEdge() {
+	if f.Edge != nil && len(f.Edge) > 2 {
+		f.Edge[0], f.Edge[2] = f.Edge[2], f.Edge[0]
+		f.Edge[1] = -f.Edge[1]
+	}
+}
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }

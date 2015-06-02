@@ -6,6 +6,7 @@ func Main3() {
 	h := 65
 	M = NewTransposableMatrix(w, h)
 	M.SetPerspective(perspect1)
+	M.SetCenter(4, 8)
 	f := func() {
 		M.Render2Termbox(-16, 16, -13, 13)
 	}
@@ -63,8 +64,6 @@ func Main3() {
 
 	restrictHeuristicsByIndex = map[int]bool{}
 
-	M.SetCenter(-7, 0)
-
 	for i := 0; i < 10; i++ {
 
 		_, err := M.HeuristicsApply(&ar)
@@ -94,6 +93,7 @@ func Main3() {
 	M.SetPerspective(perspect2)
 	M.FilledMinMax(true)
 	M.TotalMinMax(true)
+	M.SetCenter(0, 4)
 	M.Render2Termbox(-16, 16, -13, 13)
 
 }

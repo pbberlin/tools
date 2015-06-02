@@ -1,26 +1,5 @@
 package transposablematrix
 
-//
-// Find the perfect fit for a given edge x-y-x
-func StairyPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
-
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-
-	_, chosen = ar.ByStairyEdge(fs, x1, y, x2, maxOffs, VariDirection(directionIdx), grow)
-	return chosen, Point{}
-}
-
-//
-func StairyShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
-
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-	_, _, _ = x1, y, x2
-	_, _ = directionIdx, maxOffs
-
-	return
-
-}
-
 // StraightPerfect tries a perfect fit
 func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 

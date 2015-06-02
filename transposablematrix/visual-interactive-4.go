@@ -35,7 +35,7 @@ func Main4() {
 		M.DrawLine(l1, "", false)
 	}
 
-	M.SetCenter(-7, 0)
+	M.SetCenter(4, 10)
 
 	M.ViewportRestriction(-7, -4, 14, 2)
 

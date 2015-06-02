@@ -8,30 +8,12 @@ type AmorphFinder interface {
 
 type AmorphFinderFunc func(*Reservoir, Fusion) (*Amorph, Point)
 
-// Stack of heuristics - Stack No 1
-var concaveHeuristics = []AmorphFinderFunc{
+var heuristics = []AmorphFinderFunc{
 	StairyPerfect,     // 0
 	StairyShrinky,     // 1
 	StraightPerfect,   // 2
 	StraightShrinky,   // 3
 	ByNumElementsWrap, // 4
-}
-
-// Stack of heuristics - Stack No 2
-var allHeuristics = []AmorphFinderFunc{
-	StairyPerfect,     // 0
-	StairyShrinky,     // 1
-	StraightPerfect,   // 2
-	StraightShrinky,   // 3
-	ByNumElementsWrap, // 4
-}
-
-// Combinining the stacks, depending the curve description
-var applicable = map[CurveDesc][]AmorphFinderFunc{
-	cncave: concaveHeuristics,
-	stairW: concaveHeuristics,
-	stairE: concaveHeuristics,
-	convex: allHeuristics,
 }
 
 // var restrictHeuristicsByIndex = map[int]bool{0: true, 1: true, 2: true}
@@ -82,10 +64,6 @@ func (m *TransposableMatrix) IterateFusedSections(ar *Reservoir,
 
 loopFusedSections:
 	for i := 0; i < len(fs); i++ {
-
-		var heuristics []AmorphFinderFunc
-
-		heuristics = applicable[fs[i].curveDesc]
 
 		// var curveRestrictions map[CurveDesc]bool
 		// curveRestrictions = map[CurveDesc]bool{cncave: true}

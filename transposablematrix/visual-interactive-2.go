@@ -25,13 +25,8 @@ func Main2() {
 		ar.RemoveSpentEdges(ar.Amorphs[i])
 	}
 
-	ar.GenerateRandomAmorphs(48)
-
-	// ar.AddAmorphs([]Amorph{Amorph{Cols: 1, Rows: 1}})
-	// ar.AddAmorphs([]Amorph{Amorph{Cols: 4, Rows: 1}})
-	ar.AddAmorphs([]Amorph{Amorph{Cols: 4, Rows: 2}})
-	// ar.AddAmorphs([]Amorph{Amorph{Cols: 7, Rows: 3, Slack: 3}})
-	// DumpAmorphs(ar.Amorphs, 1)
+	ar.GenerateSpecificAmorphs([]int{8})
+	ar.GenerateSpecificAmorphs([]int{2})
 
 	ams := make([]Amorph, 5)
 	ams[0] = ar.Amorphs[0]

@@ -3,14 +3,12 @@ package transposablematrix
 // StraightPerfect tries a perfect fit
 func StraightPerfect(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-	_, _ = directionIdx, maxOffs
+	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
+	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
 
-	x1, y, x2, baseShift = swapAndAdjustBase(x1, y, x2, baseShift)
-	pf("try straight perfect fit%v ", x1)
+	pf("srch perfect straight %v ", x1)
 	_, chosen = exactStraightEdge(ar, x1)
 	pf("\n")
-
 	return
 
 }
@@ -23,10 +21,8 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 	// pfTmp := intermedPf(pf)
 	// defer func() { pf = pfTmp }()
 
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-	_, _ = directionIdx, maxOffs
-
-	x1, y, x2, baseShift = swapAndAdjustBase(x1, y, x2, baseShift)
+	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
+	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
 
 	if x1 > wideGapCap*ar.SmallestDesirableWidth {
 		x1 = wideGapMin * ar.SmallestDesirableWidth // worsens results
@@ -62,10 +58,8 @@ func StraightShrinky(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point)
 // search greater or equal (GTE) number than param x1
 func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Point) {
 
-	var x1, y, x2, directionIdx, maxOffs = fs.xyx[0], fs.xyx[1], fs.xyx[2], fs.dirIdx, fs.maxOffs
-	_, _ = directionIdx, maxOffs
-
-	x1, y, x2, baseShift = swapAndAdjustBase(x1, y, x2, baseShift)
+	var x1, y, x2 = fs.xyx[0], fs.xyx[1], fs.xyx[2]
+	x1, y, x2, baseShift = rightFlank(x1, y, x2, baseShift)
 
 	if x1 > wideGapCap*ar.SmallestDesirableWidth {
 		x1 = ar.SmallestDesirableWidth
@@ -88,6 +82,7 @@ func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Poin
 		}
 	}
 
+	//
 	if chosen != nil {
 		chosen.Cols = x1
 		chosen.Rows, chosen.Slack = OtherSide(chosen.NElements, chosen.Cols)
@@ -108,13 +103,6 @@ func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Poin
 				chosen.Padded)
 		}
 
-		if y < 0 {
-			baseShift.y += y
-		}
-
-		// baseShift.y -= 2
-		// baseShift.x++
-
 	} else {
 		pf("The next to last matching failed.\n")
 	}
@@ -122,10 +110,10 @@ func ByNumElementsWrap(ar *Reservoir, fs Fusion) (chosen *Amorph, baseShift Poin
 	return
 }
 
-func swapAndAdjustBase(x1, y, x2 int, baseShift Point) (int, int, int, Point) {
+func rightFlank(x1, y, x2 int, baseShift Point) (int, int, int, Point) {
 
 	if y < 0 {
-		baseShift.x += x1
+		baseShift.x += x1 // base towards the right flank
 		x1, x2 = x2, x1
 	}
 	return x1, y, x2, baseShift

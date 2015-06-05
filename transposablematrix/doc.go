@@ -23,8 +23,12 @@ You can further change the center of mapped coordinates, independently of the pe
 
 
 
-For example see:
-	visual_test.go - go test
+Usage:
+
+	transposablematrix.InitTB()
+	transposablematrix.Main[0-4]()
+	<-transposablematrix.TermBoxDone
+
 
 */
 package transposablematrix

@@ -121,24 +121,6 @@ func InsertAfter(s []int, idx int, newVal int) []int {
 }
 
 //
-// LIFO
-type Stack []string
-
-func (s *Stack) Push(v string) {
-	*s = append(*s, v)
-}
-
-func (s *Stack) Len() int {
-	return len(*s)
-}
-
-func (s *Stack) Pop() string {
-	ret := (*s)[len(*s)-1]
-	*s = (*s)[0 : len(*s)-1]
-	return ret
-}
-
-//
 // When having multiple URL params of the same name,
 func StringSliceToMapKeys(s []string) map[string]bool {
 	ret := map[string]bool{}

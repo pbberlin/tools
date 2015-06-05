@@ -6,8 +6,7 @@ package transposablematrix
 	To avoid too wide - too low usage of amorphs.
 
 	Smallest desirable Width and Height.
-	Rename and make methods: Reservoir.SDW(), Reservoir.SDH()
-		Thereby, make them independent of perspective
+	Rename to Reservoir.SDW(), Reservoir.SDH()
 
 	Longest Common Subsequence - LCS - in golang
 	adapt to website scraping:

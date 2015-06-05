@@ -120,8 +120,8 @@ func Fetch(amount int) {
 	pf("\n\n\n")
 	for i := 0; i < len(fullArticles); i++ {
 		lpFa := fullArticles[i]
-		indir := *fullArticles[i].Body
-		// pf("%v: %v\n\n", lpFa.URL[27:], util.Ellipsoider(string(indir), 200))
+		bBody := *fullArticles[i].Body
+		// pf("%v: %v\n\n", lpFa.URL[27:], util.Ellipsoider(string(bBody), 200))
 
 		fileName := lpFa.URL
 		fileName = strings.Replace(fileName, "https://", "", -1)
@@ -142,8 +142,14 @@ func Fetch(amount int) {
 			pf(" file open %v %v\n", fileName, err)
 		}
 		defer f.Close()
-		n2, err := f.Write(indir)
+		n2, err := f.Write(bBody)
 		pf("wrote %d bytes - err |%v| \n", n2, err)
+
+		err = ioutil.WriteFile("f1.html", bBody, os.ModePerm)
+		if err != nil {
+			pf("can not write file: %v", err)
+		}
+		pf("file written")
 
 	}
 

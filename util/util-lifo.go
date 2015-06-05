@@ -20,9 +20,22 @@ func (s *Stack) Pop() string {
 }
 
 func (s Stack) String() string {
+	return s.StringExt(false)
+}
+
+func (s Stack) StringExt(leafOnly bool) string {
+	sep := "/"
 	ret := ""
 	for i := 0; i < len(s); i++ {
-		ret = fmt.Sprintf("%v / %v", ret, s[i])
+		if leafOnly {
+			if i == len(s)-1 {
+				ret = fmt.Sprintf("%v%s%-5v", ret, sep, s[i])
+			} else {
+				ret = fmt.Sprintf("%v%s%-5v", ret, " ", "")
+			}
+		} else {
+			ret = fmt.Sprintf("%v%s%v", ret, sep, s[i])
+		}
 	}
 	return ret
 }

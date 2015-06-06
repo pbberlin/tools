@@ -29,12 +29,12 @@ func (s Stack) StringExt(leafOnly bool) string {
 	for i := 0; i < len(s); i++ {
 		if leafOnly {
 			if i == len(s)-1 {
-				ret = fmt.Sprintf("%v%s%-5v", ret, sep, s[i])
+				ret = fmt.Sprintf("%v%s%-3v", ret, sep, s[i])
 			} else {
-				ret = fmt.Sprintf("%v%s%-5v", ret, " ", "")
+				ret = fmt.Sprintf("%v%s%-3v", ret, " ", "")
 			}
 		} else {
-			ret = fmt.Sprintf("%v%s%v", ret, sep, s[i])
+			ret = fmt.Sprintf("%v%s%-3v", ret, sep, s[i])
 		}
 	}
 	return ret

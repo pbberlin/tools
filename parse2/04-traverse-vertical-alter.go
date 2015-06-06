@@ -7,38 +7,16 @@ import (
 	"golang.org/x/net/html"
 )
 
-// commonly used by recursive function calls:
+// vars used by all recursive function calls:
 var (
 	xPath     util.Stack
 	xPathSkip = map[string]bool{"em": true, "b": true, "br": true}
 	xPathDump []byte
-
-	removeAttributes = map[string]bool{
-		"style": true,
-		"class": true,
-		// "alt":                  true,
-		// "title":                  true,
-		"target":                 true,
-		"id":                     true,
-		"rel":                    true,
-		"headline":               true,
-		"onload":                 true,
-		"onclick":                true,
-		"onmousedown":            true,
-		"onerror":                true,
-		"readonly":               true,
-		"itemprop":               true,
-		"itemtype":               true,
-		"itemscope":              true,
-		"datetime":               true,
-		"current-time":           true,
-		"fb-iframe-plugin-query": true,
-		"fb-xfbml-state":         true,
-	}
-	attrDistinct = map[string]int{}
 )
 
-func TraverseVert(n *html.Node, lvl int) {
+// TraverseVertAlter1 writes an xpath log.
+// TraverseVertAlter1 cleans up the attributes
+func TraverseVertAlter1(n *html.Node, lvl int) {
 
 	if lvl == 0 {
 		xPathDump = []byte{}
@@ -48,25 +26,20 @@ func TraverseVert(n *html.Node, lvl int) {
 	switch n.Type {
 	case html.ElementNode:
 
+		nodeDistinct[n.Data]++
+
 		if !xPathSkip[n.Data] {
 			xPath.Push(n.Data)
 
-			// n.Attr = addIdAttr(n.Attr)
-			// printAttr(n.Attr, []string{"xxid"})
-
 			// lvl == xPath.Len()
 			s := fmt.Sprintf("%2v: %s\n", xPath.Len(), xPath.StringExt(true))
-			xPathDump = append(xPathDump, s...) // special comfort; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
+			xPathDump = append(xPathDump, s...) // yes, string appends to byteSlice ; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
 
 		}
-		n.Attr = removeAttr(n.Attr, removeAttributes)
-
-	case html.TextNode:
 	}
-
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVert(c, lvl+1)
+		TraverseVertAlter1(c, lvl+1)
 	}
 
 	// After children processing

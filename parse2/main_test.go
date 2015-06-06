@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/fetch"
+	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
 
@@ -18,7 +19,10 @@ func Test1(t *testing.T) {
 
 func main() {
 
-	s1 := `<!DOCTYPE html><html><head>
+	tests := make([]string, 2)
+	var err error
+
+	tests[0] = `<!DOCTYPE html><html><head>
 		<script type="text/javascript" src="./article01_files/empty.js"></script>
 		<link href="./article01_files/vendor.css" rel="stylesheet" type="text/css"/>
 		</head><body><p>Links:
@@ -32,7 +36,7 @@ func main() {
 				<li><a   href="/bar/baz">BarBaz</a>
 			</ul></body></html>`
 
-	s2 := `	<p>
+	tests[1] = `	<p>
 				Ja so sans<br/>
 				Ja die sans.
 			</p>
@@ -40,58 +44,56 @@ func main() {
 				<li>die ooolten Rittersleut</li>
 			</ul>`
 
-	var doc1, doc2, doc3 *html.Node
-	_, _, _ = doc1, doc2, doc3
-	var err error
-
-	doc1, err = html.Parse(strings.NewReader(s1))
-	if err != nil {
-		log.Fatal(err)
+	for i := 0; i < len(tests); i++ {
+		var doc1 *html.Node
+		fn1 := fmt.Sprintf("outpT%v.txt", i)
+		fn2 := fmt.Sprintf("outpT%v.html", i)
+		doc1, err = html.Parse(strings.NewReader(tests[i]))
+		if err != nil {
+			log.Fatal(err)
+		}
+		TraverseVertConvert(doc1, 0)
+		TraverseVertIndent(doc1, 0)
+		TraverseVertAlter1(doc1, 0)
+		ioutil.WriteFile(fn1, xPathDump, 0)
+		dom2File(doc1, fn2)
 	}
-
-	TraverseVertCleanse(doc1, 0)
-	TraverseVertIndent(doc1, 0)
-	TraverseVert(doc1, 0)
-	ioutil.WriteFile("outp1.txt", xPathDump, 0)
-	dom2File(doc1, "outp1.html")
-
-	// ================================================
-	doc2, err = html.Parse(strings.NewReader(s2))
-	if err != nil {
-		log.Fatal(err)
-	}
-	TraverseVertCleanse(doc2, 0)
-	TraverseVertIndent(doc2, 0)
-	TraverseVert(doc2, 0)
-	ioutil.WriteFile("outp2.txt", xPathDump, 0)
-	dom2File(doc2, "outp2.html")
 
 	// ================================================
 	for i := 1; i <= 3; i++ {
+		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
 		fn2 := fmt.Sprintf("outpL%v.html", i)
 		_, resBytes, err := fetch.UrlGetter(url, nil, true)
 		resBytes = globFixes(resBytes)
-		doc3, err = html.Parse(bytes.NewReader(resBytes))
+		doc, err = html.Parse(bytes.NewReader(resBytes))
 		if err != nil {
 			log.Fatal(err)
 		}
-		TraverseVertCleanse(doc3, 0)
-		TraverseHoriRemoveNodes(Tx{doc3, 0})
-		TraverseVertIndent(doc3, 0)
-		TraverseVert(doc3, 0)
+		TraverseVertConvert(doc, 0)
+		TraverseHoriRemoveNodesA(Tx{doc, 0})
+		TraverseHoriRemoveNodesB(Tx{doc, 0})
+		TraverseVertAlter1(doc, 0)
+		TraverseVertIndent(doc, 0)
+
 		ioutil.WriteFile(fn1, xPathDump, 0)
-		dom2File(doc3, fn2)
+		dom2File(doc, fn2)
 	}
 
-	//
-	for k, val := range attrDistinct {
-		fmt.Printf("%12v %v\n", k, val)
-	}
+	sorted1 := subsort.SortMapByCount(attrDistinct)
+	sorted1.Print()
+	fmt.Println()
+	sorted2 := subsort.SortMapByCount(nodeDistinct)
+	sorted2.Print()
+
+	return
+
 }
 
 func globFixes(b []byte) []byte {
+	// <!--(.*?)-->
+
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
 }

@@ -1,7 +1,10 @@
 package parse2
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"log"
 
 	"golang.org/x/net/html"
 )
@@ -37,4 +40,14 @@ func printLvl(n *html.Node, col int) {
 	if n.Type == html.ElementNode {
 		fmt.Printf("%2v: %2v ", col, n.Data)
 	}
+}
+
+func dom2File(node *html.Node, fn string) {
+	var b bytes.Buffer
+	err := html.Render(&b, node)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ioutil.WriteFile(fn, b.Bytes(), 0)
+
 }

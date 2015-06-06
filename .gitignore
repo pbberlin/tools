@@ -1,4 +1,4 @@
 # Ignore files with extension `.exe`
 *.exe
-outp.txt
-outp.html
+outp*.txt
+outp*.html

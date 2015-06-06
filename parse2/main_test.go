@@ -1,7 +1,6 @@
 package parse2
 
 import (
-	"bytes"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -24,6 +23,7 @@ func main() {
 				<li id='332' ><a   href="foo">Linktext1 <span>inside</span></a>
 				<li><a   href="/bar/baz">BarBaz</a>
 			</ul>`
+
 	s2 := `	<p>
 				Ja so sans<br/>
 				Ja die sans.
@@ -52,19 +52,15 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
-	TraverseHori(Tx{doc1, 0})
-
 	TraverseVert(doc1, 0)
+	TraverseVert(doc2, 0)
+
+	// TraverseHori(Tx{doc1, 0})
 
 	//
-	ioutil.WriteFile("outp.txt", stackOutp, 0)
+	ioutil.WriteFile("outp.txt", xPathDump, 0)
 
-	// to file
-	var b bytes.Buffer
-	err = html.Render(&b, doc1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	ioutil.WriteFile("outp.html", b.Bytes(), 0)
+	dom2File(doc1, "outp1.html")
+	dom2File(doc2, "outp2.html")
 
 }

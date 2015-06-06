@@ -7,32 +7,32 @@ import (
 	"golang.org/x/net/html"
 )
 
-var ndStack util.Stack // filled by TraverseVert()
-var skipInStack = map[string]bool{"em": true}
-var stackOutp []byte
+// commonly used by recursive function calls:
+var (
+	xPath     util.Stack
+	xPathSkip = map[string]bool{"em": true, "b": true, "br": true}
+	xPathDump []byte
+)
 
 func TraverseVert(n *html.Node, lvl int) {
 
-	// Before children
+	// Before children processing
 	switch n.Type {
 	case html.ElementNode:
-
-		if !skipInStack[n.Data] {
-			ndStack.Push(n.Data)
-			n.Attr = addIdAttr(n.Attr)
-			printAttr(n.Attr, []string{"id", "bd"})
-		}
-
 		switch n.Data {
-		case "a":
-
 		case "iframe", "script", "noscript":
 			return
 		}
 
-		// lvl == ndStack.Len()
-		s := fmt.Sprintf("%2v: %s\n", ndStack.Len(), ndStack.StringExt(true))
-		stackOutp = append(stackOutp, s...) // exceptional comfort case
+		if !xPathSkip[n.Data] {
+			xPath.Push(n.Data)
+
+			n.Attr = addIdAttr(n.Attr)
+			// printAttr(n.Attr, []string{"xxid"})
+			// lvl == xPath.Len()
+			s := fmt.Sprintf("%2v: %s\n", xPath.Len(), xPath.StringExt(true))
+			xPathDump = append(xPathDump, s...) // special comfort; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
+		}
 
 	case html.TextNode:
 		//
@@ -46,9 +46,8 @@ func TraverseVert(n *html.Node, lvl int) {
 	// After children
 	switch n.Type {
 	case html.ElementNode:
-
-		if !skipInStack[n.Data] {
-			ndStack.Pop()
+		if !xPathSkip[n.Data] {
+			xPath.Pop()
 		}
 	}
 

@@ -15,14 +15,17 @@ func Test1(t *testing.T) {
 
 func main() {
 
-	s1 := `	<p>Links:
+	s1 := ""
+	s1 = `<!DOCTYPE html><html><head></head><body><p>Links:<span>p1</span><span>p2</span><span>p3</span></p><ul><li id="332"><a href="foo">Linktext1<span>inside</span></a></li><li><a href="/bar/baz">BarBaz</a></li></ul></body></html>`
+	s1 = `<!DOCTYPE html><html><head></head><body><p>Links:
 				<span>p1</span>
 				<span>p2</span>
+				<span>p3</span>
 			</p>
 			<ul>
 				<li id='332' ><a   href="foo">Linktext1 <span>inside</span></a>
 				<li><a   href="/bar/baz">BarBaz</a>
-			</ul>`
+			</ul></body></html>`
 
 	s2 := `	<p>
 				Ja so sans<br/>
@@ -53,7 +56,7 @@ func main() {
 	// }
 
 	TraverseVert(doc1, 0)
-	TraverseVert(doc2, 0)
+	// TraverseVert(doc2, 0)
 
 	// TraverseHori(Tx{doc1, 0})
 

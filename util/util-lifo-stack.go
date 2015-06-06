@@ -19,6 +19,13 @@ func (s *Stack) Pop() string {
 	return ret
 }
 
+// Last only *reads* last element.
+// Last does *not* pop it.
+func (s *Stack) Last() string {
+	ret := (*s)[len(*s)-1]
+	return ret
+}
+
 func (s Stack) String() string {
 	return s.StringExt(false)
 }

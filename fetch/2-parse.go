@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/pbberlin/tools/dom"
 	// "github.com/pbberlin/tools/util"
 	"code.google.com/p/go.net/html"
 )
@@ -136,8 +138,8 @@ func init() {
 			// we can't put our replacement "under" an image, since img cannot have children
 			if n.Type == html.ElementNode && n.Data == "img" {
 				// n.Parent.InsertBefore(textReplacement,n)
-				InsertAfter(n, textReplacement)
-				RemoveNode(n)
+				dom.InsertAfter(n, textReplacement)
+				dom.RemoveNode(n)
 
 			} else {
 				n.AppendChild(textReplacement)

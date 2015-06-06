@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -49,5 +50,19 @@ func dom2File(node *html.Node, fn string) {
 		log.Fatal(err)
 	}
 	ioutil.WriteFile(fn, b.Bytes(), 0)
+
+}
+
+var replTabsNewline = strings.NewReplacer("\r\n", " ", "\r", " ", "\n", " ")
+
+func isSpacey(sarg string) bool {
+	s := sarg
+	s = replTabsNewline.Replace(s)
+	s = strings.TrimSpace(s)
+	if s == "" {
+		// fmt.Printf("\t\t\tspacey: %q\n", sarg)
+		return true
+	}
+	return false
 
 }

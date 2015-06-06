@@ -1,12 +1,10 @@
-package fetch
+package dom
 
 import (
 	"code.google.com/p/go.net/html"
 )
 
-
 // inspired by https://github.com/PuerkitoBio/goquery/blob/master/manipulation.go
-
 
 func ReplaceNode(src, dst *html.Node) {
 	InsertAfter(src, dst)
@@ -27,10 +25,9 @@ func InsertAfter(src, dst *html.Node) {
 	}
 }
 
-
 //
 //
-// Deep copy a node. 
+// Deep copy a node.
 // The new node has clones of all the original node's
 // children but none of its parents or siblingCNo
 func cloneNodeWithSubtree(n *html.Node) *html.Node {

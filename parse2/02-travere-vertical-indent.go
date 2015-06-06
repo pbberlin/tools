@@ -19,6 +19,8 @@ func TraverseVertIndent(n *html.Node, lvl int) {
 				dom.InsertAfter(n.LastChild, &html.Node{Type: html.TextNode, Data: "\n" + indent})
 			}
 		}
+	case html.CommentNode:
+		dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n"})
 	}
 
 	// Children

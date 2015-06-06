@@ -12,6 +12,30 @@ var (
 	xPath     util.Stack
 	xPathSkip = map[string]bool{"em": true, "b": true, "br": true}
 	xPathDump []byte
+
+	removeAttributes = map[string]bool{
+		"style": true,
+		"class": true,
+		// "alt":                  true,
+		// "title":                  true,
+		"target":                 true,
+		"id":                     true,
+		"rel":                    true,
+		"headline":               true,
+		"onload":                 true,
+		"onclick":                true,
+		"onmousedown":            true,
+		"onerror":                true,
+		"readonly":               true,
+		"itemprop":               true,
+		"itemtype":               true,
+		"itemscope":              true,
+		"datetime":               true,
+		"current-time":           true,
+		"fb-iframe-plugin-query": true,
+		"fb-xfbml-state":         true,
+	}
+	attrDistinct = map[string]int{}
 )
 
 func TraverseVert(n *html.Node, lvl int) {
@@ -35,6 +59,7 @@ func TraverseVert(n *html.Node, lvl int) {
 			xPathDump = append(xPathDump, s...) // special comfort; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
 
 		}
+		n.Attr = removeAttr(n.Attr, removeAttributes)
 
 	case html.TextNode:
 	}

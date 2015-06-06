@@ -1,19 +1,18 @@
 package dom
 
-import (
-	"golang.org/x/net/html"
-)
+import "golang.org/x/net/html"
 
 // inspired by https://github.com/PuerkitoBio/goquery/blob/master/manipulation.go
 
-func ReplaceNode(src, dst *html.Node) {
-	InsertAfter(src, dst)
-	RemoveNode(src)
+func ReplaceNode(self, dst *html.Node) {
+	InsertAfter(self, dst)
+	RemoveNode(self)
 }
 
 func RemoveNode(n *html.Node) {
-	if n.Parent != nil {
-		n.Parent.RemoveChild(n)
+	par := n.Parent
+	if par != nil {
+		par.RemoveChild(n)
 	}
 }
 

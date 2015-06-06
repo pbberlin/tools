@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -17,6 +18,38 @@ func printAttr(attributes []html.Attribute, keys []string) {
 			}
 		}
 	}
+}
+
+func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.Attribute {
+	ret := []html.Attribute{}
+	var alt, title string
+	for _, a := range attributes {
+		if removeKeys[strings.TrimSpace(a.Key)] ||
+			strings.HasPrefix(a.Key, "data") {
+		} else {
+			if a.Key == "alt" {
+				alt = a.Val
+			}
+			if a.Key == "title" {
+				title = a.Val
+			}
+			attrDistinct[a.Key]++
+			ret = append(ret, a)
+		}
+	}
+	if alt != "" && alt == title {
+		for i := 0; i < len(ret); i++ {
+			if ret[i].Key == "alt" {
+				ret[i].Key = ""
+				ret[i].Val = ""
+				// fmt.Printf(" double alt,title %v\n", title)
+				break
+			}
+		}
+
+	}
+
+	return ret
 }
 
 var idCntr = 0
@@ -34,12 +67,6 @@ func addIdAttr(attributes []html.Attribute) []html.Attribute {
 		idCntr++
 	}
 	return attributes
-}
-
-func printLvl(n *html.Node, col int) {
-	if n.Type == html.ElementNode {
-		fmt.Printf("%2v: %2v ", col, n.Data)
-	}
 }
 
 func dom2File(node *html.Node, fn string) {

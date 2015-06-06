@@ -78,13 +78,12 @@ func main() {
 			log.Fatal(err)
 		}
 		TraverseVertCleanse(doc3, 0)
+		TraverseHoriRemoveNodes(Tx{doc3, 0})
 		TraverseVertIndent(doc3, 0)
 		TraverseVert(doc3, 0)
 		ioutil.WriteFile(fn1, xPathDump, 0)
 		dom2File(doc3, fn2)
 	}
-
-	// TraverseHori(Tx{doc1, 0})
 
 	//
 	for k, val := range attrDistinct {
@@ -95,4 +94,14 @@ func main() {
 func globFixes(b []byte) []byte {
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
+}
+
+func dom2File(node *html.Node, fn string) {
+	var b bytes.Buffer
+	err := html.Render(&b, node)
+	if err != nil {
+		log.Fatal(err)
+	}
+	ioutil.WriteFile(fn, b.Bytes(), 0)
+
 }

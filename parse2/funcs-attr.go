@@ -1,10 +1,7 @@
 package parse2
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -67,14 +64,4 @@ func addIdAttr(attributes []html.Attribute) []html.Attribute {
 		idCntr++
 	}
 	return attributes
-}
-
-func dom2File(node *html.Node, fn string) {
-	var b bytes.Buffer
-	err := html.Render(&b, node)
-	if err != nil {
-		log.Fatal(err)
-	}
-	ioutil.WriteFile(fn, b.Bytes(), 0)
-
 }

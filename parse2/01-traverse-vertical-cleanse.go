@@ -20,7 +20,7 @@ var (
 
 func TraverseVertCleanse(n *html.Node, lvl int) {
 
-	RemoveUnwanted(n)
+	PrepareUnwanted(n)
 
 	switch n.Type {
 	case html.ElementNode:
@@ -41,10 +41,10 @@ func TraverseVertCleanse(n *html.Node, lvl int) {
 
 }
 
-// RemoveUnwanted neutralizes a node.
+// PrepareUnwanted neutralizes a node.
 // Note: We can not Remove() nor Replace()
 // Since that breaks the recursion one step above!
-func RemoveUnwanted(n *html.Node) {
+func PrepareUnwanted(n *html.Node) {
 	if removeTypes[n.Data] {
 		// dom.ReplaceNode(n, &html.Node{Type: html.CommentNode, Data: n.Data + " replaced"})
 		// dom.RemoveNode(n)

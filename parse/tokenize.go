@@ -10,7 +10,7 @@ import (
 
 	"github.com/pbberlin/tools/util"
 
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 var spf func(format string, a ...interface{}) string = fmt.Sprintf

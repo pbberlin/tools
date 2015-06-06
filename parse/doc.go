@@ -1,7 +1,5 @@
 package parse
 
-// https://code.google.com/p/go/source/browse/html/node.go?repo=net
-
 // example use
 // 	parse.Fetch(1)
 // 	parse.Tokenize()

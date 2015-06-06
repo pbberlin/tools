@@ -15,9 +15,7 @@ func Test1(t *testing.T) {
 
 func main() {
 
-	s1 := ""
-	s1 = `<!DOCTYPE html><html><head></head><body><p>Links:<span>p1</span><span>p2</span><span>p3</span></p><ul><li id="332"><a href="foo">Linktext1<span>inside</span></a></li><li><a href="/bar/baz">BarBaz</a></li></ul></body></html>`
-	s1 = `<!DOCTYPE html><html><head></head><body><p>Links:
+	s1 := `<!DOCTYPE html><html><head></head><body><p>Links:
 				<span>p1</span>
 				<span>p2</span>
 				<span>p3</span>
@@ -55,15 +53,20 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
+	TraverseVertCleanse(doc1, 0)
+	TraverseVertIndent(doc1, 0)
 	TraverseVert(doc1, 0)
-	// TraverseVert(doc2, 0)
+	ioutil.WriteFile("outp1.txt", xPathDump, 0)
+	dom2File(doc1, "outp1.html")
+
+	TraverseVertCleanse(doc2, 0)
+	TraverseVertIndent(doc2, 0)
+	TraverseVert(doc2, 0)
+	ioutil.WriteFile("outp2.txt", xPathDump, 0)
+	dom2File(doc2, "outp2.html")
 
 	// TraverseHori(Tx{doc1, 0})
 
 	//
-	ioutil.WriteFile("outp.txt", xPathDump, 0)
-
-	dom2File(doc1, "outp1.html")
-	dom2File(doc2, "outp2.html")
 
 }

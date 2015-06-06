@@ -9,7 +9,7 @@ import (
 
 	"github.com/pbberlin/tools/util"
 
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 var fNodeModify func(*html.Node) string
@@ -49,7 +49,7 @@ func ParseHtmlFiles() {
 				nNew.Data = s
 
 				// We want to remove all children.
-				// Direct loop impossible, since "NextSibling" is set to nil 
+				// Direct loop impossible, since "NextSibling" is set to nil
 				// 		during Remove().
 				// Therefore first assembling separately, then removing.
 				children := map[*html.Node]string{}

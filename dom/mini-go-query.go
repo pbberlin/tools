@@ -1,7 +1,7 @@
 package dom
 
 import (
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 // inspired by https://github.com/PuerkitoBio/goquery/blob/master/manipulation.go
@@ -17,11 +17,19 @@ func RemoveNode(n *html.Node) {
 	}
 }
 
+// InsertBefore inserts before itself.
+// node.InsertBefore refers to its children
+func InsertBefore(self, dst *html.Node) {
+	if self.Parent != nil {
+		self.Parent.InsertBefore(dst, self)
+	}
+}
+
 // InsertBefore inserts at the end, when NextSibling is null.
 // compare http://stackoverflow.com/questions/4793604/how-to-do-insert-after-in-javascript-without-using-a-library
-func InsertAfter(src, dst *html.Node) {
-	if src.Parent != nil {
-		src.Parent.InsertBefore(dst, src.NextSibling)
+func InsertAfter(self, dst *html.Node) {
+	if self.Parent != nil {
+		self.Parent.InsertBefore(dst, self.NextSibling)
 	}
 }
 

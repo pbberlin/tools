@@ -9,7 +9,7 @@ import (
 
 	"github.com/pbberlin/tools/dom"
 	// "github.com/pbberlin/tools/util"
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 var fCondenseNode func(*html.Node, int) string

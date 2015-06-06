@@ -7,7 +7,7 @@ import (
 
 	"github.com/pbberlin/tools/util_appengine"
 
-	"code.google.com/p/go.net/html"
+	"golang.org/x/net/html"
 )
 
 // type Attribute struct {

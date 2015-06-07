@@ -32,7 +32,7 @@ func TravVertStats(n *html.Node, lvl int) {
 			xPath.Push(n.Data)
 
 			// lvl == xPath.Len()
-			s := fmt.Sprintf("%2v: %s\n", xPath.Len(), xPath.StringExt(true))
+			s := fmt.Sprintf("%2v: %s\n", xPath.Len(), xPath.StringExt(false))
 			xPathDump = append(xPathDump, s...) // yes, string appends to byteSlice ; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
 
 		}

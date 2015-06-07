@@ -74,17 +74,15 @@ func main() {
 
 		TraverseVertConvert(doc, 0)
 
-		TravHoriRemoveWhitesp(Tx{doc, 0})
-
 		for i := 0; i < 5; i++ {
-			TravHoriRemoveWhitesp(Tx{doc, 0})
-			TravHoriRemoveEmptyDiv(Tx{doc, 0})
-			TravHoriRemoveComment(Tx{doc, 0})
+			TravVertConvertEmptyLeafs(doc, 0)
+			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
 		}
 
-		TravHoriRemoveComment(Tx{doc, 0})
-
-		TravHoriRemoveWhitesp(Tx{doc, 0})
+		for i := 0; i < 3; i++ {
+			TraverseVert_ConvertDivDiv(doc, 0)
+			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
+		}
 
 		TravVertStats(doc, 0)
 

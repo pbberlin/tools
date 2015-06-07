@@ -54,7 +54,7 @@ func main() {
 		}
 		TraverseVertConvert(doc1, 0)
 		TraverseVertIndent(doc1, 0)
-		TraverseVertAlter1(doc1, 0)
+		TravVertStats(doc1, 0)
 		ioutil.WriteFile(fn1, xPathDump, 0)
 		dom2File(doc1, fn2)
 	}
@@ -71,10 +71,23 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		TraverseVertConvert(doc, 0)
-		TraverseHoriRemoveNodesA(Tx{doc, 0})
-		TraverseHoriRemoveNodesB(Tx{doc, 0})
-		TraverseVertAlter1(doc, 0)
+
+		TravHoriRemoveWhitesp(Tx{doc, 0})
+
+		for i := 0; i < 5; i++ {
+			TravHoriRemoveWhitesp(Tx{doc, 0})
+			TravHoriRemoveEmptyDiv(Tx{doc, 0})
+			TravHoriRemoveComment(Tx{doc, 0})
+		}
+
+		TravHoriRemoveComment(Tx{doc, 0})
+
+		TravHoriRemoveWhitesp(Tx{doc, 0})
+
+		TravVertStats(doc, 0)
+
 		TraverseVertIndent(doc, 0)
 
 		ioutil.WriteFile(fn1, xPathDump, 0)

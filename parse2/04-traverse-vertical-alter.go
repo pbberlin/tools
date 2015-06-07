@@ -14,9 +14,9 @@ var (
 	xPathDump []byte
 )
 
-// TraverseVertAlter1 writes an xpath log.
-// TraverseVertAlter1 cleans up the attributes
-func TraverseVertAlter1(n *html.Node, lvl int) {
+// TravVertStats writes an xpath log.
+// TravVertStats cleans up the attributes
+func TravVertStats(n *html.Node, lvl int) {
 
 	if lvl == 0 {
 		xPathDump = []byte{}
@@ -39,7 +39,7 @@ func TraverseVertAlter1(n *html.Node, lvl int) {
 	}
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVertAlter1(c, lvl+1)
+		TravVertStats(c, lvl+1)
 	}
 
 	// After children processing

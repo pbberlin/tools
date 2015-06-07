@@ -120,7 +120,8 @@ func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
 	// processing
 	if n.FirstChild == nil &&
 		n.Type == html.ElementNode &&
-		(n.Data == "div" || n.Data == "span" || n.Data == "li") {
+		(n.Data == "div" || n.Data == "span" ||
+			n.Data == "li" || n.Data == "p") {
 		n.Type = html.CommentNode
 	}
 

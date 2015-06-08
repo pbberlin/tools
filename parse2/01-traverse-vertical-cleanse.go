@@ -25,11 +25,12 @@ var (
 		"nav":     "div",
 		"aside":   "div",
 
-		"dl":     "div",
+		"dl": "ul",
+		"dd": "li",
+		"dt": "li",
+
 		"figure": "div",
 
-		"dd":         "p",
-		"dt":         "p",
 		"figcaption": "p",
 	}
 
@@ -128,60 +129,6 @@ func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		TravVertConvertEmptyLeafs(c, lvl+1)
-	}
-
-}
-
-func TraverseVert_ConvertDivDiv(n *html.Node, lvl int) {
-
-	// Children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVert_ConvertDivDiv(c, lvl+1)
-	}
-
-	couple := []string{"div", "div"}
-	p := n.Parent
-	if p == nil {
-		return
-	}
-
-	cond1 := n.Type == html.ElementNode && n.Data == couple[0]
-	cond2 := p.Type == html.ElementNode && p.Data == couple[1]
-
-	noSiblings := n.PrevSibling == nil && n.NextSibling == nil
-	onlyChild := n.FirstChild != nil && n.FirstChild == n.LastChild
-	svrlChild := n.FirstChild != nil && n.FirstChild != n.LastChild
-
-	if cond1 && cond2 {
-
-		// fmt.Printf("%2v: %v/div/%v\n", lvl, p.Data, n.FirstChild.Data)
-
-		if svrlChild || onlyChild {
-			var children []*html.Node
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				children = append(children, c)
-			}
-
-			for _, c1 := range children {
-				n.RemoveChild(c1)
-				p.InsertBefore(c1, n.NextSibling)
-			}
-		}
-		p.RemoveChild(n)
-
-	}
-
-	if false {
-
-		if cond1 && cond2 && noSiblings {
-			if onlyChild {
-				fc := n.FirstChild
-				p.FirstChild = fc
-				// dom.RemoveNode(n)
-				// fmt.Printf("<- ")
-			}
-
-		}
 	}
 
 }

@@ -79,7 +79,7 @@ func main() {
 			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
 		}
 
-		for i := 0; i < 128; i++ {
+		for i := 0; i < 88; i++ {
 			TraverseVert_ConvertDivDiv(doc, 0)
 			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
 		}

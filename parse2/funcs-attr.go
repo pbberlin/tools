@@ -34,6 +34,8 @@ func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.
 			ret = append(ret, a)
 		}
 	}
+
+	// normalize on title
 	if alt != "" && alt == title {
 		for i := 0; i < len(ret); i++ {
 			if ret[i].Key == "alt" {
@@ -43,7 +45,16 @@ func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.
 				break
 			}
 		}
+	}
 
+	// remove both
+	if alt == "" && alt == title {
+		for i := 0; i < len(ret); i++ {
+			if ret[i].Key == "alt" || ret[i].Key == "title" {
+				ret[i].Key = ""
+				ret[i].Val = ""
+			}
+		}
 	}
 
 	return ret

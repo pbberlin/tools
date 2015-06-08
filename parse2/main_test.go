@@ -79,9 +79,18 @@ func main() {
 			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
 		}
 
+		maxLvlPrev := 0
 		for i := 0; i < 88; i++ {
-			TraverseVert_ConvertDivDiv(doc, 0)
-			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
+			lpMax := TravVertMaxLevel(doc, 0)
+			if lpMax != maxLvlPrev {
+				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
+				maxLvlPrev = lpMax
+			}
+			// TraverseVert_ConvertDivDiv(doc, 0)
+			for i := 0; i < 8; i++ {
+				TraverseHori_ConvertDivDiv(Tx{doc, 0}, lpMax-i)
+				TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
+			}
 		}
 
 		TravVertStats(doc, 0)

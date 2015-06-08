@@ -13,12 +13,11 @@ func TraverseVert_ConvertDivDiv(n *html.Node, lvl int) {
 	}
 
 	couple := []string{"div", "div"}
-
 	condenseUpwards(n, couple)
 
 }
 
-func TraverseHori_ConvertDivDiv(lp interface{}) {
+func TraverseHori_ConvertDivDiv(lp interface{}, onlyOnLvl int) {
 
 	var queue = util.NewQueue(10)
 
@@ -32,6 +31,10 @@ func TraverseHori_ConvertDivDiv(lp interface{}) {
 		}
 
 		// processing
+		if lvl == onlyOnLvl {
+			couple := []string{"div", "div"}
+			condenseUpwards(lpn, couple)
+		}
 
 		//
 		// next node

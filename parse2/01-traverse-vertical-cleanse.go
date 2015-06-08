@@ -18,19 +18,18 @@ var (
 	}
 
 	simplifies = map[string]string{
-		"section": "div",
-		"article": "div",
 		"header":  "div",
 		"footer":  "div",
 		"nav":     "div",
+		"section": "div",
+		"article": "div",
 		"aside":   "div",
 
 		"dl": "ul",
-		"dd": "li",
 		"dt": "li",
+		"dd": "p",
 
-		"figure": "div",
-
+		"figure":     "div",
 		"figcaption": "p",
 	}
 
@@ -114,6 +113,19 @@ func TraverseVertConvert(n *html.Node, lvl int) {
 		n.Data = doubleSpaces.ReplaceAllString(n.Data, " ")
 	}
 
+}
+
+func TravVertMaxLevel(n *html.Node, lvl int) (maxLvl int) {
+
+	maxLvl = lvl
+	// Children
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		ret := TravVertMaxLevel(c, lvl+1)
+		if ret > maxLvl {
+			maxLvl = ret
+		}
+	}
+	return
 }
 
 func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {

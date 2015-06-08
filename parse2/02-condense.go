@@ -67,24 +67,18 @@ func condenseUpwards(n *html.Node, couple []string) {
 		if svrlChildn || only1Child {
 			var children []*html.Node
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				children = append(children, c)
+				children = append([]*html.Node{c}, children...) // inversion
+				// children = append(children, c)
 			}
 
+			insertionPoint := n.NextSibling
 			for _, c1 := range children {
 				n.RemoveChild(c1)
-				p.InsertBefore(c1, n.NextSibling)
+				p.InsertBefore(c1, insertionPoint)
+				insertionPoint = c1
 			}
 			p.RemoveChild(n)
 		}
-
-		/*	// first approach: I have no noSiblings
-			if iAmDiv && parDiv && noSiblings {
-				if only1Child {
-					fc := n.FirstChild
-					p.FirstChild = fc
-					// dom.RemoveNode(n); fmt.Printf("<- ")
-				}
-			}*/
 
 	}
 

@@ -62,13 +62,10 @@ func condenseUpwards(n *html.Node, couple []string) {
 
 	if iAmDiv && parDiv {
 
-		// fmt.Printf("%2v: %v/div/%v\n", lvl, p.Data, n.FirstChild.Data)
-
 		if svrlChildn || only1Child {
 			var children []*html.Node
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				children = append([]*html.Node{c}, children...) // inversion
-				// children = append(children, c)
+				children = append([]*html.Node{c}, children...) // order inversion
 			}
 
 			insertionPoint := n.NextSibling

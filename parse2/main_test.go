@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strings"
 	"testing"
 
 	"github.com/pbberlin/tools/fetch"
@@ -20,7 +19,6 @@ func Test1(t *testing.T) {
 func main() {
 
 	tests := make([]string, 2)
-	var err error
 
 	tests[0] = `<!DOCTYPE html><html><head>
 		<script type="text/javascript" src="./article01_files/empty.js"></script>
@@ -34,7 +32,16 @@ func main() {
 			<ul>
 				<li id='332' ><a   href="foo">Linktext1 <span>inside</span></a>
 				<li><a   href="/bar/baz">BarBaz</a>
-			</ul></body></html>`
+			</ul>
+
+<div>
+	<div>D11</div>
+	<div>D12</div>
+	<p>P</p>
+	<div>D13</div>
+</div>
+
+			</body></html>`
 
 	tests[1] = `	<p>
 				Ja so sans<br/>
@@ -45,22 +52,12 @@ func main() {
 			</ul>`
 
 	for i := 0; i < len(tests); i++ {
-		var doc1 *html.Node
-		fn1 := fmt.Sprintf("outpT%v.txt", i)
-		fn2 := fmt.Sprintf("outpT%v.html", i)
-		doc1, err = html.Parse(strings.NewReader(tests[i]))
-		if err != nil {
-			log.Fatal(err)
-		}
-		TraverseVertConvert(doc1, 0)
-		TraverseVertIndent(doc1, 0)
-		TravVertStats(doc1, 0)
-		ioutil.WriteFile(fn1, xPathDump, 0)
-		dom2File(doc1, fn2)
+		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+4)
+		ioutil.WriteFile(fn, []byte(tests[i]), 0)
 	}
 
 	// ================================================
-	for i := 1; i <= 3; i++ {
+	for i := 1; i <= 5; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
@@ -86,11 +83,11 @@ func main() {
 				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
 				maxLvlPrev = lpMax
 			}
-			// TraverseVert_ConvertDivDiv(doc, 0)
-			for i := 0; i < 8; i++ {
-				TraverseHori_ConvertDivDiv(Tx{doc, 0}, lpMax-i)
-				TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
-			}
+			TraverseVert_ConvertDivDiv(doc, 0)
+			// for i := 0; i < 8; i++ {
+			// 	TraverseHori_ConvertDivDiv(Tx{doc, 0}, lpMax-i)
+			// 	TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
+			// }
 		}
 
 		TravVertStats(doc, 0)

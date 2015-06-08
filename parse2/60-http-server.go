@@ -1,4 +1,4 @@
-package transposablematrix
+package parse2
 
 import "net/http"
 
@@ -8,13 +8,15 @@ func serveSingleRootFile(pattern string, filename string) {
 	})
 }
 
+const docRoot = "c:/docroot/"
+
 func init() {
 	// http.HandleFunc("/", singlePage)
 
 	// static resources - Mandatory root-based
-	serveSingleRootFile("/msg.html", "c:/docroot/msg.html")
+	serveSingleRootFile("/msg.html", docRoot+"msg.html")
 	// static resources - other
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("c:/docroot"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(docRoot))))
 
 	go func() {
 		// fmt.Println("listening on 4000")

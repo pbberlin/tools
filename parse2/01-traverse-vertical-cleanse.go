@@ -162,7 +162,7 @@ func ConvertToComment(n *html.Node) {
 
 func NormalizeToDiv(n *html.Node) {
 	if repl, ok := simplifies[n.Data]; ok {
-		n.Attr = append(n.Attr, html.Attribute{"", "converted-from", n.Data})
+		n.Attr = append(n.Attr, html.Attribute{"", "cfrm", n.Data})
 		n.Data = repl
 	}
 }

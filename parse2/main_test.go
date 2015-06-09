@@ -56,6 +56,7 @@ func main() {
 		ioutil.WriteFile(fn, []byte(tests[i]), 0)
 	}
 
+	//
 	// ================================================
 	for i := 1; i <= 5; i++ {
 		var doc *html.Node
@@ -71,23 +72,19 @@ func main() {
 
 		TraverseVertConvert(doc, 0)
 
-		for i := 0; i < 5; i++ {
+		for i := 0; i < 6; i++ {
 			TravVertConvertEmptyLeafs(doc, 0)
 			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
 		}
 
 		maxLvlPrev := 0
-		for i := 0; i < 88; i++ {
+		for i := 0; i < 48; i++ {
 			lpMax := TravVertMaxLevel(doc, 0)
 			if lpMax != maxLvlPrev {
 				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
 				maxLvlPrev = lpMax
 			}
-			TraverseVert_ConvertDivDiv(doc, 0)
-			// for i := 0; i < 8; i++ {
-			// 	TraverseHori_ConvertDivDiv(Tx{doc, 0}, lpMax-i)
-			// 	TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
-			// }
+			TraverseVert_CondenseDivStaples(doc, 0)
 		}
 
 		TravVertStats(doc, 0)
@@ -95,7 +92,7 @@ func main() {
 		TraverseVertIndent(doc, 0)
 
 		ioutil.WriteFile(fn1, xPathDump, 0)
-		dom2File(doc, fn2)
+		dom2File(fn2, doc)
 	}
 
 	sorted1 := subsort.SortMapByCount(attrDistinct)
@@ -115,7 +112,7 @@ func globFixes(b []byte) []byte {
 	return b
 }
 
-func dom2File(node *html.Node, fn string) {
+func dom2File(fn string, node *html.Node) {
 	var b bytes.Buffer
 	err := html.Render(&b, node)
 	if err != nil {

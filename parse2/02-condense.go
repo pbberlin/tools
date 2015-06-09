@@ -5,19 +5,23 @@ import (
 	"golang.org/x/net/html"
 )
 
-func TraverseVert_ConvertDivDiv(n *html.Node, lvl int) {
+func TraverseVert_CondenseDivStaples(n *html.Node, lvl int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVert_ConvertDivDiv(c, lvl+1)
+		TraverseVert_CondenseDivStaples(c, lvl+1)
 	}
 
-	couple := []string{"div", "div"}
-	condenseUpwards(n, couple)
+	condenseUpwards(n, []string{"div", "div"}, "div")
+
+	condenseUpwards(n, []string{"div", "ul"}, "ul")
+
+	condenseUpwards(n, []string{"ul", "ul"}, "ul")
 
 }
 
-func TraverseHori_ConvertDivDiv(lp interface{}, onlyOnLvl int) {
+//
+func UNUSED_TraverseHori_CondenseDivStaples(lp interface{}, onlyOnLvl int) {
 
 	var queue = util.NewQueue(10)
 
@@ -33,50 +37,11 @@ func TraverseHori_ConvertDivDiv(lp interface{}, onlyOnLvl int) {
 		// processing
 		if lvl == onlyOnLvl {
 			couple := []string{"div", "div"}
-			condenseUpwards(lpn, couple)
+			condenseUpwards(lpn, couple, "div")
 		}
 
 		//
 		// next node
 		lp = queue.DeQueue()
 	}
-}
-
-func condenseUpwards(n *html.Node, couple []string) {
-
-	p := n.Parent
-	if p == nil {
-		return
-	}
-
-	iAmDiv := n.Type == html.ElementNode && n.Data == couple[0] // I am a div
-	parDiv := p.Type == html.ElementNode && p.Data == couple[1] // Parent is a div
-
-	noSiblings := n.PrevSibling == nil && n.NextSibling == nil
-
-	only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
-	svrlChildn := n.FirstChild != nil && n.FirstChild != n.LastChild
-	noChildren := n.FirstChild == nil
-
-	_, _ = noSiblings, noChildren
-
-	if iAmDiv && parDiv {
-
-		if svrlChildn || only1Child {
-			var children []*html.Node
-			for c := n.FirstChild; c != nil; c = c.NextSibling {
-				children = append([]*html.Node{c}, children...) // order inversion
-			}
-
-			insertionPoint := n.NextSibling
-			for _, c1 := range children {
-				n.RemoveChild(c1)
-				p.InsertBefore(c1, insertionPoint)
-				insertionPoint = c1
-			}
-			p.RemoveChild(n)
-		}
-
-	}
-
 }

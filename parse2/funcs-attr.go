@@ -60,9 +60,7 @@ func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.
 	return ret
 }
 
-var idCntr = 0
-
-func addIdAttr(attributes []html.Attribute) []html.Attribute {
+func addIdAttr(attributes []html.Attribute, id string) []html.Attribute {
 	hasId := false
 	for _, a := range attributes {
 		if a.Key == "id" {
@@ -71,8 +69,7 @@ func addIdAttr(attributes []html.Attribute) []html.Attribute {
 		}
 	}
 	if !hasId {
-		attributes = append(attributes, html.Attribute{"", "id", fmt.Sprintf("d%v", idCntr)})
-		idCntr++
+		attributes = append(attributes, html.Attribute{"", "id", id})
 	}
 	return attributes
 }

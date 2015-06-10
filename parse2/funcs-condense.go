@@ -22,7 +22,7 @@ func condenseUpwards(n *html.Node, couple []string, parentType string) {
 
 	if iAmDiv && parDiv {
 
-		if svrlChildn || only1Child {
+		if only1Child || svrlChildn {
 			var children []*html.Node
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				children = append([]*html.Node{c}, children...) // order inversion

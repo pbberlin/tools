@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"testing"
 
 	"github.com/pbberlin/tools/fetch"
@@ -63,6 +64,7 @@ func main() {
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
 		fn2 := fmt.Sprintf("outpL%v.html", i)
+		fn3 := fmt.Sprintf("outpL%vT.txt", i)
 		_, resBytes, err := fetch.UrlGetter(url, nil, true)
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
@@ -88,6 +90,22 @@ func main() {
 		}
 
 		TravVertStats(doc, 0)
+
+		b, _ := TravVertTextify(doc, 0, 0)
+		ioutil.WriteFile(fn3, b, 0)
+
+		mpb := []byte{}
+		keys := make([]string, 0, len(mp))
+		for k := range mp {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			row := fmt.Sprintf("%8v: %s\n", key, mp[key])
+			mpb = append(mpb, row...)
+		}
+		ioutil.WriteFile(fn3, mpb, 0)
 
 		TraverseVertIndent(doc, 0)
 

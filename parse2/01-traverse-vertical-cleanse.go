@@ -1,6 +1,10 @@
 package parse2
 
-import "golang.org/x/net/html"
+import (
+	"strings"
+
+	"golang.org/x/net/html"
+)
 
 var (
 	removes = map[string]bool{
@@ -131,14 +135,28 @@ func TravVertMaxLevel(n *html.Node, lvl int) (maxLvl int) {
 func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
 
 	// processing
-	if n.FirstChild == nil &&
-		n.Type == html.ElementNode &&
+
+	// empty element nodes
+	if n.Type == html.ElementNode &&
+		n.FirstChild == nil &&
 		(n.Data == "div" || n.Data == "span" ||
 			n.Data == "li" || n.Data == "p") {
 		n.Type = html.CommentNode
 	}
 
-	// Children
+	// spans with only 2 characters inside => remove
+	only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
+	if n.Type == html.ElementNode &&
+		n.Data == "span" &&
+		only1Child &&
+		n.FirstChild.Type == html.TextNode &&
+		len(strings.TrimSpace(n.FirstChild.Data)) < 3 {
+		n.Type = html.TextNode
+		n.Data = n.FirstChild.Data
+		n.RemoveChild(n.FirstChild)
+	}
+
+	// children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		TravVertConvertEmptyLeafs(c, lvl+1)
 	}
@@ -148,7 +166,7 @@ func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
 // ConvertToComment neutralizes a node.
 // Note: We can not Remove() nor Replace()
 // Since that breaks the recursion one step above!
-// At a later stage we will emplay horizontal traversal
+// At a later stage we will employ horizontal traversal
 // to actually remove unwanted nodes.
 func ConvertToComment(n *html.Node) {
 	if removes[n.Data] {

@@ -24,32 +24,33 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 		}
 	}
 
-	var self []byte // conent self
-	var b1 []byte   // content children
+	var cs []byte // content self
+	var cc []byte // content children
 	if n.Type == html.TextNode {
-		self = bytes.TrimSpace([]byte(n.Data))
-		if len(self) > 0 {
-			self = append(self, byte(' '))
+		cs = bytes.TrimSpace([]byte(n.Data))
+		if len(cs) > 0 {
+			cs = append(cs, byte(' '))
 		}
 	}
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-
-		b1, horiNum = TravVertTextify(c, lvl+1, horiNum+1)
-
-		b1 = bytes.TrimSpace(b1)
-		if len(b1) > 0 {
-			b1 = append(b1, byte(' '))
+		var ccX []byte // content child X
+		ccX, horiNum = TravVertTextify(c, lvl+1, horiNum+1)
+		ccX = bytes.TrimSpace(ccX)
+		if len(ccX) > 0 {
+			ccX = append(ccX, byte(' '))
+			cc = append(cc, ccX...)
 		}
 	}
 
-	b = append(b, self...)
-	b = append(b, b1...)
+	b = append(b, cs...)
+	b = append(b, cc...)
 
-	if lvl > cScaffoldLvls {
-		idMap := fmt.Sprintf("%v-%4v", id, len(b1))
-		mp[idMap] = append(self, b1...)
+	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
+		csCc := append(cs, cc...)
+		idMap := fmt.Sprintf("%v-% 5v", id, len(csCc))
+		mp[idMap] = csCc
 	}
 
 	return

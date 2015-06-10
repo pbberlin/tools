@@ -59,7 +59,7 @@ func main() {
 
 	//
 	// ================================================
-	for i := 1; i <= 5; i++ {
+	for i := 1; i <= 1; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
@@ -92,7 +92,8 @@ func main() {
 		TravVertStats(doc, 0)
 
 		b, _ := TravVertTextify(doc, 0, 0)
-		ioutil.WriteFile(fn3, b, 0)
+		_ = b
+		// ioutil.WriteFile(fn3, b, 0)
 
 		mpb := []byte{}
 		keys := make([]string, 0, len(mp))
@@ -100,10 +101,13 @@ func main() {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
+		_ = keys
 
 		for _, key := range keys {
-			row := fmt.Sprintf("%8v: %s\n", key, mp[key])
-			mpb = append(mpb, row...)
+			if len(mp[key]) > 30 {
+				row := fmt.Sprintf("%8v: %s\n", key, mp[key])
+				mpb = append(mpb, row...)
+			}
 		}
 		ioutil.WriteFile(fn3, mpb, 0)
 

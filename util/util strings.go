@@ -47,6 +47,18 @@ func LowerCasedUnderscored(s string) string {
 	return replaced
 }
 
+// ToLen chops or extends string to the exactly desired length
+// format strings like %4v do not restrict.
+func ToLen(s string, nx int) string {
+	if len(s) < nx {
+		return fmt.Sprintf("%v%v", s, strings.Repeat(" ", nx-len(s)))
+	} else if len(s) > nx {
+		return s[:nx]
+	} else {
+		return s
+	}
+}
+
 //  followed by ... and n trailing characters
 func Ellipsoider(s string, nx int) string {
 
@@ -97,7 +109,7 @@ func Breaker(s string, nx int) []string {
 }
 
 /*
-		IncrementString takes the last Character or Symbol
+	IncrementString takes the last Character or Symbol
 	and "increments" it.
 
 	This is for all datastore indexes where we want to

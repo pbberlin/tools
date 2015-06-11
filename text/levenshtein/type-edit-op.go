@@ -20,4 +20,4 @@ func (o EditOp) String() string {
 	return "del"
 }
 
-type EditScript []EditOp
+type TEditScrpt []EditOp

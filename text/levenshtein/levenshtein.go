@@ -2,22 +2,21 @@ package levenshtein
 
 import (
 	"fmt"
-	"os"
+	"strings"
+
+	"github.com/pbberlin/tools/util"
 )
 
 type Equaler interface {
 	Equal(compare2 interface{}) bool
 }
 
+type Matrix [][]int
+
 // LSDist returns the edit distance between
 // two slices of Comparables
 func LSDist(toks1, toks2 []Equaler, opt Options) int {
-	return DistanceForMatrix(MatrixForSlices(toks1, toks2, opt))
-}
-
-// DistanceForMatrix reads the edit distance off the given Levenshtein matrix.
-func DistanceForMatrix(matrix [][]int) int {
-	return matrix[len(matrix)-1][len(matrix[0])-1]
+	return MatrixForSlices(toks1, toks2, opt).Distance()
 }
 
 // MatrixForSlices generates a 2-D array representing the dynamic programming
@@ -27,7 +26,7 @@ func DistanceForMatrix(matrix [][]int) int {
 // that it cannot only be used for reading of the edit distance between two
 // strings, but also e.g. to backtrace an edit script that provides an
 // alignment between the characters of both strings.
-func MatrixForSlices(rows, cols []Equaler, opt Options) [][]int {
+func MatrixForSlices(rows, cols []Equaler, opt Options) Matrix {
 	// Make a 2-D matrix. Rows correspond to prefixes of source, columns to
 	// prefixes of target. Cells will contain edit distances.
 	// Cf. http://www.let.rug.nl/~kleiweg/lev/levenshtein.html
@@ -59,47 +58,17 @@ func MatrixForSlices(rows, cols []Equaler, opt Options) [][]int {
 			mx[i][j] = min(delCost, min(matchSubCost, insCost))
 		}
 	}
-	//LogMatrix(rows, cols, mx)
+	PrintMatrix(rows, cols, mx)
 	return mx
 }
 
-// EditScriptForStrings returns an optimal edit script
+// EditScript returns an optimal edit script
 // turning source into target.
-func EditScriptForStrings(src, dst []Equaler, opt Options) EditScript {
+func EditScript(src, dst []Equaler, opt Options) TEditScrpt {
 	return backtrace(len(src), len(dst), MatrixForSlices(src, dst, opt), opt)
 }
 
-// EditScriptForMatrix returns an optimal edit script based on the given
-// Levenshtein matrix.
-func EditScriptForMatrix(matrix [][]int, opt Options) EditScript {
-	return backtrace(len(matrix[0])-1, len(matrix)-1, matrix, opt)
-}
-
-// LogMatrix prints a visual representation of matrix to os.Stderr
-func LogMatrix(src, dst []Equaler, mx [][]int) {
-
-	fp := func(format string, args ...interface{}) { fmt.Fprintf(os.Stderr, format, args) }
-
-	fp("    ")
-	for _, dstX := range dst {
-		fp("  %c", dstX)
-	}
-	fp("\n")
-	fp("  %2d", mx[0][0])
-	for j, _ := range dst {
-		fp(" %2d", mx[0][j+1])
-	}
-	fp("\n")
-	for i, srcX := range src {
-		fp("%c %2d", srcX, mx[i+1][0])
-		for j, _ := range dst {
-			fp(" %2d", mx[i+1][j+1])
-		}
-		fp("\n")
-	}
-}
-
-func backtrace(i int, j int, mx [][]int, opt Options) EditScript {
+func backtrace(i int, j int, mx [][]int, opt Options) TEditScrpt {
 	if i > 0 && mx[i-1][j]+opt.DelCost == mx[i][j] {
 		return append(backtrace(i-1, j, mx, opt), Del)
 	}
@@ -122,17 +91,47 @@ func min(a int, b int) int {
 	return a
 }
 
-// Requires type of sl == interface{}
-// Would double conversion cost.
-// => We have to convert in the calling package.
-func ConvertToEqualer(sl []interface{}) []Equaler {
-	var ret = make([]Equaler, 0, len(sl))
-	for _, v := range sl {
-		cnv, ok := v.(Equaler)
-		if !ok {
-			panic(fmt.Sprintf("%v %T is not convertible to Equaler interface", v, v))
-		}
-		ret = append(ret, cnv)
+// Distance returns edit distance for an existing matrix.
+func (mx Matrix) Distance() int {
+	return mx[len(mx)-1][len(mx[0])-1]
+}
+
+// EditScript returns an optimal edit script for an existing matrix.
+func (mx Matrix) EditScript() TEditScrpt {
+	return backtrace(len(mx[0])-1, len(mx)-1, mx, DefaultOptions)
+}
+
+// PrintMatrix prints a visual representation of matrix to os.Stderr
+func PrintMatrix(rows, cols []Equaler, mx [][]int) {
+
+	fp := fmt.Printf
+
+	const cl = 11 // column length
+	fmt2 := fmt.Sprintf("%s-%vd", "%", cl)
+
+	fp(strings.Repeat(" ", 2*cl))
+	for _, col := range cols {
+		scol := fmt.Sprintf("%v", col)
+		fp("%v ", util.ToLen(scol, cl-1)) // at least one space right
 	}
-	return ret
+	fp("\n")
+
+	fp(strings.Repeat(" ", cl))
+	fp(fmt2, mx[0][0])
+	for j, _ := range cols {
+		fp(fmt2, mx[0][j+1])
+	}
+	fp("\n")
+
+	//
+	for i, row := range rows {
+		srow := fmt.Sprintf("%v", row)
+		fp("%v ", util.ToLen(srow, cl-1)) // at least one space right
+		fp(fmt2, mx[i+1][0])
+		for j, _ := range cols {
+			fp(fmt2, mx[i+1][j+1])
+		}
+		fp("\n")
+	}
+	fp("\n")
 }

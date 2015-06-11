@@ -7,6 +7,8 @@ import (
 	"github.com/pbberlin/tools/util"
 )
 
+const cl = 11 // column length for Print funcs
+
 type Equaler interface {
 	Equal(compare2 interface{}) bool
 }
@@ -29,6 +31,7 @@ func New(argRows, argCols []Equaler, opt Options) Matrix {
 	// prefixes of target. Cells will contain edit distances.
 	// Cf. http://www.let.rug.nl/~kleiweg/lev/levenshtein.html
 	m := Matrix{}
+	m.opt = opt
 	m.rows = argRows
 	m.cols = argCols
 	h := len(m.rows) + 1
@@ -77,29 +80,31 @@ func (m Matrix) Distance() int {
 
 // EditScript returns an optimal edit script for an existing matrix.
 func (m Matrix) EditScript() TEditScrpt {
-	return backtrace(len(m.mx[0])-1, len(m.mx)-1, m.mx, m.opt)
-	// return backtrace(len(m.mx[0]), len(m.mx), m.mx, m.opt)
+	return backtrace(len(m.mx)-1, len(m.mx[0])-1, m.mx, m.opt)
 }
 
 func backtrace(i, j int, mx [][]int, opt Options) TEditScrpt {
-	fmt.Printf("%v %v - %v %v \n", i, j, len(mx[0])-1, len(mx)-1)
-	fmt.Printf("\t")
-	fmt.Printf("a%v ", mx[i][j])
-	fmt.Printf("b%v ", mx[i-1][j])
-	fmt.Printf("c%v ", mx[i][j-1])
-	fmt.Printf("d%v \n", mx[i-1][j-1])
+
+	pf := func(str string) {}
+	// pf := fmt.Printf
+
 	if i > 0 && mx[i-1][j]+opt.DelCost == mx[i][j] {
+		pf("c1")
 		return append(backtrace(i-1, j, mx, opt), Del)
 	}
 	if j > 0 && mx[i][j-1]+opt.InsCost == mx[i][j] {
+		pf("c2")
 		return append(backtrace(i, j-1, mx, opt), Ins)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1]+opt.SubCost == mx[i][j] {
+		pf("c3")
 		return append(backtrace(i-1, j-1, mx, opt), Sub)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1] == mx[i][j] {
+		pf("c4")
 		return append(backtrace(i-1, j-1, mx, opt), Match)
 	}
+	pf("c5")
 	return []EditOp{}
 }
 
@@ -113,7 +118,6 @@ func (m Matrix) Print() {
 
 	fp := fmt.Printf
 
-	const cl = 11 // column length
 	fmt2 := fmt.Sprintf("%s-%vd", "%", cl)
 
 	fp(strings.Repeat(" ", 2*cl))
@@ -140,5 +144,5 @@ func (m Matrix) Print() {
 		}
 		fp("\n")
 	}
-	fp("\n")
+	// fp("\n")
 }

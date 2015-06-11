@@ -24,7 +24,6 @@ var testCases = []TestCase{
 	{[]Token{}, []Token{}, 0},
 	{[]Token{"wd1"}, []Token{"wd2"}, 2},
 	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1"}, 2},
-	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1", "wd3"}, 3},
 	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2"}, 3},
 
 	{[]Token{"wd1"}, []Token{"wd1"}, 0},
@@ -33,6 +32,8 @@ var testCases = []TestCase{
 
 	{[]Token{"wd1", "wd2"}, []Token{"wd1"}, 1},
 	{[]Token{"wd1", "wd2", "wd3"}, []Token{"wd1"}, 2},
+
+	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1", "wd3"}, 3},
 }
 
 func init() {
@@ -70,13 +71,11 @@ func TestLevenshtein(t *testing.T) {
 			t.Fail()
 		}
 
-		if i == 5 || i == 16 {
+		if i == 5 || i == 12 || i == 13 || true {
 			mx.Print()
 
 			es := mx.EditScript()
-			for k, v := range es {
-				t.Logf("%v - %v\n", k, v)
-			}
+			es.Print()
 		}
 
 	}

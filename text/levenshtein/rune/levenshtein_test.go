@@ -1,7 +1,7 @@
 package rune
 
 import (
-	lscore "github.com/pbberlin/tools/text/levenshtein"
+	ls_core "github.com/pbberlin/tools/text/levenshtein"
 
 	"testing"
 )
@@ -27,15 +27,16 @@ var testCases = []struct {
 	{[]Token{'a', 'a'}, []Token{'a'}, 1},
 	{[]Token{'a', 'a', 'a'}, []Token{'a'}, 2},
 
-	{[]Token{'a'}, []Token{'a'}, 220},
+	// {[]Token{'a'}, []Token{'a'}, 220},
 }
 
 func TestLevenshtein(t *testing.T) {
 	for _, testCase := range testCases {
-		got := lscore.DistanceOfSlices(
-			toTokenInterface([]Token(testCase.src)),
-			toTokenInterface([]Token(testCase.dst)),
-			lscore.DefaultOptions)
+
+		got := ls_core.LSDist(
+			convertToCore([]Token(testCase.src)),
+			convertToCore([]Token(testCase.dst)),
+			ls_core.DefaultOptions)
 		if got != testCase.distance {
 			t.Logf(
 				"Distance between %v and %v should be %v - but got %v ",

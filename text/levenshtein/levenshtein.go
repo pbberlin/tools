@@ -5,18 +5,14 @@ import (
 	"os"
 )
 
-// type Token interface {
-// 	Matches(cmp1, cmp2 interface{}) bool
-// }
-
-type Token interface {
-	Matches(cmp1, cmp2 interface{}) bool
+type Equaler interface {
+	Equal(compare2 interface{}) bool
 }
 
-// DistanceOfSlices returns the edit distance between
-// slices of tokens
-func DistanceOfSlices(tokens1, tokens2 []Token, opt Options) int {
-	return DistanceForMatrix(MatrixForStrings(tokens1, tokens2, opt))
+// LSDist returns the edit distance between
+// two slices of Comparables
+func LSDist(toks1, toks2 []Equaler, opt Options) int {
+	return DistanceForMatrix(MatrixForSlices(toks1, toks2, opt))
 }
 
 // DistanceForMatrix reads the edit distance off the given Levenshtein matrix.
@@ -24,14 +20,14 @@ func DistanceForMatrix(matrix [][]int) int {
 	return matrix[len(matrix)-1][len(matrix[0])-1]
 }
 
-// MatrixForStrings generates a 2-D array representing the dynamic programming
+// MatrixForSlices generates a 2-D array representing the dynamic programming
 // table used by the Levenshtein algorithm, as described e.g. here:
 // http://www.let.rug.nl/kleiweg/lev/
 // The reason for putting the creation of the table into a separate function is
 // that it cannot only be used for reading of the edit distance between two
 // strings, but also e.g. to backtrace an edit script that provides an
 // alignment between the characters of both strings.
-func MatrixForStrings(rows, cols []Token, opt Options) [][]int {
+func MatrixForSlices(rows, cols []Equaler, opt Options) [][]int {
 	// Make a 2-D matrix. Rows correspond to prefixes of source, columns to
 	// prefixes of target. Cells will contain edit distances.
 	// Cf. http://www.let.rug.nl/~kleiweg/lev/levenshtein.html
@@ -56,7 +52,7 @@ func MatrixForStrings(rows, cols []Token, opt Options) [][]int {
 		for j := 1; j < w; j++ {
 			delCost := mx[i-1][j] + opt.DelCost
 			matchSubCost := mx[i-1][j-1]
-			if !(rows[i-1]).Matches(rows[i-1], cols[j-1]) {
+			if !(rows[i-1]).Equal(cols[j-1]) {
 				matchSubCost += opt.SubCost
 			}
 			insCost := mx[i][j-1] + opt.InsCost
@@ -69,8 +65,8 @@ func MatrixForStrings(rows, cols []Token, opt Options) [][]int {
 
 // EditScriptForStrings returns an optimal edit script
 // turning source into target.
-func EditScriptForStrings(src, dst []Token, opt Options) EditScript {
-	return backtrace(len(src), len(dst), MatrixForStrings(src, dst, opt), opt)
+func EditScriptForStrings(src, dst []Equaler, opt Options) EditScript {
+	return backtrace(len(src), len(dst), MatrixForSlices(src, dst, opt), opt)
 }
 
 // EditScriptForMatrix returns an optimal edit script based on the given
@@ -80,7 +76,7 @@ func EditScriptForMatrix(matrix [][]int, opt Options) EditScript {
 }
 
 // LogMatrix prints a visual representation of matrix to os.Stderr
-func LogMatrix(src, dst []Token, mx [][]int) {
+func LogMatrix(src, dst []Equaler, mx [][]int) {
 
 	fp := func(format string, args ...interface{}) { fmt.Fprintf(os.Stderr, format, args) }
 
@@ -124,4 +120,19 @@ func min(a int, b int) int {
 		return b
 	}
 	return a
+}
+
+// Requires type of sl == interface{}
+// Would double conversion cost.
+// => We have to convert in the calling package.
+func ConvertToEqualer(sl []interface{}) []Equaler {
+	var ret = make([]Equaler, 0, len(sl))
+	for _, v := range sl {
+		cnv, ok := v.(Equaler)
+		if !ok {
+			panic(fmt.Sprintf("%v %T is not convertible to Equaler interface", v, v))
+		}
+		ret = append(ret, cnv)
+	}
+	return ret
 }

@@ -1,17 +1,21 @@
 package rune
 
-import lscore "github.com/pbberlin/tools/text/levenshtein"
+import ls_core "github.com/pbberlin/tools/text/levenshtein"
 
 type Token rune
 
-func (internal Token) Matches(t1, t2 interface{}) bool {
-	return t1 == t2
+func (tk1 Token) Equal(compareTo interface{}) bool {
+	tk2, ok := compareTo.(Token)
+	if !ok {
+		panic("Not the same type")
+	}
+	return tk1 == tk2
 }
 
-func toTokenInterface(sl1 []Token) []lscore.Token {
-	var ret []lscore.Token
+func convertToCore(sl1 []Token) []ls_core.Equaler {
+	var ret []ls_core.Equaler
 	for _, v := range sl1 {
-		cnv := lscore.Token(v)
+		cnv := ls_core.Equaler(v)
 		ret = append(ret, cnv)
 	}
 	return ret

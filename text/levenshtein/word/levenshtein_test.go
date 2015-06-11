@@ -1,7 +1,7 @@
 package word
 
 import (
-	lscore "github.com/pbberlin/tools/text/levenshtein"
+	ls_core "github.com/pbberlin/tools/text/levenshtein"
 
 	"testing"
 )
@@ -11,6 +11,20 @@ var testCases = []struct {
 	dst      []Token
 	distance int
 }{
+
+	{[]Token{}, []Token{"word1"}, 1},
+	{[]Token{"word1"}, []Token{"word1", "word1"}, 1},
+	{[]Token{"word1"}, []Token{"word1", "word1", "word1"}, 2},
+
+	{[]Token{}, []Token{}, 0},
+	{[]Token{"word1"}, []Token{"word2"}, 2},
+	{[]Token{"word1", "word1", "word1"}, []Token{"word1", "word2", "word1"}, 2},
+	{[]Token{"word1", "word1", "word1"}, []Token{"word1", "word2"}, 3},
+
+	{[]Token{"word1"}, []Token{"word1"}, 0},
+	{[]Token{"word1", "word2"}, []Token{"word1", "word2"}, 0},
+	{[]Token{"word1"}, []Token{}, 1},
+
 	{[]Token{"word1", "word2"}, []Token{"word1"}, 1},
 	{[]Token{"word1", "word2", "word3"}, []Token{"word1"}, 2},
 }
@@ -18,17 +32,10 @@ var testCases = []struct {
 func TestLevenshtein(t *testing.T) {
 	for _, testCase := range testCases {
 
-		for k, v := range testCase.src {
-			if v == "word1" {
-				another := Token("word1")
-				testCase.src[k] = another
-			}
-		}
-
-		got := lscore.DistanceOfSlices(
+		got := ls_core.LSDist(
 			convertToCore([]Token(testCase.src)),
 			convertToCore([]Token(testCase.dst)),
-			lscore.DefaultOptions)
+			ls_core.DefaultOptions)
 		if got != testCase.distance {
 			t.Logf(
 				"Distance between %v and %v should be %v - but got %v ",

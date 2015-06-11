@@ -31,16 +31,15 @@ var testCases = []struct {
 }
 
 func TestLevenshtein(t *testing.T) {
-	for _, testCase := range testCases {
+	for _, tc := range testCases {
 
-		got := ls_core.LSDist(
-			convertToCore([]Token(testCase.src)),
-			convertToCore([]Token(testCase.dst)),
-			ls_core.DefaultOptions)
-		if got != testCase.distance {
+		mx := ls_core.New(convertToCore(tc.src), convertToCore(tc.dst), ls_core.DefaultOptions)
+		got := mx.Distance()
+
+		if got != tc.distance {
 			t.Logf(
 				"Distance between %v and %v should be %v - but got %v ",
-				testCase.dst, testCase.src, testCase.distance, got)
+				tc.dst, tc.src, tc.distance, got)
 			t.Fail()
 		}
 	}

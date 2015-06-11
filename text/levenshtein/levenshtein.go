@@ -11,37 +11,38 @@ type Equaler interface {
 	Equal(compare2 interface{}) bool
 }
 
-type Matrix [][]int
-
-// LSDist returns the edit distance between
-// two slices of Comparables
-func LSDist(toks1, toks2 []Equaler, opt Options) int {
-	return MatrixForSlices(toks1, toks2, opt).Distance()
+type Matrix struct {
+	mx         [][]int
+	rows, cols []Equaler
+	opt        Options
 }
 
-// MatrixForSlices generates a 2-D array representing the dynamic programming
-// table used by the Levenshtein algorithm, as described e.g. here:
-// http://www.let.rug.nl/kleiweg/lev/
-// The reason for putting the creation of the table into a separate function is
-// that it cannot only be used for reading of the edit distance between two
-// strings, but also e.g. to backtrace an edit script that provides an
-// alignment between the characters of both strings.
-func MatrixForSlices(rows, cols []Equaler, opt Options) Matrix {
+// New generates a 2-D array,
+// representing the dynamic programming table
+// used by the Levenshtein algorithm.
+// Compare http://www.let.rug.nl/kleiweg/lev/
+// Matrix can be used for retrieval of edit distance
+// and for backtrace scripts
+func New(argRows, argCols []Equaler, opt Options) Matrix {
+
 	// Make a 2-D matrix. Rows correspond to prefixes of source, columns to
 	// prefixes of target. Cells will contain edit distances.
 	// Cf. http://www.let.rug.nl/~kleiweg/lev/levenshtein.html
-	h := len(rows) + 1
-	w := len(cols) + 1
-	mx := make([][]int, h)
+	m := Matrix{}
+	m.rows = argRows
+	m.cols = argCols
+	h := len(m.rows) + 1
+	w := len(m.cols) + 1
+	m.mx = make([][]int, h)
 
 	// Initialize trivial distances (from/to empty string):
 	// Filling the left column and the top row with row/column indices.
 	for i := 0; i < h; i++ {
-		mx[i] = make([]int, w)
-		mx[i][0] = i
+		m.mx[i] = make([]int, w)
+		m.mx[i][0] = i
 	}
 	for j := 1; j < w; j++ {
-		mx[0][j] = j
+		m.mx[0][j] = j
 	}
 
 	// Filling the remaining cells:
@@ -49,26 +50,44 @@ func MatrixForSlices(rows, cols []Equaler, opt Options) Matrix {
 	// 		Choose couple {edit history, operation} with lowest cost.
 	for i := 1; i < h; i++ {
 		for j := 1; j < w; j++ {
-			delCost := mx[i-1][j] + opt.DelCost
-			matchSubCost := mx[i-1][j-1]
-			if !(rows[i-1]).Equal(cols[j-1]) {
+			delCost := m.mx[i-1][j] + opt.DelCost
+			matchSubCost := m.mx[i-1][j-1]
+			if !(m.rows[i-1]).Equal(m.cols[j-1]) {
 				matchSubCost += opt.SubCost
 			}
-			insCost := mx[i][j-1] + opt.InsCost
-			mx[i][j] = min(delCost, min(matchSubCost, insCost))
+			insCost := m.mx[i][j-1] + opt.InsCost
+			m.mx[i][j] = min(delCost, min(matchSubCost, insCost))
 		}
 	}
-	PrintMatrix(rows, cols, mx)
-	return mx
+
+	return m
 }
 
-// EditScript returns an optimal edit script
-// turning source into target.
-func EditScript(src, dst []Equaler, opt Options) TEditScrpt {
-	return backtrace(len(src), len(dst), MatrixForSlices(src, dst, opt), opt)
+func min(a int, b int) int {
+	if b < a {
+		return b
+	}
+	return a
 }
 
-func backtrace(i int, j int, mx [][]int, opt Options) TEditScrpt {
+// Distance returns edit distance for an existing matrix.
+func (m Matrix) Distance() int {
+	return m.mx[len(m.mx)-1][len(m.mx[0])-1]
+}
+
+// EditScript returns an optimal edit script for an existing matrix.
+func (m Matrix) EditScript() TEditScrpt {
+	return backtrace(len(m.mx[0])-1, len(m.mx)-1, m.mx, m.opt)
+	// return backtrace(len(m.mx[0]), len(m.mx), m.mx, m.opt)
+}
+
+func backtrace(i, j int, mx [][]int, opt Options) TEditScrpt {
+	fmt.Printf("%v %v - %v %v \n", i, j, len(mx[0])-1, len(mx)-1)
+	fmt.Printf("\t")
+	fmt.Printf("a%v ", mx[i][j])
+	fmt.Printf("b%v ", mx[i-1][j])
+	fmt.Printf("c%v ", mx[i][j-1])
+	fmt.Printf("d%v \n", mx[i-1][j-1])
 	if i > 0 && mx[i-1][j]+opt.DelCost == mx[i][j] {
 		return append(backtrace(i-1, j, mx, opt), Del)
 	}
@@ -84,25 +103,13 @@ func backtrace(i int, j int, mx [][]int, opt Options) TEditScrpt {
 	return []EditOp{}
 }
 
-func min(a int, b int) int {
-	if b < a {
-		return b
-	}
-	return a
-}
+// PrintTokensWithMatrix prints a visual representation
+// of the slices of tokens
+// and of their diff matrix
+func (m Matrix) Print() {
 
-// Distance returns edit distance for an existing matrix.
-func (mx Matrix) Distance() int {
-	return mx[len(mx)-1][len(mx[0])-1]
-}
-
-// EditScript returns an optimal edit script for an existing matrix.
-func (mx Matrix) EditScript() TEditScrpt {
-	return backtrace(len(mx[0])-1, len(mx)-1, mx, DefaultOptions)
-}
-
-// PrintMatrix prints a visual representation of matrix to os.Stderr
-func PrintMatrix(rows, cols []Equaler, mx [][]int) {
+	rows, cols := m.rows, m.cols
+	mx := m.mx
 
 	fp := fmt.Printf
 

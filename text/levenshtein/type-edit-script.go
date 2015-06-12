@@ -25,7 +25,12 @@ func (o EditOp) String() string {
 	return "del"
 }
 
-type TEditScrpt []EditOp
+type EditOpExt struct {
+	op       EditOp
+	src, dst int
+}
+
+type TEditScrpt []EditOpExt
 
 func (es TEditScrpt) Print() {
 	fmt.Printf("EditScript - rowToCol - %v steps\n", len(es))
@@ -38,10 +43,27 @@ func (es TEditScrpt) Print() {
 	}
 	fmt.Printf("\n")
 
+	sumIns := 0
+	sumDel := 0
+
 	fmt.Printf("%v", strings.Repeat(" ", cl))
 	for _, v := range es {
-		fmt.Printf(fmt2, v)
+		v.src++
+		v.dst++
+
+		s := fmt.Sprintf("%v-%v-%v", v.op, v.src+sumIns-sumDel, v.dst)
+		// s := fmt.Sprintf("%v-%v", v.op, v.dst)
+		fmt.Printf(fmt2, s)
+
+		if v.op == Ins {
+			sumIns++
+		}
+		if v.op == Del {
+			sumDel++
+		}
+
 	}
+	fmt.Printf("\n")
 	fmt.Printf("\n")
 	fmt.Printf("\n")
 }

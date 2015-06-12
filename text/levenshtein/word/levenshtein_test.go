@@ -71,6 +71,10 @@ func TestLevenshtein(t *testing.T) {
 			t.Fail()
 		}
 
+		if i != 2 && i != 4 && i != 5 {
+			continue
+		}
+
 		if i == 5 || i == 12 || i == 13 || true {
 			mx.Print()
 

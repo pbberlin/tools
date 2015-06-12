@@ -80,32 +80,48 @@ func (m Matrix) Distance() int {
 
 // EditScript returns an optimal edit script for an existing matrix.
 func (m Matrix) EditScript() TEditScrpt {
-	return backtrace(len(m.mx)-1, len(m.mx[0])-1, m.mx, m.opt)
+	return m.Backtrace(len(m.mx)-1, len(m.mx[0])-1)
 }
 
-func backtrace(i, j int, mx [][]int, opt Options) TEditScrpt {
+func (m Matrix) Backtrace(i, j int) TEditScrpt {
 
 	pf := func(str string) {}
 	// pf := fmt.Printf
 
+	mx := m.mx
+	opt := m.opt
+	eo := EditOpExt{}
+
 	if i > 0 && mx[i-1][j]+opt.DelCost == mx[i][j] {
 		pf("c1")
-		return append(backtrace(i-1, j, mx, opt), Del)
+		eo.op = Del
+		eo.src = i - 1
+		eo.dst = j
+		return append(m.Backtrace(i-1, j), eo)
 	}
 	if j > 0 && mx[i][j-1]+opt.InsCost == mx[i][j] {
 		pf("c2")
-		return append(backtrace(i, j-1, mx, opt), Ins)
+		eo.op = Ins
+		eo.src = i
+		eo.dst = j - 1
+		return append(m.Backtrace(i, j-1), eo)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1]+opt.SubCost == mx[i][j] {
 		pf("c3")
-		return append(backtrace(i-1, j-1, mx, opt), Sub)
+		eo.op = Sub
+		eo.src = i - 1
+		eo.dst = j - 1
+		return append(m.Backtrace(i-1, j-1), eo)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1] == mx[i][j] {
 		pf("c4")
-		return append(backtrace(i-1, j-1, mx, opt), Match)
+		eo.op = Match
+		eo.src = i - 1
+		eo.dst = j - 1
+		return append(m.Backtrace(i-1, j-1), eo)
 	}
 	pf("c5")
-	return []EditOp{}
+	return []EditOpExt{}
 }
 
 // PrintTokensWithMatrix prints a visual representation

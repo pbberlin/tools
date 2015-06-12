@@ -35,11 +35,10 @@ func Test_Intslice2Int(t *testing.T) {
 	}
 }
 
-func Test_Insert(t *testing.T) {
-
-	inp := []int{1, 2, 3, 4}
+func Test_InsertAfter(t *testing.T) {
 
 	{
+		inp := []int{1, 2, 3, 4}
 		got := InsertAfter(inp, 2, 17)
 		want := []int{1, 2, 3, 17, 4}
 
@@ -50,6 +49,7 @@ func Test_Insert(t *testing.T) {
 	}
 
 	{
+		inp := []int{1, 2, 3, 4}
 		got := InsertAfter(inp, 3, 17)
 		want := []int{1, 2, 3, 4, 17}
 
@@ -59,4 +59,51 @@ func Test_Insert(t *testing.T) {
 
 	}
 
+	{
+		inp := []int{1, 2, 3, 4}
+		got := InsertAfter(inp, -1, 17)
+		want := []int{17, 1, 2, 3, 4}
+
+		if fmt.Sprintf("%#v", got) != fmt.Sprintf("%#v", want) {
+			t.Errorf("got %v - want %v", got, want)
+		}
+
+	}
+
+}
+
+func Test_Delete(t *testing.T) {
+
+	{
+		inp := []int{1, 2, 3, 4}
+		got := Delete(inp, 2)
+		want := []int{1, 2, 4}
+
+		if fmt.Sprintf("%#v", got) != fmt.Sprintf("%#v", want) {
+			t.Errorf("got %v - want %v", got, want)
+		}
+
+	}
+
+	{
+		inp := []int{1, 2, 3, 4}
+		got := Delete(inp, 0)
+		want := []int{2, 3, 4}
+
+		if fmt.Sprintf("%#v", got) != fmt.Sprintf("%#v", want) {
+			t.Errorf("got %v - want %v", got, want)
+		}
+
+	}
+
+	{
+		inp := []int{1, 2, 3, 4}
+		got := Delete(inp, 3)
+		want := []int{1, 2, 3}
+
+		if fmt.Sprintf("%#v", got) != fmt.Sprintf("%#v", want) {
+			t.Errorf("got %v - want %v", got, want)
+		}
+
+	}
 }

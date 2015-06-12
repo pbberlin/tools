@@ -120,6 +120,15 @@ func InsertAfter(s []int, idx int, newVal int) []int {
 	return s
 }
 
+func Delete(s []int, idx int) []int {
+	if idx > len(s)-1 {
+		panic("Cannot delete beyond existing length")
+	}
+	copy(s[idx:], s[idx+1:])
+	s = s[:len(s)-1]
+	return s
+}
+
 //
 // When having multiple URL params of the same name,
 func StringSliceToMapKeys(s []string) map[string]bool {

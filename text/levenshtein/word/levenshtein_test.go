@@ -59,8 +59,8 @@ func init() {
 func TestLevenshtein(t *testing.T) {
 	for i, tc := range testCases {
 
-		mx := ls_core.New(convertToCore(tc.src), convertToCore(tc.dst), ls_core.DefaultOptions)
-		got := mx.Distance()
+		m := ls_core.New(convertToCore(tc.src), convertToCore(tc.dst), ls_core.DefaultOptions)
+		got := m.Distance()
 
 		ssrc := fmt.Sprintf("%v", tc.src)
 		sdst := fmt.Sprintf("%v", tc.dst)
@@ -76,10 +76,10 @@ func TestLevenshtein(t *testing.T) {
 		}
 
 		if i == 5 || i == 12 || i == 13 || true {
-			mx.Print()
+			m.Print()
 
-			es := mx.EditScript()
-			es.Print()
+			es := m.EditScript()
+			es.Print(m)
 		}
 
 	}

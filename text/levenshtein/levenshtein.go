@@ -13,6 +13,26 @@ type Equaler interface {
 	Equal(compare2 interface{}) bool
 }
 
+// works also for idx == -1
+func InsertAfter(s []Equaler, idx int, newVal Equaler) []Equaler {
+	if idx > len(s)-1 {
+		panic("Cannot insert beyond existing length")
+	}
+	s = append(s, nil)
+	copy(s[idx+2:], s[idx+1:])
+	s[idx+1] = newVal
+	return s
+}
+
+func Delete(s []Equaler, idx int) []Equaler {
+	if idx > len(s)-1 {
+		panic("Cannot delete beyond existing length")
+	}
+	copy(s[idx:], s[idx+1:])
+	s = s[:len(s)-1]
+	return s
+}
+
 type Matrix struct {
 	mx         [][]int
 	rows, cols []Equaler
@@ -161,4 +181,44 @@ func (m Matrix) Print() {
 		fp("\n")
 	}
 	// fp("\n")
+}
+
+func (m *Matrix) ApplyEditScript(es TEditScrpt) {
+
+	sumIns := 0
+	sumDel := 0
+	fmt2 := fmt.Sprintf("%s-%vv", "%", cl)
+
+	rows2 := make([]Equaler, 0, len(m.rows))
+	for _, v := range m.rows {
+		rows2 = append(rows2, v)
+	}
+
+	const offs = 1
+	fmt.Printf("%v", strings.Repeat(" ", 2*cl))
+	for _, v := range es {
+
+		s := fmt.Sprintf("%v-%v-%v", v.op, offs+v.src+sumIns-sumDel, offs+v.dst)
+		// s := fmt.Sprintf("%v-%v", v.op, v.dst)
+		fmt.Printf(fmt2, s)
+
+		pos := v.src + sumIns - sumDel - 1
+
+		if v.op == Ins {
+			// rows2 = InsertAfter(rows2, util.Min(pos, len(rows2)-1), m.cols[v.dst])
+			rows2 = InsertAfter(rows2, pos, m.cols[v.dst])
+			sumIns++
+		}
+		if v.op == Del {
+			rows2 = Delete(rows2, pos+1)
+			sumDel++
+		}
+	}
+	fmt.Printf("\n")
+
+	fmt.Printf("%v", strings.Repeat(" ", 2*cl))
+	for _, row := range rows2 {
+		fmt.Printf(fmt2, row)
+	}
+
 }

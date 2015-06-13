@@ -9,7 +9,7 @@ import (
 	"net/http"
 	//"appengine"
 	"github.com/pbberlin/tools/colors"
-	"github.com/pbberlin/tools/util"
+	htmlpb "github.com/pbberlin/tools/pbhtml"
 	"github.com/pbberlin/tools/util_appengine"
 )
 
@@ -39,7 +39,7 @@ func disLegend(w http.ResponseWriter, r *http.Request) (b1 *bytes.Buffer, m map[
 	cd1 := GetChartDataFromDatastore(w, r, "chart_data_01")
 	cd := *cd1
 
-	span := util.GetSpanner()
+	span := htmlpb.GetSpanner()
 
 	widthLabel := 80
 	widthColorBox := 120

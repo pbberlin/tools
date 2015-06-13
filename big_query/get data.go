@@ -4,6 +4,7 @@ package big_query
 // https://developers.google.com/bigquery/bigquery-api-quickstart
 import (
 	"bytes"
+	"log"
 	"math/rand"
 	"time"
 
@@ -11,13 +12,17 @@ import (
 	"net/http"
 
 	bq "code.google.com/p/google-api-go-client/bigquery/v2"
-	oauth2_google "github.com/golang/oauth2/google"
 	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_appengine"
 	"github.com/pbberlin/tools/util_err"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
 
 	"appengine"
+
+	newappengine "google.golang.org/appengine" // https://github.com/golang/oauth2
 )
 
 // print it to http writer
@@ -62,16 +67,23 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 	`
 
 	c := appengine.NewContext(r)
-	config := oauth2_google.NewAppEngineConfig(c, []string{
-		"https://www.googleapis.com/auth/bigquery",
-	})
+
 	// The following client will be authorized by the App Engine
 	// app's service account for the provided scopes.
-	client := http.Client{Transport: config.NewTransport()}
-	//client.Get("...")
+	// "https://www.googleapis.com/auth/bigquery"
+	// "https://www.googleapis.com/auth/devstorage.full_control"
 
-	//oauthHttpClient := &http.Client{}
-	bigqueryService, err := bq.New(&client)
+	// 2015-06: instead of oauth2.NoContext we get a new type of context
+	var ctx context.Context = newappengine.NewContext(r)
+	oauthHttpClient, err := google.DefaultClient(
+		ctx, "https://www.googleapis.com/auth/bigquery")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bigqueryService, err := bq.New(oauthHttpClient)
+
 	util_err.Err_http(w, r, err, false)
 
 	fmt.Fprint(w, "s1<br>\n")
@@ -189,7 +201,7 @@ func regroupFromDatastore01(w http.ResponseWriter, r *http.Request, m map[string
 	for i0 := 0; i0 < len(vVSrc); i0++ {
 
 		s_row := string(vVSrc[i0])
-		v_row := util.SplitByWhitespace(s_row)
+		v_row := pbstrings.SplitByWhitespace(s_row)
 		b_row := new(bytes.Buffer)
 
 		b_row.WriteString(fmt.Sprintf("%16.12s   ", v_row[3])) // leading spaces
@@ -228,7 +240,7 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 	for i0 := 0; i0 < len(vVSrc); i0++ {
 		//vVDest[i0] = []byte( b_row.Bytes() )
 		s_row := string(vVSrc[i0])
-		v_row := util.SplitByWhitespace(s_row)
+		v_row := pbstrings.SplitByWhitespace(s_row)
 
 		lang := v_row[0]
 		period := v_row[1]

@@ -11,23 +11,21 @@ import (
 	"fmt"
 	"path"
 
-
-
 	"appengine/image"
 
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/util"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util_err"
 
-	"appengine/datastore"
-	"appengine/user"
 	"bytes"
 	"strings"
 	"time"
 
+	"appengine/datastore"
+	"appengine/user"
+
 	"github.com/mjibson/appstats"
 )
-
 
 const upload2HTML = `
 		<form action="{{.}}" method="POST" enctype="multipart/form-data">
@@ -37,8 +35,6 @@ const upload2HTML = `
 			<input type="submit" name="submit" value="Submit">
 		</form>
 `
-
-
 
 var upload2 = template.Must(template.New("topLevelTemplateName").Parse(upload2HTML))
 
@@ -66,10 +62,9 @@ const openHTML = `
 	</style>
 `
 
-const closeHTML  =`
+const closeHTML = `
 	</body>
-</html>` 
-
+</html>`
 
 func submitUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 
@@ -91,33 +86,32 @@ func processUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 	}()
 
 	blobs, otherFormFields, err := MyParseUpload(r)
-	util_err.Err_http(w, r, err, false, fmt.Errorf("Fehler beim Parsen: %v",err))
+	util_err.Err_http(w, r, err, false, fmt.Errorf("Fehler beim Parsen: %v", err))
 
-	// s1 := util.IndentedDump(blobs)
+	// s1 := pbstrings.IndentedDump(blobs)
 	// if len(s1) > 2 {
 	// 	b1.WriteString("<br>blob: " + s1)
 	// }
 
-	// s2 := util.IndentedDump(otherFormFields)
+	// s2 := pbstrings.IndentedDump(otherFormFields)
 	// if len(s2) > 2 {
 	// 	b1.WriteString("<br>otherF: " + s2+"<br>")
 	// }
 
 	numFiles := len(blobs["post_field_file"]) // this always yields (int)1
 	numOther := len(otherFormFields["post_field_file"])
-	if numFiles == 0  && numOther == 0 {
+	if numFiles == 0 && numOther == 0 {
 		//http.Redirect(w, r, "/blob2/upload", http.StatusFound)
 		b1.WriteString("<a href='/blob2/upload' >No file uploaded? Try again.</a><br>")
 		b1.WriteString("<a href='/blob2' >List</a><br>")
 		return
 	}
 
-	if numFiles > 0   {
+	if numFiles > 0 {
 
 		blob0 := blobs["post_field_file"][0]
 
-		dataStoreClone(w,r,blob0, otherFormFields)
-
+		dataStoreClone(w, r, blob0, otherFormFields)
 
 		urlSuccessX := "/blob2/serve-full?blobkey=" + string(blob0.BlobKey)
 		urlThumb := "/blob2/thumb?blobkey=" + string(blob0.BlobKey)
@@ -134,7 +128,6 @@ func serveFull(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 	blobstore.Send(w, appengine.BlobKey(r.FormValue("blobkey")))
 }
 
-
 // working differently as in Python
 //		//blob2s := blobstore.BlobInfo.gql("ORDER BY creation DESC")
 func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
@@ -148,14 +141,13 @@ func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 
 	errFormParse := r.ParseForm()
 	if errFormParse != nil {
-		b1.WriteString(fmt.Sprintf("Form parse Error %v",errFormParse))
+		b1.WriteString(fmt.Sprintf("Form parse Error %v", errFormParse))
 		return
 	}
 
 	s1 := ""
 	b1.WriteString(openHTML)
 	b1.WriteString(restrictForm)
-
 
 	nameFilter := r.PostFormValue("nameFilter")
 	nameFilter = strings.TrimSpace(nameFilter)
@@ -168,7 +160,7 @@ func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 		f = "January 02"
 		prefix := tn.Format(f)
 		// nameFilter = fmt.Sprintf("%v %s", prefix,nameFilter )
-		if ! strings.HasPrefix(nameFilter, prefix) ||  len(nameFilter) == len(prefix)  {
+		if !strings.HasPrefix(nameFilter, prefix) || len(nameFilter) == len(prefix) {
 			b1.WriteString(fmt.Sprintf("cannot filter by %v", nameFilter))
 			return
 		} else {
@@ -176,24 +168,22 @@ func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-
 	u := user.Current(c)
 	if u != nil {
-		b1.WriteString(fmt.Sprintf("%v %v %v<br>\n",u.ID, u.Email, u.FederatedIdentity ))
+		b1.WriteString(fmt.Sprintf("%v %v %v<br>\n", u.ID, u.Email, u.FederatedIdentity))
 	} else {
 		b1.WriteString("nobody calling on the phone<br>")
 	}
-
 
 	// c := appengine.NewContext(r)
 	q := datastore.NewQuery("__BlobInfo__")
 	if nameFilter != "" {
 
 		// nameFilter = strings.ToLower(nameFilter)
-		b1.WriteString(fmt.Sprintf("Filtering by %v-%v<br>", nameFilter, util.IncrementString(nameFilter)))
+		b1.WriteString(fmt.Sprintf("Filtering by %v-%v<br>", nameFilter, pbstrings.IncrementString(nameFilter)))
 
 		q = datastore.NewQuery("__BlobInfo__").Filter("filename >=", nameFilter)
-		q = q.Filter("filename <", util.IncrementString(nameFilter))
+		q = q.Filter("filename <", pbstrings.IncrementString(nameFilter))
 
 	}
 	for t := q.Run(c); ; {
@@ -232,7 +222,7 @@ func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 			if len(showBackup) < 1 {
 				continue
 			}
-		}  
+		}
 
 		s1 = fmt.Sprintf("<a class='ib' style='width:280px;margin-right:20px' target='_view' href='/blob2/serve-full?blobkey=%v'>%v</a> &nbsp; &nbsp; \n", dsKey.StringID(), titledFilename)
 		b1.WriteString(s1)
@@ -392,32 +382,30 @@ func serveThumb(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 }
 
 // This was an attempt, to "catch" the uploaded blob
-// and store it by myself into the datastore - 
+// and store it by myself into the datastore -
 // where I would be able to delete it.
 // But this failed - the actual blob data does not even reach the appengine.
 // Only the blob-info data.
 func dataStoreClone(w http.ResponseWriter, r *http.Request,
 	blob0 *BlobInfo, otherFormFields url.Values) {
 
-
 	return
 
-		wbl := dsu.WrapBlob{}
-		wbl.Category = "print"
-		wbl.Name = otherFormFields["title"][0] + " - " + otherFormFields["descr"][0]
-		wbl.Name += " - " + util.LowerCasedUnderscored(blob0.Filename)
-		wbl.Desc = fmt.Sprintf("%v", blob0.BlobKey)
-		wbl.S = blob0.ContentType
-		if len(otherFormFields["post_field_file"]) > 0 {
-			filecontent := otherFormFields["post_field_file"][0]
-			wbl.VByte = []byte(filecontent)
-		}
-		keyX2 := "bl"+ time.Now().Format("060102_1504-05")
-		_, errDS := dsu.BufPut(w, r, wbl, keyX2)
-		util_err.Err_http(w, r, errDS, false)
+	wbl := dsu.WrapBlob{}
+	wbl.Category = "print"
+	wbl.Name = otherFormFields["title"][0] + " - " + otherFormFields["descr"][0]
+	wbl.Name += " - " + pbstrings.LowerCasedUnderscored(blob0.Filename)
+	wbl.Desc = fmt.Sprintf("%v", blob0.BlobKey)
+	wbl.S = blob0.ContentType
+	if len(otherFormFields["post_field_file"]) > 0 {
+		filecontent := otherFormFields["post_field_file"][0]
+		wbl.VByte = []byte(filecontent)
+	}
+	keyX2 := "bl" + time.Now().Format("060102_1504-05")
+	_, errDS := dsu.BufPut(w, r, wbl, keyX2)
+	util_err.Err_http(w, r, errDS, false)
 
 }
-
 
 func init() {
 	http.Handle("/print", appstats.NewHandler(blobList))
@@ -428,4 +416,3 @@ func init() {
 	http.Handle("/blob2/thumb", appstats.NewHandler(serveThumb))
 	http.Handle("/blob2/rename-delete", appstats.NewHandler(renameOrDelete))
 }
-

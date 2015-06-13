@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 )
 
@@ -77,7 +78,7 @@ func Fetch(amount int) {
 	bcntent = bytes.Replace(bcntent, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
 
 	// scntent := string(bcntent)
-	// pf("size: %v \n%v\n", len(scntent), util.Ellipsoider(scntent, 1450))
+	// pf("size: %v \n%v\n", len(scntent), pbstrings.Ellipsoider(scntent, 1450))
 
 	var rssDoc RSS
 	err = xml.Unmarshal(bcntent, &rssDoc)
@@ -85,7 +86,7 @@ func Fetch(amount int) {
 		pf("%v\n", err)
 	}
 
-	ps := util.IndentedDump(rssDoc)
+	ps := pbstrings.IndentedDump(rssDoc)
 	s := *ps
 	pf("- %v - \n%v\n", len(s), s[:util.Min(1600, len(s)-1)])
 
@@ -121,7 +122,7 @@ func Fetch(amount int) {
 	for i := 0; i < len(fullArticles); i++ {
 		lpFa := fullArticles[i]
 		bBody := *fullArticles[i].Body
-		// pf("%v: %v\n\n", lpFa.URL[27:], util.Ellipsoider(string(bBody), 200))
+		// pf("%v: %v\n\n", lpFa.URL[27:], pbstrings.Ellipsoider(string(bBody), 200))
 
 		fileName := lpFa.URL
 		fileName = strings.Replace(fileName, "https://", "", -1)

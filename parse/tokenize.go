@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 
 	"golang.org/x/net/html"
@@ -22,7 +23,7 @@ func Tokenize() {
 	directory := ""
 
 	ss := util.GetFilesByExtension(directory, extension, false)
-	pss := util.IndentedDump(ss)
+	pss := pbstrings.IndentedDump(ss)
 	pf("%v \n\n", *pss)
 
 	if len(ss) < 1 {
@@ -125,7 +126,7 @@ func cleanseHtml(r io.Reader) (*bytes.Buffer, error) {
 		} else {
 			if s2 != "" {
 				s2 = strings.Replace(s2, "\n", "", -1)
-				s2 = util.Ellipsoider(s2, 30)
+				s2 = pbstrings.Ellipsoider(s2, 30)
 				pf("skipped %v \n", s2)
 
 			}
@@ -201,7 +202,7 @@ func decomposeHtml(r io.Reader) {
 		case html.TextToken:
 			if s2 != "" && len(s2) > 1 && !strings.HasPrefix(s2, `//`) {
 				s2 = strings.Replace(s2, "\n", "", -1)
-				pf("\t%v", util.Ellipsoider(s2, 22))
+				pf("\t%v", pbstrings.Ellipsoider(s2, 22))
 			}
 		case html.EndTagToken: // </tag>
 			// pf("/%v ", s2)

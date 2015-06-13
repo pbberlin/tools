@@ -1,4 +1,4 @@
-package util
+package pbstrings
 
 import (
 	"fmt"

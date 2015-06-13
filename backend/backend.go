@@ -7,6 +7,8 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
+	htmlpb "github.com/pbberlin/tools/pbhtml"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_appengine"
 	"github.com/pbberlin/tools/util_err"
@@ -19,58 +21,58 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1 := new(bytes.Buffer)
 
-	util.Wb(b1, "Diverse", "")
-	util.Wb(b1, "Login", "/login")
-	util.Wb(b1, "Schreib-Methoden", "/write-methods")
-	util.Wb(b1, "Letzte Email", "/email-view")
-	util.Wb(b1, "Blob List", "/blob/list")
-	util.Wb(b1, "Template Demo 1", "/tpl/demo1")
-	util.Wb(b1, "Template Demo 2", "/tpl/demo2")
-	util.Wb(b1, "Http fetch", "/fetch-url")
-	util.Wb(b1, "Instance Info", "/instance-info/view")
-	util.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
+	htmlpb.Wb(b1, "Diverse", "")
+	htmlpb.Wb(b1, "Login", "/login")
+	htmlpb.Wb(b1, "Schreib-Methoden", "/write-methods")
+	htmlpb.Wb(b1, "Letzte Email", "/email-view")
+	htmlpb.Wb(b1, "Blob List", "/blob/list")
+	htmlpb.Wb(b1, "Template Demo 1", "/tpl/demo1")
+	htmlpb.Wb(b1, "Template Demo 2", "/tpl/demo2")
+	htmlpb.Wb(b1, "Http fetch", "/fetch-url")
+	htmlpb.Wb(b1, "Instance Info", "/instance-info/view")
+	htmlpb.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 
-	util.Wb(b1, "JSON encode", "/json-encode")
-	util.Wb(b1, "JSON decode", "/json-decode")
+	htmlpb.Wb(b1, "JSON encode", "/json-encode")
+	htmlpb.Wb(b1, "JSON decode", "/json-decode")
 
-	util.Wb(b1, "Fulltext put", "/fulltext-search/put")
-	util.Wb(b1, "Fulltext get", "/fulltext-search/get")
+	htmlpb.Wb(b1, "Fulltext put", "/fulltext-search/put")
+	htmlpb.Wb(b1, "Fulltext get", "/fulltext-search/get")
 
-	util.Wb(b1, "datastore object view quoted printabe", "/dsu/show")
+	htmlpb.Wb(b1, "datastore object view quoted printabe", "/dsu/show")
 
-	util.Wb(b1, "Guest Book", "")
-	util.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
-	util.Wb(b1, "Einträge auflisten", "/guest-view")
-	util.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
+	htmlpb.Wb(b1, "Guest Book", "")
+	htmlpb.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
+	htmlpb.Wb(b1, "Einträge auflisten", "/guest-view")
+	htmlpb.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
 
-	util.Wb(b1, " ", "")
-	util.Wb(b1, "Drawing a static chart", "/image/draw-lines-example")
+	htmlpb.Wb(b1, " ", "")
+	htmlpb.Wb(b1, "Drawing a static chart", "/image/draw-lines-example")
 
-	util.Wb(b1, "Big Query ...", "")
-	util.Wb(b1, "Get real data", "/big-query/query-into-datastore")
-	util.Wb(b1, "Get mocked data", "/big-query/mock-data-into-datastore")
-	util.Wb(b1, "  &nbsp; &nbsp; &nbsp; ... with Chart", "")
-	util.Wb(b1, "Process Data 1 (mock=1)", "/big-query/regroup-data-01?mock=0")
-	util.Wb(b1, "Process Data 2", "/big-query/regroup-data-02?f=table")
-	util.Wb(b1, "Show as Table", "/big-query/show-table")
-	util.Wb(b1, "Show as Chart", "/big-query/show-chart")
-	util.Wb(b1, "As HTML", "/big-query/html")
+	htmlpb.Wb(b1, "Big Query ...", "")
+	htmlpb.Wb(b1, "Get real data", "/big-query/query-into-datastore")
+	htmlpb.Wb(b1, "Get mocked data", "/big-query/mock-data-into-datastore")
+	htmlpb.Wb(b1, "  &nbsp; &nbsp; &nbsp; ... with Chart", "")
+	htmlpb.Wb(b1, "Process Data 1 (mock=1)", "/big-query/regroup-data-01?mock=0")
+	htmlpb.Wb(b1, "Process Data 2", "/big-query/regroup-data-02?f=table")
+	htmlpb.Wb(b1, "Show as Table", "/big-query/show-table")
+	htmlpb.Wb(b1, "Show as Chart", "/big-query/show-chart")
+	htmlpb.Wb(b1, "As HTML", "/big-query/html")
 
-	util.Wb(b1, "Request Images ", "")
-	util.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
-	util.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
-	util.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
-	util.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
+	htmlpb.Wb(b1, "Request Images ", "")
+	htmlpb.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
+	htmlpb.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
+	htmlpb.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
+	htmlpb.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
 
-	util.Wb(b1, "Namespaces + Task Queues", "")
-	util.Wb(b1, "Increment", "/namespaced-counters/increment")
-	util.Wb(b1, "Read", "/namespaced-counters/read")
-	util.Wb(b1, "Push to task-queue", "/namespaced-counters/queue-push")
+	htmlpb.Wb(b1, "Namespaces + Task Queues", "")
+	htmlpb.Wb(b1, "Increment", "/namespaced-counters/increment")
+	htmlpb.Wb(b1, "Read", "/namespaced-counters/read")
+	htmlpb.Wb(b1, "Push to task-queue", "/namespaced-counters/queue-push")
 
-	util.Wb(b1, "URLs with/without ancestors", "")
-	util.Wb(b1, "Backend", "/save-url/backend")
+	htmlpb.Wb(b1, "URLs with/without ancestors", "")
+	htmlpb.Wb(b1, "Backend", "/save-url/backend")
 
-	util.Wb(b1, "Statistics", "/_ah/stats")
+	htmlpb.Wb(b1, "Statistics", "/_ah/stats")
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")
@@ -111,11 +113,11 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 		util.MonthsBack(24)))
 
 	b1.WriteString("<br>\n")
-	x1 := " z" + util.IncrementString("--z")
-	x2 := " Z" + util.IncrementString("--Z")
-	x3 := " 9" + util.IncrementString("--9")
-	x4 := " Peter" + util.IncrementString("--Peter")
-	sEnc := "Theo - wir fahrn nach Łódź <  " + util.IncrementString("Łódź") + x1 + x2 + x3 + x4
+	x1 := " z" + pbstrings.IncrementString("--z")
+	x2 := " Z" + pbstrings.IncrementString("--Z")
+	x3 := " 9" + pbstrings.IncrementString("--9")
+	x4 := " Peter" + pbstrings.IncrementString("--Peter")
+	sEnc := "Theo - wir fahrn nach Łódź <  " + pbstrings.IncrementString("Łódź") + x1 + x2 + x3 + x4
 	b1.WriteString(fmt.Sprint("restore string string(  []byte(sEnc) ): ", string([]byte(sEnc)), "<br>"))
 
 	w.Header().Set("Content-Type", "text/html")

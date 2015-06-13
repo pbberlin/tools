@@ -3,14 +3,16 @@ package dsu_distributed_unancestored
 import (
 	"net/http"
 
-	"appengine"
-	"appengine/datastore"
-	"appengine/memcache"
 	"fmt"
+	"math/rand"
+
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_err"
-	"math/rand"
+
+	"appengine"
+	"appengine/datastore"
+	"appengine/memcache"
 	// _ "os"
 	"time"
 )
@@ -92,7 +94,7 @@ Loop1:
 		// because we have "hashed" the keys, we can no longer
 		// range query them by key -
 		//q = q.Filter("__key__ >=", valName+shardId )
-		//q = q.Filter("__key__ < ",util.IncrementString(valName+shardId) )
+		//q = q.Filter("__key__ < ",pbstrings.IncrementString(valName+shardId) )
 
 		q = q.Order("Name")
 		q = q.Order("-ShardId")

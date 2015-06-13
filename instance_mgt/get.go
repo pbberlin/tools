@@ -7,11 +7,12 @@ import (
 	"appengine/module"
 
 	"errors"
-	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
 	"strings"
 	"time"
+
+	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/util_appengine"
+	"github.com/pbberlin/tools/util_err"
 )
 
 var ii = new(Instance)
@@ -105,7 +106,7 @@ func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Inst
 	ii.LastUpdated = time.Now()
 
 	c.Infof("collectInfo() completed, %v.%v.%v.%v, took %v",
-		util.Ellipsoider(ii.InstanceID, 4), ii.VersionMajor, ii.ModuleName,
+		pbstrings.Ellipsoider(ii.InstanceID, 4), ii.VersionMajor, ii.ModuleName,
 		ii.Hostname,
 		ii.LastUpdated.Sub(startFunc))
 

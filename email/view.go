@@ -9,6 +9,7 @@ import (
 
 	// "github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_err"
 
@@ -81,7 +82,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 						// b.WriteString("\t\t" + v + "\n")
 						if strings.HasPrefix(v, "name=") {
 							vv := strings.Split(v, "=")
-							fn = util.LowerCasedUnderscored(vv[1])
+							fn = pbstrings.LowerCasedUnderscored(vv[1])
 						}
 					}
 					s = s[start+len(sepHeaderContent):]
@@ -92,7 +93,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 			}
 
 			if ctype == "" {
-				b.WriteString("unparseable: " + util.Ellipsoider(s, 400))
+				b.WriteString("unparseable: " + pbstrings.Ellipsoider(s, 400))
 			} else {
 				b.WriteString(sp("\n\tctype=%v\n\t------------", ctype))
 				if fn != "" {

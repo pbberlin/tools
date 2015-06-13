@@ -3,8 +3,8 @@ package word
 import (
 	"fmt"
 
+	"github.com/pbberlin/tools/pbstrings"
 	ls_core "github.com/pbberlin/tools/text/levenshtein"
-	"github.com/pbberlin/tools/util"
 
 	"testing"
 )
@@ -39,26 +39,12 @@ var testCases = []TestCase{
 	{[]Token{"wd1", "wd2", "wd3"}, []Token{"wd1"}, 2},
 
 	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1", "wd3"}, 3},
-}
 
-func init() {
-	sss := [][]string{
-		[]string{"wd1", "wd2", "up"},
-		[]string{"trink", "nicht", "so", "viel", "Kaffee"},
-		[]string{"nicht", "fuer", "Kinder", "ist", "Tuerkentrank"},
-	}
+	{[]Token{"trink", "nicht", "so", "viel", "Kaffee"},
+		[]Token{"nicht", "für", "Kinder", "ist", "der", "Türkentrank"}, 9},
 
-	for i := 0; i < len(sss); i++ {
-		st := make([]Token, 0, len(sss[i]))
-		for j := 0; j < len(sss[i]); j++ {
-			st = append(st, Token(sss[i][j]))
-		}
-
-		prev := testCases[len(testCases)-1]
-		// log.Printf("%v", prev)
-		testCases = append(testCases, TestCase{src: st, dst: prev.src, distance: 2})
-	}
-
+	{[]Token{"ihn", "nicht", "der", "lassen", "kann"},
+		[]Token{"nicht", "für", "Kinder", "ist", "der", "Türkentrank"}, 7},
 }
 
 func TestLevenshtein(t *testing.T) {
@@ -72,12 +58,8 @@ func TestLevenshtein(t *testing.T) {
 		if got != tc.distance {
 			t.Logf(
 				"%2v: Distance between %20v and %20v should be %v - but got %v ",
-				i, util.Ellipsoider(ssrc, 8), util.Ellipsoider(sdst, 8), tc.distance, got)
+				i, pbstrings.Ellipsoider(ssrc, 8), pbstrings.Ellipsoider(sdst, 8), tc.distance, got)
 			t.Fail()
-		}
-
-		if i > 1 {
-			// continue
 		}
 
 		m.Print()
@@ -89,10 +71,8 @@ func TestLevenshtein(t *testing.T) {
 
 		got2 := m.ApplyEditScript(es)
 		if !m.CompareToCol(got2) {
-			t.Logf(
-				"wnt %v \ngot %v ", convertToCore(tc.dst), got2)
+			t.Logf("\nwnt %v \ngot %v ", convertToCore(tc.dst), got2)
 			t.Fail()
-
 		}
 
 		fmt.Printf("\n")

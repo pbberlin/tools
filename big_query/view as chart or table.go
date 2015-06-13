@@ -13,6 +13,7 @@ import (
 
 	"github.com/pbberlin/tools/charting"
 	"github.com/pbberlin/tools/colors"
+	htmlpb "github.com/pbberlin/tools/pbhtml"
 	"github.com/pbberlin/tools/util"
 	"github.com/pbberlin/tools/util_appengine"
 	"github.com/pbberlin/tools/util_err"
@@ -25,7 +26,7 @@ func showAsTable(w http.ResponseWriter, r *http.Request, m map[string]interface{
 	cd1 := GetChartDataFromDatastore(w, r, "chart_data_01")
 	cd := *cd1
 
-	span := util.GetSpanner()
+	span := htmlpb.GetSpanner()
 	// Header row
 	fmt.Fprintf(w, span(" ", 164))
 	for _, lg := range cd.VLangs {

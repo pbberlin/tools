@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pbberlin/tools/util"
+	"github.com/pbberlin/tools/pbstrings"
 )
 
 const cl = 11 // column length for Print funcs
@@ -160,7 +160,7 @@ func (m Matrix) Print() {
 	fp(strings.Repeat(" ", 2*cl))
 	for _, col := range cols {
 		scol := fmt.Sprintf("%v", col)
-		fp("%v ", util.ToLen(scol, cl-1)) // at least one space right
+		fp("%v ", pbstrings.ToLen(scol, cl-1)) // at least one space right
 	}
 	fp("\n")
 
@@ -174,7 +174,7 @@ func (m Matrix) Print() {
 	//
 	for i, row := range rows {
 		srow := fmt.Sprintf("%v", row)
-		fp("%v ", util.ToLen(srow, cl-1)) // at least one space right
+		fp("%v ", pbstrings.ToLen(srow, cl-1)) // at least one space right
 		fp(fmt2, mx[i+1][0])
 		for j, _ := range cols {
 			fp(fmt2, mx[i+1][j+1])

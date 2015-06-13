@@ -2,6 +2,7 @@ package backend
 
 import (
 	sc "github.com/pbberlin/tools/dsu_distributed_unancestored"
+	htmlpb "github.com/pbberlin/tools/pbhtml"
 	ss "github.com/pbberlin/tools/shared_structs"
 
 	"appengine"
@@ -184,7 +185,7 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 	add, tplExec := tpl_html.FuncTplBuilder(w, r)
 	add("n_html_title", "Backend", nil)
 
-	add("n_cont_0", "<style>"+util.CSSColumnsWidth(nColsViewport)+"</style>", "")
+	add("n_cont_0", "<style>"+htmlpb.CSSColumnsWidth(nColsViewport)+"</style>", "")
 	add("n_cont_1", tpl_html.PrefixLff+"backend3_body", myB0)
 	add("tpl_legend", tpl_html.PrefixLff+"backend3_body_embed01", "")
 	add("n_cont_2", "<p>{{.}} views</p>", cntr)

@@ -109,7 +109,7 @@ func DoubleSliceCap(ba []byte) (newBa []byte) {
 	return newBa
 }
 
-// https://github.com/golang/go/wiki/SliceTricks
+// https://golang.org/x/go/wiki/SliceTricks
 func InsertAfter(s []int, idx int, newVal int) []int {
 	if idx > len(s)-1 {
 		panic("Cannot insert beyond existing length")

@@ -100,10 +100,12 @@ func (m Matrix) Distance() int {
 
 // EditScript returns an optimal edit script for an existing matrix.
 func (m Matrix) EditScript() TEditScrpt {
-	return m.Backtrace(len(m.mx)-1, len(m.mx[0])-1)
+	return m.backtrace(len(m.mx)-1, len(m.mx[0])-1)
 }
 
-func (m Matrix) Backtrace(i, j int) TEditScrpt {
+// Backtrace is recursive
+// It starts bottom right and steps left/top/lefttop
+func (m Matrix) backtrace(i, j int) TEditScrpt {
 
 	pf := func(str string) {}
 	// pf := fmt.Printf
@@ -117,36 +119,35 @@ func (m Matrix) Backtrace(i, j int) TEditScrpt {
 		eo.op = Del
 		eo.src = i - 1
 		eo.dst = j
-		return append(m.Backtrace(i-1, j), eo)
+		return append(m.backtrace(i-1, j), eo)
 	}
 	if j > 0 && mx[i][j-1]+opt.InsCost == mx[i][j] {
 		pf("c2")
 		eo.op = Ins
 		eo.src = i
 		eo.dst = j - 1
-		return append(m.Backtrace(i, j-1), eo)
+		return append(m.backtrace(i, j-1), eo)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1]+opt.SubCost == mx[i][j] {
 		pf("c3")
 		eo.op = Sub
 		eo.src = i - 1
 		eo.dst = j - 1
-		return append(m.Backtrace(i-1, j-1), eo)
+		return append(m.backtrace(i-1, j-1), eo)
 	}
 	if i > 0 && j > 0 && mx[i-1][j-1] == mx[i][j] {
 		pf("c4")
 		eo.op = Match
 		eo.src = i - 1
 		eo.dst = j - 1
-		return append(m.Backtrace(i-1, j-1), eo)
+		return append(m.backtrace(i-1, j-1), eo)
 	}
 	pf("c5")
 	return []EditOpExt{}
 }
 
 // PrintTokensWithMatrix prints a visual representation
-// of the slices of tokens
-// and of their diff matrix
+// of the slices of tokens and their distance matrix
 func (m Matrix) Print() {
 
 	rows, cols := m.rows, m.cols
@@ -183,7 +184,7 @@ func (m Matrix) Print() {
 	// fp("\n")
 }
 
-func (m *Matrix) ApplyEditScript(es TEditScrpt) {
+func (m *Matrix) ApplyEditScript(es TEditScrpt) []Equaler {
 
 	sumIns := 0
 	sumDel := 0
@@ -199,19 +200,23 @@ func (m *Matrix) ApplyEditScript(es TEditScrpt) {
 	for _, v := range es {
 
 		s := fmt.Sprintf("%v-%v-%v", v.op, offs+v.src+sumIns-sumDel, offs+v.dst)
-		// s := fmt.Sprintf("%v-%v", v.op, v.dst)
 		fmt.Printf(fmt2, s)
 
-		pos := v.src + sumIns - sumDel - 1
+		pos := v.src + sumIns - sumDel
 
 		if v.op == Ins {
 			// rows2 = InsertAfter(rows2, util.Min(pos, len(rows2)-1), m.cols[v.dst])
-			rows2 = InsertAfter(rows2, pos, m.cols[v.dst])
+			rows2 = InsertAfter(rows2, pos-1, m.cols[v.dst])
 			sumIns++
 		}
+
 		if v.op == Del {
-			rows2 = Delete(rows2, pos+1)
+			rows2 = Delete(rows2, pos)
 			sumDel++
+		}
+
+		if v.op == Sub {
+			rows2[pos] = m.cols[v.dst]
 		}
 	}
 	fmt.Printf("\n")
@@ -220,5 +225,19 @@ func (m *Matrix) ApplyEditScript(es TEditScrpt) {
 	for _, row := range rows2 {
 		fmt.Printf(fmt2, row)
 	}
+	return rows2
 
+}
+
+// CompareToCol takes a slice of Equaler-Tokens
+// and compares them against the column tokens of m.
+func (m *Matrix) CompareToCol(col2 []Equaler) bool {
+	equal := true
+	for idx, v := range m.cols {
+		if v != col2[idx] {
+			equal = false
+			break
+		}
+	}
+	return equal
 }

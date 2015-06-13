@@ -18,9 +18,8 @@ type TestCase struct {
 var testCases = []TestCase{
 
 	// Edit Script Test Cases
-	// {[]Token{"wd1"}, []Token{"wd1", "wd1"}, 1},
-	{[]Token{"wd2", "wd1"}, []Token{"wd1", "wd1", "wd1", "wd1", "wd2", "wd1"}, 2},
-	{[]Token{"wd2", "wd1", "wd1", "wd1", "wd2", "wd1"}, []Token{"wd1", "wd1"}, 2},
+	{[]Token{"wd1", "wd2", "wd1"}, []Token{"wd1", "wd3", "wd1"}, 2},
+	{[]Token{"wd2", "wd1", "wd1", "wd1", "wd2", "wd1"}, []Token{"wd1", "wd1"}, 4},
 
 	//
 	{[]Token{}, []Token{"wd1"}, 1},
@@ -78,7 +77,7 @@ func TestLevenshtein(t *testing.T) {
 		}
 
 		if i > 1 {
-			continue
+			// continue
 		}
 
 		m.Print()
@@ -88,7 +87,14 @@ func TestLevenshtein(t *testing.T) {
 		// es.Print()
 		// fmt.Printf("\n")
 
-		m.ApplyEditScript(es)
+		got2 := m.ApplyEditScript(es)
+		if !m.CompareToCol(got2) {
+			t.Logf(
+				"wnt %v \ngot %v ", convertToCore(tc.dst), got2)
+			t.Fail()
+
+		}
+
 		fmt.Printf("\n")
 		fmt.Printf("\n")
 

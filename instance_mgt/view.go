@@ -3,7 +3,7 @@ package instance_mgt
 import (
 	"net/http"
 
-	// sc "github.com/pbberlin/tools/dsu_distributed_unancestored"
+	// sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 
 	"github.com/pbberlin/tools/tpl_html"
 	"github.com/pbberlin/tools/util_appengine"

@@ -1,8 +1,9 @@
-package dsu_ancestored_urls
+package ancestored_urls
 
 import (
-	"github.com/pbberlin/tools/tpl_html"
 	"net/http"
+
+	"github.com/pbberlin/tools/tpl_html"
 )
 
 func init() {

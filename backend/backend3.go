@@ -1,7 +1,7 @@
 package backend
 
 import (
-	sc "github.com/pbberlin/tools/dsu_distributed_unancestored"
+	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	htmlpb "github.com/pbberlin/tools/pbhtml"
 	ss "github.com/pbberlin/tools/shared_structs"
 

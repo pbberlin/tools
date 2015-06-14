@@ -19,7 +19,7 @@
 	and then wrapping it into a dsu.WrapBlob struct.
 
 
-	dsu_ancestored_gb_entries.saveEntry() and ...ListEntries() demonstrate
+	ancestored_gb_entries.saveEntry() and ...ListEntries() demonstrate
 		retrieval by ancestor query
 
 	dsu_persistent_cursor.guestViewCursor demonstrates scanning

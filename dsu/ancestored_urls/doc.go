@@ -32,4 +32,4 @@
 
 */
 
-package dsu_ancestored_urls
+package ancestored_urls

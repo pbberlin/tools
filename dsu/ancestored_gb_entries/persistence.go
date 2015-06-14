@@ -1,4 +1,4 @@
-package dsu_ancestored_gb_entries
+package ancestored_gb_entries
 
 import (
 	"net/http"

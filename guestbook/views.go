@@ -5,10 +5,10 @@ import (
 
 	"appengine"
 
-	sc "github.com/pbberlin/tools/dsu_distributed_unancestored"
+	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	"github.com/pbberlin/tools/util_err"
 
-	gbp "github.com/pbberlin/tools/dsu_ancestored_gb_entries" // guest book persistence
+	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
 	"github.com/pbberlin/tools/tpl_html"
 )
 

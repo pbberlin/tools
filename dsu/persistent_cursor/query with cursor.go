@@ -1,4 +1,4 @@
-package dsu_persistent_cursor
+package persistent_cursor
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 	"github.com/pbberlin/tools/util_appengine"
 	"github.com/pbberlin/tools/util_err"
 
-	gbp "github.com/pbberlin/tools/dsu_ancestored_gb_entries" // guest book persistence
+	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
 )
 
 func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -98,7 +98,5 @@ func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interf
 }
 
 func init() {
-
 	http.HandleFunc("/guest-view-cursor", util_appengine.Adapter(guestViewCursor))
-
 }

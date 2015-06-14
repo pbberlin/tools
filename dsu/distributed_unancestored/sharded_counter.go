@@ -1,4 +1,4 @@
-package dsu_distributed_unancestored
+package distributed_unancestored
 
 import (
 	"net/http"

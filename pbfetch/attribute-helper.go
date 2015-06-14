@@ -1,4 +1,4 @@
-package fetch
+package pbfetch
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ func rewriteAttributes(attributes []html.Attribute, r *http.Request) []html.Attr
 
 		if attr.Key == "href" || attr.Key == "src" {
 			if attr.Key == "href" {
-				attr.Val = fmt.Sprintf("/%v?url=%v", fetchURL, attr.Val)
+				attr.Val = fmt.Sprintf("/%v?url=%v", FetchURL, attr.Val)
 			}
 		}
 

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
+	"github.com/pbberlin/tools/pbfetch"
 	htmlpb "github.com/pbberlin/tools/pbhtml"
 	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
@@ -25,10 +26,10 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlpb.Wb(b1, "Login", "/login")
 	htmlpb.Wb(b1, "Schreib-Methoden", "/write-methods")
 	htmlpb.Wb(b1, "Letzte Email", "/email-view")
-	htmlpb.Wb(b1, "Blob List", "/blob/list")
+	htmlpb.Wb(b1, "Blob List", "/blob2")
 	htmlpb.Wb(b1, "Template Demo 1", "/tpl/demo1")
 	htmlpb.Wb(b1, "Template Demo 2", "/tpl/demo2")
-	htmlpb.Wb(b1, "Http fetch", "/fetch-url")
+	htmlpb.Wb(b1, "Http fetch", "/"+pbfetch.FetchURL)
 	htmlpb.Wb(b1, "Instance Info", "/instance-info/view")
 	htmlpb.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 

@@ -1,4 +1,4 @@
-package fetch
+package pbfetch
 
 import (
 	"fmt"
@@ -51,7 +51,7 @@ const c_formFetchURL = `
 
 `
 
-const fetchURL = "fetch-url-x"
+const FetchURL = "fetch-url-x"
 
 func handleFetchURL(w http.ResponseWriter, r *http.Request) {
 
@@ -98,7 +98,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request) {
 		tplAdder, tplExec := tpl_html.FuncTplBuilder(w, r)
 		tplAdder("n_html_title", "Fetch some http data", nil)
 
-		m := map[string]string{"protocol": "https", "host": r.Host, "path": fetchURL, "val": "google.com"}
+		m := map[string]string{"protocol": "https", "host": r.Host, "path": FetchURL, "val": "google.com"}
 		if util_appengine.IsLocalEnviron() {
 			m["protocol"] = "http"
 		}
@@ -174,5 +174,5 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/"+fetchURL, handleFetchURL)
+	http.HandleFunc("/"+FetchURL, handleFetchURL)
 }

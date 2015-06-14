@@ -1,4 +1,5 @@
 # Ignore files with extension `.exe`
+exclude*.go
 *.exe
 outp*.txt
 outp*.html

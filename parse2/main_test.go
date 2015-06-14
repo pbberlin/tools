@@ -8,7 +8,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/pbberlin/tools/fetch"
+	"github.com/pbberlin/tools/pbfetch"
 	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
@@ -65,7 +65,7 @@ func main() {
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
 		fn2 := fmt.Sprintf("outpL%v.html", i)
 		fn3 := fmt.Sprintf("outpL%vT.txt", i)
-		_, resBytes, err := fetch.UrlGetter(url, nil, true)
+		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
 		if err != nil {

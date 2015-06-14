@@ -21,9 +21,9 @@ import (
 
 var opf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 var spf func(format string, a ...interface{}) string = fmt.Sprintf
+var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 
 // var sq func(a ...interface{}) string = fmt.Sprint
-// var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 
 func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 

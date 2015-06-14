@@ -128,5 +128,4 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 func init() {
 	http.HandleFunc("/backend", util_appengine.Adapter(backend))
-
 }

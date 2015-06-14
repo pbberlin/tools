@@ -26,7 +26,7 @@ func main() {
 		<link href="./article01_files/vendor.css" rel="stylesheet" type="text/css"/>
 		</head><body><p>Links:
 				<span>p1</span>
-				<span>p2</span>
+				<span>p2<br>p2a</span>
 				<span>p3</span>
 			</p>
 			<style> p {font-size:17px}</style>
@@ -59,7 +59,7 @@ func main() {
 
 	//
 	// ================================================
-	for i := 1; i <= 1; i++ {
+	for i := 4; i <= 4; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpL%v.txt", i)
@@ -91,9 +91,7 @@ func main() {
 
 		TravVertStats(doc, 0)
 
-		b, _ := TravVertTextify(doc, 0, 0)
-		_ = b
-		// ioutil.WriteFile(fn3, b, 0)
+		TravVertTextify(doc, 0, 0)
 
 		mpb := []byte{}
 		keys := make([]string, 0, len(mp))
@@ -101,10 +99,8 @@ func main() {
 			keys = append(keys, k)
 		}
 		sort.Strings(keys)
-		_ = keys
-
 		for _, key := range keys {
-			if len(mp[key]) > 30 {
+			if true || len(mp[key]) > 30 {
 				row := fmt.Sprintf("%8v: %s\n", key, mp[key])
 				mpb = append(mpb, row...)
 			}

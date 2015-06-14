@@ -32,6 +32,10 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 			cs = append(cs, byte(' '))
 		}
 	}
+	if cntnt, ok := isInline(n); ok {
+		// cs = append([]byte(cntnt), cs...)
+		cs = append(cs, cntnt...)
+	}
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -51,6 +55,23 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 		csCc := append(cs, cc...)
 		idMap := fmt.Sprintf("%v-% 5v", id, len(csCc))
 		mp[idMap] = csCc
+	}
+
+	return
+}
+
+func isInline(n *html.Node) (ct string, ok bool) {
+
+	if n.Type == html.ElementNode {
+		switch n.Data {
+		case "br":
+			ct, ok = "softbreak ", true
+		case "img":
+			ct = spf("hardbreak %v hardbreak ", n.Attr)
+			ok = true
+			// case "p", "div":
+			// 	ct, ok = "hardbreak ", true
+		}
 	}
 
 	return

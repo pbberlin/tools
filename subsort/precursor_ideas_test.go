@@ -1,7 +1,8 @@
 package subsort
 
-// This is just a reminder.
-// It shows the base, upon which I developed my own versatile sorting helper
+// File contains examples of other strategies for flexible sorting.
+// I considered and rejected these examples.
+// Then I developed my own versatile sorting helper.
 
 import (
 	"fmt"
@@ -10,12 +11,18 @@ import (
 	"testing"
 )
 
+//--------------------------------------------
+// Precursor 1
+
+// A type, containing function headers for the sort interface.
 type sortI struct {
-	l    int
+	l    int // not len(), but its value
 	less func(int, int) bool
 	swap func(int, int)
 }
 
+// The methods of the sort interface
+// are now satisfied, using the *members* of the struct.
 func (s *sortI) Len() int {
 	return s.l
 }
@@ -28,12 +35,20 @@ func (s *sortI) Swap(i, j int) {
 	s.swap(i, j)
 }
 
-// SortF sorts the data defined by the length, Less and Swap functions.
+// SortI can now be used as follows:
+//   sort.Sort( &sortI{} )
+
+// SortF wraps the construction
+// and usage of a sortI instance.
 func SortF(Len int, Less func(int, int) bool, Swap func(int, int)) {
-	sort.Sort(&sortI{l: Len, less: Less, swap: Swap})
+	si := &sortI{l: Len, less: Less, swap: Swap}
+	sort.Sort(si)
 }
 
-func TestSort(t *testing.T) {
+// We can now take any int slice
+// and construct two-and-a-half closures with it
+// and pass the closures (with our int slice implicitly piggypacked) to SortF
+func TestSortI_demo(t *testing.T) {
 	ints := []int{3, 4, 1, 7, 0}
 	SortF(len(ints), func(i, j int) bool {
 		return ints[i] < ints[j]
@@ -47,8 +62,13 @@ func TestSort(t *testing.T) {
 	}
 }
 
+// This approach still needs typespecific variations of sortI.
+// And it requires the closure notation.
+
+//
 //--------------------------------------------
 
+// precursor2 - using interface{}
 // copyAndSort() first produces a copy,
 // the copy containing only the desired data.
 // Then this subset copy is sorted.

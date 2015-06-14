@@ -32,4 +32,10 @@
 // Thus we end up with *four* identical implementations of Len(),Swap()
 // and four *almost identical* implementations of Less()
 
+// Special-map-by-int.go adds a special case.
+// I often have map[string]int for counters. I.e.:
+//   mapX["someKey"]++
+// SortMapByCount sorts such a map by the integer.
+// It then returns the sorted data as a sorted slice of {int,key}.
+//
 package subsort

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/pbberlin/tools/pbstrings"
 	"golang.org/x/net/html"
 )
 
@@ -17,7 +18,7 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 
 	horiNum = argHoriNum
 
-	id := fmt.Sprintf("%v-%v", lvl, horiNum)
+	id := fmt.Sprintf("%v-%2v", lvl, horiNum)
 	if lvl > cScaffoldLvls {
 		if n.Type == html.ElementNode {
 			n.Attr = addIdAttr(n.Attr, id)
@@ -32,9 +33,9 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 			cs = append(cs, byte(' '))
 		}
 	}
-	if cntnt, ok := isInline(n); ok {
-		// cs = append([]byte(cntnt), cs...)
-		cs = append(cs, cntnt...)
+	if content, ok := inlineContent(n); ok {
+		// cs = append([]byte(content), cs...)
+		cs = append(cs, content...)
 	}
 
 	// Children
@@ -50,6 +51,7 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 
 	b = append(b, cs...)
 	b = append(b, cc...)
+	b = append(b, hardSoftBreaks(n)...)
 
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
@@ -60,19 +62,60 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 	return
 }
 
-func isInline(n *html.Node) (ct string, ok bool) {
+func inlineContent(n *html.Node) (ct string, ok bool) {
 
 	if n.Type == html.ElementNode {
 		switch n.Data {
 		case "br":
-			ct, ok = "softbreak ", true
+			ct, ok = "sbr ", true
 		case "img":
-			ct = spf("hardbreak %v hardbreak ", n.Attr)
+
+			href := attrX(n.Attr, "href")
+			href = pbstrings.Ellipsoider(href, 5)
+
+			alt := attrX(n.Attr, "alt")
+			title := attrX(n.Attr, "title")
+
+			if alt == "" && title == "" {
+				ct = spf("[img] %v ", href)
+			} else if alt == "" {
+				ct = spf("[img] %v hbr %v ", title, href)
+			} else {
+				ct = spf("[img] %v hbr %v hbr %v ", title, alt, href)
+
+			}
+
 			ok = true
-			// case "p", "div":
-			// 	ct, ok = "hardbreak ", true
+		case "a":
+			href := attrX(n.Attr, "href")
+			href = pbstrings.Ellipsoider(href, 5)
+
+			title := attrX(n.Attr, "title")
+
+			if title == "" {
+				ct = spf("[a] %v ", href)
+			} else {
+				ct = spf("[a] %v hbr %v ", title, href)
+			}
+
+			ok = true
 		}
+
 	}
 
 	return
+}
+
+func hardSoftBreaks(n *html.Node) (s string) {
+
+	if n.Type == html.ElementNode {
+		switch n.Data {
+		case "img":
+			s = "hbr "
+		case "p", "div":
+			s = "hbr "
+		}
+	}
+	return
+
 }

@@ -7,14 +7,25 @@ import (
 	"golang.org/x/net/html"
 )
 
-func printAttr(attributes []html.Attribute, keys []string) {
+func attrsX(attributes []html.Attribute, keys []string) (s string) {
 	for _, a := range attributes {
 		for i := 0; i < len(keys); i++ {
 			if keys[i] == a.Key {
-				fmt.Printf("id is %v\n", a.Val)
+				s += fmt.Sprintf("%v is %v\n", a.Key, a.Val)
 			}
 		}
 	}
+	return
+}
+
+func attrX(attributes []html.Attribute, key string) (s string) {
+	for _, a := range attributes {
+		if key == a.Key {
+			s = a.Val
+			break
+		}
+	}
+	return
 }
 
 func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.Attribute {

@@ -25,23 +25,22 @@ func main() {
 		<script type="text/javascript" src="./article01_files/empty.js"></script>
 		<link href="./article01_files/vendor.css" rel="stylesheet" type="text/css"/>
 		</head><body><p>Links:
-				<span>p1</span>
-				<span>p2<br>p2a</span>
-				<span>p3</span>
+				<span>span01</span>
+				<span>span02-line1<br>span02-line2</span>
+				<span>span03</span>
 			</p>
 			<style> p {font-size:17px}</style>
 			<ul>
-				<li id='332' ><a   href="foo">Linktext1 <span>inside</span></a>
-				<li><a   href="/bar/baz">BarBaz</a>
+				<li id='332' ><a   href="/some/first/page.html">Linktext1 <span>inside</span></a>
+				<li><a   href="/snd/page" title="wi-title">LinkT2</a>
 			</ul>
-
-<div>
-	<div>D11</div>
-	<div>D12</div>
-	<p>P</p>
-	<div>D13</div>
-</div>
-
+			<div>
+				<div>div-1-content</div>
+				<div>div-2-content</div>
+				<p>pararaph in between</p>
+				<div>div-3-content with iimmage<img alt="alt-cnt" title='title-cnt' 
+				href='some-long-href-some-long-href-some-long-href-some-long-href'>after img</div>
+			</div>
 			</body></html>`
 
 	tests[1] = `	<p>
@@ -62,9 +61,9 @@ func main() {
 	for i := 4; i <= 4; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
-		fn1 := fmt.Sprintf("outpL%v.txt", i)
-		fn2 := fmt.Sprintf("outpL%v.html", i)
-		fn3 := fmt.Sprintf("outpL%vT.txt", i)
+		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
+		fn2 := fmt.Sprintf("outpI%v_2T.txt", i)
+		fn3 := fmt.Sprintf("outpI%v_3.html", i)
 		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
@@ -105,12 +104,12 @@ func main() {
 				mpb = append(mpb, row...)
 			}
 		}
-		ioutil.WriteFile(fn3, mpb, 0)
+		ioutil.WriteFile(fn2, mpb, 0)
 
 		TraverseVertIndent(doc, 0)
 
 		ioutil.WriteFile(fn1, xPathDump, 0)
-		dom2File(fn2, doc)
+		dom2File(fn3, doc)
 	}
 
 	sorted1 := subsort.SortMapByCount(attrDistinct)

@@ -14,9 +14,9 @@ var (
 	xPathDump []byte
 )
 
-// TravVertStats writes an xpath log.
-// TravVertStats cleans up the attributes
-func TravVertStats(n *html.Node, lvl int) {
+// nodeHistogramAndXPathDump writes an xpath log
+// and collects frequency of node type data.
+func nodeHistogramAndXPathDump(n *html.Node, lvl int) {
 
 	if lvl == 0 {
 		xPathDump = []byte{}
@@ -26,20 +26,19 @@ func TravVertStats(n *html.Node, lvl int) {
 	switch n.Type {
 	case html.ElementNode:
 
-		nodeDistinct[n.Data]++
+		nodeDistinct[n.Data]++ // Histogram
 
 		if !xPathSkip[n.Data] {
 			xPath.Push(n.Data)
-
-			// lvl == xPath.Len()
+			// apart from skipped node types:  xPath.Len() == lvl
 			s := fmt.Sprintf("%2v: %s\n", xPath.Len(), xPath.StringExt(false))
 			xPathDump = append(xPathDump, s...) // yes, string appends to byteSlice ; http://stackoverflow.com/questions/16248241/concatenate-two-slices-in-go#
-
 		}
 	}
+
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TravVertStats(c, lvl+1)
+		nodeHistogramAndXPathDump(c, lvl+1)
 	}
 
 	// After children processing

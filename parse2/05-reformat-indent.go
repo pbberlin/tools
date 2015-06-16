@@ -24,12 +24,6 @@ func TraverseVertIndent(n *html.Node, lvl int) {
 	case html.CommentNode:
 		dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n"})
 	case html.TextNode:
-
-		// if strings.HasSuffix(n.Data, "\n") {
-		// }
-		// if strings.HasSuffix(n.Data, " ") {
-		// }
-
 		n.Data = strings.TrimSpace(n.Data) + " "
 	}
 
@@ -41,7 +35,6 @@ func TraverseVertIndent(n *html.Node, lvl int) {
 	// After children processing
 	switch n.Type {
 	case html.ElementNode:
-
 		// I dont know why,
 		// but this needs to happend AFTER the children
 		if lvl > cScaffoldLvls && n.Parent.Type == html.ElementNode {

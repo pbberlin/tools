@@ -8,7 +8,7 @@ func serveSingleRootFile(pattern string, filename string) {
 	})
 }
 
-const docRoot = "c:/docroot/"
+const docRoot = "c:/docroot/" // no relative path, 'cause working dir too flippant
 
 func init() {
 	// http.HandleFunc("/", singlePage)

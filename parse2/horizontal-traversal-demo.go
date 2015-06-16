@@ -15,7 +15,7 @@ type Tx struct {
 // TraverseHori traverses the tree horizontally.
 // It uses a queue. A FiFo structure.
 // Inspired by www.geeksforgeeks.org/level-order-tree-traversal/
-func TraverseHori(lp interface{}) {
+func traverseHori(lp interface{}) {
 
 	var queue = util.NewQueue(10)
 

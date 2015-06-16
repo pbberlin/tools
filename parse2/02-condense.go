@@ -1,15 +1,47 @@
 package parse2
 
 import (
-	"github.com/pbberlin/tools/util"
+	"strings"
+
 	"golang.org/x/net/html"
 )
 
-func TraverseVert_CondenseDivStaples(n *html.Node, lvl int) {
+func convEmptyElementLeafs(n *html.Node, lvl int) {
+
+	// processing
+
+	// empty element nodes
+	if n.Type == html.ElementNode &&
+		n.FirstChild == nil &&
+		(n.Data == "div" || n.Data == "span" ||
+			n.Data == "li" || n.Data == "p") {
+		n.Type = html.CommentNode
+	}
+
+	// spans with only 2 characters inside => remove
+	only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
+	if n.Type == html.ElementNode &&
+		n.Data == "span" &&
+		only1Child &&
+		n.FirstChild.Type == html.TextNode &&
+		len(strings.TrimSpace(n.FirstChild.Data)) < 3 {
+		n.Type = html.TextNode
+		n.Data = n.FirstChild.Data
+		n.RemoveChild(n.FirstChild)
+	}
+
+	// children
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		convEmptyElementLeafs(c, lvl+1)
+	}
+
+}
+
+func condenseNestedDivs(n *html.Node, lvl int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVert_CondenseDivStaples(c, lvl+1)
+		condenseNestedDivs(c, lvl+1)
 	}
 
 	condenseUpwards(n, []string{"div", "div"}, "div")
@@ -18,30 +50,4 @@ func TraverseVert_CondenseDivStaples(n *html.Node, lvl int) {
 
 	condenseUpwards(n, []string{"ul", "ul"}, "ul")
 
-}
-
-//
-func UNUSED_TraverseHori_CondenseDivStaples(lp interface{}, onlyOnLvl int) {
-
-	var queue = util.NewQueue(10)
-
-	for lp != nil {
-
-		lpn := lp.(Tx).Nd
-		lvl := lp.(Tx).Lvl
-
-		for c := lpn.FirstChild; c != nil; c = c.NextSibling {
-			queue.EnQueue(Tx{c, lvl + 1})
-		}
-
-		// processing
-		if lvl == onlyOnLvl {
-			couple := []string{"div", "div"}
-			condenseUpwards(lpn, couple, "div")
-		}
-
-		//
-		// next node
-		lp = queue.DeQueue()
-	}
 }

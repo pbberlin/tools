@@ -10,7 +10,7 @@ import (
 
 var mp = map[string][]byte{}
 
-func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
+func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
 
 	if lvl == 0 {
 		mp = map[string][]byte{}
@@ -33,7 +33,7 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 			cs = append(cs, byte(' '))
 		}
 	}
-	if content, ok := inlineContent(n); ok {
+	if content, ok := inlineNodesToText(n); ok {
 		// cs = append([]byte(content), cs...)
 		cs = append(cs, content...)
 	}
@@ -41,7 +41,7 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		var ccX []byte // content child X
-		ccX, horiNum = TravVertTextify(c, lvl+1, horiNum+1)
+		ccX, horiNum = textExtraction(c, lvl+1, horiNum+1)
 		ccX = bytes.TrimSpace(ccX)
 		if len(ccX) > 0 {
 			ccX = append(ccX, byte(' '))
@@ -51,7 +51,7 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 
 	b = append(b, cs...)
 	b = append(b, cc...)
-	b = append(b, hardSoftBreaks(n)...)
+	b = append(b, addHardBreaks(n)...)
 
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
@@ -62,7 +62,8 @@ func TravVertTextify(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) 
 	return
 }
 
-func inlineContent(n *html.Node) (ct string, ok bool) {
+// img and a nodes are converted into text nodes.
+func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 
 	if n.Type == html.ElementNode {
 		switch n.Data {
@@ -106,7 +107,7 @@ func inlineContent(n *html.Node) (ct string, ok bool) {
 	return
 }
 
-func hardSoftBreaks(n *html.Node) (s string) {
+func addHardBreaks(n *html.Node) (s string) {
 
 	if n.Type == html.ElementNode {
 		switch n.Data {

@@ -1,10 +1,6 @@
 package parse2
 
-import (
-	"strings"
-
-	"golang.org/x/net/html"
-)
+import "golang.org/x/net/html"
 
 var (
 	removes = map[string]bool{
@@ -98,6 +94,19 @@ var (
 	attrDistinct = map[string]int{}
 )
 
+func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
+
+	maxLvl = lvl
+	// Children
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		ret := maxTreeDepth(c, lvl+1)
+		if ret > maxLvl {
+			maxLvl = ret
+		}
+	}
+	return
+}
+
 func TraverseVertConvert(n *html.Node, lvl int) {
 
 	n.Attr = removeAttr(n.Attr, removeAttributes)
@@ -119,50 +128,6 @@ func TraverseVertConvert(n *html.Node, lvl int) {
 
 }
 
-func TravVertMaxLevel(n *html.Node, lvl int) (maxLvl int) {
-
-	maxLvl = lvl
-	// Children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		ret := TravVertMaxLevel(c, lvl+1)
-		if ret > maxLvl {
-			maxLvl = ret
-		}
-	}
-	return
-}
-
-func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
-
-	// processing
-
-	// empty element nodes
-	if n.Type == html.ElementNode &&
-		n.FirstChild == nil &&
-		(n.Data == "div" || n.Data == "span" ||
-			n.Data == "li" || n.Data == "p") {
-		n.Type = html.CommentNode
-	}
-
-	// spans with only 2 characters inside => remove
-	only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
-	if n.Type == html.ElementNode &&
-		n.Data == "span" &&
-		only1Child &&
-		n.FirstChild.Type == html.TextNode &&
-		len(strings.TrimSpace(n.FirstChild.Data)) < 3 {
-		n.Type = html.TextNode
-		n.Data = n.FirstChild.Data
-		n.RemoveChild(n.FirstChild)
-	}
-
-	// children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TravVertConvertEmptyLeafs(c, lvl+1)
-	}
-
-}
-
 // ConvertToComment neutralizes a node.
 // Note: We can not Remove() nor Replace()
 // Since that breaks the recursion one step above!
@@ -170,10 +135,7 @@ func TravVertConvertEmptyLeafs(n *html.Node, lvl int) {
 // to actually remove unwanted nodes.
 func ConvertToComment(n *html.Node) {
 	if removes[n.Data] {
-		// dom.ReplaceNode(n, &html.Node{Type: html.CommentNode, Data: n.Data + " replaced"})
-		// dom.RemoveNode(n)
 		n.Type = html.CommentNode
-		// fmt.Printf("\tunwanted %9v turned into comment\n", n.Data)
 		n.Data = n.Data + " replaced"
 	}
 }

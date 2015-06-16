@@ -6,7 +6,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-func TravHoriRemoveCommentAndSpaces(lp interface{}) {
+// Attn: Horizontal traversal using a queue
+func physicalNodeRemoval(lp interface{}) {
 
 	var queue = util.NewQueue(10)
 
@@ -24,6 +25,7 @@ func TravHoriRemoveCommentAndSpaces(lp interface{}) {
 			dom.RemoveNode(lpn)
 		}
 
+		// extinguish textnodes that do only formatting (spaces, tabs, line breaks)
 		if lpn.Type == html.TextNode && isSpacey(lpn.Data) {
 			dom.RemoveNode(lpn)
 		}

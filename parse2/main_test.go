@@ -13,6 +13,9 @@ import (
 	"golang.org/x/net/html"
 )
 
+var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
+var spf func(format string, a ...interface{}) string = fmt.Sprintf
+
 func Test1(t *testing.T) {
 	main()
 }
@@ -53,12 +56,18 @@ func main() {
 
 	for i := 0; i < len(tests); i++ {
 		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+4)
-		ioutil.WriteFile(fn, []byte(tests[i]), 0)
+		err := ioutil.WriteFile(fn, []byte(tests[i]), 0)
+		if err != nil {
+			log.Println(err)
+		} else {
+			pf("Written to %v\n", fn)
+		}
+
 	}
 
 	//
 	// ================================================
-	for i := 4; i <= 4; i++ {
+	for i := 1; i <= 4; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
@@ -74,23 +83,23 @@ func main() {
 		TraverseVertConvert(doc, 0)
 
 		for i := 0; i < 6; i++ {
-			TravVertConvertEmptyLeafs(doc, 0)
-			TravHoriRemoveCommentAndSpaces(Tx{doc, 0})
+			convEmptyElementLeafs(doc, 0)
+			physicalNodeRemoval(Tx{doc, 0})
 		}
 
 		maxLvlPrev := 0
 		for i := 0; i < 48; i++ {
-			lpMax := TravVertMaxLevel(doc, 0)
+			lpMax := maxTreeDepth(doc, 0)
 			if lpMax != maxLvlPrev {
 				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
 				maxLvlPrev = lpMax
 			}
-			TraverseVert_CondenseDivStaples(doc, 0)
+			condenseNestedDivs(doc, 0)
 		}
 
-		TravVertStats(doc, 0)
+		nodeHistogramAndXPathDump(doc, 0)
 
-		TravVertTextify(doc, 0, 0)
+		textExtraction(doc, 0, 0)
 
 		mpb := []byte{}
 		keys := make([]string, 0, len(mp))
@@ -135,6 +144,11 @@ func dom2File(fn string, node *html.Node) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ioutil.WriteFile(fn, b.Bytes(), 0)
+	err = ioutil.WriteFile(fn, b.Bytes(), 0)
+	if err != nil {
+		log.Println(err)
+	} else {
+		// pf("Written to %v\n", fn)
+	}
 
 }

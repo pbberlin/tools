@@ -1,6 +1,12 @@
+// Package levenshtein/word does tokenization on word level.
 package word
 
-import ls_core "github.com/pbberlin/tools/text/levenshtein"
+import (
+	"sort"
+
+	"github.com/pbberlin/tools/pbstrings"
+	ls_core "github.com/pbberlin/tools/text/levenshtein"
+)
 
 type Token string // we could use []rune instead of string
 
@@ -12,10 +18,23 @@ func (tk1 Token) Equal(compareTo interface{}) bool {
 	return tk1 == tk2
 }
 
-func convertToCore(sl1 []Token) []ls_core.Equaler {
-	var ret []ls_core.Equaler
-	for _, v := range sl1 {
-		cnv := ls_core.Equaler(v)
+// wrapAsEqualer breaks string into a slice of strings.
+// Each string is then converted to <Token> to <Equaler>.
+// []<Equaler> can then be pumped into the generic core.
+// We could as well create slices of Equalers in the first place
+// but first leads to a var farTooUglyLiteral =
+//   []ls_core.Equaler{ls_core.Equaler(Token("trink")), ls_core.Equaler(Token("nicht"))}
+func wrapAsEqualer(s string, sorted bool) []ls_core.Equaler {
+
+	ss := pbstrings.SplitByWhitespace(s)
+
+	if sorted {
+		sort.Strings(ss)
+	}
+
+	ret := make([]ls_core.Equaler, 0, len(ss))
+	for _, v := range ss {
+		cnv := ls_core.Equaler(Token(v))
 		ret = append(ret, cnv)
 	}
 	return ret

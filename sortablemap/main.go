@@ -1,11 +1,12 @@
+// Package sortablemap takes histogram data maps
+// with unpredictable *sparse* long tails,
+// and transforms them into a ordered and partially summed slice of struct.
 // Before using this package,
 // consider the documentation for util.StringKeysToSortedArray()
 // This package only adds value, if we want *repeated* access to
 // specific sort offsets, or to min and max values.
 // The package furthermore *flattens* the map to a fully ranged array
 // of offsets.
-// Use it to collect *sparse*, unpredictable histogram data
-// which later needs to be ordered and partially summed
 package sortablemap
 
 import "sort"

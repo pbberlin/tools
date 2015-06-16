@@ -1,3 +1,7 @@
+// Package levenshtein core computes the edit distance of two slices of tokens.
+// Tokens must be of interface type <Equaler> - implementing (tok) Equal(tok) bool.
+// An edit script for converting slice1 to slice2 can also be derived.
+// Preference for substitution over insertion/deletion is configurable.
 package levenshtein
 
 import (
@@ -9,12 +13,13 @@ import (
 
 const cl = 11 // column length for Print funcs
 
+// Equaler is the neccessary interface to compute the levenshtein distance.
 type Equaler interface {
 	Equal(compare2 interface{}) bool
 }
 
 // works also for idx == -1
-func InsertAfter(s []Equaler, idx int, newVal Equaler) []Equaler {
+func insertAfter(s []Equaler, idx int, newVal Equaler) []Equaler {
 	if idx > len(s)-1 {
 		panic("Cannot insert beyond existing length")
 	}
@@ -24,7 +29,7 @@ func InsertAfter(s []Equaler, idx int, newVal Equaler) []Equaler {
 	return s
 }
 
-func Delete(s []Equaler, idx int) []Equaler {
+func deleteAt(s []Equaler, idx int) []Equaler {
 	if idx > len(s)-1 {
 		panic("Cannot delete beyond existing length")
 	}
@@ -33,6 +38,8 @@ func Delete(s []Equaler, idx int) []Equaler {
 	return s
 }
 
+// The internal levenshtein matrix is only exported,
+// because calling packages need to declare its type.
 type Matrix struct {
 	mx         [][]int
 	rows, cols []Equaler
@@ -42,7 +49,7 @@ type Matrix struct {
 // New generates a 2-D array,
 // representing the dynamic programming table
 // used by the Levenshtein algorithm.
-// Compare http://www.let.rug.nl/kleiweg/lev/
+// Compare http://www.let.rug.nl/kleiweg/lev/.
 // Matrix can be used for retrieval of edit distance
 // and for backtrace scripts
 func New(argRows, argCols []Equaler, opt Options) Matrix {
@@ -93,19 +100,19 @@ func min(a int, b int) int {
 	return a
 }
 
-// Distance returns edit distance for an existing matrix.
-func (m Matrix) Distance() int {
+// Distance returns levenshtein edit distance for the two slices of tokens of m.
+func (m *Matrix) Distance() int {
 	return m.mx[len(m.mx)-1][len(m.mx[0])-1]
 }
 
 // EditScript returns an optimal edit script for an existing matrix.
-func (m Matrix) EditScript() TEditScrpt {
+func (m *Matrix) EditScript() TEditScrpt {
 	return m.backtrace(len(m.mx)-1, len(m.mx[0])-1)
 }
 
-// Backtrace is recursive
+// backtrace is recursive.
 // It starts bottom right and steps left/top/lefttop
-func (m Matrix) backtrace(i, j int) TEditScrpt {
+func (m *Matrix) backtrace(i, j int) TEditScrpt {
 
 	pf := func(str string) {}
 	// pf := fmt.Printf
@@ -146,9 +153,9 @@ func (m Matrix) backtrace(i, j int) TEditScrpt {
 	return []EditOpExt{}
 }
 
-// PrintTokensWithMatrix prints a visual representation
+// Print prints a visual representation
 // of the slices of tokens and their distance matrix
-func (m Matrix) Print() {
+func (m *Matrix) Print() {
 
 	rows, cols := m.rows, m.cols
 	mx := m.mx
@@ -184,6 +191,10 @@ func (m Matrix) Print() {
 	// fp("\n")
 }
 
+// ApplyEditScript applies the given Editscript
+// to the first slice of tokens of m.
+// The returned slice should be equal
+// to the second slice of tokens of m.
 func (m *Matrix) ApplyEditScript(es TEditScrpt) []Equaler {
 
 	sumIns := 0
@@ -205,13 +216,13 @@ func (m *Matrix) ApplyEditScript(es TEditScrpt) []Equaler {
 		pos := v.src + sumIns - sumDel
 
 		if v.op == Ins {
-			// rows2 = InsertAfter(rows2, util.Min(pos, len(rows2)-1), m.cols[v.dst])
-			rows2 = InsertAfter(rows2, pos-1, m.cols[v.dst])
+			// rows2 = insertAfter(rows2, util.Min(pos, len(rows2)-1), m.cols[v.dst])
+			rows2 = insertAfter(rows2, pos-1, m.cols[v.dst])
 			sumIns++
 		}
 
 		if v.op == Del {
-			rows2 = Delete(rows2, pos)
+			rows2 = deleteAt(rows2, pos)
 			sumDel++
 		}
 
@@ -230,7 +241,7 @@ func (m *Matrix) ApplyEditScript(es TEditScrpt) []Equaler {
 }
 
 // CompareToCol takes a slice of Equaler-Tokens
-// and compares them against the column tokens of m.
+// and compares them against the second matrix slice.
 func (m *Matrix) CompareToCol(col2 []Equaler) bool {
 	equal := true
 	for idx, v := range m.cols {

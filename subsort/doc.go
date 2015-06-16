@@ -1,5 +1,5 @@
-// Use case: We have a slice of any struct,
-// and want to sort that slice by some field *in* the struct.
+// Package subsort is for sorting slices of any struct,
+// to be sorted by some field *in* the struct.
 //
 // We can standardize / generify this sorting,
 // provided we stick to a few narrowing assumptions
@@ -18,20 +18,20 @@
 //		Therefore we resort to creating desired []SortedByVal outside.
 // 7.) Similar mechanisms for float, time could be added
 // 8.) Maintenance by file diffing
-
+//
 // We don't need to return pointers to the sorted slices,
 // since slices are already references to the underlying array.
-
+//
 // SortedBy[String/Int]Val sadly needs to be exported,
 // because the sorted slices will be given to the outside callee
 // with type []SortedBy...Val
-
+//
 // I tried to cascade the sort interface implementations,
 // using a "base" type for .Len() and have the others wrap it,
 // but strangely, compiler demands implementation at the top level.
 // Thus we end up with *four* identical implementations of Len(),Swap()
 // and four *almost identical* implementations of Less()
-
+//
 // Special-map-by-int.go adds a special case.
 // I often have map[string]int for counters. I.e.:
 //   mapX["someKey"]++

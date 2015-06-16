@@ -1,3 +1,4 @@
+// Package levenshtein/rune tokenizes on utf8 "codepoint" level.
 package rune
 
 import ls_core "github.com/pbberlin/tools/text/levenshtein"
@@ -12,7 +13,9 @@ func (tk1 Token) Equal(compareTo interface{}) bool {
 	return tk1 == tk2
 }
 
-func convertToCore(sl1 []Token) []ls_core.Equaler {
+// wrapAsEqualer wraps slice of tokens into interface type Equaler.
+// Since our core implementation requires such slices.
+func wrapAsEqualer(sl1 []Token) []ls_core.Equaler {
 	var ret []ls_core.Equaler
 	for _, v := range sl1 {
 		cnv := ls_core.Equaler(v)

@@ -5,7 +5,7 @@ import "fmt"
 // Requires type of sl == interface{}
 // Would double conversion cost.
 // => We have to convert in the calling package.
-func ConvertToEqualer(sl []interface{}) []Equaler {
+func convertToEqualer(sl []interface{}) []Equaler {
 	var ret = make([]Equaler, 0, len(sl))
 	for _, v := range sl {
 		cnv, ok := v.(Equaler)

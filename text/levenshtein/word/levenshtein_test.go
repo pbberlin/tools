@@ -10,55 +10,78 @@ import (
 )
 
 type TestCase struct {
-	src      []Token
-	dst      []Token
-	distance int
+	src       string
+	dst       string
+	distances []int
 }
 
-var testCases = []TestCase{
+var testCasesBasic = []TestCase{
 
 	// Edit Script Test Cases
-	{[]Token{"wd1", "wd2", "wd1"}, []Token{"wd1", "wd3", "wd1"}, 2},
-	{[]Token{"wd2", "wd1", "wd1", "wd1", "wd2", "wd1"}, []Token{"wd1", "wd1"}, 4},
+	{"", "wd1", []int{1, 1}},
+	{"wd1", "wd1 wd1", []int{1, 1}},
+	{"wd1", "wd1 wd1 wd1", []int{2, 2}},
 
-	//
-	{[]Token{}, []Token{"wd1"}, 1},
-	{[]Token{"wd1"}, []Token{"wd1", "wd1"}, 1},
-	{[]Token{"wd1"}, []Token{"wd1", "wd1", "wd1"}, 2},
+	{"", "", []int{0, 0}},
+	{"wd1", "wd2", []int{2, 2}},
+	{"wd1 wd1 wd1", "wd1 wd2 wd1", []int{2, 2}},
+	{"wd1 wd1 wd1", "wd1 wd2", []int{3, 3}},
 
-	{[]Token{}, []Token{}, 0},
-	{[]Token{"wd1"}, []Token{"wd2"}, 2},
-	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1"}, 2},
-	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2"}, 3},
+	{"wd1", "wd1", []int{0, 0}},
+	{"wd1 wd2", "wd1 wd2", []int{0, 0}},
+	{"wd1", "", []int{1, 1}},
 
-	{[]Token{"wd1"}, []Token{"wd1"}, 0},
-	{[]Token{"wd1", "wd2"}, []Token{"wd1", "wd2"}, 0},
-	{[]Token{"wd1"}, []Token{}, 1},
+	{"wd1 wd2", "wd1", []int{1, 1}},
+	{"wd1 wd2 wd3", "wd1", []int{2, 2}},
 
-	{[]Token{"wd1", "wd2"}, []Token{"wd1"}, 1},
-	{[]Token{"wd1", "wd2", "wd3"}, []Token{"wd1"}, 2},
-
-	{[]Token{"wd1", "wd1", "wd1"}, []Token{"wd1", "wd2", "wd1", "wd3"}, 3},
-
-	{[]Token{"trink", "nicht", "so", "viel", "Kaffee"},
-		[]Token{"nicht", "für", "Kinder", "ist", "der", "Türkentrank"}, 9},
-
-	{[]Token{"ihn", "nicht", "der", "lassen", "kann"},
-		[]Token{"nicht", "für", "Kinder", "ist", "der", "Türkentrank"}, 7},
+	{"wd1 wd1 wd1", "wd1 wd2 wd1 wd3", []int{3, 3}},
 }
 
-func TestLevenshtein(t *testing.T) {
-	for i, tc := range testCases {
+var testCasesAdv1 = []TestCase{
+	{"trink nicht so viel Kaffee",
+		"nicht für Kinder ist der Türkentrank", []int{9, 9}},
 
-		m := ls_core.New(convertToCore(tc.src), convertToCore(tc.dst), ls_core.DefaultOptions)
+	{"ihn nicht der lassen kann",
+		"nicht für Kinder ist der Türkentrank", []int{7, 7}},
+}
+
+var testCasesMoved = []TestCase{
+	{"Ich ging im Walde so vor mich hin",
+		"im Walde Ich ging so vor mich hin", []int{4, 4}},
+
+	{"Ich ging im Walde so vor mich hin",
+		"so vor mich hin im Walde Ich ging", []int{8, 8}},
+}
+
+func TestLevenshteinA(t *testing.T) {
+
+	cases := &testCasesBasic
+	cases = &testCasesAdv1
+	cases = &testCasesMoved
+
+	{
+		inner(t, cases, 0, ls_core.DefaultOptions, false)
+		opt2 := ls_core.DefaultOptions
+		opt2.SubCost = 1
+		inner(t, cases, 1, opt2, false)
+		inner(t, cases, 1, opt2, true)
+	}
+
+}
+
+func inner(t *testing.T, cases *[]TestCase, wantIdx int, opt ls_core.Options, sortIt bool) {
+
+	for i, tc := range *cases {
+
+		m := ls_core.New(wrapAsEqualer(tc.src, sortIt), wrapAsEqualer(tc.dst, sortIt), opt)
 		got := m.Distance()
 
 		ssrc := fmt.Sprintf("%v", tc.src)
 		sdst := fmt.Sprintf("%v", tc.dst)
-		if got != tc.distance {
+		if got != tc.distances[wantIdx] {
 			t.Logf(
 				"%2v: Distance between %20v and %20v should be %v - but got %v ",
-				i, pbstrings.Ellipsoider(ssrc, 8), pbstrings.Ellipsoider(sdst, 8), tc.distance, got)
+				i, pbstrings.Ellipsoider(ssrc, 8), pbstrings.Ellipsoider(sdst, 8), tc.distances[wantIdx], got)
 			t.Fail()
 		}
 
@@ -66,12 +89,10 @@ func TestLevenshtein(t *testing.T) {
 		fmt.Printf("\n")
 
 		es := m.EditScript()
-		// es.Print()
-		// fmt.Printf("\n")
 
 		got2 := m.ApplyEditScript(es)
 		if !m.CompareToCol(got2) {
-			t.Logf("\nwnt %v \ngot %v ", convertToCore(tc.dst), got2)
+			t.Logf("\nwnt %v \ngot %v ", wrapAsEqualer(tc.dst, sortIt), got2)
 			t.Fail()
 		}
 

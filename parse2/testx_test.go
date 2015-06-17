@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/pbfetch"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
@@ -84,9 +85,25 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
-	for _, v1 := range texts {
+	pf("testing\n")
+	for k1, v1 := range texts {
+		pf("%v\n", k1)
 		for _, v2 := range v1 {
-			pf("%v\n", v2)
+			pf(" cmp %v\n  to ", pbstrings.Ellipsoider(string(v2), 22))
+			cols := 0
+			for k3, v3 := range texts {
+				if k1 == k3 {
+					continue
+				}
+				for _, v4 := range v3 {
+					pf("%v |", pbstrings.Ellipsoider(pbstrings.ToLen(string(v4), 26), 12))
+					cols++
+					if cols%4 == 0 {
+						pf("\n     ")
+					}
+				}
+			}
+			pf("\n")
 		}
 	}
 

@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/html"
 )
 
+const cMinLen = 10
+
 var mp = map[string][]byte{}
 
 func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
@@ -56,7 +58,9 @@ func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
 		idMap := fmt.Sprintf("%v-% 5v", id, len(csCc))
-		mp[idMap] = csCc
+		if len(csCc) > cMinLen {
+			mp[idMap] = csCc
+		}
 	}
 
 	return

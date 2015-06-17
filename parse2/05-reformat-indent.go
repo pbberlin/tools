@@ -12,14 +12,14 @@ import (
 //        0    1    2
 const cScaffoldLvls = 2
 
-func TraverseVertIndent(n *html.Node, lvl int) {
+func reIndent(n *html.Node, lvl int) {
 
 	// Before children processing
 	switch n.Type {
 	case html.ElementNode:
 		if lvl > cScaffoldLvls && n.Parent.Type == html.ElementNode {
-			indent := strings.Repeat("\t", lvl-2)
-			dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n" + indent})
+			ind := strings.Repeat("\t", lvl-2)
+			dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n" + ind})
 		}
 	case html.CommentNode:
 		dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n"})
@@ -29,7 +29,7 @@ func TraverseVertIndent(n *html.Node, lvl int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVertIndent(c, lvl+1)
+		reIndent(c, lvl+1)
 	}
 
 	// After children processing
@@ -38,9 +38,9 @@ func TraverseVertIndent(n *html.Node, lvl int) {
 		// I dont know why,
 		// but this needs to happend AFTER the children
 		if lvl > cScaffoldLvls && n.Parent.Type == html.ElementNode {
-			indent := strings.Repeat("\t", lvl-2)
+			ind := strings.Repeat("\t", lvl-2)
 			if n.LastChild != nil {
-				dom.InsertAfter(n.LastChild, &html.Node{Type: html.TextNode, Data: "\n" + indent})
+				dom.InsertAfter(n.LastChild, &html.Node{Type: html.TextNode, Data: "\n" + ind})
 			}
 		}
 	}

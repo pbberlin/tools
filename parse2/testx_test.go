@@ -3,7 +3,6 @@ package parse2
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"sort"
 	"testing"
@@ -19,14 +18,11 @@ func Test1(t *testing.T) {
 
 func main() {
 
-	for i := 0; i < len(tests); i++ {
-		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+4)
-		bytes2File(fn, []byte(tests[i]))
-	}
+	texts := []map[string][]byte{}
 
 	//
 	// ================================================
-	for i := 1; i <= 4; i++ {
+	for i := 4; i <= 5; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
@@ -74,7 +70,9 @@ func main() {
 		}
 		bytes2File(fn2, mpb)
 
-		TraverseVertIndent(doc, 0)
+		texts = append(texts, mp)
+
+		reIndent(doc, 0)
 
 		bytes2File(fn1, xPathDump)
 		dom2File(fn3, doc)
@@ -86,6 +84,12 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
+	for _, v1 := range texts {
+		for _, v2 := range v1 {
+			pf("%v\n", v2)
+		}
+	}
+
 	return
 
 }
@@ -95,20 +99,4 @@ func globFixes(b []byte) []byte {
 
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
-}
-
-func dom2File(fn string, node *html.Node) {
-	var b bytes.Buffer
-	err := html.Render(&b, node)
-	if err != nil {
-		log.Fatal(err)
-	}
-	bytes2File(fn, b.Bytes())
-}
-
-func bytes2File(fn string, b []byte) {
-	err := ioutil.WriteFile(fn, b, 0)
-	if err != nil {
-		log.Println(err)
-	}
 }

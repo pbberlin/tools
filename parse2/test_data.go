@@ -1,5 +1,7 @@
 package parse2
 
+import "fmt"
+
 var tests = make([]string, 2)
 
 func init() {
@@ -33,5 +35,13 @@ func init() {
 			<ul>
 				<li>die ooolten Rittersleut</li>
 			</ul>`
+
+	const offSetFilename = 4
+
+	// write out to http doc root
+	for i := 0; i < len(tests); i++ {
+		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+offSetFilename)
+		bytes2File(fn, []byte(tests[i]))
+	}
 
 }

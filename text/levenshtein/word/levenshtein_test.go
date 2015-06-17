@@ -73,7 +73,7 @@ func inner(t *testing.T, cases *[]TestCase, wantIdx int, opt ls_core.Options, so
 
 	for i, tc := range *cases {
 
-		m := ls_core.New(wrapAsEqualer(tc.src, sortIt), wrapAsEqualer(tc.dst, sortIt), opt)
+		m := ls_core.New(WrapAsEqualer(tc.src, sortIt), WrapAsEqualer(tc.dst, sortIt), opt)
 		got := m.Distance()
 
 		ssrc := fmt.Sprintf("%v", tc.src)
@@ -92,7 +92,7 @@ func inner(t *testing.T, cases *[]TestCase, wantIdx int, opt ls_core.Options, so
 
 		got2 := m.ApplyEditScript(es)
 		if !m.CompareToCol(got2) {
-			t.Logf("\nwnt %v \ngot %v ", wrapAsEqualer(tc.dst, sortIt), got2)
+			t.Logf("\nwnt %v \ngot %v ", WrapAsEqualer(tc.dst, sortIt), got2)
 			t.Fail()
 		}
 

@@ -13,56 +13,15 @@ import (
 	"golang.org/x/net/html"
 )
 
-var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
-var spf func(format string, a ...interface{}) string = fmt.Sprintf
-
 func Test1(t *testing.T) {
 	main()
 }
 
 func main() {
 
-	tests := make([]string, 2)
-
-	tests[0] = `<!DOCTYPE html><html><head>
-		<script type="text/javascript" src="./article01_files/empty.js"></script>
-		<link href="./article01_files/vendor.css" rel="stylesheet" type="text/css"/>
-		</head><body><p>Links:
-				<span>span01</span>
-				<span>span02-line1<br>span02-line2</span>
-				<span>span03</span>
-			</p>
-			<style> p {font-size:17px}</style>
-			<ul>
-				<li id='332' ><a   href="/some/first/page.html">Linktext1 <span>inside</span></a>
-				<li><a   href="/snd/page" title="wi-title">LinkT2</a>
-			</ul>
-			<div>
-				<div>div-1-content</div>
-				<div>div-2-content</div>
-				<p>pararaph in between</p>
-				<div>div-3-content with iimmage<img alt="alt-cnt" title='title-cnt' 
-				href='some-long-href-some-long-href-some-long-href-some-long-href'>after img</div>
-			</div>
-			</body></html>`
-
-	tests[1] = `	<p>
-				Ja so sans<br/>
-				Ja die sans.
-			</p>
-			<ul>
-				<li>die ooolten Rittersleut</li>
-			</ul>`
-
 	for i := 0; i < len(tests); i++ {
 		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+4)
-		err := ioutil.WriteFile(fn, []byte(tests[i]), 0)
-		if err != nil {
-			log.Println(err)
-		} else {
-			pf("Written to %v\n", fn)
-		}
-
+		bytes2File(fn, []byte(tests[i]))
 	}
 
 	//
@@ -80,11 +39,11 @@ func main() {
 			log.Fatal(err)
 		}
 
-		TraverseVertConvert(doc, 0)
+		cleanseDom(doc, 0)
 
 		for i := 0; i < 6; i++ {
 			convEmptyElementLeafs(doc, 0)
-			physicalNodeRemoval(Tx{doc, 0})
+			physicalNodeRemoval(NdX{doc, 0})
 		}
 
 		maxLvlPrev := 0
@@ -97,7 +56,7 @@ func main() {
 			condenseNestedDivs(doc, 0)
 		}
 
-		nodeHistogramAndXPathDump(doc, 0)
+		dumpXPath(doc, 0)
 
 		textExtraction(doc, 0, 0)
 
@@ -113,11 +72,11 @@ func main() {
 				mpb = append(mpb, row...)
 			}
 		}
-		ioutil.WriteFile(fn2, mpb, 0)
+		bytes2File(fn2, mpb)
 
 		TraverseVertIndent(doc, 0)
 
-		ioutil.WriteFile(fn1, xPathDump, 0)
+		bytes2File(fn1, xPathDump)
 		dom2File(fn3, doc)
 	}
 
@@ -144,11 +103,12 @@ func dom2File(fn string, node *html.Node) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(fn, b.Bytes(), 0)
+	bytes2File(fn, b.Bytes())
+}
+
+func bytes2File(fn string, b []byte) {
+	err := ioutil.WriteFile(fn, b, 0)
 	if err != nil {
 		log.Println(err)
-	} else {
-		// pf("Written to %v\n", fn)
 	}
-
 }

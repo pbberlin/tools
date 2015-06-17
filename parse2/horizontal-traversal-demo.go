@@ -7,11 +7,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type Tx struct {
-	Nd  *html.Node
-	Lvl int
-}
-
 // TraverseHori traverses the tree horizontally.
 // It uses a queue. A FiFo structure.
 // Inspired by www.geeksforgeeks.org/level-order-tree-traversal/
@@ -22,8 +17,8 @@ func traverseHori(lp interface{}) {
 	lvlPrev := 0
 	for lp != nil {
 
-		lpn := lp.(Tx).Nd
-		lvl := lp.(Tx).Lvl
+		lpn := lp.(NdX).Nd
+		lvl := lp.(NdX).Lvl
 
 		// print current
 		if lvl != lvlPrev { // new level => newline
@@ -35,7 +30,7 @@ func traverseHori(lp interface{}) {
 		// enqueue all children
 		for c := lpn.FirstChild; c != nil; c = c.NextSibling {
 			if c.Type == html.ElementNode {
-				queue.EnQueue(Tx{c, lvl + 1})
+				queue.EnQueue(NdX{c, lvl + 1})
 			}
 		}
 		lp = queue.DeQueue()

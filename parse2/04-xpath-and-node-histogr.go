@@ -14,9 +14,9 @@ var (
 	xPathDump []byte
 )
 
-// nodeHistogramAndXPathDump writes an xpath log
-// and collects frequency of node type data.
-func nodeHistogramAndXPathDump(n *html.Node, lvl int) {
+// dumpXPath writes an xpath log.
+// dumpXPath also collects frequency of node type data.
+func dumpXPath(n *html.Node, lvl int) {
 
 	if lvl == 0 {
 		xPathDump = []byte{}
@@ -38,7 +38,7 @@ func nodeHistogramAndXPathDump(n *html.Node, lvl int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		nodeHistogramAndXPathDump(c, lvl+1)
+		dumpXPath(c, lvl+1)
 	}
 
 	// After children processing

@@ -33,7 +33,7 @@ var testCases = []struct {
 func TestLevenshtein(t *testing.T) {
 	for _, tc := range testCases {
 
-		mx := ls_core.New(wrapAsEqualer(tc.src), wrapAsEqualer(tc.dst), ls_core.DefaultOptions)
+		mx := ls_core.New(WrapAsEqualer(tc.src), WrapAsEqualer(tc.dst), ls_core.DefaultOptions)
 		got := mx.Distance()
 
 		if got != tc.distance {

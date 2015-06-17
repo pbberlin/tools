@@ -107,17 +107,17 @@ func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
 	return
 }
 
-func TraverseVertConvert(n *html.Node, lvl int) {
+func cleanseDom(n *html.Node, lvl int) {
 
 	n.Attr = removeAttr(n.Attr, removeAttributes)
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		TraverseVertConvert(c, lvl+1)
+		cleanseDom(c, lvl+1)
 	}
 
-	NormalizeToDiv(n)
-	ConvertToComment(n)
+	normalizeToDiv(n)
+	convertToComment(n)
 
 	// one time text normalization
 	if n.Type == html.TextNode {
@@ -128,19 +128,19 @@ func TraverseVertConvert(n *html.Node, lvl int) {
 
 }
 
-// ConvertToComment neutralizes a node.
+// convertToComment neutralizes a node.
 // Note: We can not Remove() nor Replace()
 // Since that breaks the recursion one step above!
 // At a later stage we will employ horizontal traversal
 // to actually remove unwanted nodes.
-func ConvertToComment(n *html.Node) {
+func convertToComment(n *html.Node) {
 	if removes[n.Data] {
 		n.Type = html.CommentNode
 		n.Data = n.Data + " replaced"
 	}
 }
 
-func NormalizeToDiv(n *html.Node) {
+func normalizeToDiv(n *html.Node) {
 	if repl, ok := simplifies[n.Data]; ok {
 		n.Attr = append(n.Attr, html.Attribute{"", "cfrm", n.Data})
 		n.Data = repl

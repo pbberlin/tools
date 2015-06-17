@@ -13,9 +13,9 @@ func (tk1 Token) Equal(compareTo interface{}) bool {
 	return tk1 == tk2
 }
 
-// wrapAsEqualer wraps slice of tokens into interface type Equaler.
+// WrapAsEqualer wraps slice of tokens into interface type Equaler.
 // Since our core implementation requires such slices.
-func wrapAsEqualer(sl1 []Token) []ls_core.Equaler {
+func WrapAsEqualer(sl1 []Token) []ls_core.Equaler {
 	var ret []ls_core.Equaler
 	for _, v := range sl1 {
 		cnv := ls_core.Equaler(v)

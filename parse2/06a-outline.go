@@ -33,3 +33,21 @@ func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 
 	return
 }
+
+func nodeCountHoriz(n *html.Node, lvl int, argNum int) (num int) {
+
+	num = argNum
+
+	if lvl > cScaffoldLvls {
+		if n.Type == html.ElementNode {
+			n.Attr = append(n.Attr, html.Attribute{"", "id", spf("%v", num)})
+		}
+	}
+
+	// Children
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		num = nodeCountHoriz(c, lvl+1, num+1)
+	}
+
+	return
+}

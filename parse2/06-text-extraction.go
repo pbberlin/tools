@@ -10,21 +10,14 @@ import (
 
 const cMinLen = 10
 
-var mp = map[string][]byte{}
+var mpLg = map[string][]byte{}
+var mpSh = map[string][]byte{}
 
-func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
+func textExtraction(n *html.Node, lvl int) (b []byte) {
 
 	if lvl == 0 {
-		mp = map[string][]byte{}
-	}
-
-	horiNum = argHoriNum
-
-	id := fmt.Sprintf("%v-%2v", lvl, horiNum)
-	if lvl > cScaffoldLvls {
-		if n.Type == html.ElementNode {
-			n.Attr = addIdAttr(n.Attr, id)
-		}
+		mpLg = map[string][]byte{}
+		mpSh = map[string][]byte{}
 	}
 
 	var cs []byte // content self
@@ -36,14 +29,13 @@ func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
 		}
 	}
 	if content, ok := inlineNodesToText(n); ok {
-		// cs = append([]byte(content), cs...)
 		cs = append(cs, content...)
 	}
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		var ccX []byte // content child X
-		ccX, horiNum = textExtraction(c, lvl+1, horiNum+1)
+		ccX = textExtraction(c, lvl+1)
 		ccX = bytes.TrimSpace(ccX)
 		if len(ccX) > 0 {
 			ccX = append(ccX, byte(' '))
@@ -59,9 +51,13 @@ func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
 
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
-		idMap := fmt.Sprintf("%v-% 5v", id, len(csCc))
+		ol := attrX(n.Attr, "ol")
+		id := attrX(n.Attr, "id")
+		key := fmt.Sprintf("%2v:%8v:%5v:%5v", lvl-cScaffoldLvls, ol, id, len(csCc))
+
+		mpLg[key] = csCc
 		if len(csCc) > cMinLen {
-			mp[idMap] = csCc
+			mpSh[key] = csCc
 		}
 	}
 

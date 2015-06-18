@@ -55,37 +55,20 @@ func main() {
 
 		dumpXPath(doc, 0)
 
-		textExtraction(doc, 0, 0)
+		computeOutline(doc, 0, []int{0})
+		nodeCountHoriz(doc, 0, 1)
 
-		mpb := []byte{}
-		keys := make([]string, 0, len(mp))
-		for k := range mp {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, key := range keys {
-			if true || len(mp[key]) > 30 {
-				row := fmt.Sprintf("%8v: %s\n", key, mp[key])
-				mpb = append(mpb, row...)
-			}
-		}
-		bytes2File(fn2, mpb)
+		textExtraction(doc, 0)
 
-		texts = append(texts, mp)
+		textsLong := sortedByKey(mpLg)
+		bytes2File(fn2, textsLong)
+		texts = append(texts, mpSh)
 
 		reIndent(doc, 0)
-
-		computeOutline(doc, 0, []int{0})
 
 		bytes2File(fn1, xPathDump)
 		dom2File(fn3, doc)
 	}
-
-	sorted1 := subsort.SortMapByCount(attrDistinct)
-	sorted1.Print()
-	fmt.Println()
-	sorted2 := subsort.SortMapByCount(nodeDistinct)
-	sorted2.Print()
 
 	pf("testing\n")
 	for k1, v1 := range texts {
@@ -109,7 +92,11 @@ func main() {
 		}
 	}
 
-	return
+	sorted1 := subsort.SortMapByCount(attrDistinct)
+	sorted1.Print()
+	fmt.Println()
+	sorted2 := subsort.SortMapByCount(nodeDistinct)
+	sorted2.Print()
 
 }
 
@@ -118,4 +105,22 @@ func globFixes(b []byte) []byte {
 
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
+}
+
+func sortedByKey(mp1which map[string][]byte) []byte {
+
+	keys := make([]string, 0, len(mp1which))
+	for k := range mp1which {
+		keys = append(keys, k)
+	}
+
+	sort.Strings(keys)
+
+	ret := []byte{}
+	for _, key := range keys {
+		row := fmt.Sprintf("%8v: %s\n", key, mp1which[key])
+		ret = append(ret, row...)
+	}
+	return ret
+
 }

@@ -71,7 +71,7 @@ func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.
 	return ret
 }
 
-func addIdAttr(attributes []html.Attribute, id string) []html.Attribute {
+func Unused_addIdAttr(attributes []html.Attribute, id string) []html.Attribute {
 	hasId := false
 	for _, a := range attributes {
 		if a.Key == "id" {

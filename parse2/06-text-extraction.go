@@ -51,7 +51,9 @@ func textExtraction(n *html.Node, lvl, argHoriNum int) (b []byte, horiNum int) {
 		}
 	}
 
+	// b = append(b, "slf:"...)
 	b = append(b, cs...)
+	// b = append(b, "chn:"...)
 	b = append(b, cc...)
 	b = append(b, addHardBreaks(n)...)
 

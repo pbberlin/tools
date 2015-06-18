@@ -23,7 +23,7 @@ func main() {
 
 	//
 	// ================================================
-	for i := 4; i <= 5; i++ {
+	for i := 3; i <= 5; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
@@ -75,6 +75,8 @@ func main() {
 
 		reIndent(doc, 0)
 
+		computeOutline(doc, 0, []int{0})
+
 		bytes2File(fn1, xPathDump)
 		dom2File(fn3, doc)
 	}
@@ -87,16 +89,16 @@ func main() {
 
 	pf("testing\n")
 	for k1, v1 := range texts {
-		pf("%v\n", k1)
-		for _, v2 := range v1 {
-			pf(" cmp %v\n  to ", pbstrings.Ellipsoider(string(v2), 22))
+		pf(" %v\n", k1)
+		for k2, v2 := range v1 {
+			pf(" cmp  %v - %v\n  to ", pbstrings.Ellipsoider(string(v2), 10), k2)
 			cols := 0
 			for k3, v3 := range texts {
 				if k1 == k3 {
 					continue
 				}
 				for _, v4 := range v3 {
-					pf("%v |", pbstrings.Ellipsoider(pbstrings.ToLen(string(v4), 26), 12))
+					pf(" %v |", pbstrings.ToLen(pbstrings.Ellipsoider(string(v4), 10), 20))
 					cols++
 					if cols%4 == 0 {
 						pf("\n     ")

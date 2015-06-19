@@ -1,5 +1,7 @@
 package pbstrings
 
+// go test -bench=. -benchtime=6ms
+
 import (
 	"fmt"
 	"testing"
@@ -36,4 +38,26 @@ func Test(t *testing.T) {
 		}
 
 	}
+}
+
+// Sadly, conversion of []byte to string costs O(n)
+func BenchmarkByteToString(b *testing.B) {
+
+	var tests = []struct {
+		inp []byte
+		wnt string
+	}{
+		{[]byte("C A F F E E trink nicht so viel Kaffee"), "C A F F E E trink nicht so viel Kaffee"},
+		{[]byte("änne zylinder"), "änne zylinder"},
+	}
+
+	b.ResetTimer() // Don't time creation and population
+
+	b.StartTimer()
+	idx := 0
+	for i := 0; i < b.N; i++ {
+		idx = i % len(tests)
+		_ = string(tests[idx].inp)
+	}
+
 }

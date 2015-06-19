@@ -25,10 +25,24 @@ func (tk1 Token) Equal(compareTo interface{}) bool {
 // but first leads to a var farTooUglyLiteral =
 //   []ls_core.Equaler{ls_core.Equaler(Token("trink")), ls_core.Equaler(Token("nicht"))}
 func WrapAsEqualer(s string, sorted bool) []ls_core.Equaler {
+
 	ss := pbstrings.SplitByWhitespace(s)
 	if sorted {
 		sort.Strings(ss)
+
+		// weed out doublettes
+		su, prev := make([]string, 0, len(ss)), ""
+		for _, v := range ss {
+			if v == prev {
+				continue
+			}
+			su = append(su, v)
+			prev = v
+		}
+		ss = su
+
 	}
+
 	ret := make([]ls_core.Equaler, 0, len(ss))
 	for _, v := range ss {
 		cnv := ls_core.Equaler(Token(v))

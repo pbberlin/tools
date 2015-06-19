@@ -46,9 +46,9 @@ func condenseNestedDivs(n *html.Node, lvl int) {
 
 	condenseUpwards(n, []string{"div", "div"}, "div")
 
-	condenseUpwards(n, []string{"div", "ul"}, "ul")
+	// condenseUpwards(n, []string{"div", "ul"}, "ul")
 
-	condenseUpwards(n, []string{"ul", "ul"}, "ul")
+	// condenseUpwards(n, []string{"ul", "ul"}, "ul")
 
 	// condenseUpwards(n, []string{"li", "div"}, "li") // questionable
 

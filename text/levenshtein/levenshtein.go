@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/util"
 )
 
 const cl = 11 // column length for Print funcs
@@ -101,8 +102,19 @@ func min(a int, b int) int {
 }
 
 // Distance returns levenshtein edit distance for the two slices of tokens of m.
-func (m *Matrix) Distance() int {
-	return m.mx[len(m.mx)-1][len(m.mx[0])-1]
+func (m *Matrix) Distance() (int, float64) {
+	dist := m.mx[len(m.mx)-1][len(m.mx[0])-1]
+
+	relDist := 0.0
+
+	ls1, ls2 := len(m.mx), len(m.mx[0])
+	diff := util.Abs(ls1 - ls2)
+	if ls1 >= ls2 { // row > col
+		relDist = float64(dist-diff) / float64(ls2)
+	} else {
+		relDist = float64(dist-diff) / float64(ls1)
+	}
+	return dist, relDist
 }
 
 // EditScript returns an optimal edit script for an existing matrix.

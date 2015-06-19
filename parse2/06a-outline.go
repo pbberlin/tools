@@ -1,12 +1,10 @@
 package parse2
 
 import (
-	"strings"
+	"fmt"
 
 	"golang.org/x/net/html"
 )
-
-var outlFmt = strings.NewReplacer("[", "", "]", "", " ", ".")
 
 func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 
@@ -15,8 +13,11 @@ func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 	if n.Type == html.ElementNode && lvl > cScaffoldLvls {
 
 		outline[len(outline)-1]++
-		s := spf("%v", outline)
-		s = outlFmt.Replace(s)
+
+		s := ""
+		for _, v := range outline {
+			s = fmt.Sprintf("%v%02v.", s, v)
+		}
 		n.Attr = append(n.Attr, html.Attribute{"", "ol", s})
 
 		outline = append(outline, 0) // add children lvl

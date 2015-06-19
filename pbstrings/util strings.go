@@ -50,20 +50,33 @@ func LowerCasedUnderscored(s string) string {
 // ToLen chops or extends string to the exactly desired length
 // format strings like %4v do not restrict.
 func ToLen(s string, nx int) string {
-	if len(s) < nx {
-		return fmt.Sprintf("%v%v", s, strings.Repeat(" ", nx-len(s)))
-	} else if len(s) > nx {
-		return s[:nx]
-	} else {
-		return s
+
+	ret := make([]rune, 0, nx)
+	cntr := 0
+
+	for idx, cp := range s {
+		ret = append(ret, cp)
+		cntr++
+		if idx > nx {
+			break
+		}
 	}
+
+	for cntr <= nx {
+		ret = append(ret, ' ')
+		cntr++
+	}
+
+	return string(ret)
+
 }
 
 //  followed by ... and n trailing characters
 func Ellipsoider(s string, nx int) string {
 
 	if len(s) == 0 {
-		return "[empty]"
+		return ""
+		// return "[empty]"
 	}
 
 	if len(s) <= 2*nx {

@@ -33,8 +33,8 @@ func init() {
 				Ja die sans.
 			</p>
 			<ul>
-				<li>die ooolten</li>
-				<li>Rittersleut</li>
+				<li>Gepriesen sei der Mann, der wenn er nichts</li>
+				<li>zu sagen hat</li>
 			</ul>`
 
 	const offSetFilename = 4

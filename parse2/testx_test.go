@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/pbfetch"
-	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
@@ -17,9 +16,9 @@ func Test1(t *testing.T) {
 	main()
 }
 
-func main() {
+var articleTexts = map[string]map[string][]byte{}
 
-	texts := []map[string][]byte{}
+func main() {
 
 	//
 	// ================================================
@@ -27,7 +26,8 @@ func main() {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
-		fn2 := fmt.Sprintf("outpI%v_2T.txt", i)
+		fn2sh := fmt.Sprintf("outpI%v_2Tsh.txt", i)
+		fn2lg := fmt.Sprintf("outpI%v_2Tlg.txt", i)
 		fn3 := fmt.Sprintf("outpI%v_3.html", i)
 		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
 		resBytes = globFixes(resBytes)
@@ -61,8 +61,12 @@ func main() {
 		textExtraction(doc, 0)
 
 		textsLong := sortedByKey(mpLg)
-		bytes2File(fn2, textsLong)
-		texts = append(texts, mpSh)
+		bytes2File(fn2lg, textsLong)
+
+		textsShrt := sortedByKey(mpSh)
+		bytes2File(fn2sh, textsShrt)
+
+		articleTexts[fn3] = mpSh
 
 		reIndent(doc, 0)
 
@@ -70,27 +74,7 @@ func main() {
 		dom2File(fn3, doc)
 	}
 
-	pf("testing\n")
-	for k1, v1 := range texts {
-		pf(" %v\n", k1)
-		for k2, v2 := range v1 {
-			pf(" cmp  %v - %v\n  to ", pbstrings.Ellipsoider(string(v2), 10), k2)
-			cols := 0
-			for k3, v3 := range texts {
-				if k1 == k3 {
-					continue
-				}
-				for _, v4 := range v3 {
-					pf(" %v |", pbstrings.ToLen(pbstrings.Ellipsoider(string(v4), 10), 20))
-					cols++
-					if cols%4 == 0 {
-						pf("\n     ")
-					}
-				}
-			}
-			pf("\n")
-		}
-	}
+	rangeOverTexts()
 
 	sorted1 := subsort.SortMapByCount(attrDistinct)
 	sorted1.Print()

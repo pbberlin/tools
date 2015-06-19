@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-const cMinLen = 10
+const cMinLen = 50
 
 var mpLg = map[string][]byte{}
 var mpSh = map[string][]byte{}
@@ -43,9 +43,7 @@ func textExtraction(n *html.Node, lvl int) (b []byte) {
 		}
 	}
 
-	// b = append(b, "slf:"...)
 	b = append(b, cs...)
-	// b = append(b, "chn:"...)
 	b = append(b, cc...)
 	b = append(b, addHardBreaks(n)...)
 
@@ -53,15 +51,17 @@ func textExtraction(n *html.Node, lvl int) (b []byte) {
 		csCc := append(cs, cc...)
 		ol := attrX(n.Attr, "ol")
 		id := attrX(n.Attr, "id")
-		key := fmt.Sprintf("%2v:%8v:%5v:%5v", lvl-cScaffoldLvls, ol, id, len(csCc))
+		_ = id
+		// key := fmt.Sprintf("%2v:%8v:%5v:%5v", lvl-cScaffoldLvls, ol, id, len(csCc))
+		key := fmt.Sprintf("%-9v", ol)
 
 		mpLg[key] = csCc
 		if len(csCc) > cMinLen {
 			mpSh[key] = csCc
 		}
 	}
-
 	return
+
 }
 
 // img and a nodes are converted into text nodes.
@@ -69,44 +69,47 @@ func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 
 	if n.Type == html.ElementNode {
 		switch n.Data {
+
 		case "br":
 			ct, ok = "sbr ", true
+
 		case "img":
 
-			href := attrX(n.Attr, "href")
-			href = pbstrings.Ellipsoider(href, 5)
+			src := attrX(n.Attr, "src")
+			src = pbstrings.Ellipsoider(src, 5)
 
 			alt := attrX(n.Attr, "alt")
 			title := attrX(n.Attr, "title")
 
 			if alt == "" && title == "" {
-				ct = spf("[img] %v ", href)
+				ct = spf("[img] %v ", src)
 			} else if alt == "" {
-				ct = spf("[img] %v hbr %v ", title, href)
+				ct = spf("[img] %v hbr %v ", src, title)
 			} else {
-				ct = spf("[img] %v hbr %v hbr %v ", title, alt, href)
+				ct = spf("[img] %v hbr %v hbr %v ", src, title, alt)
 
 			}
-
 			ok = true
+
 		case "a":
+
 			href := attrX(n.Attr, "href")
 			href = pbstrings.Ellipsoider(href, 5)
 
 			title := attrX(n.Attr, "title")
-
 			if title == "" {
 				ct = spf("[a] %v ", href)
 			} else {
-				ct = spf("[a] %v hbr %v ", title, href)
+				ct = spf("[a] %v hbr %v ", href, title)
 			}
-
 			ok = true
+
 		}
 
 	}
 
 	return
+
 }
 
 func addHardBreaks(n *html.Node) (s string) {

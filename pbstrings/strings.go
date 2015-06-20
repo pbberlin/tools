@@ -1,6 +1,7 @@
 package pbstrings
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"regexp"
@@ -173,19 +174,37 @@ func IncrementString(s string) string {
 // Big disadvantage: no unexported fields.
 // For unexported fields fall back to
 //		fmt.Println(spew.Sdump(nd))
+// http://play.golang.org/p/AQASTC4mBl suggests,
+// that strings are copied upon call and upon return
 func IndentedDump(v interface{}) *string {
 
-	var reverseJSONTagEscaping = strings.NewReplacer(`\u003c`, "<", `\u003e`, ">", `\n`, "\n")
-
 	firstColLeftMostPrefix := " "
-	bytes, err := json.MarshalIndent(v, firstColLeftMostPrefix, "\t")
+	byts, err := json.MarshalIndent(v, firstColLeftMostPrefix, "\t")
 	if err != nil {
 		s := fmt.Sprintf("error indent: %v\n", err)
 		return &s
 	}
-	s := reverseJSONTagEscaping.Replace(string(bytes))
+
+	var reverseJSONTagEscaping = strings.NewReplacer(`\u003c`, "<", `\u003e`, ">", `\n`, "\n")
+	s := reverseJSONTagEscaping.Replace(string(byts))
 
 	return &s
+}
+
+func IndentedDumpBytes(v interface{}) []byte {
+
+	firstColLeftMostPrefix := " "
+	byts, err := json.MarshalIndent(v, firstColLeftMostPrefix, "\t")
+	if err != nil {
+		s := fmt.Sprintf("error indent: %v\n", err)
+		return []byte(s)
+	}
+
+	byts = bytes.Replace(byts, []byte(`\u003c`), []byte("<"), -1)
+	byts = bytes.Replace(byts, []byte(`\u003e`), []byte(">"), -1)
+	byts = bytes.Replace(byts, []byte(`\n`), []byte("\n"), -1)
+
+	return byts
 }
 
 func SliceDumpI(sl [][]int) {

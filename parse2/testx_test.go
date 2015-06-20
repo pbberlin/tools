@@ -77,6 +77,24 @@ func main() {
 
 	rangeOverTexts()
 
+	// bfrags := pbstrings.IndentedDumpBytes(frags)
+	bfrags := []byte{}
+	for _, v := range frags {
+		bfrags = append(bfrags, v.ArticleUrl...)
+		bfrags = append(bfrags, ' ')
+		bfrags = append(bfrags, fmt.Sprintf("%v", v.Lvl)...)
+		bfrags = append(bfrags, ' ')
+		bfrags = append(bfrags, string(v.Outline)...)
+		bfrags = append(bfrags, '\n')
+		bfrags = append(bfrags, string(v.Text)...)
+		bfrags = append(bfrags, '\n')
+		for _, v1 := range v.Similars {
+			bfrags = append(bfrags, string(v1)...)
+			bfrags = append(bfrags, '\n')
+		}
+	}
+	bytes2File("outp_frags.txt", bfrags)
+
 	sorted1 := subsort.SortMapByCount(attrDistinct)
 	sorted1.Print()
 	fmt.Println()

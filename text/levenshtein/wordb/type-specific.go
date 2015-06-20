@@ -47,6 +47,8 @@ func WrapAsEqualer(sb []byte, sorted bool) []ls_core.Equaler {
 	return ret
 }
 
+//
+// We have to implement the sorting of strings stored as byte slices
 type sortBoB [][]byte // slice of bytes of bytes
 
 func (sb sortBoB) Len() int {
@@ -59,8 +61,4 @@ func (sb sortBoB) Less(i, j int) bool {
 
 func (sb sortBoB) Swap(i, j int) {
 	sb[i], sb[j] = sb[j], sb[i]
-}
-
-func sortBBSlice(bs [][]byte) {
-	sort.Sort(sortBoB(bs))
 }

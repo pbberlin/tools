@@ -2,6 +2,7 @@ package parse2
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -16,7 +17,10 @@ func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 
 		s := ""
 		for _, v := range outline {
-			s = fmt.Sprintf("%v%02v.", s, v)
+			s = fmt.Sprintf("%v%v.", s, v)
+		}
+		if strings.HasSuffix(s, ".") {
+			s = s[:len(s)-1]
 		}
 		n.Attr = append(n.Attr, html.Attribute{"", "ol", s})
 

@@ -53,7 +53,7 @@ func textExtraction(n *html.Node, lvl int) (b []byte) {
 		id := attrX(n.Attr, "id")
 		_ = id
 		// key := fmt.Sprintf("%2v:%8v:%5v:%5v", lvl-cScaffoldLvls, ol, id, len(csCc))
-		key := fmt.Sprintf("%-9v", ol)
+		key := fmt.Sprintf("%v", ol)
 
 		mpLg[key] = csCc
 		if len(csCc) > cMinLen {

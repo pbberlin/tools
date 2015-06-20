@@ -22,7 +22,8 @@ func main() {
 
 	//
 	// ================================================
-	for i := 3; i <= 5; i++ {
+	// for i := 3; i <= 5; i++ {
+	for i := 1; i <= 3; i++ {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
 		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
@@ -60,10 +61,10 @@ func main() {
 
 		textExtraction(doc, 0)
 
-		textsLong := sortedByKey(mpLg)
+		textsLong := sortByKey(mpLg)
 		bytes2File(fn2lg, textsLong)
 
-		textsShrt := sortedByKey(mpSh)
+		textsShrt := sortByKey(mpSh)
 		bytes2File(fn2sh, textsShrt)
 
 		articleTexts[fn3] = mpSh
@@ -84,27 +85,28 @@ func main() {
 
 }
 
-func globFixes(b []byte) []byte {
-	// <!--(.*?)-->
-
-	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
-	return b
-}
-
-func sortedByKey(mp1which map[string][]byte) []byte {
+func sortByKey(mp1which map[string][]byte) []byte {
 
 	keys := make([]string, 0, len(mp1which))
 	for k := range mp1which {
 		keys = append(keys, k)
 	}
 
-	sort.Strings(keys)
+	// sort.Strings(keys)
+	sort.Sort(sortByOutline(keys))
 
 	ret := []byte{}
 	for _, key := range keys {
-		row := fmt.Sprintf("%8v: %s\n", key, mp1which[key])
+		row := fmt.Sprintf("%-12v: %s\n", key, mp1which[key])
 		ret = append(ret, row...)
 	}
 	return ret
 
+}
+
+func globFixes(b []byte) []byte {
+	// <!--(.*?)-->
+
+	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
+	return b
 }

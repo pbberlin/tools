@@ -5,12 +5,19 @@ import (
 
 	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/text/levenshtein"
-	"github.com/pbberlin/tools/text/levenshtein/word"
+	"github.com/pbberlin/tools/text/levenshtein/wordb"
 )
 
 var opt = levenshtein.Options{1, 1, 1}
 
 const cMaxLvl = 2
+
+type fragment struct {
+	ArticleUrl string
+	Lvl        int
+	Outline    string
+	Text       []byte
+}
 
 func rangeOverTexts() {
 	for articleId, atexts := range articleTexts {
@@ -21,7 +28,7 @@ func rangeOverTexts() {
 			if lvl > cMaxLvl {
 				continue
 			}
-			rangeOverTexts2(articleId, lvl, outl, text)
+			rangeOverTexts2(fragment{articleId, lvl, outl, text})
 			cntr++
 			if cntr > 20 {
 				pf("  over 20\n")
@@ -31,16 +38,16 @@ func rangeOverTexts() {
 	}
 }
 
-func rangeOverTexts2(srcArticle string, srcLvl int, srcOutl string, srcText []byte) {
+func rangeOverTexts2(src fragment) {
 
-	src := string(srcText)
-	srcE := word.WrapAsEqualer(src, true) // src as Equaler
+	// srcE := word.WrapAsEqualer(string(src.Text), true) // ssrc as Equaler
+	srcE := wordb.WrapAsEqualer(src.Text, true)
 
-	pf(" cmp  l%v - o%v - len%v  %v  \n", srcLvl, strings.TrimSpace(srcOutl), len(src), pbstrings.Ellipsoider(src, 10))
+	pf(" cmp  l%v - o%v - len%v    \n", src.Lvl, strings.TrimSpace(src.Outline), len(src.Text))
 
 	for articleId, atexts := range articleTexts {
-		if articleId == srcArticle {
-			pf("    to %v SKIP\n", articleId)
+		if articleId == src.ArticleUrl {
+			pf("    to %v SKIP self\n", articleId)
 			continue
 		}
 		pf("    to %v\n", articleId)
@@ -55,13 +62,12 @@ func rangeOverTexts2(srcArticle string, srcLvl int, srcOutl string, srcText []by
 			if br {
 				pf("\t")
 			}
-			s := string(text)
 
-			dstE := word.WrapAsEqualer(s, true) // destinations as Equaler
+			dstE := wordb.WrapAsEqualer(text, true) // destinations as Equaler
 			m := levenshtein.New(srcE, dstE, levenshtein.DefaultOptions)
 			absDist, relDist := m.Distance()
 
-			sd := pbstrings.Ellipsoider(s, 10)
+			sd := pbstrings.Ellipsoider(string(text), 10)
 			sd = pbstrings.ToLen(sd, 21)
 
 			pf("%v %v %2v %5.2v   ", pbstrings.ToLen(outl, 11), sd, absDist, relDist)

@@ -1,4 +1,5 @@
-// Package levenshtein core computes the edit distance of two slices of tokens.
+// Package levenshtein core computes the edit distance of two slices of tokens,
+// of slim interface type Equaler; subpackages provide various granularity.
 // Tokens must be of interface type <Equaler> - implementing (tok) Equal(tok) bool.
 // An edit script for converting slice1 to slice2 can also be derived.
 // Preference for substitution over insertion/deletion is configurable.

@@ -91,9 +91,11 @@ func Ellipsoider(s string, nx int) string {
 
 // SplitByWhitespace splits by *any* combination of \t \n or space
 func SplitByWhitespace(s1 string) (s2 []string) {
-	s1 = strings.TrimSpace(s1)
-	s2 = regexp.MustCompile(`[\s]+`).Split(s1, -1)
 
+	return strings.Fields(s1) // 2015-06: RTFM
+
+	s1 = strings.TrimSpace(s1)
+	s2 = regexp.MustCompile(`[\s]+`).Split(s1, -1) // 2015-06: nice but needless
 	return
 }
 

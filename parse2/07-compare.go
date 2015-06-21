@@ -11,7 +11,8 @@ import (
 
 var opt = levenshtein.Options{1, 1, 1}
 
-const cMaxLvl = 1
+var processLevels = map[int]bool{1: true, 2: true}
+
 const excerptLen = 20
 
 type fragment struct {
@@ -30,10 +31,14 @@ func rangeOverTexts() {
 		cntr := 0
 		for outl, text := range atexts {
 			lvl := strings.Count(outl, ".") + 1
-			if lvl > cMaxLvl {
+			if !processLevels[lvl] {
 				continue
 			}
 			fr := fragment{articleId, lvl, outl, text, [][]byte{}}
+			pf("  cmp %5v lvl%v - len%v   %v \n",
+				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
+				string(fr.Text[:util.Min(len(fr.Text), 3*excerptLen)]))
+
 			rangeOverTexts2(&fr)
 
 			if len(fr.Similars) > 0 {
@@ -53,10 +58,7 @@ func rangeOverTexts2(src *fragment) {
 
 	// srcE := word.WrapAsEqualer(string(src.Text), true) // ssrc as Equaler
 	srcE := wordb.WrapAsEqualer(src.Text, true)
-
-	pf("  cmp %5v lvl%v - len%v   %v \n",
-		strings.TrimSpace(src.Outline), src.Lvl, len(src.Text),
-		string(src.Text[:util.Min(len(src.Text), 3*excerptLen)]))
+	srcLen := float64(len(src.Text))
 
 	for articleId, atexts := range articleTexts {
 		if articleId == src.ArticleUrl {
@@ -68,13 +70,14 @@ func rangeOverTexts2(src *fragment) {
 		for outl, text := range atexts {
 
 			lvl := strings.Count(outl, ".") + 1
-			if lvl != src.Lvl && lvl != src.Lvl+1 && lvl != src.Lvl-1 {
+			if lvl == src.Lvl || lvl == src.Lvl+1 {
+				// proceed
+			} else {
 				continue
 			}
 
-			relSize := float64(len(src.Text)) / float64(util.Max(1, len(text)))
+			relSize := srcLen / float64(util.Max(1, len(text)))
 			if relSize < 0.33 || relSize > 3 {
-				// pf("skipping size ratio %4.2v  ", relSize)
 				continue
 			}
 
@@ -83,7 +86,7 @@ func rangeOverTexts2(src *fragment) {
 			absDist, relDist := m.Distance()
 
 			//
-			if relDist < 0.75 {
+			if relDist < 0.5 {
 				if br {
 					pf("\t")
 				}

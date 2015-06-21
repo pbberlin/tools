@@ -18,6 +18,21 @@ func (s sortByOutline) Swap(i, j int) {
 
 func (s sortByOutline) Less(i, j int) bool {
 
+	var sortByLevelFirst bool = true
+
+	if sortByLevelFirst {
+		lvl1 := strings.Count(s[i], ".")
+		lvl2 := strings.Count(s[j], ".")
+		if lvl1 < lvl2 {
+			return true
+		}
+		if lvl1 > lvl2 {
+			return false
+		}
+	}
+
+	// A pure number comparison
+	// 1.1, 1.2, 2.1, 2.1.1.
 	st1 := strings.Split(s[i], ".")
 	st2 := strings.Split(s[j], ".")
 

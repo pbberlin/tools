@@ -85,10 +85,11 @@ func main() {
 		bfrags = append(bfrags, fmt.Sprintf("%v", v.Lvl)...)
 		bfrags = append(bfrags, ' ')
 		bfrags = append(bfrags, string(v.Outline)...)
-		bfrags = append(bfrags, '\n')
+		bfrags = append(bfrags, '\n', ' ', ' ')
 		bfrags = append(bfrags, string(v.Text)...)
 		bfrags = append(bfrags, '\n')
 		for _, v1 := range v.Similars {
+			bfrags = append(bfrags, "    "...)
 			bfrags = append(bfrags, string(v1)...)
 			bfrags = append(bfrags, '\n')
 		}

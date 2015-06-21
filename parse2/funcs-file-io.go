@@ -23,3 +23,11 @@ func bytes2File(fn string, b []byte) {
 		log.Println(err)
 	}
 }
+
+func bytesFromFile(fn string) []byte {
+	b, err := ioutil.ReadFile(fn)
+	if err != nil {
+		log.Println(err)
+	}
+	return b
+}

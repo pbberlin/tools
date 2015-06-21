@@ -17,20 +17,25 @@ func Test1(t *testing.T) {
 }
 
 var articleTexts = map[string]map[string][]byte{}
+var numTotal = 0
 
 func main() {
 
 	//
 	// ================================================
-	// for i := 3; i <= 5; i++ {
-	for i := 1; i <= 3; i++ {
+	iter := []int{1, 2, 3}
+
+	for _, i := range iter {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
-		fn1 := fmt.Sprintf("outpI%v_1S.txt", i)
-		fn2sh := fmt.Sprintf("outpI%v_2Tsh.txt", i)
-		fn2lg := fmt.Sprintf("outpI%v_2Tlg.txt", i)
-		fn3 := fmt.Sprintf("outpI%v_3.html", i)
+		fn1 := fmt.Sprintf("outp_%v_1S.txt", i)
+		fn2sh := fmt.Sprintf("outp_%v_2Tsh.txt", i)
+		fn2lg := fmt.Sprintf("outp_%v_2Tlg.txt", i)
+		fn3 := fmt.Sprintf("outp_%v_3.html", i)
 		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
+		if err != nil {
+			log.Fatal(err)
+		}
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
 		if err != nil {
@@ -61,10 +66,10 @@ func main() {
 
 		textExtraction(doc, 0)
 
-		textsLong := sortByKey(mpLg)
+		textsLong := recreateOrderedByOutline(mpLg)
 		bytes2File(fn2lg, textsLong)
 
-		textsShrt := sortByKey(mpSh)
+		textsShrt := recreateOrderedByOutline(mpSh)
 		bytes2File(fn2sh, textsShrt)
 
 		articleTexts[fn3] = mpSh
@@ -73,28 +78,9 @@ func main() {
 
 		bytes2File(fn1, xPathDump)
 		dom2File(fn3, doc)
-	}
 
-	rangeOverTexts()
-
-	// bfrags := pbstrings.IndentedDumpBytes(frags)
-	bfrags := []byte{}
-	for _, v := range frags {
-		bfrags = append(bfrags, v.ArticleUrl...)
-		bfrags = append(bfrags, ' ')
-		bfrags = append(bfrags, fmt.Sprintf("%v", v.Lvl)...)
-		bfrags = append(bfrags, ' ')
-		bfrags = append(bfrags, string(v.Outline)...)
-		bfrags = append(bfrags, '\n', ' ', ' ')
-		bfrags = append(bfrags, string(v.Text)...)
-		bfrags = append(bfrags, '\n')
-		for _, v1 := range v.Similars {
-			bfrags = append(bfrags, "    "...)
-			bfrags = append(bfrags, string(v1)...)
-			bfrags = append(bfrags, '\n')
-		}
+		numTotal++
 	}
-	bytes2File("outp_frags.txt", bfrags)
 
 	sorted1 := subsort.SortMapByCount(attrDistinct)
 	sorted1.Print()
@@ -102,9 +88,29 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
+	rangeOverTexts()
+	compileSimarities()
+
+	for _, i := range iter {
+		fn3 := fmt.Sprintf("outp_%v_3.html", i)
+		fn4 := fmt.Sprintf("outp_%v_4.html", i)
+
+		resBytes := bytesFromFile(fn3)
+
+		doc, err := html.Parse(bytes.NewReader(resBytes))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		dom2File(fn4, doc)
+
+		pf("xx\n")
+
+	}
+
 }
 
-func sortByKey(mp1which map[string][]byte) []byte {
+func recreateOrderedByOutline(mp1which map[string][]byte) []byte {
 
 	keys := make([]string, 0, len(mp1which))
 	for k := range mp1which {

@@ -11,16 +11,26 @@ import (
 
 var opt = levenshtein.Options{1, 1, 1}
 
-var processLevels = map[int]bool{1: true, 2: true}
+// var processLevels = map[int]bool{1: true, 2: true}
+var processLevels = map[int]bool{1: true}
 
 const excerptLen = 20
+
+type similarity struct {
+	ArticleUrl     string
+	Lvl            int
+	Outline        string
+	AbsLevenshtein int
+	RelLevenshtein float64
+	Text           []byte
+}
 
 type fragment struct {
 	ArticleUrl string
 	Lvl        int
 	Outline    string
 	Text       []byte
-	Similars   [][]byte
+	Similars   []similarity
 }
 
 var frags = []fragment{}
@@ -34,7 +44,7 @@ func rangeOverTexts() {
 			if !processLevels[lvl] {
 				continue
 			}
-			fr := fragment{articleId, lvl, outl, text, [][]byte{}}
+			fr := fragment{articleId, lvl, outl, text, []similarity{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
 				string(fr.Text[:util.Min(len(fr.Text), 3*excerptLen)]))
@@ -86,17 +96,24 @@ func rangeOverTexts2(src *fragment) {
 			absDist, relDist := m.Distance()
 
 			//
-			if relDist < 0.5 {
+			if relDist < 0.26 && absDist < 10 {
 				if br {
 					pf("\t")
 				}
-				sd := pbstrings.Ellipsoider(string(text), excerptLen)
+				sd := string(text[util.Min(2*excerptLen, len(text))])
 				sd = pbstrings.ToLen(sd, 2*excerptLen+1)
 				pf("%12v %v %4v %5.2v   ", outl, sd, absDist, relDist)
 				cntr++
 				br = false
 
-				src.Similars = append(src.Similars, text)
+				sim := similarity{}
+				sim.ArticleUrl = articleId
+				sim.Lvl = lvl
+				sim.Outline = outl
+				sim.AbsLevenshtein = absDist
+				sim.RelLevenshtein = relDist
+				sim.Text = text
+				src.Similars = append(src.Similars, sim)
 
 				if cntr%2 == 0 || cntr > 20 {
 					pf("\n")

@@ -13,27 +13,10 @@ var opt = levenshtein.Options{1, 1, 1}
 
 // var processLevels = map[int]bool{1: true, 2: true}
 var processLevels = map[int]bool{1: true}
+var lvlTolerance = 1
+var frags = []fragment{}
 
 const excerptLen = 20
-
-type similarity struct {
-	ArticleUrl     string
-	Lvl            int
-	Outline        string
-	AbsLevenshtein int
-	RelLevenshtein float64
-	Text           []byte
-}
-
-type fragment struct {
-	ArticleUrl string
-	Lvl        int
-	Outline    string
-	Text       []byte
-	Similars   []similarity
-}
-
-var frags = []fragment{}
 
 func rangeOverTexts() {
 	for articleId, atexts := range articleTexts {
@@ -57,8 +40,8 @@ func rangeOverTexts() {
 
 			cntr++
 			if cntr > 20 {
-				pf("  over 20\n")
-				break
+				// pf("  over 20\n")
+				// break
 			}
 		}
 	}
@@ -80,7 +63,8 @@ func rangeOverTexts2(src *fragment) {
 		for outl, text := range atexts {
 
 			lvl := strings.Count(outl, ".") + 1
-			if lvl == src.Lvl || lvl == src.Lvl+1 {
+			if lvl == src.Lvl ||
+				(lvl > src.Lvl && lvl <= src.Lvl+lvlTolerance) {
 				// proceed
 			} else {
 				continue

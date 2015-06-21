@@ -26,7 +26,7 @@ func main() {
 
 	for _, i := range iter {
 		var doc *html.Node
-		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/article0%v.html", i)
+		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/art0%v.html", i)
 		fn1 := fmt.Sprintf("outp_%v_1S.txt", i)
 		fn2sh := fmt.Sprintf("outp_%v_2Tsh.txt", i)
 		fn2lg := fmt.Sprintf("outp_%v_2Tlg.txt", i)
@@ -87,26 +87,26 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
-	rangeOverTexts()
-	compileSimarities()
+	lvlTolerance = 0
+	for stage := 1; stage < 7; stage++ {
 
-	weedouts = weedOut()
+		processLevels = map[int]bool{stage: true}
+		rangeOverTexts()
+		compileSimarities(stage)
+		weedouts = weedOut()
 
-	for _, i := range iter {
-		fn3 := fmt.Sprintf("outp_%v_3.html", i)
-		fn4 := fmt.Sprintf("outp_%v_4.html", i)
+		for _, i := range iter {
+			fnInn := fmt.Sprintf("outp_%v_%v.html", i, stage+2)
+			fnOut := fmt.Sprintf("outp_%v_%v.html", i, stage+3)
 
-		resBytes := bytesFromFile(fn3)
-
-		doc, err := html.Parse(bytes.NewReader(resBytes))
-		if err != nil {
-			log.Fatal(err)
+			resBytes := bytesFromFile(fnInn)
+			doc, err := html.Parse(bytes.NewReader(resBytes))
+			if err != nil {
+				log.Fatal(err)
+			}
+			weedoutApply(doc)
+			dom2File(fnOut, doc)
 		}
-
-		weedoutApply(doc)
-
-		dom2File(fn4, doc)
-
 	}
 
 }

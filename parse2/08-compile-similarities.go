@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func compileSimarities() {
+func compileSimarities(stage int) {
 
 	// bfrags := pbstrings.IndentedDumpBytes(frags)
 	bfrags := []byte{}
@@ -33,7 +33,7 @@ func compileSimarities() {
 		}
 		bfrags = append(bfrags, '\n')
 	}
-	bytes2File("outp_frags.txt", bfrags)
+	bytes2File(spf("outp_frags_st%v.txt", stage), bfrags)
 
 }
 
@@ -45,7 +45,8 @@ func weedOut() (ret map[string]bool) {
 
 	for _, v := range frags {
 
-		if len(v.Similars) >= numTotal-1 {
+		// if len(v.Similars) >= numTotal-1 {
+		if len(v.Similars) >= 2 {
 
 			lvlHighest := v.Lvl
 			for _, v1 := range v.Similars {
@@ -67,7 +68,7 @@ func weedOut() (ret map[string]bool) {
 
 	}
 
-	pf("%v\n", ret)
+	// pf("%v\n", ret)
 	return
 }
 

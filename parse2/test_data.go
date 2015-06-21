@@ -41,7 +41,7 @@ func init() {
 
 	// write out to http doc root
 	for i := 0; i < len(tests); i++ {
-		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/article%02v.html", i+offSetFilename)
+		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/art%02v.html", i+offSetFilename)
 		bytes2File(fn, []byte(tests[i]))
 	}
 

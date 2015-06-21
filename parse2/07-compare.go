@@ -1,6 +1,7 @@
 package parse2
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/pbberlin/tools/pbstrings"
@@ -9,24 +10,26 @@ import (
 	"github.com/pbberlin/tools/util"
 )
 
-var opt = levenshtein.Options{1, 1, 1}
+var opt = levenshtein.Options{1, 1, 1} // cheap substitution
 
-// var processLevels = map[int]bool{1: true, 2: true}
-var processLevels = map[int]bool{1: true}
-var lvlTolerance = 1
-var frags = []fragment{}
+var levelsToProcess = map[int]bool{1: true}
+var levelsTolerance = 1
 
 const excerptLen = 20
 
-func rangeOverTexts() {
+func rangeOverTexts() []fragment {
+
+	frags := []fragment{}
+
 	for articleId, atexts := range articleTexts {
 		pf("%v\n", articleId)
-		cntr := 0
+
 		for outl, text := range atexts {
 			lvl := strings.Count(outl, ".") + 1
-			if !processLevels[lvl] {
+			if !levelsToProcess[lvl] {
 				continue
 			}
+			text = cleanseText(text)
 			fr := fragment{articleId, lvl, outl, text, []similarity{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
@@ -38,13 +41,10 @@ func rangeOverTexts() {
 				frags = append(frags, fr)
 			}
 
-			cntr++
-			if cntr > 20 {
-				// pf("  over 20\n")
-				// break
-			}
 		}
 	}
+
+	return frags
 }
 
 func rangeOverTexts2(src *fragment) {
@@ -54,22 +54,26 @@ func rangeOverTexts2(src *fragment) {
 	srcLen := float64(len(src.Text))
 
 	for articleId, atexts := range articleTexts {
+
 		if articleId == src.ArticleUrl {
 			pf("    to %v SKIP self\n", articleId)
 			continue
 		}
+
 		pf("    to %v\n", articleId)
+
 		cntr, br := 0, true
 		for outl, text := range atexts {
 
 			lvl := strings.Count(outl, ".") + 1
 			if lvl == src.Lvl ||
-				(lvl > src.Lvl && lvl <= src.Lvl+lvlTolerance) {
+				(lvl > src.Lvl && lvl <= src.Lvl+levelsTolerance) {
 				// proceed
 			} else {
 				continue
 			}
 
+			text = cleanseText(text)
 			relSize := srcLen / float64(util.Max(1, len(text)))
 			if relSize < 0.33 || relSize > 3 {
 				continue
@@ -114,4 +118,12 @@ func rangeOverTexts2(src *fragment) {
 		}
 	}
 
+}
+
+func cleanseText(text []byte) []byte {
+	text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
+	text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
+	return text
 }

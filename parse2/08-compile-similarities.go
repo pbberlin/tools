@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func compileSimarities(stage int) {
+func similaritiesToFile(frags []fragment, stage int) {
 
 	// bfrags := pbstrings.IndentedDumpBytes(frags)
 	bfrags := []byte{}
@@ -37,9 +37,7 @@ func compileSimarities(stage int) {
 
 }
 
-var weedouts map[string]bool
-
-func weedOut() (ret map[string]bool) {
+func weedOut(frags []fragment) (ret map[string]bool) {
 
 	ret = map[string]bool{}
 
@@ -72,11 +70,11 @@ func weedOut() (ret map[string]bool) {
 	return
 }
 
-func weedoutApply(n *html.Node) {
+func weedoutApply(weedouts map[string]bool, n *html.Node) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		weedoutApply(c)
+		weedoutApply(weedouts, c)
 	}
 
 	if n.Type == html.ElementNode {

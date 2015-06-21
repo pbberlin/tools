@@ -26,6 +26,26 @@ func init() {
 				<div>div-3-content with iimmage<img alt="alt-cnt" title='title-cnt' 
 				href='some-long-href-some-long-href-some-long-href-some-long-href'>after img</div>
 			</div>
+
+
+				<menu type="popup" typeFirefox="context"  id="myMenu">
+				    <menuitem label="Item 1" title="First menu item"> </menuitem>
+				    <menuitem label="Item 2" title="Second menu item" disabled> </menuitem>
+				</menu>
+
+				<div contextmenu="myMenu">Right-Click Me</div>
+				<a contextmenu="myMenu" href='#' >A link with custom context menu</a>
+
+				<script>
+					// changing type attr for firefox
+					var menus = document.querySelectorAll('menu');
+					Array.prototype.forEach.call(menus, function(menu) {
+					if (menu.getAttribute('type') == 'popup' && menu.type == 'list') {
+						menu.type = 'context';
+					}
+					});
+				</script>
+
 			</body></html>`
 
 	tests[1] = `	<p>

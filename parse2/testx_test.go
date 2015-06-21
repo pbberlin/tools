@@ -87,13 +87,13 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
-	lvlTolerance = 0
-	for stage := 1; stage < 7; stage++ {
+	levelsTolerance = 0
+	for stage := 1; stage < 4; stage++ {
 
-		processLevels = map[int]bool{stage: true}
-		rangeOverTexts()
-		compileSimarities(stage)
-		weedouts = weedOut()
+		levelsToProcess = map[int]bool{stage: true}
+		frags := rangeOverTexts()
+		similaritiesToFile(frags, stage)
+		weedouts := weedOut(frags)
 
 		for _, i := range iter {
 			fnInn := fmt.Sprintf("outp_%v_%v.html", i, stage+2)
@@ -104,7 +104,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			weedoutApply(doc)
+			weedoutApply(weedouts, doc)
 			dom2File(fnOut, doc)
 		}
 	}

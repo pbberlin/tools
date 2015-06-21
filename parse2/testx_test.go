@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"sort"
 	"testing"
 
 	"github.com/pbberlin/tools/pbfetch"
@@ -91,6 +90,8 @@ func main() {
 	rangeOverTexts()
 	compileSimarities()
 
+	weedouts = weedOut()
+
 	for _, i := range iter {
 		fn3 := fmt.Sprintf("outp_%v_3.html", i)
 		fn4 := fmt.Sprintf("outp_%v_4.html", i)
@@ -102,30 +103,11 @@ func main() {
 			log.Fatal(err)
 		}
 
+		weedoutApply(doc)
+
 		dom2File(fn4, doc)
 
-		pf("xx\n")
-
 	}
-
-}
-
-func recreateOrderedByOutline(mp1which map[string][]byte) []byte {
-
-	keys := make([]string, 0, len(mp1which))
-	for k := range mp1which {
-		keys = append(keys, k)
-	}
-
-	// sort.Strings(keys)
-	sort.Sort(sortByOutline(keys))
-
-	ret := []byte{}
-	for _, key := range keys {
-		row := fmt.Sprintf("%-12v: %s\n", key, mp1which[key])
-		ret = append(ret, row...)
-	}
-	return ret
 
 }
 

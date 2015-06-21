@@ -1,6 +1,8 @@
 package parse2
 
 import (
+	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/pbberlin/tools/util"
@@ -90,5 +92,25 @@ func px(st1, st2 []string, idx int, op string) {
 	}
 
 	pf("%10v %s %10v    \n", string(ps1), op, string(ps2))
+
+}
+
+// apply ordering
+func recreateOrderedByOutline(mp1which map[string][]byte) []byte {
+
+	keys := make([]string, 0, len(mp1which))
+	for k := range mp1which {
+		keys = append(keys, k)
+	}
+
+	// sort.Strings(keys)
+	sort.Sort(sortByOutline(keys))
+
+	ret := []byte{}
+	for _, key := range keys {
+		row := fmt.Sprintf("%-12v: %s\n", key, mp1which[key])
+		ret = append(ret, row...)
+	}
+	return ret
 
 }

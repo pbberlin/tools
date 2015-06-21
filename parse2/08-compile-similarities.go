@@ -1,6 +1,10 @@
 package parse2
 
-import "fmt"
+import (
+	"fmt"
+
+	"golang.org/x/net/html"
+)
 
 func compileSimarities() {
 
@@ -33,7 +37,11 @@ func compileSimarities() {
 
 }
 
-func weedOut() {
+var weedouts map[string]bool
+
+func weedOut() (ret map[string]bool) {
+
+	ret = map[string]bool{}
 
 	for _, v := range frags {
 
@@ -46,6 +54,36 @@ func weedOut() {
 				}
 			}
 
+			for _, v1 := range v.Similars {
+				if v1.Lvl == lvlHighest {
+					ret[v1.Outline] = true
+				}
+			}
+			if v.Lvl == lvlHighest {
+				ret[v.Outline] = true
+			}
+
+		}
+
+	}
+
+	pf("%v\n", ret)
+	return
+}
+
+func weedoutApply(n *html.Node) {
+
+	// Children
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		weedoutApply(c)
+	}
+
+	if n.Type == html.ElementNode {
+		outline := attrX(n.Attr, "ol")
+		if weedouts[outline] {
+			n.Type = html.CommentNode
+			n.Data = n.Data + " replaced"
 		}
 	}
+
 }

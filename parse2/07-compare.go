@@ -30,7 +30,7 @@ func rangeOverTexts() []fragment {
 			if !levelsToProcess[lvl] {
 				continue
 			}
-			text = cleanseText(text)
+			text = cleanseTextForComparisonOnly(text)
 			fr := fragment{articleId, lvl, outl, text, []similarity{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
@@ -80,7 +80,7 @@ func rangeOverTexts2(src *fragment) {
 				continue
 			}
 
-			text = cleanseText(text)
+			text = cleanseTextForComparisonOnly(text)
 			relSize := srcLen / float64(util.Max(1, len(text)))
 			if relSize < 0.33 || relSize > 3 {
 				continue
@@ -95,9 +95,11 @@ func rangeOverTexts2(src *fragment) {
 				if br {
 					pf("\t")
 				}
-				sd := string(text[util.Min(2*excerptLen, len(text)-1)])
+				sd := string(text[:util.Min(2*excerptLen, len(text)-1)])
 				sd = pbstrings.ToLen(sd, 2*excerptLen+1)
+				_ = sd
 				pf("%12v %v %4v %5.2v   ", outl, sd, absDist, relDist)
+
 				cntr++
 				br = false
 
@@ -127,7 +129,7 @@ func rangeOverTexts2(src *fragment) {
 
 }
 
-func cleanseText(text []byte) []byte {
+func cleanseTextForComparisonOnly(text []byte) []byte {
 	text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
 	text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
 	text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)

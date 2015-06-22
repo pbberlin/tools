@@ -1,9 +1,6 @@
 package parse2
 
-import (
-	"fmt"
-	"os"
-)
+import "fmt"
 
 func similaritiesToFile(frags []fragment, stage int) {
 
@@ -52,13 +49,13 @@ func assembleWeedout(frags []fragment, ret map[string]map[string]bool) map[strin
 
 			for _, v1 := range v.Similars {
 				if v1.Lvl == lvlHighest {
-					if ret[v1.ArticleUrl] == nil {
-						pf("WANT %v\n", v1.ArticleUrl)
-						for k, _ := range ret {
-							pf("     %v\n", k)
-						}
-						os.Exit(1)
-					}
+					// if ret[v1.ArticleUrl] == nil {
+					// 	pf("WANT %v\n", v1.ArticleUrl)
+					// 	for k, _ := range ret {
+					// 		pf("     %v\n", k)
+					// 	}
+					// 	os.Exit(1)
+					// }
 					ret[v1.ArticleUrl][v1.Outline] = true
 				}
 			}

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/pbfetch"
+	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
@@ -98,6 +99,8 @@ func main() {
 			}
 		}
 		weedoutMap = assembleWeedout(frags, weedoutMap)
+		bb := pbstrings.IndentedDumpBytes(weedoutMap)
+		bytes2File(spf("outp_wd_%v.txt", stage), bb)
 
 		for _, i := range iter {
 			fnInn := fmt.Sprintf("outp_%v_%v.html", i, stage+2)

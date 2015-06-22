@@ -15,8 +15,8 @@ func Test1(t *testing.T) {
 	main()
 }
 
-var articleTexts = map[string]map[string][]byte{}
-var numTotal = 0
+var numTotal = 0 // comparable html docs
+const stageMax = 2
 
 func main() {
 
@@ -28,8 +28,7 @@ func main() {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/art0%v.html", i)
 		fn1 := fmt.Sprintf("outp_%v_1S.txt", i)
-		fn2sh := fmt.Sprintf("outp_%v_2Tsh.txt", i)
-		fn2lg := fmt.Sprintf("outp_%v_2Tlg.txt", i)
+		fn2 := fmt.Sprintf("outp_%v_2T.txt", i)
 		fn3 := fmt.Sprintf("outp_%v_3.html", i)
 		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
 		if err != nil {
@@ -65,13 +64,9 @@ func main() {
 
 		textExtraction(doc, 0)
 
-		textsLong := recreateOrderedByOutline(mpLg)
-		bytes2File(fn2lg, textsLong)
-
-		textsShrt := recreateOrderedByOutline(mpSh)
-		bytes2File(fn2sh, textsShrt)
-
-		articleTexts[fn3] = mpSh
+		textsBytes, textsSorted := orderByOutline(textsByOutl)
+		bytes2File(fn2, textsBytes)
+		textsByArticOutl[fn3] = textsSorted
 
 		reIndent(doc, 0)
 
@@ -81,19 +76,28 @@ func main() {
 		numTotal++
 	}
 
+	// statistics on elements and attributes
 	sorted1 := subsort.SortMapByCount(attrDistinct)
 	sorted1.Print()
 	fmt.Println()
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
-	levelsTolerance = 0
-	for stage := 1; stage < 4; stage++ {
+	for stage := 1; stage <= stageMax; stage++ {
 
 		levelsToProcess = map[int]bool{stage: true}
 		frags := rangeOverTexts()
+
 		similaritiesToFile(frags, stage)
-		weedouts := weedOut(frags)
+
+		weedoutMap := map[string]map[string]bool{}
+		for _, i := range iter {
+			for j := 0; j < stageMax+3; j++ {
+				fn := fmt.Sprintf("outp_%v_%v.html", i, j)
+				weedoutMap[fn] = map[string]bool{}
+			}
+		}
+		weedoutMap = assembleWeedout(frags, weedoutMap)
 
 		for _, i := range iter {
 			fnInn := fmt.Sprintf("outp_%v_%v.html", i, stage+2)
@@ -104,7 +108,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			weedoutApply(weedouts, doc)
+			weedoutApply(weedoutMap[fnInn], doc)
 			dom2File(fnOut, doc)
 		}
 	}

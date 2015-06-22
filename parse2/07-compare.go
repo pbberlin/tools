@@ -13,7 +13,7 @@ import (
 var opt = levenshtein.Options{1, 1, 1} // cheap substitution
 
 var levelsToProcess = map[int]bool{1: true}
-var levelsTolerance = 1
+var levelsTolerance = 0
 
 const excerptLen = 20
 
@@ -21,10 +21,11 @@ func rangeOverTexts() []fragment {
 
 	frags := []fragment{}
 
-	for articleId, atexts := range articleTexts {
+	for articleId, atexts := range textsByArticOutl {
 		pf("%v\n", articleId)
 
-		for outl, text := range atexts {
+		for _, se := range atexts {
+			outl, text := se.Outl, se.Text
 			lvl := strings.Count(outl, ".") + 1
 			if !levelsToProcess[lvl] {
 				continue
@@ -33,7 +34,7 @@ func rangeOverTexts() []fragment {
 			fr := fragment{articleId, lvl, outl, text, []similarity{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
-				string(fr.Text[:util.Min(len(fr.Text), 3*excerptLen)]))
+				string(fr.Text[:util.Min(len(fr.Text)-1, 3*excerptLen)]))
 
 			rangeOverTexts2(&fr)
 
@@ -53,7 +54,7 @@ func rangeOverTexts2(src *fragment) {
 	srcE := wordb.WrapAsEqualer(src.Text, true)
 	srcLen := float64(len(src.Text))
 
-	for articleId, atexts := range articleTexts {
+	for articleId, atexts := range textsByArticOutl {
 
 		if articleId == src.ArticleUrl {
 			pf("    to %v SKIP self\n", articleId)
@@ -63,9 +64,15 @@ func rangeOverTexts2(src *fragment) {
 		pf("    to %v\n", articleId)
 
 		cntr, br := 0, true
-		for outl, text := range atexts {
+		for _, se := range atexts {
+			outl, text := se.Outl, se.Text
 
 			lvl := strings.Count(outl, ".") + 1
+
+			if lvl > src.Lvl+levelsTolerance {
+				break // since we are now sorted by lvl, we can this is safe
+			}
+
 			if lvl == src.Lvl ||
 				(lvl > src.Lvl && lvl <= src.Lvl+levelsTolerance) {
 				// proceed
@@ -88,7 +95,7 @@ func rangeOverTexts2(src *fragment) {
 				if br {
 					pf("\t")
 				}
-				sd := string(text[util.Min(2*excerptLen, len(text))])
+				sd := string(text[util.Min(2*excerptLen, len(text)-1)])
 				sd = pbstrings.ToLen(sd, 2*excerptLen+1)
 				pf("%12v %v %4v %5.2v   ", outl, sd, absDist, relDist)
 				cntr++
@@ -123,7 +130,7 @@ func rangeOverTexts2(src *fragment) {
 func cleanseText(text []byte) []byte {
 	text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
 	text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
-	// text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
-	// text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
+	text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
+	text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
 	return text
 }

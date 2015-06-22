@@ -2,8 +2,7 @@ package parse2
 
 import (
 	"fmt"
-
-	"golang.org/x/net/html"
+	"os"
 )
 
 func similaritiesToFile(frags []fragment, stage int) {
@@ -37,9 +36,7 @@ func similaritiesToFile(frags []fragment, stage int) {
 
 }
 
-func weedOut(frags []fragment) (ret map[string]bool) {
-
-	ret = map[string]bool{}
+func assembleWeedout(frags []fragment, ret map[string]map[string]bool) map[string]map[string]bool {
 
 	for _, v := range frags {
 
@@ -55,11 +52,18 @@ func weedOut(frags []fragment) (ret map[string]bool) {
 
 			for _, v1 := range v.Similars {
 				if v1.Lvl == lvlHighest {
-					ret[v1.Outline] = true
+					if ret[v1.ArticleUrl] == nil {
+						pf("WANT %v\n", v1.ArticleUrl)
+						for k, _ := range ret {
+							pf("     %v\n", k)
+						}
+						os.Exit(1)
+					}
+					ret[v1.ArticleUrl][v1.Outline] = true
 				}
 			}
 			if v.Lvl == lvlHighest {
-				ret[v.Outline] = true
+				ret[v.ArticleUrl][v.Outline] = true
 			}
 
 		}
@@ -67,22 +71,5 @@ func weedOut(frags []fragment) (ret map[string]bool) {
 	}
 
 	// pf("%v\n", ret)
-	return
-}
-
-func weedoutApply(weedouts map[string]bool, n *html.Node) {
-
-	// Children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		weedoutApply(weedouts, c)
-	}
-
-	if n.Type == html.ElementNode {
-		outline := attrX(n.Attr, "ol")
-		if weedouts[outline] {
-			n.Type = html.CommentNode
-			n.Data = n.Data + " replaced"
-		}
-	}
-
+	return ret
 }

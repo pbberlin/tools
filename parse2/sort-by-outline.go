@@ -96,21 +96,26 @@ func px(st1, st2 []string, idx int, op string) {
 }
 
 // apply ordering
-func recreateOrderedByOutline(mp1which map[string][]byte) []byte {
+func orderByOutline(m map[string][]byte) ([]byte, []SortEl) {
 
-	keys := make([]string, 0, len(mp1which))
-	for k := range mp1which {
-		keys = append(keys, k)
+	outlines := make([]string, 0, len(m))
+	for k := range m {
+		outlines = append(outlines, k)
 	}
 
-	// sort.Strings(keys)
-	sort.Sort(sortByOutline(keys))
+	// sort.Strings(outlines)
+	sort.Sort(sortByOutline(outlines))
 
-	ret := []byte{}
-	for _, key := range keys {
-		row := fmt.Sprintf("%-12v: %s\n", key, mp1which[key])
-		ret = append(ret, row...)
+	ret1 := []byte{}
+	ret2 := []SortEl{}
+
+	for _, outl := range outlines {
+		row := fmt.Sprintf("%-12v: %s\n", outl, m[outl])
+		ret1 = append(ret1, row...)
+
+		ret2 = append(ret2, SortEl{outl, m[outl]})
 	}
-	return ret
+
+	return ret1, ret2
 
 }

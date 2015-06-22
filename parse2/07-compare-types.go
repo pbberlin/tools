@@ -1,5 +1,10 @@
 package parse2
 
+type SortEl struct {
+	Outl string
+	Text []byte
+}
+
 type similarity struct {
 	ArticleUrl     string
 	Lvl            int

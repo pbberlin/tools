@@ -2,22 +2,18 @@ package parse2
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/pbberlin/tools/pbstrings"
 	"golang.org/x/net/html"
 )
 
-const cMinLen = 50
-
-var mpLg = map[string][]byte{}
-var mpSh = map[string][]byte{}
+var textsByOutl = map[string][]byte{}
+var textsByArticOutl = map[string][]SortEl{}
 
 func textExtraction(n *html.Node, lvl int) (b []byte) {
 
 	if lvl == 0 {
-		mpLg = map[string][]byte{}
-		mpSh = map[string][]byte{}
+		textsByOutl = map[string][]byte{}
 	}
 
 	var cs []byte // content self
@@ -50,15 +46,7 @@ func textExtraction(n *html.Node, lvl int) (b []byte) {
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
 		ol := attrX(n.Attr, "ol")
-		id := attrX(n.Attr, "id")
-		_ = id
-		// key := fmt.Sprintf("%2v:%8v:%5v:%5v", lvl-cScaffoldLvls, ol, id, len(csCc))
-		key := fmt.Sprintf("%v", ol)
-
-		mpLg[key] = csCc
-		if len(csCc) > cMinLen {
-			mpSh[key] = csCc
-		}
+		textsByOutl[ol] = csCc
 	}
 	return
 

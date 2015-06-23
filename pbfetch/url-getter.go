@@ -12,7 +12,9 @@ import (
 	"appengine/urlfetch"
 )
 
-func UrlGetter(sUrl string, gaeReq *http.Request, httpExclusively bool) (*http.Response, []byte, error) {
+// UrlGetter universal http getter for app engine and standalone go programs.
+// Previously response was returned. Forgot why. Dropped it.
+func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error) {
 
 	client := &http.Client{}
 	if gaeReq != nil {
@@ -24,9 +26,9 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpExclusively bool) (*http.R
 
 	u, err := url.Parse(sUrl)
 	if err != nil {
-		return nil, nil, fmt.Errorf("url unparseable: %v", err)
+		return nil, fmt.Errorf("url unparseable: %v", err)
 	}
-	if !httpExclusively {
+	if httpsOnly || u.Scheme == "" {
 		u.Scheme = "https"
 	}
 
@@ -39,19 +41,19 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpExclusively bool) (*http.R
 
 	resp, err := client.Get(u.String())
 	if err != nil {
-		return nil, nil, fmt.Errorf("get request failed: %v", err)
+		return nil, fmt.Errorf("get request failed: %v", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
+		return nil, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
 	}
 
 	defer resp.Body.Close()
 	byteContent, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, nil, fmt.Errorf("cannot read resp body: %v", err)
+		return nil, fmt.Errorf("cannot read resp body: %v", err)
 	}
 
-	return resp, byteContent, nil
+	return byteContent, nil
 
 }

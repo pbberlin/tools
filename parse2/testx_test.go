@@ -1,3 +1,6 @@
+// +build parsing
+// go test -tags=parsing
+
 package parse2
 
 import (
@@ -31,7 +34,7 @@ func main() {
 		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
 		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
 		fn3, fnKey := getFN(i, 0)
-		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
+		resBytes, err := pbfetch.UrlGetter(url, nil, false)
 		if err != nil {
 			log.Fatal(err)
 		}

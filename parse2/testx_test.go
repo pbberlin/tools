@@ -114,6 +114,7 @@ func main() {
 			dom2File(fnOut, doc)
 		}
 	}
+	pf("correct finish\n")
 
 }
 

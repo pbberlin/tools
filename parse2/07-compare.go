@@ -19,6 +19,9 @@ const excerptLen = 20
 
 func rangeOverTexts() []fragment {
 
+	pf = pfDevNull
+	defer func() { pf = pfRestore }()
+
 	frags := []fragment{}
 
 	for articleId, atexts := range textsByArticOutl {

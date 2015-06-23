@@ -40,15 +40,29 @@ func convEmptyElementLeafs(n *html.Node, lvl int) {
 func condenseNestedDivs(n *html.Node, lvl int) {
 
 	// Children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		condenseNestedDivs(c, lvl+1)
+	if true {
+		// like in removeDirect, we first assemble children separately.
+		// since "NextSibling" might be set to nil during condension
+		cc := []*html.Node{}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			cc = append(cc, c)
+		}
+		for _, c := range cc {
+			condenseNestedDivs(c, lvl+1)
+		}
+	} else {
+		// this also worked,
+		// but required 45 (!) repetitive traversals...
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			condenseNestedDivs(c, lvl+1)
+		}
 	}
 
 	condenseUpwards(n, []string{"div", "div"}, "div")
 
-	// condenseUpwards(n, []string{"div", "ul"}, "ul")
+	// condenseUpwards(n, []string{"div", "ul"}, "ul")  // incompatible with separate assembly, move to separate traversal
 
-	// condenseUpwards(n, []string{"ul", "ul"}, "ul")
+	// condenseUpwards(n, []string{"ul", "ul"}, "ul")  // incompatible with separate assembly, move to separate traversal
 
 	// condenseUpwards(n, []string{"li", "div"}, "li") // questionable
 

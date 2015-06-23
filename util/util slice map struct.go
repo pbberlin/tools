@@ -21,7 +21,7 @@ import (
 //		for _, k := range sKeys {
 //			doSomething  := mapAny[k]
 //		}
-func StringKeysToSortedArray(m map[string]interface{}) (vKeys []string) {
+func DEPRECATED_StringKeysToSortedArray(m map[string]interface{}) (vKeys []string) {
 	vKeys = make([]string, len(m))
 	i := 0
 	for key, _ := range m {

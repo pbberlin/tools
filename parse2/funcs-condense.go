@@ -2,6 +2,20 @@ package parse2
 
 import "golang.org/x/net/html"
 
+/*
+   div                     div
+       div                     p
+           p         TO        img
+           img                 p
+           p
+
+
+	Operates from the *middle* div.
+	Saves all children in inverted slice.
+	Removes each child and reattaches it one level higher.
+	Finally the intermediary, now childless div is removed.
+
+*/
 func condenseUpwards(n *html.Node, couple []string, parentType string) {
 
 	p := n.Parent
@@ -23,6 +37,7 @@ func condenseUpwards(n *html.Node, couple []string, parentType string) {
 	if iAmDiv && parDiv {
 
 		if only1Child || svrlChildn {
+
 			var children []*html.Node
 			for c := n.FirstChild; c != nil; c = c.NextSibling {
 				children = append([]*html.Node{c}, children...) // order inversion
@@ -47,7 +62,6 @@ func condenseUpwards(n *html.Node, couple []string, parentType string) {
 			}
 			p.RemoveChild(n)
 			if p.Data != parentType {
-				// fmt.Printf("\t%v=>%v\n", p.Data, parentType)
 				p.Data = parentType
 			}
 

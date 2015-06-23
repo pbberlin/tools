@@ -86,7 +86,7 @@ func Ellipsoider(s string, nx int) string {
 
 	// len(s) > 2*nx
 	const ellip = "..."
-	return fmt.Sprintf("%v%v%v", s[:nx-1], ellip, s[len(s)-nx+1:])
+	return fmt.Sprintf("%v%v%v", ToLen(s, nx-1), ellip, s[len(s)-nx+1:])
 
 }
 

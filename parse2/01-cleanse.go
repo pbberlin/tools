@@ -116,14 +116,19 @@ func cleanseDom(n *html.Node, lvl int) {
 		cleanseDom(c, lvl+1)
 	}
 
+	if true {
+		removeDirect(n)
+	} else {
+		convertToComment(n)
+	}
+
+	// ---
+
 	normalizeToDiv(n)
-	convertToComment(n)
 
 	// one time text normalization
 	if n.Type == html.TextNode {
-		n.Data = replNewLines.Replace(n.Data)
-		n.Data = replTabs.Replace(n.Data)
-		n.Data = doubleSpaces.ReplaceAllString(n.Data, " ")
+		n.Data = textNormalize(n.Data)
 	}
 
 }
@@ -137,6 +142,24 @@ func convertToComment(n *html.Node) {
 	if removes[n.Data] {
 		n.Type = html.CommentNode
 		n.Data = n.Data + " replaced"
+	}
+}
+
+// We want to remove some children.
+// A direct loop is impossible,
+// since "NextSibling" is set to nil during Remove().
+// Therefore:
+//   First assemble children separately.
+//   Then remove them.
+func removeDirect(n *html.Node) {
+	cc := []*html.Node{}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		cc = append(cc, c)
+	}
+	for _, c := range cc {
+		if removes[c.Data] {
+			n.RemoveChild(c)
+		}
 	}
 }
 

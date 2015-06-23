@@ -19,3 +19,10 @@ func isSpacey(sarg string) bool {
 	}
 	return false
 }
+
+func textNormalize(s string) string {
+	s = replNewLines.Replace(s)
+	s = replTabs.Replace(s)
+	s = doubleSpaces.ReplaceAllString(s, " ")
+	return s
+}

@@ -17,7 +17,7 @@ func Test1(t *testing.T) {
 }
 
 var numTotal = 0 // comparable html docs
-const stageMax = 3
+const stageMax = 2
 
 func main() {
 
@@ -48,8 +48,10 @@ func main() {
 			physicalNodeRemoval(NdX{doc, 0})
 		}
 
+		pf("-----------------\n")
+
 		maxLvlPrev := 0
-		for i := 0; i < 48; i++ {
+		for i := 0; i < 1; i++ {
 			lpMax := maxTreeDepth(doc, 0)
 			if lpMax != maxLvlPrev {
 				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
@@ -114,6 +116,20 @@ func main() {
 			dom2File(fnOut, doc)
 		}
 	}
+
+	for _, i := range iter {
+		fnInn, _ := getFN(i, stageMax)
+		fnOut, _ := getFN(i, stageMax+1)
+
+		resBytes := bytesFromFile(fnInn)
+		doc, err := html.Parse(bytes.NewReader(resBytes))
+		if err != nil {
+			log.Fatal(err)
+		}
+		flattenTraverse(doc)
+		dom2File(fnOut, doc)
+	}
+
 	pf("correct finish\n")
 
 }

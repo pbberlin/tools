@@ -44,7 +44,7 @@ type Enclosure struct {
 
 type FullArticle struct {
 	URL  string
-	Body *[]byte
+	Body []byte
 }
 
 var fullArticles []FullArticle
@@ -69,19 +69,16 @@ func Fetch(amount int) {
 	if err != nil {
 		pf("%v\n", err)
 	}
-	bcntent, err := ioutil.ReadAll(resp.Body)
+	bs, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		pf("%v\n", err)
 	}
 
-	bcntent = bytes.Replace(bcntent, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
-
-	// scntent := string(bcntent)
-	// pf("size: %v \n%v\n", len(scntent), pbstrings.Ellipsoider(scntent, 1450))
+	bs = bytes.Replace(bs, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
 
 	var rssDoc RSS
-	err = xml.Unmarshal(bcntent, &rssDoc)
+	err = xml.Unmarshal(bs, &rssDoc)
 	if err != nil {
 		pf("%v\n", err)
 	}
@@ -101,14 +98,14 @@ func Fetch(amount int) {
 			if err != nil {
 				pf(" full art %v %v\n", argURL, err)
 			}
-			bcntent, err := ioutil.ReadAll(resp.Body)
+			bs, err := ioutil.ReadAll(resp.Body)
 			defer resp.Body.Close()
 			if err != nil {
 				pf(" full art %v %v\n", argURL, err)
 			}
 			fa := FullArticle{}
 			fa.URL = argURL
-			fa.Body = &bcntent
+			fa.Body = bs
 			c <- &fa
 		}(lpItem.Link)
 

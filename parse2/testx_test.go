@@ -17,7 +17,7 @@ func Test1(t *testing.T) {
 }
 
 var numTotal = 0 // comparable html docs
-const stageMax = 2
+const stageMax = 3
 
 func main() {
 
@@ -28,9 +28,9 @@ func main() {
 	for _, i := range iter {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/art0%v.html", i)
-		fn1 := fmt.Sprintf("outp_%v_1S.txt", i)
-		fn2 := fmt.Sprintf("outp_%v_2T.txt", i)
-		fn3 := fmt.Sprintf("outp_%v_3.html", i)
+		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
+		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
+		fn3, fnKey := getFN(i, 0)
 		_, resBytes, err := pbfetch.UrlGetter(url, nil, true)
 		if err != nil {
 			log.Fatal(err)
@@ -67,7 +67,7 @@ func main() {
 
 		textsBytes, textsSorted := orderByOutline(textsByOutl)
 		bytes2File(fn2, textsBytes)
-		textsByArticOutl[fn3] = textsSorted
+		textsByArticOutl[fnKey] = textsSorted
 
 		reIndent(doc, 0)
 
@@ -84,34 +84,33 @@ func main() {
 	sorted2 := subsort.SortMapByCount(nodeDistinct)
 	sorted2.Print()
 
-	for stage := 1; stage <= stageMax; stage++ {
+	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
-		levelsToProcess = map[int]bool{stage: true}
+		levelsToProcess = map[int]bool{weedStage: true}
 		frags := rangeOverTexts()
 
-		similaritiesToFile(frags, stage)
+		similaritiesToFile(frags, weedStage)
 
 		weedoutMap := map[string]map[string]bool{}
 		for _, i := range iter {
-			for j := 0; j < stageMax+3; j++ {
-				fn := fmt.Sprintf("outp_%v_%v.html", i, j)
-				weedoutMap[fn] = map[string]bool{}
-			}
+			_, fnKey := getFN(i, weedStage)
+			weedoutMap[fnKey] = map[string]bool{}
 		}
 		weedoutMap = assembleWeedout(frags, weedoutMap)
+
 		bb := pbstrings.IndentedDumpBytes(weedoutMap)
-		bytes2File(spf("outp_wd_%v.txt", stage), bb)
+		bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
 
 		for _, i := range iter {
-			fnInn := fmt.Sprintf("outp_%v_%v.html", i, stage+2)
-			fnOut := fmt.Sprintf("outp_%v_%v.html", i, stage+3)
+			fnInn, _ := getFN(i, weedStage-1)
+			fnOut, fnKey := getFN(i, weedStage)
 
 			resBytes := bytesFromFile(fnInn)
 			doc, err := html.Parse(bytes.NewReader(resBytes))
 			if err != nil {
 				log.Fatal(err)
 			}
-			weedoutApply(weedoutMap[fnInn], doc)
+			weedoutApply(weedoutMap[fnKey], doc)
 			dom2File(fnOut, doc)
 		}
 	}
@@ -123,4 +122,10 @@ func globFixes(b []byte) []byte {
 
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
+}
+
+func getFN(articleId, weedoutStage int) (string, string) {
+	fn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
+	prefix := fmt.Sprintf("outp_%03v", articleId)
+	return fn, prefix
 }

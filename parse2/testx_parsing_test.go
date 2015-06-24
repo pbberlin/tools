@@ -20,15 +20,16 @@ func Test1(t *testing.T) {
 }
 
 var numTotal = 0 // comparable html docs
-const stageMax = 2
+const stageMax = 3
 
 func main() {
 
 	//
 	// ================================================
-	iter := []int{1, 2, 3}
+	iter := make([]int, len(testDocs))
+	iter = append(iter, []int{2, 3, 4}...)
 
-	for _, i := range iter {
+	for i, _ := range iter {
 		var doc *html.Node
 		url := fmt.Sprintf("http://localhost:4000/static/%v/art0%v.html", hosts[0], i)
 		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
@@ -86,7 +87,7 @@ func main() {
 		similaritiesToFile(frags, weedStage)
 
 		weedoutMap := map[string]map[string]bool{}
-		for _, i := range iter {
+		for i, _ := range iter {
 			_, fnKey := weedoutFilename(i, weedStage)
 			weedoutMap[fnKey] = map[string]bool{}
 		}
@@ -95,7 +96,7 @@ func main() {
 		bb := pbstrings.IndentedDumpBytes(weedoutMap)
 		bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
 
-		for _, i := range iter {
+		for i, _ := range iter {
 			fnInn, _ := weedoutFilename(i, weedStage-1)
 			fnOut, fnKey := weedoutFilename(i, weedStage)
 
@@ -109,7 +110,7 @@ func main() {
 		}
 	}
 
-	for _, i := range iter {
+	for i, _ := range iter {
 		fnInn, _ := weedoutFilename(i, stageMax)
 		fnOut, _ := weedoutFilename(i, stageMax+1)
 

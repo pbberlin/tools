@@ -22,7 +22,7 @@ func fetchFileName(sUrl string, idx int) (orig, numbered string) {
 
 	numbered = filepath.Join(docRoot, u.Host, spf("art%02v.html", idx))
 
-	pf("orig: %v | numbered: %v\n", orig, numbered)
+	// pf("orig: %v | numbered: %v\n", orig, numbered)
 	return orig, numbered
 
 }

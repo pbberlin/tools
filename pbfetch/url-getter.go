@@ -3,10 +3,9 @@ package pbfetch
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
-	"net"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -24,20 +23,21 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 		}
 	}
 
+	if !strings.HasPrefix(sUrl, "http://") && !strings.HasPrefix(sUrl, "https://") {
+		sUrl = "https://" + sUrl
+	}
+
 	u, err := url.Parse(sUrl)
 	if err != nil {
 		return nil, fmt.Errorf("url unparseable: %v", err)
 	}
-	if httpsOnly || u.Scheme == "" {
+
+	if httpsOnly {
 		u.Scheme = "https"
 	}
 
-	host, port, err = net.SplitHostPort(u.Host)
-	if err != nil {
-		host = u.Host
-	}
-	log.Println("get url:", u.String())
-	log.Println("host and port: ", host, port, "standalone:", u.Host)
+	// log.Println("host:   ", u.Host)
+	// log.Println("get url:", u.RequestURI())
 
 	resp, err := client.Get(u.String())
 	if err != nil {
@@ -49,11 +49,11 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 	}
 
 	defer resp.Body.Close()
-	byteContent, err := ioutil.ReadAll(resp.Body)
+	bts, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read resp body: %v", err)
 	}
 
-	return byteContent, nil
+	return bts, nil
 
 }

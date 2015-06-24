@@ -30,10 +30,10 @@ func main() {
 
 	for _, i := range iter {
 		var doc *html.Node
-		url := fmt.Sprintf("http://localhost:4000/static/handelsblatt.com/art0%v.html", i)
+		url := fmt.Sprintf("http://localhost:4000/static/%v/art0%v.html", hosts[0], i)
 		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
 		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
-		fn3, fnKey := getFN(i, 0)
+		fn3, fnKey := weedoutFilename(i, 0)
 		resBytes, err := pbfetch.UrlGetter(url, nil, false)
 		if err != nil {
 			log.Fatal(err)
@@ -46,22 +46,11 @@ func main() {
 
 		cleanseDom(doc, 0)
 
-		for i := 0; i < 6; i++ {
-			convEmptyElementLeafs(doc, 0)
-			physicalNodeRemoval(NdX{doc, 0})
-		}
+		physicalNodeRemoval(NdX{doc, 0})
 
-		pf("-----------------\n")
+		convEmptyElementLeafs(doc, 0)
 
-		maxLvlPrev := 0
-		for i := 0; i < 1; i++ {
-			lpMax := maxTreeDepth(doc, 0)
-			if lpMax != maxLvlPrev {
-				fmt.Printf("i%2v: maxL %2v\n", i, lpMax)
-				maxLvlPrev = lpMax
-			}
-			condenseNestedDivs(doc, 0)
-		}
+		condenseNestedDivs(doc, 0)
 
 		dumpXPath(doc, 0)
 
@@ -98,7 +87,7 @@ func main() {
 
 		weedoutMap := map[string]map[string]bool{}
 		for _, i := range iter {
-			_, fnKey := getFN(i, weedStage)
+			_, fnKey := weedoutFilename(i, weedStage)
 			weedoutMap[fnKey] = map[string]bool{}
 		}
 		weedoutMap = assembleWeedout(frags, weedoutMap)
@@ -107,8 +96,8 @@ func main() {
 		bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
 
 		for _, i := range iter {
-			fnInn, _ := getFN(i, weedStage-1)
-			fnOut, fnKey := getFN(i, weedStage)
+			fnInn, _ := weedoutFilename(i, weedStage-1)
+			fnOut, fnKey := weedoutFilename(i, weedStage)
 
 			resBytes := bytesFromFile(fnInn)
 			doc, err := html.Parse(bytes.NewReader(resBytes))
@@ -121,8 +110,8 @@ func main() {
 	}
 
 	for _, i := range iter {
-		fnInn, _ := getFN(i, stageMax)
-		fnOut, _ := getFN(i, stageMax+1)
+		fnInn, _ := weedoutFilename(i, stageMax)
+		fnOut, _ := weedoutFilename(i, stageMax+1)
 
 		resBytes := bytesFromFile(fnInn)
 		doc, err := html.Parse(bytes.NewReader(resBytes))
@@ -142,10 +131,4 @@ func globFixes(b []byte) []byte {
 
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
-}
-
-func getFN(articleId, weedoutStage int) (string, string) {
-	fn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
-	prefix := fmt.Sprintf("outp_%03v", articleId)
-	return fn, prefix
 }

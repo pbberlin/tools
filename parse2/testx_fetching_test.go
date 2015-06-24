@@ -7,7 +7,7 @@ import "testing"
 
 func Test2(t *testing.T) {
 
-	url := "www.handelsblatt.com/contentexport/feed/schlagzeilen"
+	url := spf("%v/contentexport/feed/schlagzeilen", hosts[0])
 	Fetch(url, 5)
 
 }

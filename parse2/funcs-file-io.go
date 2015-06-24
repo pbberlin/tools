@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 
+	"github.com/pbberlin/tools/pblog"
 	"golang.org/x/net/html"
 )
 
@@ -18,9 +21,16 @@ func dom2File(fn string, node *html.Node) {
 }
 
 func bytes2File(fn string, b []byte) {
-	err := ioutil.WriteFile(fn, b, 0)
+	var err error
+	err = ioutil.WriteFile(fn, b, 0)
 	if err != nil {
-		log.Println(err)
+
+		err = os.MkdirAll(filepath.Dir(fn), os.ModePerm)
+		pblog.LogE(err, "directory creation failed: %v")
+
+		err = ioutil.WriteFile(fn, b, 0)
+		pblog.LogE(err)
+
 	}
 }
 

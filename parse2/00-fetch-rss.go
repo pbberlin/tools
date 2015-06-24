@@ -3,17 +3,16 @@ package parse2
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
 	"log"
-	"path/filepath"
 	"time"
 
-	urlX "net/url"
-
 	"github.com/pbberlin/tools/pbfetch"
+	"github.com/pbberlin/tools/pblog"
 	"github.com/pbberlin/tools/pbstrings"
 	"github.com/pbberlin/tools/util"
 )
+
+var hosts = []string{"www.handelsblatt.com"}
 
 type FullArticle struct {
 	Url  string
@@ -34,26 +33,26 @@ func Fetch(rssUrl string, numberArticles int) {
 		}
 	}()
 
-	resBytes, err := pbfetch.UrlGetter(rssUrl, nil, false)
-	if err != nil {
-		log.Fatal(err)
-	}
+	bts, err := pbfetch.UrlGetter(rssUrl, nil, false)
+	pblog.Fatal(err)
 
-	resBytes = bytes.Replace(resBytes, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
+	bts = bytes.Replace(bts, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
 
 	var rssDoc RSS
-	err = xml.Unmarshal(resBytes, &rssDoc)
-	if err != nil {
-		pf("%v\n", err)
-	}
+	err = xml.Unmarshal(bts, &rssDoc)
+	pblog.LogE(err)
 
-	bsd := pbstrings.IndentedDumpBytes(rssDoc)
-	pf("RSS resp size: %v\n%s\n", len(bsd), bsd[:util.Min(5*excerptLen, len(bsd)-1)])
+	bdmp := pbstrings.IndentedDumpBytes(rssDoc)
+	pf("RSS resp size: %v\n%s\n", len(bdmp), bdmp[:util.Min(5*excerptLen, len(bdmp)-1)])
+	bytes2File("outp_rss.xml", bdmp)
 
 	items := rssDoc.Items
 	for i := 0; i < len(items.ItemList); i++ {
 		lpItem := items.ItemList[i]
-		pf("%v: %v - %v\n", i, lpItem.Published[5:22], lpItem.Link)
+
+		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
+		pblog.LogE(err)
+		pf("%2v: %v - %v\n", i, t.Format("2.1. 15:04:05"), lpItem.Link)
 
 		go func(argURL string) {
 			bs, err := pbfetch.UrlGetter(argURL, nil, false)
@@ -72,22 +71,10 @@ func Fetch(rssUrl string, numberArticles int) {
 	time.Sleep(4 * time.Second)
 	pf("\n\n\n")
 
-	for _, a := range fullArticles {
-		fn := fileName(a.Url)
-		bytes2File(fn, a.Body)
+	for idx, a := range fullArticles {
+		orig, numbered := fetchFileName(a.Url, idx+len(testDocs))
+		bytes2File(orig, a.Body)
+		bytes2File(numbered, a.Body)
 	}
-
-}
-
-func fileName(url string) string {
-
-	u, err := urlX.Parse(url)
-	if err != nil {
-		panic(fmt.Errorf("url unparseable: %v", err))
-	}
-	s := u.RequestURI()
-	fn := filepath.Base(s)
-	pf("fn: %v\n", fn)
-	return fn
 
 }

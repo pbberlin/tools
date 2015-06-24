@@ -1,0 +1,714 @@
+{
+ 	"XMLName": {
+ 		"Space": "",
+ 		"Local": "rss"
+ 	},
+ 	"Items": {
+ 		"XMLName": {
+ 			"Space": "",
+ 			"Local": "channel"
+ 		},
+ 		"ItemList": [
+ 			{
+ 				"Title": "Streit um Stromtrassen: Gabriel kommt Bayern bei Trassenbau entgegen",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/streit-um-stromtrassen-gabriel-kommt-bayern-bei-trassenbau-entgegen/11962342.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/streit-um-stromtrassen-gabriel-kommt-bayern-bei-trassenbau-entgegen/11962342.html",
+ 				"Description": "Mehr Erdkabel und das Nutzen einer bereits bestehenden Trasse: Bundeswirtschaftsminister Gabriel versucht Bayern im Streit um Stromtrassen entgegen zu kommen. Aber: Eine neue Trasse muss sein.",
+ 				"Category": "Deutschland",
+ 				"Published": "Wed, 24 Jun 2015 14:19:58 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/nord-sued-trasse/11962530/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 584818
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/streit-um-stromtrassen-gabriel-kommt-bayern-bei-trassenbau-entgegen/11962342.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/nord-sued-trasse/11962530/2-format7.jpg?format=format7\"/></a>Mehr Erdkabel und das Nutzen einer bereits bestehenden Trasse: Bundeswirtschaftsminister Gabriel versucht Bayern im Streit um Stromtrassen entgegen zu kommen. Aber: Eine neue Trasse muss sein."
+ 			},
+ 			{
+ 				"Title": "OECD-Studie: Lebensversicherer spielen mit dem Leben",
+ 				"Link": "http://www.handelsblatt.com/finanzen/vorsorge/altersvorsorge-sparen/oecd-studie-lebensversicherer-spielen-mit-dem-leben/11962366.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/vorsorge/altersvorsorge-sparen/oecd-studie-lebensversicherer-spielen-mit-dem-leben/11962366.html",
+ 				"Description": "Die internationale Wirtschaftsorganisation OECD findet klare Worte: Lebensversicherern drohen Insolvenzen. Die Suche nach Rendite werde zu riskant. Was bedeutet das für Ihren Vertrag?",
+ 				"Category": "Altersvorsorge + Sparen",
+ 				"Published": "Wed, 24 Jun 2015 14:18:23 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/warnschild/11961860/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 919703
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/vorsorge/altersvorsorge-sparen/oecd-studie-lebensversicherer-spielen-mit-dem-leben/11962366.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/warnschild/11961860/2-format7.jpg?format=format7\"/></a>Die internationale Wirtschaftsorganisation OECD findet klare Worte: Lebensversicherern drohen Insolvenzen. Die Suche nach Rendite werde zu riskant. Was bedeutet das für Ihren Vertrag?"
+ 			},
+ 			{
+ 				"Title": "Segeln Kieler Woche: Schadewaldt und Schmidt/Böhme sorgen für deutsche Siege",
+ 				"Link": "http://www.handelsblatt.com/segeln-kieler-woche-schadewaldt-und-schmidt-boehme-sorgen-fuer-deutsche-siege/11962028.html",
+ 				"GUID": "http://www.handelsblatt.com/segeln-kieler-woche-schadewaldt-und-schmidt-boehme-sorgen-fuer-deutsche-siege/11962028.html",
+ 				"Description": "Laser-Athlet Tobias Schadewaldt und das 49er-Duo Justus Schmidt/Max Böhme sind bei der 121. Kieler Woche zum Gesamtsieg gesegelt.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:55:51 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/schadewaldt-siegt-bei-der-121-kieler-woche-souveraen/11962026/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 45653
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/segeln-kieler-woche-schadewaldt-und-schmidt-boehme-sorgen-fuer-deutsche-siege/11962028.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/schadewaldt-siegt-bei-der-121-kieler-woche-souveraen/11962026/1-format7.jpg?format=format7\"/></a>Laser-Athlet Tobias Schadewaldt und das 49er-Duo Justus Schmidt/Max Böhme sind bei der 121. Kieler Woche zum Gesamtsieg gesegelt."
+ 			},
+ 			{
+ 				"Title": "Hellmut Patzelt: Karstadt-Betriebsratschef legt seinen Posten nieder",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/management/hellmut-patzelt-karstadt-betriebsratschef-legt-seinen-posten-nieder/11962346.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/management/hellmut-patzelt-karstadt-betriebsratschef-legt-seinen-posten-nieder/11962346.html",
+ 				"Description": "Als Karstadt-Betriebsratschef hat Hellmut Patzelt viel mitgemacht, etwa die Insolvenzanmeldung der damaligen Karstadt-Mutter Arcandor. Nun scheidet er nach 47 Jahren bei Karstadt aus dem Unternehmen aus.",
+ 				"Category": "Management",
+ 				"Published": "Wed, 24 Jun 2015 13:53:37 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/eine-karstadt-filiale-in-recklinghausen/11962394/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 328329
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/management/hellmut-patzelt-karstadt-betriebsratschef-legt-seinen-posten-nieder/11962346.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/eine-karstadt-filiale-in-recklinghausen/11962394/3-format7.jpg?format=format7\"/></a>Als Karstadt-Betriebsratschef hat Hellmut Patzelt viel mitgemacht, etwa die Insolvenzanmeldung der damaligen Karstadt-Mutter Arcandor. Nun scheidet er nach 47 Jahren bei Karstadt aus dem Unternehmen aus."
+ 			},
+ 			{
+ 				"Title": "Reiten Derby: Galopp: Über zwei Millionen Euro bei Derbywoche in Hamburg zu verdienen",
+ 				"Link": "http://www.handelsblatt.com/reiten-derby-galopp-ueber-zwei-millionen-euro-bei-derbywoche-in-hamburg-zu-verdienen/11962476.html",
+ 				"GUID": "http://www.handelsblatt.com/reiten-derby-galopp-ueber-zwei-millionen-euro-bei-derbywoche-in-hamburg-zu-verdienen/11962476.html",
+ 				"Description": "Der Organisatoren der Derbywoche der Galopper auf der Rennbahn in Hamburg-Horn rechnen mit mit einem Wettumsatz von 3,3 Millionen Euro.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:49:44 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/am-27-juni-beginnt-die-derbywoche-in-hamburg-horn/11962474/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 110048
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/reiten-derby-galopp-ueber-zwei-millionen-euro-bei-derbywoche-in-hamburg-zu-verdienen/11962476.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/am-27-juni-beginnt-die-derbywoche-in-hamburg-horn/11962474/1-format7.jpg?format=format7\"/></a>Der Organisatoren der Derbywoche der Galopper auf der Rennbahn in Hamburg-Horn rechnen mit mit einem Wettumsatz von 3,3 Millionen Euro."
+ 			},
+ 			{
+ 				"Title": "NSA-Affäre in Frankreich: „Diese Enthüllungen machen Angst“",
+ 				"Link": "http://www.handelsblatt.com/politik/international/nsa-affaere-in-frankreich-diese-enthuellungen-machen-angst/11961294.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/nsa-affaere-in-frankreich-diese-enthuellungen-machen-angst/11961294.html",
+ 				"Description": "Die NSA hat Frankreichs Präsident ausgespäht – und auch Gespräche über Kanzlerin Merkel belauscht. Paris ist empört und nennt das Vorgehen „inakzeptabel“. Die Regierung spricht von einer „schwerwiegenden Krise“.",
+ 				"Category": "International",
+ 				"Published": "Wed, 24 Jun 2015 13:41:49 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/hollande-obama-merkel/11961374/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 239069
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/nsa-affaere-in-frankreich-diese-enthuellungen-machen-angst/11961294.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/hollande-obama-merkel/11961374/2-format7.jpg?format=format7\"/></a>Die NSA hat Frankreichs Präsident ausgespäht – und auch Gespräche über Kanzlerin Merkel belauscht. Paris ist empört und nennt das Vorgehen „inakzeptabel“. Die Regierung spricht von einer „schwerwiegenden Krise“."
+ 			},
+ 			{
+ 				"Title": "Rennsport in der Krise: Wahnsinnssumme für die Formel 1",
+ 				"Link": "http://www.handelsblatt.com/sport/motorsport/rennsport-in-der-krise-wahnsinnssumme-fuer-die-formel-1/11962180.html",
+ 				"GUID": "http://www.handelsblatt.com/sport/motorsport/rennsport-in-der-krise-wahnsinnssumme-fuer-die-formel-1/11962180.html",
+ 				"Description": "Ein US-Investor und Katar wollen die Formel 1 übernehmen: Der Deal ist noch nicht durch. Sicher ist nur, dass das Geschehen in den Hinterzimmern der Sportszene spannender ist als die Rennen der Boliden. Ein Kommentar.",
+ 				"Category": "Motorsport",
+ 				"Published": "Wed, 24 Jun 2015 13:39:33 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/formel-1/11962240/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 335435
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/sport/motorsport/rennsport-in-der-krise-wahnsinnssumme-fuer-die-formel-1/11962180.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/formel-1/11962240/2-format7.jpg?format=format7\"/></a>Ein US-Investor und Katar wollen die Formel 1 übernehmen: Der Deal ist noch nicht durch. Sicher ist nur, dass das Geschehen in den Hinterzimmern der Sportszene spannender ist als die Rennen der Boliden. Ein Kommentar."
+ 			},
+ 			{
+ 				"Title": "Radsport Tour de France: Niederländische Polizei will Tour-Start behindern",
+ 				"Link": "http://www.handelsblatt.com/radsport-tour-de-france-niederlaendische-polizei-will-tour-start-behindern/11962450.html",
+ 				"GUID": "http://www.handelsblatt.com/radsport-tour-de-france-niederlaendische-polizei-will-tour-start-behindern/11962450.html",
+ 				"Description": "Der Start der 102. Tour de France in den Niederlanden droht im Chaos zu versinken.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:39:17 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/die-polizeigewerkschaften-kuendigen-proteste-an/11962446/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 99089
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/radsport-tour-de-france-niederlaendische-polizei-will-tour-start-behindern/11962450.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/die-polizeigewerkschaften-kuendigen-proteste-an/11962446/1-format7.jpg?format=format7\"/></a>Der Start der 102. Tour de France in den Niederlanden droht im Chaos zu versinken."
+ 			},
+ 			{
+ 				"Title": "Springer verkauft Talpa Germany: „Newtopia“ und „The Voice“ werden niederländisch",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/it-medien/springer-verkauft-talpa-germany-newtopia-und-the-voice-werden-niederlaendisch/11962184.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/it-medien/springer-verkauft-talpa-germany-newtopia-und-the-voice-werden-niederlaendisch/11962184.html",
+ 				"Description": "Das Experiment „Newtopia“ bringt Sat.1 nur mäßige Quoten. Gedreht wird in Königs Wusterhausen – die Chefs sitzen nun allerdings in den Niederlanden: John de Mols Firma Talpa Media übernimmt TV-Produzent Talpa Germany.",
+ 				"Category": "IT + Medien",
+ 				"Published": "Wed, 24 Jun 2015 13:35:56 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/drehort-von-newtopia/11962234/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 259397
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/it-medien/springer-verkauft-talpa-germany-newtopia-und-the-voice-werden-niederlaendisch/11962184.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/drehort-von-newtopia/11962234/2-format7.jpg?format=format7\"/></a>Das Experiment „Newtopia“ bringt Sat.1 nur mäßige Quoten. Gedreht wird in Königs Wusterhausen – die Chefs sitzen nun allerdings in den Niederlanden: John de Mols Firma Talpa Media übernimmt TV-Produzent Talpa Germany."
+ 			},
+ 			{
+ 				"Title": "Verbraucherschutz: Brüssel verhängt Millionenstrafe gegen Verpackungskartell",
+ 				"Link": "http://www.handelsblatt.com/finanzen/steuern-recht/recht/verbraucherschutz-bruessel-verhaengt-millionenstrafe-gegen-verpackungskartell/11962218.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/steuern-recht/recht/verbraucherschutz-bruessel-verhaengt-millionenstrafe-gegen-verpackungskartell/11962218.html",
+ 				"Description": "Acht Hersteller und zwei Händler für Kunststoffverpackungen müssen über 115 Millionen Euro zahlen, weil sie den Markt jahrelang unter einander aufteilten. Millionen Verbraucher zahlten wegen dem Kartell wohl zu viel.",
+ 				"Category": "Recht",
+ 				"Published": "Wed, 24 Jun 2015 13:33:49 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/verpackungskartell-kostet-verbraucher-millionen/11962258/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 218267
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/steuern-recht/recht/verbraucherschutz-bruessel-verhaengt-millionenstrafe-gegen-verpackungskartell/11962218.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/verpackungskartell-kostet-verbraucher-millionen/11962258/2-format7.jpg?format=format7\"/></a>Acht Hersteller und zwei Händler für Kunststoffverpackungen müssen über 115 Millionen Euro zahlen, weil sie den Markt jahrelang unter einander aufteilten. Millionen Verbraucher zahlten wegen dem Kartell wohl zu viel."
+ 			},
+ 			{
+ 				"Title": "Schwimmen WM: Freiwasserschwimmen: Kampf um die letzten WM-Tickets in Lindau",
+ 				"Link": "http://www.handelsblatt.com/schwimmen-wm-freiwasserschwimmen-kampf-um-die-letzten-wm-tickets-in-lindau/11962280.html",
+ 				"GUID": "http://www.handelsblatt.com/schwimmen-wm-freiwasserschwimmen-kampf-um-die-letzten-wm-tickets-in-lindau/11962280.html",
+ 				"Description": "Bei den Internationalen Deutschen Meisterschaften im Freiwasserschwimmen geht es für die Athleten des DSV ab Donnerstag um die letzten WM-Tickets.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:27:46 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/hat-ihr-wm-ticket-sicher-isabelle-haerle/11962278/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 43030
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/schwimmen-wm-freiwasserschwimmen-kampf-um-die-letzten-wm-tickets-in-lindau/11962280.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/hat-ihr-wm-ticket-sicher-isabelle-haerle/11962278/1-format7.jpg?format=format7\"/></a>Bei den Internationalen Deutschen Meisterschaften im Freiwasserschwimmen geht es für die Athleten des DSV ab Donnerstag um die letzten WM-Tickets."
+ 			},
+ 			{
+ 				"Title": "Anleihen und Rendite: Wo Zinsjäger auf Pirsch gehen",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/anleihen/anleihen-und-rendite-wo-zinsjaeger-auf-pirsch-gehen/11956200.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/anleihen/anleihen-und-rendite-wo-zinsjaeger-auf-pirsch-gehen/11956200.html",
+ 				"Description": "Tagesgeld bringt kaum Erträge. Und selbst Profianleger kämpfen, um für Versicherungen oder Fonds gute Renditen zu erzielen. Jenseits der Euro-Zone locken Erträge. In welche Regionen die Flucht vor dem Zinstief führt.",
+ 				"Category": "Anleihen",
+ 				"Published": "Wed, 24 Jun 2015 13:23:31 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/tiger-auf-jagd/11960534/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 4430089
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/anleihen/anleihen-und-rendite-wo-zinsjaeger-auf-pirsch-gehen/11956200.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/tiger-auf-jagd/11960534/3-format7.jpg?format=format7\"/></a>Tagesgeld bringt kaum Erträge. Und selbst Profianleger kämpfen, um für Versicherungen oder Fonds gute Renditen zu erzielen. Jenseits der Euro-Zone locken Erträge. In welche Regionen die Flucht vor dem Zinstief führt."
+ 			},
+ 			{
+ 				"Title": "Nikkei auf 18-Jahres-Hoch: Die Rendite-Raketen aus Japan",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/aktien/nikkei-auf-18-jahres-hoch-die-rendite-raketen-aus-japan/11960558.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/aktien/nikkei-auf-18-jahres-hoch-die-rendite-raketen-aus-japan/11960558.html",
+ 				"Description": "Der Nikkei ist auf den höchsten Stand seit 18 Jahren geklettert. Angeschoben wird der Trend von großen Namen wie Toyota, Sony und Fujifilm. Welche bekannten japanischen Aktien Sie besser im Depot hätten.",
+ 				"Category": "Aktien",
+ 				"Published": "Wed, 24 Jun 2015 13:17:34 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/zuschauer-reagieren-auf-eine-praesentation-von-sony/11962130/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 343522
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/aktien/nikkei-auf-18-jahres-hoch-die-rendite-raketen-aus-japan/11960558.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/zuschauer-reagieren-auf-eine-praesentation-von-sony/11962130/2-format7.jpg?format=format7\"/></a>Der Nikkei ist auf den höchsten Stand seit 18 Jahren geklettert. Angeschoben wird der Trend von großen Namen wie Toyota, Sony und Fujifilm. Welche bekannten japanischen Aktien Sie besser im Depot hätten."
+ 			},
+ 			{
+ 				"Title": "Netzbetreiber: Amprion investiert Milliarden",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/netzbetreiber-amprion-investiert-milliarden/11962120.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/netzbetreiber-amprion-investiert-milliarden/11962120.html",
+ 				"Description": "Der Netzbetreiber Amprion erhöht noch einmal die Investitionen. In diesem Jahr soll eine halbe Milliarde Euro in den Ausbau des Stromnetzes fließen. Dabei ging der Gewinn zuletzt deutlich zurück.",
+ 				"Category": "Industrie",
+ 				"Published": "Wed, 24 Jun 2015 13:16:37 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/netzbetreiber-amprion/11962168/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 272454
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/netzbetreiber-amprion-investiert-milliarden/11962120.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/netzbetreiber-amprion/11962168/2-format7.jpg?format=format7\"/></a>Der Netzbetreiber Amprion erhöht noch einmal die Investitionen. In diesem Jahr soll eine halbe Milliarde Euro in den Ausbau des Stromnetzes fließen. Dabei ging der Gewinn zuletzt deutlich zurück."
+ 			},
+ 			{
+ 				"Title": "Verfassungsschutz: Cyber-Angriff auf Bundestag ist schwerwiegend",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/verfassungsschutz-cyber-angriff-auf-bundestag-ist-schwerwiegend/11962092.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/verfassungsschutz-cyber-angriff-auf-bundestag-ist-schwerwiegend/11962092.html",
+ 				"Description": "Der Verfassungsschutz ruft Staat, Wirtschaft und Gesellschaft zu mehr Wachsamkeit im Umgang mit Daten auf. Den Hacker-Angriff auf den Bundestag, bei dem massenhaft Daten kopiert worden, stuft er als schwerwiegend ein.",
+ 				"Category": "Deutschland",
+ 				"Published": "Wed, 24 Jun 2015 13:14:17 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/der-deutsche-bundestag/11962140/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 336181
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/verfassungsschutz-cyber-angriff-auf-bundestag-ist-schwerwiegend/11962092.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/der-deutsche-bundestag/11962140/2-format7.jpg?format=format7\"/></a>Der Verfassungsschutz ruft Staat, Wirtschaft und Gesellschaft zu mehr Wachsamkeit im Umgang mit Daten auf. Den Hacker-Angriff auf den Bundestag, bei dem massenhaft Daten kopiert worden, stuft er als schwerwiegend ein."
+ 			},
+ 			{
+ 				"Title": "Basketball Bundesliga: Basketball: Trainer Obradovic bleibt bei Alba Berlin",
+ 				"Link": "http://www.handelsblatt.com/basketball-bundesliga-basketball-trainer-obradovic-bleibt-bei-alba-berlin/11962186.html",
+ 				"GUID": "http://www.handelsblatt.com/basketball-bundesliga-basketball-trainer-obradovic-bleibt-bei-alba-berlin/11962186.html",
+ 				"Description": "Sasa Obradovic bleibt auch in der nächsten Saison Cheftrainer bei Basketball-Bundesligist Alba Berlin.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:13:23 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/sasa-obradovic-bleibt-cheftrainer-bei-alba-berlin/11392994/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 39274
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/basketball-bundesliga-basketball-trainer-obradovic-bleibt-bei-alba-berlin/11962186.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/sasa-obradovic-bleibt-cheftrainer-bei-alba-berlin/11392994/3-format7.jpg?format=format7\"/></a>Sasa Obradovic bleibt auch in der nächsten Saison Cheftrainer bei Basketball-Bundesligist Alba Berlin."
+ 			},
+ 			{
+ 				"Title": "Skispringen National: Seehofer ehrt Skispringer Freund und FC Ingolstadt",
+ 				"Link": "http://www.handelsblatt.com/skispringen-national-seehofer-ehrt-skispringer-freund-und-fc-ingolstadt/11962162.html",
+ 				"GUID": "http://www.handelsblatt.com/skispringen-national-seehofer-ehrt-skispringer-freund-und-fc-ingolstadt/11962162.html",
+ 				"Description": "Große Ehre für Severin Freund und Bundesliga-Aufsteiger FC Ingolstadt: Horst Seehofer verleiht Freund sowie den Fußballern den Sportpreises 2015.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 13:10:59 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/olympiasieger-freund-und-der-fci-erhalten-sportpreis/11602356/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 74536
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/skispringen-national-seehofer-ehrt-skispringer-freund-und-fc-ingolstadt/11962162.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/olympiasieger-freund-und-der-fci-erhalten-sportpreis/11602356/2-format7.jpg?format=format7\"/></a>Große Ehre für Severin Freund und Bundesliga-Aufsteiger FC Ingolstadt: Horst Seehofer verleiht Freund sowie den Fußballern den Sportpreises 2015."
+ 			},
+ 			{
+ 				"Title": "Weicheier im Management: Wenn der Chef alles mit sich machen lässt!",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/management/weicheier-im-management-wenn-der-chef-alles-mit-sich-machen-laesst/11956234.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/management/weicheier-im-management-wenn-der-chef-alles-mit-sich-machen-laesst/11956234.html",
+ 				"Description": "Unverschämtheit gehört offenbar zur Job Description. Unglaublich, was sich Mitarbeiter heutzutage herausnehmen! Täglich toben sich Vorgesetzte beim Berater Klaus Schuster aus, der von abenteuerlichen Geschichten weiß.",
+ 				"Category": "Management",
+ 				"Published": "Wed, 24 Jun 2015 12:58:55 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/-/11956900/3-format7.png?format=format7",
+ 					"Type": "image/png",
+ 					"Len": 274045
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/management/weicheier-im-management-wenn-der-chef-alles-mit-sich-machen-laesst/11956234.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/-/11956900/3-format7.png?format=format7\"/></a>Unverschämtheit gehört offenbar zur Job Description. Unglaublich, was sich Mitarbeiter heutzutage herausnehmen! Täglich toben sich Vorgesetzte beim Berater Klaus Schuster aus, der von abenteuerlichen Geschichten weiß."
+ 			},
+ 			{
+ 				"Title": "Impressionismus: Kühe im nördlichen Licht",
+ 				"Link": "http://www.handelsblatt.com/panorama/kultur-kunstmarkt/impressionismus-kuehe-im-noerdlichen-licht/11961858.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/kultur-kunstmarkt/impressionismus-kuehe-im-noerdlichen-licht/11961858.html",
+ 				"Description": "Thomas Herbst gehört zu den weniger bekannten Impressionisten norddeutscher Herkunft. Ausstellungen in der Hamburger Galerie Herold und im Jenisch-Haus erinnern an den Freiluftmaler, der von Max Liebermann gefördert wurde.",
+ 				"Category": "Kultur + Kunstmarkt",
+ 				"Published": "Wed, 24 Jun 2015 12:55:37 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/lieblingsmotiv-von-thomas-herbst/11961980/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 118436
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/kultur-kunstmarkt/impressionismus-kuehe-im-noerdlichen-licht/11961858.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/lieblingsmotiv-von-thomas-herbst/11961980/3-format7.jpg?format=format7\"/></a>Thomas Herbst gehört zu den weniger bekannten Impressionisten norddeutscher Herkunft. Ausstellungen in der Hamburger Galerie Herold und im Jenisch-Haus erinnern an den Freiluftmaler, der von Max Liebermann gefördert wurde."
+ 			},
+ 			{
+ 				"Title": "AfD-Co-Chefin Petry : Notfalls auch mit Lucke",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/afd-co-chefin-petry-notfalls-auch-mit-lucke/11961956.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/afd-co-chefin-petry-notfalls-auch-mit-lucke/11961956.html",
+ 				"Description": "Im Juli wählt die AfD eine neue Führungsspitze, der interne Streit ist damit wohl aber nicht beendet. AfD-Chef Bernd Lucke hat eine Kooperation mit Frauke Petry ausgeschlossen – sie erklärt sich nun notfalls dazu bereit.",
+ 				"Category": "Deutschland",
+ 				"Published": "Wed, 24 Jun 2015 12:52:51 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/streit-bei-der-alternative-fuer-deutschland/11961988/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 277879
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/afd-co-chefin-petry-notfalls-auch-mit-lucke/11961956.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/streit-bei-der-alternative-fuer-deutschland/11961988/3-format7.jpg?format=format7\"/></a>Im Juli wählt die AfD eine neue Führungsspitze, der interne Streit ist damit wohl aber nicht beendet. AfD-Chef Bernd Lucke hat eine Kooperation mit Frauke Petry ausgeschlossen – sie erklärt sich nun notfalls dazu bereit."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Stöger kritisiert Zoller für Winterwechsel nach Kaiserslautern",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-stoeger-kritisiert-zoller-fuer-winterwechsel-nach-kaiserslautern/11962068.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-stoeger-kritisiert-zoller-fuer-winterwechsel-nach-kaiserslautern/11962068.html",
+ 				"Description": "Trainer Peter Stöger vom 1. FC Köln hat Stürmer Simon Zoller für seine Winter-Flucht zum Zweitligisten 1. FC Kaiserslautern kritisiert.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 12:51:34 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/trainer-peter-stoeger-r-und-stuermer-simon-zoller-l-/11302740/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 55595
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-stoeger-kritisiert-zoller-fuer-winterwechsel-nach-kaiserslautern/11962068.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/trainer-peter-stoeger-r-und-stuermer-simon-zoller-l-/11302740/2-format7.jpg?format=format7\"/></a>Trainer Peter Stöger vom 1. FC Köln hat Stürmer Simon Zoller für seine Winter-Flucht zum Zweitligisten 1. FC Kaiserslautern kritisiert."
+ 			},
+ 			{
+ 				"Title": "Samsung: LKW-Anhänger mit Riesendisplay soll Sicherheit erhöhen",
+ 				"Link": "http://www.handelsblatt.com/auto/test-technik/samsung-lkw-anhaenger-mit-riesendisplay-soll-sicherheit-erhoehen/11961880.html",
+ 				"GUID": "http://www.handelsblatt.com/auto/test-technik/samsung-lkw-anhaenger-mit-riesendisplay-soll-sicherheit-erhoehen/11961880.html",
+ 				"Description": "Der Safety Truck von Samsung bietet eine neue Einsatzmöglichkeit für riesige Displays: Diese werden an den Türen des Anhängers montiert und zeigen dem nachfolgenden Verkehr an, was vor dem LKW passiert.",
+ 				"Category": "Test + Technik",
+ 				"Published": "Wed, 24 Jun 2015 12:46:59 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/safety-truck-von-samsung/11962008/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 144587
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/auto/test-technik/samsung-lkw-anhaenger-mit-riesendisplay-soll-sicherheit-erhoehen/11961880.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/safety-truck-von-samsung/11962008/3-format7.jpg?format=format7\"/></a>Der Safety Truck von Samsung bietet eine neue Einsatzmöglichkeit für riesige Displays: Diese werden an den Türen des Anhängers montiert und zeigen dem nachfolgenden Verkehr an, was vor dem LKW passiert."
+ 			},
+ 			{
+ 				"Title": "Liberty-Chef Michael Fries: „In Deutschland haben wir großen Nachholbedarf“",
+ 				"Link": "http://www.handelsblatt.com/my/unternehmen/it-medien/liberty-chef-michael-fries-in-deutschland-haben-wir-grossen-nachholbedarf/11959548.html",
+ 				"GUID": "http://www.handelsblatt.com/my/unternehmen/it-medien/liberty-chef-michael-fries-in-deutschland-haben-wir-grossen-nachholbedarf/11959548.html",
+ 				"Description": "Der Kabelnetzbetreiber Liberty Global versorgt über 40 Millionen Haushalte mit TV und Internet. Im Interview spricht Chef Michael Fries über den deutschen Markt, eine Fusion mit Vodafone und aggressives Wachstum.",
+ 				"Category": "IT + Medien",
+ 				"Published": "Wed, 24 Jun 2015 12:46:42 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/liberty-global-vorstandschef-fries/11959554/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 237514
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/unternehmen/it-medien/liberty-chef-michael-fries-in-deutschland-haben-wir-grossen-nachholbedarf/11959548.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/liberty-global-vorstandschef-fries/11959554/3-format7.jpg?format=format7\"/></a>Der Kabelnetzbetreiber Liberty Global versorgt über 40 Millionen Haushalte mit TV und Internet. Im Interview spricht Chef Michael Fries über den deutschen Markt, eine Fusion mit Vodafone und aggressives Wachstum."
+ 			},
+ 			{
+ 				"Title": "Fußball 3. Liga: Forderung einiger Klubs: 3. Liga künftig bei Sky",
+ 				"Link": "http://www.handelsblatt.com/fussball-3-liga-forderung-einiger-klubs-3-liga-kuenftig-bei-sky/11962020.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-3-liga-forderung-einiger-klubs-3-liga-kuenftig-bei-sky/11962020.html",
+ 				"Description": "Die Spiele der 3. Liga sollen nach dem Willen von einigen Klubverantwortlichen zukünftig beim Bezahlsender Sky anstatt bei der ARD laufen.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 12:44:19 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/klubs-fordern-3-liga-zukuenftig-bei-sky/11962018/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 61228
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-3-liga-forderung-einiger-klubs-3-liga-kuenftig-bei-sky/11962020.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/klubs-fordern-3-liga-zukuenftig-bei-sky/11962018/1-format7.jpg?format=format7\"/></a>Die Spiele der 3. Liga sollen nach dem Willen von einigen Klubverantwortlichen zukünftig beim Bezahlsender Sky anstatt bei der ARD laufen."
+ 			},
+ 			{
+ 				"Title": "Preisabsprachen: Kartellamt verhängt Bußgelder gegen Zulieferer",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/preisabsprachen-kartellamt-verhaengt-bussgelder-gegen-zulieferer/11961810.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/preisabsprachen-kartellamt-verhaengt-bussgelder-gegen-zulieferer/11961810.html",
+ 				"Description": "Ein anonymer Hinweise aus der Autobranche hat das Kartellamt auf die Spur von illegalen Absprachen gebracht. Preise, Rabatte und sogar der Kundenstamm – alles wurde vereinbart. Das wird für die Beteiligten jetzt teuer.",
+ 				"Category": "Industrie",
+ 				"Published": "Wed, 24 Jun 2015 12:36:52 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/bundeskartellamt/11961822/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 213687
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/preisabsprachen-kartellamt-verhaengt-bussgelder-gegen-zulieferer/11961810.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/bundeskartellamt/11961822/2-format7.jpg?format=format7\"/></a>Ein anonymer Hinweise aus der Autobranche hat das Kartellamt auf die Spur von illegalen Absprachen gebracht. Preise, Rabatte und sogar der Kundenstamm – alles wurde vereinbart. Das wird für die Beteiligten jetzt teuer."
+ 			},
+ 			{
+ 				"Title": "Ruinöser Wettbewerb im Modehandel: Vorsicht, Rabatte!",
+ 				"Link": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/ruinoeser-wettbewerb-im-modehandel-vorsicht-rabatte/11958168.html",
+ 				"GUID": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/ruinoeser-wettbewerb-im-modehandel-vorsicht-rabatte/11958168.html",
+ 				"Description": "Im Modehandel tobt ein Preiskrieg wie noch nie. Hosen, T-Shirts und Röcke werden immer schneller reduziert. Es ist ein ruinöser Wettlauf. Hersteller und Händler leiden zugleich.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Wed, 24 Jun 2015 12:36:28 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/schaufenster-in-berlin/11960574/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 342765
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/ruinoeser-wettbewerb-im-modehandel-vorsicht-rabatte/11958168.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/schaufenster-in-berlin/11960574/2-format7.jpg?format=format7\"/></a>Im Modehandel tobt ein Preiskrieg wie noch nie. Hosen, T-Shirts und Röcke werden immer schneller reduziert. Es ist ein ruinöser Wettlauf. Hersteller und Händler leiden zugleich."
+ 			},
+ 			{
+ 				"Title": "Fußball DFB: Fragen und Antworten zur Olympia-Qualifikation der deutschen Fußballer",
+ 				"Link": "http://www.handelsblatt.com/fussball-dfb-fragen-und-antworten-zur-olympia-qualifikation-der-deutschen-fussballer/11961958.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-dfb-fragen-und-antworten-zur-olympia-qualifikation-der-deutschen-fussballer/11961958.html",
+ 				"Description": "Die deutsche U21 hat bei der EM in Tschechien das Halbfinale erreicht und das ersehnte Ticket für die Sommerspiele 2016 in Rio de Janeiro gelöst.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 12:34:39 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/deutschland-ist-bei-den-olympischen-spielen-dabei-/11385128/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 32228
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-dfb-fragen-und-antworten-zur-olympia-qualifikation-der-deutschen-fussballer/11961958.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/deutschland-ist-bei-den-olympischen-spielen-dabei-/11385128/3-format7.jpg?format=format7\"/></a>Die deutsche U21 hat bei der EM in Tschechien das Halbfinale erreicht und das ersehnte Ticket für die Sommerspiele 2016 in Rio de Janeiro gelöst."
+ 			},
+ 			{
+ 				"Title": "Sparkurs beim Lkw-Hersteller: MAN baut 1.800 Stellen ab",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/sparkurs-beim-lkw-hersteller-man-baut-1-800-stellen-ab/11961644.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/sparkurs-beim-lkw-hersteller-man-baut-1-800-stellen-ab/11961644.html",
+ 				"Description": "Volkswagen will die Kosten beim Lastwagenbauer MAN bis 2017 um 850 Millionen Euro senken. 1.800 Arbeitsplätze fallen daher weg. Betroffen sind alle deutschen Werke – ein Standort aber besonders.",
+ 				"Category": "Industrie",
+ 				"Published": "Wed, 24 Jun 2015 12:30:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/man-laster-vor-der-zentrale-in-muenchen/11961718/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 190501
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/sparkurs-beim-lkw-hersteller-man-baut-1-800-stellen-ab/11961644.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/man-laster-vor-der-zentrale-in-muenchen/11961718/2-format7.jpg?format=format7\"/></a>Volkswagen will die Kosten beim Lastwagenbauer MAN bis 2017 um 850 Millionen Euro senken. 1.800 Arbeitsplätze fallen daher weg. Betroffen sind alle deutschen Werke – ein Standort aber besonders."
+ 			},
+ 			{
+ 				"Title": "Produktionsfirma Brainpool: Raab-Rückzug kostet 80 Arbeitsplätze",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/it-medien/produktionsfirma-brainpool-raab-rueckzug-kostet-80-arbeitsplaetze/11961784.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/it-medien/produktionsfirma-brainpool-raab-rueckzug-kostet-80-arbeitsplaetze/11961784.html",
+ 				"Description": "Brainpool produziert bisher 200 Stunden Programm im Jahr mit Stefan Raab. Ob irgendeines dieser Formate 2016 ohne den Entertainer fortgeführt wird, ist ungewiss. Die Firma hat deshalb 80 Mitarbeitern gekündigt.",
+ 				"Category": "IT + Medien",
+ 				"Published": "Wed, 24 Jun 2015 12:24:11 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/stefan-raab/11961806/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 188666
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/it-medien/produktionsfirma-brainpool-raab-rueckzug-kostet-80-arbeitsplaetze/11961784.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/stefan-raab/11961806/2-format7.jpg?format=format7\"/></a>Brainpool produziert bisher 200 Stunden Programm im Jahr mit Stefan Raab. Ob irgendeines dieser Formate 2016 ohne den Entertainer fortgeführt wird, ist ungewiss. Die Firma hat deshalb 80 Mitarbeitern gekündigt."
+ 			},
+ 			{
+ 				"Title": "Bootsfahrt auf der Spree: Wie Präsident Gauck der Queen Berlin zeigt",
+ 				"Link": "http://www.handelsblatt.com/panorama/aus-aller-welt/bootsfahrt-auf-der-spree-wie-praesident-gauck-der-queen-berlin-zeigt/11961712.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/aus-aller-welt/bootsfahrt-auf-der-spree-wie-praesident-gauck-der-queen-berlin-zeigt/11961712.html",
+ 				"Description": "Der Bundespräsident als prominente Reisebegleitung: Für die britische Königin Elizabeth II. übt sich Joachim Gauck als Touristenführer durch Berlin. Gemeinsam mit den Partnern ging es auf eine Bootsfahrt auf der Spree.",
+ 				"Category": "Aus aller Welt",
+ 				"Published": "Wed, 24 Jun 2015 12:18:02 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/bootsfahrt-mit-aussicht/11961754/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 155844
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/aus-aller-welt/bootsfahrt-auf-der-spree-wie-praesident-gauck-der-queen-berlin-zeigt/11961712.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/bootsfahrt-mit-aussicht/11961754/2-format7.jpg?format=format7\"/></a>Der Bundespräsident als prominente Reisebegleitung: Für die britische Königin Elizabeth II. übt sich Joachim Gauck als Touristenführer durch Berlin. Gemeinsam mit den Partnern ging es auf eine Bootsfahrt auf der Spree."
+ 			},
+ 			{
+ 				"Title": "Keine Krone für die Kanzlerin: Deutsche wollen keine eigene Queen",
+ 				"Link": "http://www.handelsblatt.com/panorama/aus-aller-welt/keine-krone-fuer-die-kanzlerin-deutsche-wollen-keine-eigene-queen/11961720.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/aus-aller-welt/keine-krone-fuer-die-kanzlerin-deutsche-wollen-keine-eigene-queen/11961720.html",
+ 				"Description": "Gegen ein gekröntes Staatsoberhaupt nach britischem Vorbild: Die große Mehrheit der Deutschen möchte kein eigenes Königshaus. In Ostdeutschland würde eine „deutsche Queen“ zumindest mehr Anklang finden als im Westen.",
+ 				"Category": "Aus aller Welt",
+ 				"Published": "Wed, 24 Jun 2015 12:13:28 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/die-queen-vor-dem-bellevue-palast/11961738/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 246745
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/aus-aller-welt/keine-krone-fuer-die-kanzlerin-deutsche-wollen-keine-eigene-queen/11961720.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/die-queen-vor-dem-bellevue-palast/11961738/2-format7.jpg?format=format7\"/></a>Gegen ein gekröntes Staatsoberhaupt nach britischem Vorbild: Die große Mehrheit der Deutschen möchte kein eigenes Königshaus. In Ostdeutschland würde eine „deutsche Queen“ zumindest mehr Anklang finden als im Westen."
+ 			},
+ 			{
+ 				"Title": "Paternoster-Verbot kippt: Es geht wieder aufwärts",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/paternoster-verbot-kippt-es-geht-wieder-aufwaerts/11960658.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/paternoster-verbot-kippt-es-geht-wieder-aufwaerts/11960658.html",
+ 				"Description": "Das Bundeskabinett hat wichtiges zu tun: Heute kippte es eine Verordnung, die den Betrieb von nostalgischen Paternoster-Aufzügen unmöglich gemacht hätte. Die Begründung hat etwas mit VW zu tun.",
+ 				"Category": "Deutschland",
+ 				"Published": "Wed, 24 Jun 2015 12:03:31 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/paternoster/11961316/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 315675
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/paternoster-verbot-kippt-es-geht-wieder-aufwaerts/11960658.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/paternoster/11961316/3-format7.jpg?format=format7\"/></a>Das Bundeskabinett hat wichtiges zu tun: Heute kippte es eine Verordnung, die den Betrieb von nostalgischen Paternoster-Aufzügen unmöglich gemacht hätte. Die Begründung hat etwas mit VW zu tun."
+ 			},
+ 			{
+ 				"Title": "Hamborner Reit: Immobilienfirma will 142 Millionen Euro einsammeln",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/aktien/hamborner-reit-immobilienfirma-will-142-millionen-euro-einsammeln/11961380.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/aktien/hamborner-reit-immobilienfirma-will-142-millionen-euro-einsammeln/11961380.html",
+ 				"Description": "Um weitere Immobilien zu erwerben, gibt ein Duisburger Investor neue Aktien aus. Insgesamt 142 Millionen Euro sollen so dem Unternehmen zufließen. Die Aktie gibt im SDax am Mittwoch nach.",
+ 				"Category": "Aktien",
+ 				"Published": "Wed, 24 Jun 2015 11:57:56 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/kapitalerhoehung-bei-hamborner-reit/11961442/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 406289
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/aktien/hamborner-reit-immobilienfirma-will-142-millionen-euro-einsammeln/11961380.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/kapitalerhoehung-bei-hamborner-reit/11961442/2-format7.jpg?format=format7\"/></a>Um weitere Immobilien zu erwerben, gibt ein Duisburger Investor neue Aktien aus. Insgesamt 142 Millionen Euro sollen so dem Unternehmen zufließen. Die Aktie gibt im SDax am Mittwoch nach."
+ 			},
+ 			{
+ 				"Title": "Unterbeschäftigt: Drei Millionen Erwerbstätige wollen mehr arbeiten",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/beruf-und-buero/buero-special/unterbeschaeftigt-drei-millionen-erwerbstaetige-wollen-mehr-arbeiten/11961586.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/beruf-und-buero/buero-special/unterbeschaeftigt-drei-millionen-erwerbstaetige-wollen-mehr-arbeiten/11961586.html",
+ 				"Description": "Ein ungenutztes Arbeitspotenzial von etwa 566.000 Vollzeitstellen: Fast drei Millionen deutsche Erwerbstätige fühlen sich unterbeschäftigt und würden gern mehr arbeiten. Weniger arbeiten will nur knapp eine Million.",
+ 				"Category": "Beruf + Büro",
+ 				"Published": "Wed, 24 Jun 2015 11:57:16 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/die-deutschen-fuehlen-sich-unterbeschaeftigt/11961634/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 134323
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/beruf-und-buero/buero-special/unterbeschaeftigt-drei-millionen-erwerbstaetige-wollen-mehr-arbeiten/11961586.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/die-deutschen-fuehlen-sich-unterbeschaeftigt/11961634/2-format7.jpg?format=format7\"/></a>Ein ungenutztes Arbeitspotenzial von etwa 566.000 Vollzeitstellen: Fast drei Millionen deutsche Erwerbstätige fühlen sich unterbeschäftigt und würden gern mehr arbeiten. Weniger arbeiten will nur knapp eine Million."
+ 			},
+ 			{
+ 				"Title": "Börse Frankfurt: Dax schmiert ab",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-frankfurt-dax-schmiert-ab/11960010.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-frankfurt-dax-schmiert-ab/11960010.html",
+ 				"Description": "Der Tag begann noch optimistisch und Anleger glaubten an eine Einigung im griechischen Schuldenstreit. Doch nun gibt es Gerüchte, dass Griechenlands Vorschläge abgelehnt wurden. Der Dax reagiert sofort.",
+ 				"Category": "Marktberichte",
+ 				"Published": "Wed, 24 Jun 2015 11:56:32 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/alles-andere-als-bullenstimmung/11961698/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 107777
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-frankfurt-dax-schmiert-ab/11960010.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/alles-andere-als-bullenstimmung/11961698/2-format7.jpg?format=format7\"/></a>Der Tag begann noch optimistisch und Anleger glaubten an eine Einigung im griechischen Schuldenstreit. Doch nun gibt es Gerüchte, dass Griechenlands Vorschläge abgelehnt wurden. Der Dax reagiert sofort."
+ 			},
+ 			{
+ 				"Title": "Radsport Tour de France: Greipel und Sieberg im Tour-Aufgebot von Lotto-Soudal",
+ 				"Link": "http://www.handelsblatt.com/radsport-tour-de-france-greipel-und-sieberg-im-tour-aufgebot-von-lotto-soudal/11961674.html",
+ 				"GUID": "http://www.handelsblatt.com/radsport-tour-de-france-greipel-und-sieberg-im-tour-aufgebot-von-lotto-soudal/11961674.html",
+ 				"Description": "Der Sprinter André Greipel und Anfahrer Marcel Sieberg sind vom Radsportteam Lotto-Soudal in das Aufgebot für die 102. Tour de France berufen worden.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:52:02 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/andre-greipel-und-marcel-sieburg-stehen-im-tour-aufgebot/11961672/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 61149
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/radsport-tour-de-france-greipel-und-sieberg-im-tour-aufgebot-von-lotto-soudal/11961674.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/andre-greipel-und-marcel-sieburg-stehen-im-tour-aufgebot/11961672/1-format7.jpg?format=format7\"/></a>Der Sprinter André Greipel und Anfahrer Marcel Sieberg sind vom Radsportteam Lotto-Soudal in das Aufgebot für die 102. Tour de France berufen worden."
+ 			},
+ 			{
+ 				"Title": "Ungewöhnliche Fahrzeug-Ferien: So erholen sich Menschen mit Benzin im Blut",
+ 				"Link": "http://www.handelsblatt.com/auto/nachrichten/ungewoehnliche-fahrzeug-ferien-so-erholen-sich-menschen-mit-benzin-im-blut/11961394.html",
+ 				"GUID": "http://www.handelsblatt.com/auto/nachrichten/ungewoehnliche-fahrzeug-ferien-so-erholen-sich-menschen-mit-benzin-im-blut/11961394.html",
+ 				"Description": "Der Desktop-Hintergrundbild zeigt Ihren Lieblings-Oldtimer? Auf Ihrem Schreibtisch steht ein Foto Ihrer Harley? Dann sind Sie reif für diese Urlaubs-Vorschläge.",
+ 				"Category": "Nachrichten",
+ 				"Published": "Wed, 24 Jun 2015 11:45:39 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/tipp-2-alpenquerung/11942082/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 188346
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/auto/nachrichten/ungewoehnliche-fahrzeug-ferien-so-erholen-sich-menschen-mit-benzin-im-blut/11961394.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/tipp-2-alpenquerung/11942082/3-format7.jpg?format=format7\"/></a>Der Desktop-Hintergrundbild zeigt Ihren Lieblings-Oldtimer? Auf Ihrem Schreibtisch steht ein Foto Ihrer Harley? Dann sind Sie reif für diese Urlaubs-Vorschläge."
+ 			},
+ 			{
+ 				"Title": "Fußball U21: Hrubesch zu Olympia-Start von Lahm: \"Vorstellen kann ich mir alles\"",
+ 				"Link": "http://www.handelsblatt.com/fussball-u21-hrubesch-zu-olympia-start-von-lahm-vorstellen-kann-ich-mir-alles/11960556.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-u21-hrubesch-zu-olympia-start-von-lahm-vorstellen-kann-ich-mir-alles/11960556.html",
+ 				"Description": "DFB-Trainer Horst Hrubesch hat einen Olympia-Start der zurückgetretenen Fußball-Nationalspieler Philipp Lahm und Per Mertesacker nicht ausgeschlossen.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:45:10 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/das-team-von-horst-hrubesch-tritt-2016-bei-olympia-an/11960554/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 65626
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-u21-hrubesch-zu-olympia-start-von-lahm-vorstellen-kann-ich-mir-alles/11960556.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/das-team-von-horst-hrubesch-tritt-2016-bei-olympia-an/11960554/1-format7.jpg?format=format7\"/></a>DFB-Trainer Horst Hrubesch hat einen Olympia-Start der zurückgetretenen Fußball-Nationalspieler Philipp Lahm und Per Mertesacker nicht ausgeschlossen."
+ 			},
+ 			{
+ 				"Title": "Schwimmen WM: Dänischer Schwimmstar Ottesen bangt nach tätlichem Angriff um WM-Start",
+ 				"Link": "http://www.handelsblatt.com/schwimmen-wm-daenischer-schwimmstar-ottesen-bangt-nach-taetlichem-angriff-um-wm-start/11961594.html",
+ 				"GUID": "http://www.handelsblatt.com/schwimmen-wm-daenischer-schwimmstar-ottesen-bangt-nach-taetlichem-angriff-um-wm-start/11961594.html",
+ 				"Description": "Die dänische Schwimm-Weltmeisterin Jeanette Ottesen bangt nach einem tätlichen Angriff auf sie und ihren Lebensgefährten um ihre Teilnahme an der WM.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:43:38 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/nach-taetlichem-angriff-ottesen-bangt-um-wm-start/11961592/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 65014
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/schwimmen-wm-daenischer-schwimmstar-ottesen-bangt-nach-taetlichem-angriff-um-wm-start/11961594.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/nach-taetlichem-angriff-ottesen-bangt-um-wm-start/11961592/1-format7.jpg?format=format7\"/></a>Die dänische Schwimm-Weltmeisterin Jeanette Ottesen bangt nach einem tätlichen Angriff auf sie und ihren Lebensgefährten um ihre Teilnahme an der WM."
+ 			},
+ 			{
+ 				"Title": "Kapitalerhöhung: LEG Immobilien kauft 3500 Wohnungen",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/dienstleister/kapitalerhoehung-leg-immobilien-kauft-3500-wohnungen/11960372.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/dienstleister/kapitalerhoehung-leg-immobilien-kauft-3500-wohnungen/11960372.html",
+ 				"Description": "Weitere Wohnungen in Nordrhein-Westfalen für 225 Millionen Euro: LEG Immobilien will bis Oktober 3500 Wohnungen kaufen. Die neue Übernahme finanziert der Düsseldorfer Konzern zum Teil über eine Kapitalerhöhung.",
+ 				"Category": "Dienstleister",
+ 				"Published": "Wed, 24 Jun 2015 11:37:36 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/leg-immobilien/11960386/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 552856
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/dienstleister/kapitalerhoehung-leg-immobilien-kauft-3500-wohnungen/11960372.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/leg-immobilien/11960386/2-format7.jpg?format=format7\"/></a>Weitere Wohnungen in Nordrhein-Westfalen für 225 Millionen Euro: LEG Immobilien will bis Oktober 3500 Wohnungen kaufen. Die neue Übernahme finanziert der Düsseldorfer Konzern zum Teil über eine Kapitalerhöhung."
+ 			},
+ 			{
+ 				"Title": "Syngenta-Verhandlungen ziehen sich hin: Monsanto prüft Übernahme-Optionen bei Bayer",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/syngenta-verhandlungen-ziehen-sich-hin-monsanto-prueft-uebernahme-optionen-bei-bayer/11960920.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/syngenta-verhandlungen-ziehen-sich-hin-monsanto-prueft-uebernahme-optionen-bei-bayer/11960920.html",
+ 				"Description": "Nach den jüngsten Wortgefechten mit Konkurrent Syngenta lotet Monsanto nun seine Übernahme-Optionen bei Bayer aus. Der US-Saatgutkonzern könnte versuchen, einen Bereich bei den Leverkusenern herauszukaufen.",
+ 				"Category": "Industrie",
+ 				"Published": "Wed, 24 Jun 2015 11:35:53 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/unkrautbekaempfungsmittel-roundup/11961034/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 432778
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/syngenta-verhandlungen-ziehen-sich-hin-monsanto-prueft-uebernahme-optionen-bei-bayer/11960920.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/unkrautbekaempfungsmittel-roundup/11961034/2-format7.jpg?format=format7\"/></a>Nach den jüngsten Wortgefechten mit Konkurrent Syngenta lotet Monsanto nun seine Übernahme-Optionen bei Bayer aus. Der US-Saatgutkonzern könnte versuchen, einen Bereich bei den Leverkusenern herauszukaufen."
+ 			},
+ 			{
+ 				"Title": "Costa Concordia: Concordia-Kapitän geht unter die Autoren",
+ 				"Link": "http://www.handelsblatt.com/panorama/aus-aller-welt/costa-concordia-concordia-kapitaen-geht-unter-die-autoren/11961508.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/aus-aller-welt/costa-concordia-concordia-kapitaen-geht-unter-die-autoren/11961508.html",
+ 				"Description": "Geld statt Gefängnis: Francesco Schettino schlachtet seine Bekanntheit aus. Der verurteilte Unglückskapitän der Costa Concordia schreibt ein Buch – und darf weiterhin Tantiemen einsammeln, statt hinter Gittern zu sitzen.",
+ 				"Category": "Aus aller Welt",
+ 				"Published": "Wed, 24 Jun 2015 11:34:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/francesco-schettino/11961566/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 220993
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/aus-aller-welt/costa-concordia-concordia-kapitaen-geht-unter-die-autoren/11961508.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/francesco-schettino/11961566/2-format7.jpg?format=format7\"/></a>Geld statt Gefängnis: Francesco Schettino schlachtet seine Bekanntheit aus. Der verurteilte Unglückskapitän der Costa Concordia schreibt ein Buch – und darf weiterhin Tantiemen einsammeln, statt hinter Gittern zu sitzen."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Geis: \"Stammspieler sein und mich weiterentwickeln\"",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-geis-stammspieler-sein-und-mich-weiterentwickeln/11961520.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-geis-stammspieler-sein-und-mich-weiterentwickeln/11961520.html",
+ 				"Description": "U21-Nationalspieler Johannes Geis erwartet sich von seinem Wechsel zum Fußball-Bundesligisten Schalke 04 einen Karriereschub.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:32:21 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/johannes-geis-will-sich-bei-schalke-04-weiterentwickeln/11961516/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 45420
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-geis-stammspieler-sein-und-mich-weiterentwickeln/11961520.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/johannes-geis-will-sich-bei-schalke-04-weiterentwickeln/11961516/1-format7.jpg?format=format7\"/></a>U21-Nationalspieler Johannes Geis erwartet sich von seinem Wechsel zum Fußball-Bundesligisten Schalke 04 einen Karriereschub."
+ 			},
+ 			{
+ 				"Title": "Fußball England: Mertesacker: Olympia-Teilnahme \"höchst unwahrscheinlich\"",
+ 				"Link": "http://www.handelsblatt.com/fussball-england-mertesacker-olympia-teilnahme-hoechst-unwahrscheinlich/11961518.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-england-mertesacker-olympia-teilnahme-hoechst-unwahrscheinlich/11961518.html",
+ 				"Description": "Fußball-Weltmeister Per Mertesacker hat eine Teilnahme an den Olympischen Spielen 2016 in Rio als \"höchst unwahrscheinlich\" bezeichnet.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:32:01 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/mertesacker-haelt-olympia-teilnahme-fuer-unwahrscheinlich/11961512/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 46283
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-england-mertesacker-olympia-teilnahme-hoechst-unwahrscheinlich/11961518.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/mertesacker-haelt-olympia-teilnahme-fuer-unwahrscheinlich/11961512/1-format7.jpg?format=format7\"/></a>Fußball-Weltmeister Per Mertesacker hat eine Teilnahme an den Olympischen Spielen 2016 in Rio als \"höchst unwahrscheinlich\" bezeichnet."
+ 			},
+ 			{
+ 				"Title": "Fußball Italien: Medien: Pirlo wechselt nach New York",
+ 				"Link": "http://www.handelsblatt.com/fussball-italien-medien-pirlo-wechselt-nach-new-york/11961486.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-italien-medien-pirlo-wechselt-nach-new-york/11961486.html",
+ 				"Description": "Der italienische Fußball-Nationalspieler Andrea Pirlo verlässt offenbar Rekordmeister Juventus Turin und wechselt zu New York City FC.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:31:33 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/andrea-pirlo-wechselt-wohl-in-die-usa/11961480/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 53404
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-italien-medien-pirlo-wechselt-nach-new-york/11961486.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/andrea-pirlo-wechselt-wohl-in-die-usa/11961480/1-format7.jpg?format=format7\"/></a>Der italienische Fußball-Nationalspieler Andrea Pirlo verlässt offenbar Rekordmeister Juventus Turin und wechselt zu New York City FC."
+ 			},
+ 			{
+ 				"Title": "Fußball 2.Bundesliga: Thomalla wechselt zu Lech Posen",
+ 				"Link": "http://www.handelsblatt.com/fussball-2-bundesliga-thomalla-wechselt-zu-lech-posen/11961490.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-2-bundesliga-thomalla-wechselt-zu-lech-posen/11961490.html",
+ 				"Description": "Denis Thomalla verlässt Fußball-Zweitligist RB Leipzig und schließt sich dem polnischen Meister Lech Posen an.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:31:05 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/lech-posen-verpflichtet-denis-thomalla-/11961484/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 52888
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-2-bundesliga-thomalla-wechselt-zu-lech-posen/11961490.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/lech-posen-verpflichtet-denis-thomalla-/11961484/1-format7.jpg?format=format7\"/></a>Denis Thomalla verlässt Fußball-Zweitligist RB Leipzig und schließt sich dem polnischen Meister Lech Posen an."
+ 			},
+ 			{
+ 				"Title": "Fußball England: Podolski will \"bei Arsenal wieder voll angreifen\"",
+ 				"Link": "http://www.handelsblatt.com/fussball-england-podolski-will-bei-arsenal-wieder-voll-angreifen/11961488.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-england-podolski-will-bei-arsenal-wieder-voll-angreifen/11961488.html",
+ 				"Description": "Fußball-Weltmeister Lukas Podolski hat seine Wechselabsichten offenbar auf Eis gelegt und hofft beim FC Arsenal auf einen Neustart.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:30:23 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/podolski-will-bei-arsenal-wieder-voll-angreifen/11961482/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 57656
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-england-podolski-will-bei-arsenal-wieder-voll-angreifen/11961488.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/podolski-will-bei-arsenal-wieder-voll-angreifen/11961482/1-format7.jpg?format=format7\"/></a>Fußball-Weltmeister Lukas Podolski hat seine Wechselabsichten offenbar auf Eis gelegt und hofft beim FC Arsenal auf einen Neustart."
+ 			},
+ 			{
+ 				"Title": "ELA-Hilfen erneut genehmigt: EZB stützt griechische Banken weiter",
+ 				"Link": "http://www.handelsblatt.com/politik/konjunktur/ela-hilfen-erneut-genehmigt-ezb-stuetzt-griechische-banken-weiter/11961124.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/konjunktur/ela-hilfen-erneut-genehmigt-ezb-stuetzt-griechische-banken-weiter/11961124.html",
+ 				"Description": "Bereits zum dritten Mal in dieser Woche soll die EZB weitere Nothilfen für griechische Geldhäuser freigegeben haben. Das berichten Medien. Die nächste Hilfe könnte schon bald folgen.",
+ 				"Category": "Konjunktur + Geldpolitik",
+ 				"Published": "Wed, 24 Jun 2015 11:26:34 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/bank-of-greece-in-athen/11961326/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 274249
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/konjunktur/ela-hilfen-erneut-genehmigt-ezb-stuetzt-griechische-banken-weiter/11961124.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/bank-of-greece-in-athen/11961326/2-format7.jpg?format=format7\"/></a>Bereits zum dritten Mal in dieser Woche soll die EZB weitere Nothilfen für griechische Geldhäuser freigegeben haben. Das berichten Medien. Die nächste Hilfe könnte schon bald folgen."
+ 			},
+ 			{
+ 				"Title": "Ifo-Geschäftsklimaindex: „Aussichten für deutsche Wirtschaft gedämpft“",
+ 				"Link": "http://www.handelsblatt.com/politik/konjunktur/nachrichten/ifo-geschaeftsklimaindex-aussichten-fuer-deutsche-wirtschaft-gedaempft/11961262.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/konjunktur/nachrichten/ifo-geschaeftsklimaindex-aussichten-fuer-deutsche-wirtschaft-gedaempft/11961262.html",
+ 				"Description": "Führungskräfte deutscher Unternehmen beurteilen sowohl ihre Lage als auch ihre Geschäftsaussichten im Juni schlechter: Der Geschäftsklimaindex ist erneut gefallen – und das stärker als von Ökonomen bereits erwartet.",
+ 				"Category": "Nachrichten",
+ 				"Published": "Wed, 24 Jun 2015 11:19:22 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ifo-praesident-hans-werner-sinn/11961304/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 110989
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/konjunktur/nachrichten/ifo-geschaeftsklimaindex-aussichten-fuer-deutsche-wirtschaft-gedaempft/11961262.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ifo-praesident-hans-werner-sinn/11961304/2-format7.jpg?format=format7\"/></a>Führungskräfte deutscher Unternehmen beurteilen sowohl ihre Lage als auch ihre Geschäftsaussichten im Juni schlechter: Der Geschäftsklimaindex ist erneut gefallen – und das stärker als von Ökonomen bereits erwartet."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Stuttgart verpflichtet Rupp und Tyton",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-stuttgart-verpflichtet-rupp-und-tyton/11961346.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-stuttgart-verpflichtet-rupp-und-tyton/11961346.html",
+ 				"Description": "Fußball-Bundesligist VfB Stuttgart hat wenige Tage vor dem Trainingsstart zwei weitere Spieler verpflichtet.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Wed, 24 Jun 2015 11:15:53 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/lukas-rupp-wechselt-zum-vfb-stuttgart/11961342/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 68878
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-stuttgart-verpflichtet-rupp-und-tyton/11961346.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/lukas-rupp-wechselt-zum-vfb-stuttgart/11961342/1-format7.jpg?format=format7\"/></a>Fußball-Bundesligist VfB Stuttgart hat wenige Tage vor dem Trainingsstart zwei weitere Spieler verpflichtet."
+ 			}
+ 		]
+ 	}
+ }

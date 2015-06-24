@@ -8,17 +8,26 @@ import (
 
 func convEmptyElementLeafs(n *html.Node, lvl int) {
 
-	// processing
+	// children
+	cc := []*html.Node{}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		cc = append(cc, c)
+	}
+	for _, c := range cc {
+		convEmptyElementLeafs(c, lvl+1)
+	}
 
+	// processing
 	// empty element nodes
 	if n.Type == html.ElementNode &&
 		n.FirstChild == nil &&
 		(n.Data == "div" || n.Data == "span" ||
 			n.Data == "li" || n.Data == "p") {
-		n.Type = html.CommentNode
+		// n.Type = html.CommentNode
+		n.Parent.RemoveChild(n)
 	}
 
-	// spans with only 2 characters inside => remove
+	// spans with less than 2 characters inside => flatten to text
 	only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
 	if n.Type == html.ElementNode &&
 		n.Data == "span" &&
@@ -28,11 +37,6 @@ func convEmptyElementLeafs(n *html.Node, lvl int) {
 		n.Type = html.TextNode
 		n.Data = n.FirstChild.Data
 		n.RemoveChild(n.FirstChild)
-	}
-
-	// children
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		convEmptyElementLeafs(c, lvl+1)
 	}
 
 }

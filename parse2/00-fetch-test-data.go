@@ -2,11 +2,11 @@ package parse2
 
 import "fmt"
 
-var tests = make([]string, 2)
+var testDocs = make([]string, 2)
 
 func init() {
 
-	tests[0] = `<!DOCTYPE html><html><head>
+	testDocs[0] = `<!DOCTYPE html><html><head>
 		<script type="text/javascript" src="./article01_files/empty.js"></script>
 		<link href="./article01_files/vendor.css" rel="stylesheet" type="text/css"/>
 		</head><body><p>Links:
@@ -48,7 +48,7 @@ func init() {
 
 			</body></html>`
 
-	tests[1] = `	<p>
+	testDocs[1] = `	<p>
 				Ja so sans<br/>
 				Ja die sans.
 			</p>
@@ -57,12 +57,10 @@ func init() {
 				<li>zu sagen hat</li>
 			</ul>`
 
-	const offSetFilename = 4
-
 	// write out to http doc root
-	for i := 0; i < len(tests); i++ {
-		fn := fmt.Sprintf(docRoot+"/handelsblatt.com/art%02v.html", i+offSetFilename)
-		bytes2File(fn, []byte(tests[i]))
+	for i := 0; i < len(testDocs); i++ {
+		fn := fmt.Sprintf(docRoot+"/%v/art%02v.html", hosts[0], i)
+		bytes2File(fn, []byte(testDocs[i]))
 	}
 
 }

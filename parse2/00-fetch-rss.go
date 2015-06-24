@@ -89,6 +89,9 @@ func Fetch(rssUrl string, numberArticles int) {
 	wg.Wait()
 	pf("wait() after\n")
 
+	close(c)
+
+	// just saving them
 	for idx, a := range fullArticles {
 		orig, numbered := fetchFileName(a.Url, idx+len(testDocs))
 		bytes2File(orig, a.Body)

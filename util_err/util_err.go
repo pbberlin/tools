@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"runtime"
 	"strings"
 )
@@ -111,9 +112,11 @@ func Err_panic(e error) {
 }
 
 func StackTrace(max int) {
+	lg := log.New(os.Stdout, "str", 0)
+
 	for i := 1; i <= max; i++ {
 		_, file, line, _ := runtime.Caller(i)
-		log.Printf("        %s:%d ", file, line)
+		lg.Printf("        %s:%d ", file, line)
 	}
 }
 

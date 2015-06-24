@@ -8,6 +8,6 @@ import "testing"
 func Test2(t *testing.T) {
 
 	url := spf("%v/contentexport/feed/schlagzeilen", hosts[0])
-	Fetch(url, 8)
+	Fetch(url, 9)
 
 }

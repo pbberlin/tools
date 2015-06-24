@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -22,6 +23,8 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 			client = urlfetch.Client(c)
 		}
 	}
+	client.Timeout = time.Duration(5 * time.Second)
+	// client.Timeout = time.Duration(500 * time.Millisecond)
 
 	if !strings.HasPrefix(sUrl, "http://") && !strings.HasPrefix(sUrl, "https://") {
 		sUrl = "https://" + sUrl

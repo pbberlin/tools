@@ -19,18 +19,20 @@ type FullArticle struct {
 	Body []byte
 }
 
-var fullArticles []FullArticle
-var c chan *FullArticle = make(chan *FullArticle)
-var wg sync.WaitGroup
-
 func Fetch(rssUrl string, numberArticles int) {
+
+	var fullArticles []FullArticle
+
+	var c chan *FullArticle = make(chan *FullArticle)
+	var finish chan struct{} = make(chan struct{})
+	var wg sync.WaitGroup
 
 	// fire up the "collector"
 	go func() {
 		wg.Add(1)
-		const initialFetch = 800
-		const forthcomingFetches = 400
-		cout := time.After(time.Millisecond * initialFetch)
+		const delay1 = 800
+		const delay2 = 400 // 400 good value; critical point at 35
+		cout := time.After(time.Millisecond * delay1)
 		for {
 			select {
 
@@ -39,9 +41,13 @@ func Fetch(rssUrl string, numberArticles int) {
 				fullArticles = append(fullArticles, fa)
 				u, _ := url.Parse(fa.Url)
 				pf("    fetched %v \n", u.RequestURI())
-				cout = time.After(time.Millisecond * forthcomingFetches) // refresh timeout
+				cout = time.After(time.Millisecond * delay2) // refresh timeout
 			case <-cout:
 				pf("timeout after %v articles\n", len(fullArticles))
+				close(finish)
+				c = nil
+				// close(c)
+				pf("finish closed; c nilled\n")
 				wg.Done()
 				return
 			}
@@ -62,9 +68,7 @@ func Fetch(rssUrl string, numberArticles int) {
 	bytes2File("outp_rss.xml", bdmp)
 	pf("RSS resp size, outp_rss.xml, : %v\n", len(bdmp))
 
-	items := rssDoc.Items
-	for i := 0; i < len(items.ItemList); i++ {
-		lpItem := items.ItemList[i]
+	for i, lpItem := range rssDoc.Items.ItemList {
 
 		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
 		pblog.LogE(err)
@@ -74,9 +78,25 @@ func Fetch(rssUrl string, numberArticles int) {
 
 		// fire up a dedicated fetcher routine
 		go func(argURL string) {
+
+			// defer func() {
+			// 	panicSignal := recover()
+			// 	if panicSignal != nil {
+			// 		log.Printf("panic caught:\n\n%s", panicSignal)
+			// 		util_err.StackTrace(15)
+			// 	}
+			// }()
+
 			bs, err := pbfetch.UrlGetter(argURL, nil, false)
 			pblog.Fatal(err)
-			c <- &FullArticle{argURL, bs}
+			select {
+			case c <- &FullArticle{argURL, bs}:
+				return
+			case <-finish:
+				u, _ := url.Parse(argURL)
+				pf("    abandoned %v\n", u.RequestURI())
+				return
+			}
 		}(lpItem.Link)
 
 		if i+1 >= numberArticles {
@@ -89,7 +109,7 @@ func Fetch(rssUrl string, numberArticles int) {
 	wg.Wait()
 	pf("wait() after\n")
 
-	close(c)
+	time.Sleep(333 * time.Millisecond)
 
 	// just saving them
 	for idx, a := range fullArticles {

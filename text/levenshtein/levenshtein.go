@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 )
 
@@ -180,7 +180,7 @@ func (m *Matrix) Print() {
 	fp(strings.Repeat(" ", 2*cl))
 	for _, col := range cols {
 		scol := fmt.Sprintf("%v", col)
-		fp("%v ", pbstrings.ToLen(scol, cl-1)) // at least one space right
+		fp("%v ", stringspb.ToLen(scol, cl-1)) // at least one space right
 	}
 	fp("\n")
 
@@ -194,7 +194,7 @@ func (m *Matrix) Print() {
 	//
 	for i, row := range rows {
 		srow := fmt.Sprintf("%v", row)
-		fp("%v ", pbstrings.ToLen(srow, cl-1)) // at least one space right
+		fp("%v ", stringspb.ToLen(srow, cl-1)) // at least one space right
 		fp(fmt2, mx[i+1][0])
 		for j, _ := range cols {
 			fp(fmt2, mx[i+1][j+1])

@@ -3,7 +3,7 @@ package ancestored_urls
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/tpl_html"
+	"github.com/pbberlin/tools/net/http/tpl_html"
 )
 
 func init() {

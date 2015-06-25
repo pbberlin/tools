@@ -3,7 +3,7 @@ package word
 import (
 	"fmt"
 
-	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/stringspb"
 	ls_core "github.com/pbberlin/tools/text/levenshtein"
 
 	"testing"
@@ -81,7 +81,7 @@ func inner(t *testing.T, cases *[]TestCase, wantIdx int, opt ls_core.Options, so
 		if got != tc.distances[wantIdx] {
 			t.Logf(
 				"%2v: Distance between %20v and %20v should be %v - but got %v ",
-				i, pbstrings.Ellipsoider(ssrc, 8), pbstrings.Ellipsoider(sdst, 8), tc.distances[wantIdx], got)
+				i, stringspb.Ellipsoider(ssrc, 8), stringspb.Ellipsoider(sdst, 8), tc.distances[wantIdx], got)
 			t.Fail()
 		}
 

@@ -12,11 +12,11 @@ import (
 
 	_ "net/http/pprof"
 
-	htmlpb "github.com/pbberlin/tools/pbhtml"
-	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -96,19 +96,19 @@ func makeRequest(w http.ResponseWriter, r *http.Request, path string) CGI_Result
 	url_dis := spf(`http://%s%s&ts=%s`, dns_cam, path, urlParamTS())
 	opf(w, "<div style='font-size:10px; line-height:11px;'>requesting %v<br></div>\n", url_dis)
 	resp1, err := client.Get(url_exe)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	bcont, err := ioutil.ReadAll(resp1.Body)
 	defer resp1.Body.Close()
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	cgiRes := CGI_Result{}
 	xmlerr := xml.Unmarshal(bcont, &cgiRes)
-	util_err.Err_http(w, r, xmlerr, false)
+	loghttp.E(w, r, xmlerr, false)
 
 	if cgiRes.Result != "0" {
 		opf(w, "<b>RESPONSE shows bad mood:</b><br>\n")
-		psXml := pbstrings.IndentedDump(cgiRes)
+		psXml := stringspb.IndentedDump(cgiRes)
 		dis := strings.Trim(*psXml, "{}")
 		opf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
 	}
@@ -184,7 +184,7 @@ func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	cgiRes := makeRequest(w, r, path_get_alarm)
 
-	psXml := pbstrings.IndentedDump(cgiRes)
+	psXml := stringspb.IndentedDump(cgiRes)
 	dis := strings.Trim(*psXml, "{}")
 	dis = strings.Replace(dis, "\t", "", -1)
 	dis = strings.Replace(dis, " ", "", -1)
@@ -254,11 +254,11 @@ func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface
 	}
 
 	opf(w, "<pre>")
-	// disS2 := pbstrings.Breaker(s2, 50)
+	// disS2 := stringspb.Breaker(s2, 50)
 	// for _, v := range disS2 {
 	// 	opf(w, "%v\n", v)
 	// }
-	disRecombined := pbstrings.Breaker(recombined, 50)
+	disRecombined := stringspb.Breaker(recombined, 50)
 	for _, v := range disRecombined {
 		opf(w, "%v\n", v)
 	}

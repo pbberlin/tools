@@ -18,10 +18,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 // output static file as base64 string
@@ -36,15 +36,15 @@ func imagefileAsBase64(w http.ResponseWriter, r *http.Request, m map[string]inte
 	}
 
 	f, err := os.Open(p)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	defer f.Close()
 
 	img, whichFormat, err := image.Decode(f)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	c.Infof("format %v - subtype %T\n", whichFormat, img)
 
 	imgRGBA, ok := img.(*image.RGBA)
-	util_err.Err_http(w, r, ok, true, "source image was not convertible to image.RGBA - gifs or jpeg?")
+	loghttp.E(w, r, ok, true, "source image was not convertible to image.RGBA - gifs or jpeg?")
 
 	// => header with mime prefix always prepended
 	//   and its always image/PNG

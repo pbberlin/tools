@@ -1,12 +1,15 @@
 package charting
 
 import (
-	"appengine"
 	"fmt"
+	"image"
+
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/util_err"
-	"image"
+	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
+
+	"appengine"
 
 	"net/http"
 
@@ -21,7 +24,7 @@ func SaveImageToDatastore(w http.ResponseWriter, r *http.Request, i *image.RGBA,
 	internalType := fmt.Sprintf("%T", i)
 	//buffBytes, _     := StringToVByte(s)  // instead of []byte(s)
 	key_combi, err := dsu.BufPut(w, r, dsu.WrapBlob{Name: key, VByte: []byte(s), S: internalType}, key)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	return key_combi
 
@@ -32,7 +35,7 @@ func GetImageFromDatastore(w http.ResponseWriter, r *http.Request, key string) *
 	c := appengine.NewContext(r)
 
 	dsObj, err := dsu.BufGet(w, r, "dsu.WrapBlob__"+key)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	s := string(dsObj.VByte)
 
@@ -40,7 +43,7 @@ func GetImageFromDatastore(w http.ResponseWriter, r *http.Request, key string) *
 	c.Infof("retrieved img from base64: format %v - subtype %T\n", whichFormat, img)
 
 	i, ok := img.(*image.RGBA)
-	util_err.Err_http(w, r, ok, false, "saved image needs to be reconstructible into a format png of subtype *image.RGBA")
+	loghttp.E(w, r, ok, false, "saved image needs to be reconstructible into a format png of subtype *image.RGBA")
 
 	return i
 }
@@ -62,7 +65,7 @@ func StringToVByte(s string) (*bytes.Buffer, *bytes.Buffer) {
 		if err == io.EOF {
 			break
 		}
-		util_err.Err_log(err)
+		logif.E(err)
 		if n1 < 1 {
 			break
 		}
@@ -70,7 +73,7 @@ func StringToVByte(s string) (*bytes.Buffer, *bytes.Buffer) {
 		independentCopy := make([]byte, n1)
 		copy(independentCopy, lb)
 		n2, err := bDst.Write(independentCopy)
-		util_err.Err_log(err)
+		logif.E(err)
 
 		bMsg.WriteString(fmt.Sprintln("reading", n1, "bytes - writing", n2, "bytes: \n"))
 		bMsg.WriteString(fmt.Sprint(" --", string(independentCopy), "--<br>\n"))
@@ -90,7 +93,7 @@ func VByteToString( m []byte)( *bytes.Buffer, *bytes.Buffer){
 
 	n,err := bRet.Write( m )
 	bMsg.WriteString( fmt.Sprintln("reading" , n, "bytes\n"))
-	util_err.Err_log(err)
+	logif.E(err)
 
 	return bRet,bMsg
 }

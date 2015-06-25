@@ -6,8 +6,9 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_err"
 
 	"appengine"
 	ds "appengine/datastore"
@@ -40,16 +41,16 @@ func saveURLNoAnc(w http.ResponseWriter, r *http.Request) {
 	e := new(LastURL)
 	err := ds.Get(c, k, e)
 	if err == ds.ErrNoSuchEntity {
-		util_err.Err_log(err)
+		logif.E(err)
 	} else {
-		util_err.Err_http(w, r, err, false)
+		loghttp.E(w, r, err, false)
 	}
 
 	old := e.Value
 	e.Value = r.URL.Path + r.URL.RawQuery
 
 	_, err = ds.Put(c, k, e)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte("old=" + old + "\n"))
@@ -68,7 +69,7 @@ func saveURLWithAncestor(w http.ResponseWriter, r *http.Request) {
 	lc := len("09-26 17:29:25")
 	lastURL_fictitious_1 := LastURL{"with_anc " + s[ls-lc:ls-3]}
 	_, err := ds.Put(c, k, &lastURL_fictitious_1)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 }
 
@@ -121,7 +122,7 @@ func listURLWithAncestors(w http.ResponseWriter, r *http.Request) {
 		Order("-Value")
 	var vURLs []LastURL
 	keys, err := q.GetAll(c, &vURLs)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	for i, v := range vURLs {
 		io.WriteString(w, fmt.Sprint("q loop ", i, "\n"))

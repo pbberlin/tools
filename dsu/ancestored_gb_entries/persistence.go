@@ -13,8 +13,8 @@ import (
 	"strings"
 	//"reflect"
 
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_err"
 )
 
 /*
@@ -86,7 +86,7 @@ func (g GbEntryRetr) String() string {
 func SaveEntry(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	contnt, ok := m["content"].(string)
-	util_err.Err_http(w, r, ok, false, "need a key 'content' with a string")
+	loghttp.E(w, r, ok, false, "need a key 'content' with a string")
 
 	c := appengine.NewContext(r)
 
@@ -114,7 +114,7 @@ func SaveEntry(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	incomplete := ds.NewIncompleteKey(c, DSKindGBEntry, key_entity_group_key_parent(c))
 	concreteNewKey, err := ds.Put(c, incomplete, &g)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	_ = concreteNewKey // we query entries via key_entity_group_key_parent - via parent
 
 }
@@ -135,10 +135,10 @@ func ListEntries(w http.ResponseWriter,
 
 	if fmt.Sprintf("%T", err) == fmt.Sprintf("%T", new(ds.ErrFieldMismatch)) {
 		//s := fmt.Sprintf("%v %T  vs %v %T <br>\n",err,err,ds.ErrFieldMismatch{},ds.ErrFieldMismatch{})
-		util_err.Err_http(w, r, err, true)
+		loghttp.E(w, r, err, true)
 		err = nil // ignore this one - it's caused by our deliberate differences between gbsaveEntry and gbEntrieRetr
 	}
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	// for investigative purposes,
 	// we

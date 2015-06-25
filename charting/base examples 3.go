@@ -17,8 +17,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 func imgServingExample3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -41,24 +41,24 @@ func imgServingExample3(w http.ResponseWriter, r *http.Request, m map[string]int
 	var rec image.Rectangle = image.Rectangle{Min: p1, Max: p2}
 
 	f, err := os.Open(p)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	defer f.Close()
 
 	img, whichFormat, err := image.Decode(f)
-	util_err.Err_http(w, r, err, false, "only jpeg and png are 'activated' ")
+	loghttp.E(w, r, err, false, "only jpeg and png are 'activated' ")
 	c.Infof("serving format %v %T\n", whichFormat, img)
 
 	switch t := img.(type) {
 
 	default:
-		util_err.Err_http(w, r, false, false, "internal color formats image.YCbCr and image.RGBA are understood")
+		loghttp.E(w, r, false, false, "internal color formats image.YCbCr and image.RGBA are understood")
 
 	case *image.RGBA, *image.YCbCr:
 		imgXFull, ok := t.(*image.RGBA)
-		util_err.Err_http(w, r, ok, false, "image.YCbCr can not be typed to image.RGBA - this will panic")
+		loghttp.E(w, r, ok, false, "image.YCbCr can not be typed to image.RGBA - this will panic")
 
 		imgXCutout, ok := imgXFull.SubImage(rec).(*image.RGBA)
-		util_err.Err_http(w, r, ok, false, "cutout operation failed")
+		loghttp.E(w, r, ok, false, "cutout operation failed")
 
 		// we serve it as JPEG
 		w.Header().Set("Content-Type", "image/jpeg")

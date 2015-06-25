@@ -10,10 +10,10 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/pbberlin/tools/instance_mgt"
-	"github.com/pbberlin/tools/pbstrings"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/appengine/instance_mgt"
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/stringspb"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -33,7 +33,7 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	ii := instance_mgt.Get(w, r, m)
 	resp2, err := client.Get(spf(`http://%s/write-methods-read`, ii.Hostname))
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	bufDemo := new(bytes.Buffer)
 	bufDemo.WriteString("end of page")
@@ -118,10 +118,10 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 	opf(w, "ioutil.ReadAll\n")
 	var content []byte
 	resp3, err := client.Get(spf(`http://%s/write-methods-read`, ii.Hostname))
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	content, _ = ioutil.ReadAll(resp3.Body)
 	scont := string(content)
-	scont = pbstrings.Ellipsoider(scont, 20)
+	scont = stringspb.Ellipsoider(scont, 20)
 	w.Write([]byte(scont))
 
 	fmt.Fprint(w, "</pre>")

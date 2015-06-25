@@ -9,9 +9,9 @@ import (
 
 	// "github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_err"
 
 	"fmt"
 	"strings"
@@ -52,7 +52,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 	// Get the item from the memcache
 	wb1 := new(dsu.WrapBlob)
 	ok := dsu.McacheGet(c, keyLatest, wb1)
-	util_err.Err_http(w, r, ok, true)
+	loghttp.E(w, r, ok, true)
 
 	if ok {
 		b.WriteString(sp("name %v\n", wb1.Name))
@@ -82,7 +82,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 						// b.WriteString("\t\t" + v + "\n")
 						if strings.HasPrefix(v, "name=") {
 							vv := strings.Split(v, "=")
-							fn = pbstrings.LowerCasedUnderscored(vv[1])
+							fn = stringspb.LowerCasedUnderscored(vv[1])
 						}
 					}
 					s = s[start+len(sepHeaderContent):]
@@ -93,7 +93,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 			}
 
 			if ctype == "" {
-				b.WriteString("unparseable: " + pbstrings.Ellipsoider(s, 400))
+				b.WriteString("unparseable: " + stringspb.Ellipsoider(s, 400))
 			} else {
 				b.WriteString(sp("\n\tctype=%v\n\t------------", ctype))
 				if fn != "" {

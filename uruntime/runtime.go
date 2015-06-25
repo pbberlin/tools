@@ -2,8 +2,20 @@ package uruntime
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 )
+
+func StackTrace(max int) {
+	// we could construct a logger without info:
+	// 	lg := log.New(os.Stdout, "str", 0)
+	// but it would not be  written under appengine, because of os.Stdout
+
+	for i := 1; i <= max; i++ {
+		_, file, line, _ := runtime.Caller(i)
+		log.Printf("        %s:%d ", file, line)
+	}
+}
 
 /*
 	bookkeeping of memory allocation

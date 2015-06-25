@@ -11,8 +11,8 @@ import (
 
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_err"
 
 	"strings"
 
@@ -48,7 +48,7 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	msg, err := go_mail.ReadMessage(r.Body)
-	util_err.Err_http(w, r, err, false, "could not do ReadMessage")
+	loghttp.E(w, r, err, false, "could not do ReadMessage")
 	if msg == nil {
 		c.Warningf("-empty msg- " + r.URL.Path)
 		return
@@ -155,7 +155,7 @@ func emailSend(w http.ResponseWriter, r *http.Request, m map[string]string) {
 		Headers: go_mail.Header{"References": email_thread_id},
 	}
 	err := ae_mail.Send(c, msg)
-	util_err.Err_http(w, r, err, false, "could not send the email")
+	loghttp.E(w, r, err, false, "could not send the email")
 
 }
 

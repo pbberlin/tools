@@ -3,8 +3,8 @@ package big_query
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/tpl_html"
-	"github.com/pbberlin/tools/util_appengine"
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/tpl_html"
 )
 
 func ViewHTML(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

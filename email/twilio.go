@@ -9,9 +9,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/pbberlin/tools/net/http/loghttp"
+
 	"appengine"
 	"appengine/urlfetch"
-	"github.com/pbberlin/tools/util_err"
 	// "github.com/subosito/twilio"
 )
 
@@ -76,7 +77,7 @@ func call(w http.ResponseWriter, r *http.Request) {
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	resp, err := clientClassic.Do(req)
-	util_err.Err_http(w, r, err, false, "something wrong with the http client")
+	loghttp.E(w, r, err, false, "something wrong with the http client")
 
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		var data map[string]interface{}
@@ -87,7 +88,7 @@ func call(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, "%#v", resp)
 	} else {
-		util_err.Err_http(w, r, err, false, "twilio response not ok", resp.Status)
+		loghttp.E(w, r, err, false, "twilio response not ok", resp.Status)
 	}
 }
 
@@ -121,7 +122,7 @@ func sendSMS(w http.ResponseWriter, r *http.Request) {
 		params := twilio.MessageParams{Body: "Hello Go!", MediaUrl: []string{}, StatusCallback: "", ApplicationSid: ""}
 		// Send SMS
 		twMsg, twRsp, err = clientTwilio.Messages.Send(phoneFrom, phoneTo, params)
-		util_err.Err_http(w, r, err, false, "SMS Message send failed")
+		loghttp.E(w, r, err, false, "SMS Message send failed")
 
 		fmt.Fprintf(w, "%+v  %+v\n", twMsg, twRsp)
 	*/

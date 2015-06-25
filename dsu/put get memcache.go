@@ -6,7 +6,7 @@ import "appengine/memcache"
 
 import "time"
 
-import "github.com/pbberlin/tools/util_err"
+import "github.com/pbberlin/tools/logif"
 import "github.com/pbberlin/tools/util"
 
 import "reflect"
@@ -112,7 +112,7 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 					Value: []byte(val),
 				}
 				eset := memcache.Set(c, miCas)
-				util_err.Err_log(eset)
+				logif.E(eset)
 				time.Sleep(10 * time.Millisecond)
 				continue
 			}

@@ -15,7 +15,7 @@ func main() {
 
 	tasks := [][]string{
 		[]string{"htmlpb/", "pbhtml/"},
-		[]string{"stringspb/", "pbstrings/"},
+		[]string{"stringspb/", "stringspb/"},
 		[]string{"ancestored_.../", "dsu/ancestored_.../"},
 	}
 

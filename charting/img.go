@@ -21,9 +21,9 @@ import (
 	"os"
 
 	//"github.com/pbberlin/tools/util"
+	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/conv"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 // An example demonstrating decoding JPEG img + examining its pixels.
@@ -90,17 +90,17 @@ func drawLinesOverGrid(w http.ResponseWriter, r *http.Request, m map[string]inte
 	}
 
 	f, err := os.Open(p)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	defer f.Close()
 
 	img, whichFormat, err := image.Decode(f)
-	util_err.Err_http(w, r, err, false, "only jpeg and png are 'activated' ")
+	loghttp.E(w, r, err, false, "only jpeg and png are 'activated' ")
 	c.Infof("serving img format %v %T\n", whichFormat, img)
 
 	switch imgXFull := img.(type) {
 
 	default:
-		util_err.Err_http(w, r, false, true, "convertibility into internal color format image.RGBA required")
+		loghttp.E(w, r, false, true, "convertibility into internal color format image.RGBA required")
 
 	case *image.RGBA:
 

@@ -22,9 +22,10 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/util_err"
 	"net/http"
+
+	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 // chart data
@@ -47,11 +48,11 @@ func SaveChartDataToDatastore(w http.ResponseWriter, r *http.Request, cd CData, 
 	serializedStruct := new(bytes.Buffer)
 	enc := gob.NewEncoder(serializedStruct)
 	err := enc.Encode(cd)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	key_combi, err := dsu.BufPut(w, r,
 		dsu.WrapBlob{Name: key, VByte: serializedStruct.Bytes(), S: internalType}, key)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	return key_combi
 }
@@ -61,13 +62,13 @@ func GetChartDataFromDatastore(w http.ResponseWriter, r *http.Request, key strin
 	key_combi := "dsu.WrapBlob__" + key
 
 	dsObj, err := dsu.BufGet(w, r, key_combi)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	serializedStruct := bytes.NewBuffer(dsObj.VByte)
 	dec := gob.NewDecoder(serializedStruct)
 	newCData := new(CData) // hell, it was set to nil above - causing this "unassignable value" error
 	err = dec.Decode(newCData)
-	util_err.Err_http(w, r, err, false, "VByte was ", dsObj.VByte[:10])
+	loghttp.E(w, r, err, false, "VByte was ", dsObj.VByte[:10])
 
 	return newCData
 }
@@ -91,7 +92,7 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
 	serializedStruct := new(bytes.Buffer)
 	enc := gob.NewEncoder(serializedStruct)
 	err := enc.Encode(orig)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	sx := serializedStruct.String()
 	lx := len(sx)
@@ -100,10 +101,10 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
 	// saving to ds
 	key_combi, err := dsu.BufPut(w, r,
 		dsu.WrapBlob{Name: "chart_data_test_1", VByte: serializedStruct.Bytes(), S: "chart data"}, "chart_data_test_1")
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	// restoring from ds
 	dsObj, err := dsu.BufGet(w, r, key_combi)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	p := r.FormValue("p")
 
@@ -117,12 +118,12 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
 		readr := bytes.NewBuffer(dsObj.VByte)
 		dec := gob.NewDecoder(readr)
 		err = dec.Decode(rest1)
-		util_err.Err_http(w, r, err, false)
+		loghttp.E(w, r, err, false)
 	} else {
 		readr := bytes.NewBuffer(serializedStruct.Bytes())
 		dec := gob.NewDecoder(readr)
 		err = dec.Decode(rest1)
-		util_err.Err_http(w, r, err, false)
+		loghttp.E(w, r, err, false)
 	}
 
 	fmt.Fprintf(w, "resl\n%#v\n", rest1)
@@ -131,7 +132,7 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
 	SaveChartDataToDatastore(w, r, orig, "chart_data_test_2")
 
 	dsObj2, err := dsu.BufGet(w, r, "dsu.WrapBlob__chart_data_test_2")
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	{
 
 		rest2 := new(CData)
@@ -143,7 +144,7 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
 		readr := bytes.NewBuffer(dsObj2.VByte)
 		dec := gob.NewDecoder(readr)
 		err = dec.Decode(rest2)
-		util_err.Err_http(w, r, err, false)
+		loghttp.E(w, r, err, false)
 
 		fmt.Fprintf(w, "res2\n%#v\n", rest2)
 

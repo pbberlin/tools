@@ -7,8 +7,8 @@ import (
 	"math/rand"
 
 	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_err"
 
 	"appengine"
 	"appengine/datastore"
@@ -76,7 +76,7 @@ func Count(w http.ResponseWriter, r *http.Request, valName string) (retVal int, 
 
 	wi := dsu.WrapInt{}
 	errMc := dsu.McacheGet(c, mCKValue(valName), &wi)
-	util_err.Err_http(w, r, errMc, false)
+	loghttp.E(w, r, errMc, false)
 	retVal = wi.I
 	if retVal > 0 {
 		c.Infof("found counter %s = %v in memcache; return", mCKValue(valName), wi.I)
@@ -94,7 +94,7 @@ Loop1:
 		// because we have "hashed" the keys, we can no longer
 		// range query them by key -
 		//q = q.Filter("__key__ >=", valName+shardId )
-		//q = q.Filter("__key__ < ",pbstrings.IncrementString(valName+shardId) )
+		//q = q.Filter("__key__ < ",stringspb.IncrementString(valName+shardId) )
 
 		q = q.Order("Name")
 		q = q.Order("-ShardId")
@@ -124,7 +124,7 @@ Loop1:
 			retVal += sd.I
 			c.Infof("        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
 
-			util_err.Err_http(w, r, err, false)
+			loghttp.E(w, r, err, false)
 			// other err
 			// if err != nil {
 			// 	return retVal, err

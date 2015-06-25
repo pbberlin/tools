@@ -4,7 +4,7 @@ package word
 import (
 	"sort"
 
-	"github.com/pbberlin/tools/pbstrings"
+	"github.com/pbberlin/tools/stringspb"
 	ls_core "github.com/pbberlin/tools/text/levenshtein"
 )
 
@@ -26,7 +26,7 @@ func (tk1 Token) Equal(compareTo interface{}) bool {
 //   []ls_core.Equaler{ls_core.Equaler(Token("trink")), ls_core.Equaler(Token("nicht"))}
 func WrapAsEqualer(s string, sorted bool) []ls_core.Equaler {
 
-	ss := pbstrings.SplitByWhitespace(s)
+	ss := stringspb.SplitByWhitespace(s)
 	if sorted {
 		sort.Strings(ss)
 

@@ -1,0 +1,714 @@
+{
+ 	"XMLName": {
+ 		"Space": "",
+ 		"Local": "rss"
+ 	},
+ 	"Items": {
+ 		"XMLName": {
+ 			"Space": "",
+ 			"Local": "channel"
+ 		},
+ 		"ItemList": [
+ 			{
+ 				"Title": "Der Werber-Rat: Die Vollbärte bevölkern Cannes",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/dienstleister/werber-rat/der-werber-rat-die-vollbaerte-bevoelkern-cannes/11966962.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/dienstleister/werber-rat/der-werber-rat-die-vollbaerte-bevoelkern-cannes/11966962.html",
+ 				"Description": "Das Kreativzentrum der Welt: Seit einigen Tagen findet das Werbefestival in Cannes statt – auch genannt das Oktoberfest der Branche. Neben Rosé und Sonne treffen sich beim Kreativwettbewerb die verschiedensten Menschen.",
+ 				"Category": "Der Werber-Rat",
+ 				"Published": "Thu, 25 Jun 2015 20:50:31 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/cannes-lions/11967026/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 501937
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/dienstleister/werber-rat/der-werber-rat-die-vollbaerte-bevoelkern-cannes/11966962.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/cannes-lions/11967026/2-format7.jpg?format=format7\"/></a>Das Kreativzentrum der Welt: Seit einigen Tagen findet das Werbefestival in Cannes statt – auch genannt das Oktoberfest der Branche. Neben Rosé und Sonne treffen sich beim Kreativwettbewerb die verschiedensten Menschen."
+ 			},
+ 			{
+ 				"Title": "Tennis Wimbledon: Wimbledon: Siegemund erstmals im Grand-Slam-Hauptfeld",
+ 				"Link": "http://www.handelsblatt.com/tennis-wimbledon-wimbledon-siegemund-erstmals-im-grand-slam-hauptfeld/11969302.html",
+ 				"GUID": "http://www.handelsblatt.com/tennis-wimbledon-wimbledon-siegemund-erstmals-im-grand-slam-hauptfeld/11969302.html",
+ 				"Description": "Laura Siegemund (Filderstadt) steht in Wimbledon zum ersten Mal in ihrer Karriere im Hauptfeld eines Grand-Slam-Turniers.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 20:12:03 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/wimbledon-siegemund-estmals-in-grand-slam-hauptfeld/11969298/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 51801
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/tennis-wimbledon-wimbledon-siegemund-erstmals-im-grand-slam-hauptfeld/11969302.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/wimbledon-siegemund-estmals-in-grand-slam-hauptfeld/11969298/1-format7.jpg?format=format7\"/></a>Laura Siegemund (Filderstadt) steht in Wimbledon zum ersten Mal in ihrer Karriere im Hauptfeld eines Grand-Slam-Turniers."
+ 			},
+ 			{
+ 				"Title": "Eklat bei Pariser Modenschau: „Please kill Angela Merkel not“",
+ 				"Link": "http://www.handelsblatt.com/panorama/aus-aller-welt/eklat-bei-pariser-modenschau-please-kill-angela-merkel-not/11971890.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/aus-aller-welt/eklat-bei-pariser-modenschau-please-kill-angela-merkel-not/11971890.html",
+ 				"Description": "Eine Fashion Show des US-Designers Rick Owens gerät zum Politikum: Eines der Models trug bei seinem Walk ein wirres Stoff-Transparent vor sich her, mit der Bitte, die Kanzlerin nicht zu töten. Der Maestro ist erzürnt.",
+ 				"Category": "Aus aller Welt",
+ 				"Published": "Thu, 25 Jun 2015 20:08:31 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/please-kill-angela-merkel-not/11971900/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 174949
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/aus-aller-welt/eklat-bei-pariser-modenschau-please-kill-angela-merkel-not/11971890.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/please-kill-angela-merkel-not/11971900/3-format7.jpg?format=format7\"/></a>Eine Fashion Show des US-Designers Rick Owens gerät zum Politikum: Eines der Models trug bei seinem Walk ein wirres Stoff-Transparent vor sich her, mit der Bitte, die Kanzlerin nicht zu töten. Der Maestro ist erzürnt."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Nach OP: Schalker Giefer fällt erneut aus - Wellenreuther wird ausgeliehen",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-nach-op-schalker-giefer-faellt-erneut-aus-wellenreuther-wird-ausgeliehen/11968162.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-nach-op-schalker-giefer-faellt-erneut-aus-wellenreuther-wird-ausgeliehen/11968162.html",
+ 				"Description": "Fußball-Bundesligist Schalke 04 muss noch länger auf Torhüter Fabian Giefer verzichten.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 20:04:20 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/fabian-giefer-faellt-voraussichtlich-zwei-monate-aus/11968160/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 65024
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-nach-op-schalker-giefer-faellt-erneut-aus-wellenreuther-wird-ausgeliehen/11968162.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/fabian-giefer-faellt-voraussichtlich-zwei-monate-aus/11968160/1-format7.jpg?format=format7\"/></a>Fußball-Bundesligist Schalke 04 muss noch länger auf Torhüter Fabian Giefer verzichten."
+ 			},
+ 			{
+ 				"Title": "Judo Europaspiele: Europaspiele: Judo-Trio um Roper holt Bronze",
+ 				"Link": "http://www.handelsblatt.com/judo-europaspiele-europaspiele-judo-trio-um-roper-holt-bronze/11972004.html",
+ 				"GUID": "http://www.handelsblatt.com/judo-europaspiele-europaspiele-judo-trio-um-roper-holt-bronze/11972004.html",
+ 				"Description": "Die frühere Judo-Weltranglistenerste Miryam Roper (Leverkusen) muss weiter auf ihren ersten internationalen Einzel-Titel warten.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:50:55 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/europaspiele-judo-trio-um-roper-holt-bronze/11972002/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 38660
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/judo-europaspiele-europaspiele-judo-trio-um-roper-holt-bronze/11972004.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/europaspiele-judo-trio-um-roper-holt-bronze/11972002/1-format7.jpg?format=format7\"/></a>Die frühere Judo-Weltranglistenerste Miryam Roper (Leverkusen) muss weiter auf ihren ersten internationalen Einzel-Titel warten."
+ 			},
+ 			{
+ 				"Title": "Motorsport Motorrad: Assen-Auftakt: Bradl ordentlich, Folger gut, Cortese frustriert",
+ 				"Link": "http://www.handelsblatt.com/motorsport-motorrad-assen-auftakt-bradl-ordentlich-folger-gut-cortese-frustriert/11971996.html",
+ 				"GUID": "http://www.handelsblatt.com/motorsport-motorrad-assen-auftakt-bradl-ordentlich-folger-gut-cortese-frustriert/11971996.html",
+ 				"Description": "Deutschlands einziger MotoGP-Pilot Stefan Bradl hat zum Auftakt des Renn-Wochenendes in Assen leise Hoffnung auf einen Achtungserfolg gemacht.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:50:35 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/assen-bradl-ordentlich-folger-gut-cortesse-schwach-/11563412/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 61000
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/motorsport-motorrad-assen-auftakt-bradl-ordentlich-folger-gut-cortese-frustriert/11971996.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/assen-bradl-ordentlich-folger-gut-cortesse-schwach-/11563412/3-format7.jpg?format=format7\"/></a>Deutschlands einziger MotoGP-Pilot Stefan Bradl hat zum Auftakt des Renn-Wochenendes in Assen leise Hoffnung auf einen Achtungserfolg gemacht."
+ 			},
+ 			{
+ 				"Title": "Motorsport Motorrad: Motorrad: Rennen in Assen ab 2016 auch Sonntag",
+ 				"Link": "http://www.handelsblatt.com/motorsport-motorrad-motorrad-rennen-in-assen-ab-2016-auch-sonntag/11971998.html",
+ 				"GUID": "http://www.handelsblatt.com/motorsport-motorrad-motorrad-rennen-in-assen-ab-2016-auch-sonntag/11971998.html",
+ 				"Description": "Eine Motorrad-Tradition wird gebrochen: Ab dem Jahr 2016 werden auch in Assen/Niederlande die WM-Rennen am Sonntag ausgetragen.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:50:04 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ab-2016-sind-die-wm-rennen-in-assen-auch-sonntags/11971994/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 76785
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/motorsport-motorrad-motorrad-rennen-in-assen-ab-2016-auch-sonntag/11971998.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ab-2016-sind-die-wm-rennen-in-assen-auch-sonntags/11971994/1-format7.jpg?format=format7\"/></a>Eine Motorrad-Tradition wird gebrochen: Ab dem Jahr 2016 werden auch in Assen/Niederlande die WM-Rennen am Sonntag ausgetragen."
+ 			},
+ 			{
+ 				"Title": "Linde-Chef Büchele wird Nachfolger: Cordes will als Ost-Ausschuss-Chef aufhören",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/linde-chef-buechele-wird-nachfolger-cordes-will-als-ost-ausschuss-chef-aufhoeren/11971982.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/linde-chef-buechele-wird-nachfolger-cordes-will-als-ost-ausschuss-chef-aufhoeren/11971982.html",
+ 				"Description": "Ex-Metro-Chef Eckhard Cordes gibt den Vorsitz im Ost-Ausschuss der Deutschen Wirtschaft im Herbst ab. Im Vorstand will Cordes bleiben, für den Vositz seien die Belastungen der anderen Tätigkeiten zu hoch.",
+ 				"Category": "Deutschland",
+ 				"Published": "Thu, 25 Jun 2015 19:50:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ruecktritt/11972000/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 229667
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/linde-chef-buechele-wird-nachfolger-cordes-will-als-ost-ausschuss-chef-aufhoeren/11971982.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ruecktritt/11972000/2-format7.jpg?format=format7\"/></a>Ex-Metro-Chef Eckhard Cordes gibt den Vorsitz im Ost-Ausschuss der Deutschen Wirtschaft im Herbst ab. Im Vorstand will Cordes bleiben, für den Vositz seien die Belastungen der anderen Tätigkeiten zu hoch."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Frankfurt löst Vertrag mit Rosenthal auf",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-frankfurt-loest-vertrag-mit-rosenthal-auf/11971992.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-frankfurt-loest-vertrag-mit-rosenthal-auf/11971992.html",
+ 				"Description": "Eintracht Frankfurt und Jan Rosenthal (29) haben den ursprünglich bis zum 30. Juni 2016 datierten Vertrag einvernehmlich vorzeitig aufgelöst.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:49:45 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/vertragsaufloesung-frankfurt-trenn-sich-von-rosenthal/11315072/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 51818
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-frankfurt-loest-vertrag-mit-rosenthal-auf/11971992.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/vertragsaufloesung-frankfurt-trenn-sich-von-rosenthal/11315072/2-format7.jpg?format=format7\"/></a>Eintracht Frankfurt und Jan Rosenthal (29) haben den ursprünglich bis zum 30. Juni 2016 datierten Vertrag einvernehmlich vorzeitig aufgelöst."
+ 			},
+ 			{
+ 				"Title": "Leichtathletik Europaspiele: Europaspiele: Siebenmal Bronze für Deutschland - Umstrittene Urteile kosten Boxer Goldkampf",
+ 				"Link": "http://www.handelsblatt.com/leichtathletik-europaspiele-europaspiele-siebenmal-bronze-fuer-deutschland-umstrittene-urteile-kosten-boxer-goldkampf/11971990.html",
+ 				"GUID": "http://www.handelsblatt.com/leichtathletik-europaspiele-europaspiele-siebenmal-bronze-fuer-deutschland-umstrittene-urteile-kosten-boxer-goldkampf/11971990.html",
+ 				"Description": "Bronzener Donnerstag für das deutsche Team bei den Europaspielen mit sieben dritten Plätzen: Dreimal Bronze ging dabei auf das Konto der Judoka.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:49:26 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/der-donnerstag-bringt-siebenmal-bronze-fuer-deutschland/11971988/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 78663
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/leichtathletik-europaspiele-europaspiele-siebenmal-bronze-fuer-deutschland-umstrittene-urteile-kosten-boxer-goldkampf/11971990.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/der-donnerstag-bringt-siebenmal-bronze-fuer-deutschland/11971988/1-format7.jpg?format=format7\"/></a>Bronzener Donnerstag für das deutsche Team bei den Europaspielen mit sieben dritten Plätzen: Dreimal Bronze ging dabei auf das Konto der Judoka."
+ 			},
+ 			{
+ 				"Title": "Golf National: 84. Platz: Kaymer mit ganz schwachem Auftakt in München",
+ 				"Link": "http://www.handelsblatt.com/golf-national-84-platz-kaymer-mit-ganz-schwachem-auftakt-in-muenchen/11969030.html",
+ 				"GUID": "http://www.handelsblatt.com/golf-national-84-platz-kaymer-mit-ganz-schwachem-auftakt-in-muenchen/11969030.html",
+ 				"Description": "Golfstar Martin Kaymer hat zum Auftakt der 27. BMW International Open in München-Eichenried eine weitere Enttäuschung erlebt.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 19:49:05 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/martin-kaymer-enttaeuscht-beim-auftakt-in-muenchen/11969028/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 40186
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/golf-national-84-platz-kaymer-mit-ganz-schwachem-auftakt-in-muenchen/11969030.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/martin-kaymer-enttaeuscht-beim-auftakt-in-muenchen/11969028/1-format7.jpg?format=format7\"/></a>Golfstar Martin Kaymer hat zum Auftakt der 27. BMW International Open in München-Eichenried eine weitere Enttäuschung erlebt."
+ 			},
+ 			{
+ 				"Title": "Musterdepots: Was die Hellas-Rettung den Märkten bringt",
+ 				"Link": "http://www.handelsblatt.com/finanzen/anlagestrategie/trends/musterdepots-was-die-hellas-rettung-den-maerkten-bringt/11969246.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/anlagestrategie/trends/musterdepots-was-die-hellas-rettung-den-maerkten-bringt/11969246.html",
+ 				"Description": "Als gescheiterten Staat bezeichnet Daniel Hupfer Griechenland. Die Befürchtung: Seine Rettung führe in die Transferunion. Georgios Kokologiannis bleibt der Politik fern. Er sackt lieber Gewinne von Zertifikaten ein.",
+ 				"Category": "Trends",
+ 				"Published": "Thu, 25 Jun 2015 19:32:57 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/teaser_musterdepot_hupfer/9417418/1-format7.png?format=format7",
+ 					"Type": "image/png",
+ 					"Len": 246625
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/anlagestrategie/trends/musterdepots-was-die-hellas-rettung-den-maerkten-bringt/11969246.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/teaser_musterdepot_hupfer/9417418/1-format7.png?format=format7\"/></a>Als gescheiterten Staat bezeichnet Daniel Hupfer Griechenland. Die Befürchtung: Seine Rettung führe in die Transferunion. Georgios Kokologiannis bleibt der Politik fern. Er sackt lieber Gewinne von Zertifikaten ein."
+ 			},
+ 			{
+ 				"Title": "Metro: Kellerhals bietet Kauf von Media-Saturn an",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/metro-kellerhals-bietet-kauf-von-media-saturn-an/11971866.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/metro-kellerhals-bietet-kauf-von-media-saturn-an/11971866.html",
+ 				"Description": "Seit Jahren streitet Minderheitsgesellschafter Erich Kellerhals mit der Metro um den Kurs des Elektronikhändlers Media-Saturn. Nun hat er angeboten, die Anteile der Metro zu kaufen. Es wäre ein Ende des Richtungsstreits.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 19:24:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/machtkampf-um-media-saturn/11971880/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 251468
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/handel-konsumgueter/metro-kellerhals-bietet-kauf-von-media-saturn-an/11971866.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/machtkampf-um-media-saturn/11971880/2-format7.jpg?format=format7\"/></a>Seit Jahren streitet Minderheitsgesellschafter Erich Kellerhals mit der Metro um den Kurs des Elektronikhändlers Media-Saturn. Nun hat er angeboten, die Anteile der Metro zu kaufen. Es wäre ein Ende des Richtungsstreits."
+ 			},
+ 			{
+ 				"Title": "Masterpiece: Eine Messe findet ihren Platz",
+ 				"Link": "http://www.handelsblatt.com/panorama/kultur-kunstmarkt/masterpiece-eine-messe-findet-ihren-platz/11971720.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/kultur-kunstmarkt/masterpiece-eine-messe-findet-ihren-platz/11971720.html",
+ 				"Description": "Mit ihrem Angebotsmix aus allen Stilepochen setzt Londons Masterpiece inzwischen international Maßstäbe. Die Nachfolgerin der alten Grosvenor House Messe ist weniger elitär als die Biennale des Antiquaire in Paris und lockerer als die Tefaf in Maastricht.",
+ 				"Category": "Kultur + Kunstmarkt",
+ 				"Published": "Thu, 25 Jun 2015 19:11:14 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/aus-der-tom-scott-collection/11971748/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 219530
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/kultur-kunstmarkt/masterpiece-eine-messe-findet-ihren-platz/11971720.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/aus-der-tom-scott-collection/11971748/3-format7.jpg?format=format7\"/></a>Mit ihrem Angebotsmix aus allen Stilepochen setzt Londons Masterpiece inzwischen international Maßstäbe. Die Nachfolgerin der alten Grosvenor House Messe ist weniger elitär als die Biennale des Antiquaire in Paris und lockerer als die Tefaf in Maastricht."
+ 			},
+ 			{
+ 				"Title": "Alibaba: Chinesischer Onlinehändler startet Internetbank",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/it-medien/alibaba-chinesischer-onlinehaendler-startet-internetbank/11971822.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/it-medien/alibaba-chinesischer-onlinehaendler-startet-internetbank/11971822.html",
+ 				"Description": "Vom Onlinehändler zur Finanzinstitut: Der chinesische IT-Riese Alibaba hat seine Internetbank gestartet und vergibt nun Kredite an kleine und mittlere Unternehmen. Zehn Millionen Kunden will die Mybank bis 2020 gewinnen.",
+ 				"Category": "IT + Medien",
+ 				"Published": "Thu, 25 Jun 2015 19:11:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/chinesischer-it-riese/11971844/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 259192
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/it-medien/alibaba-chinesischer-onlinehaendler-startet-internetbank/11971822.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/chinesischer-it-riese/11971844/2-format7.jpg?format=format7\"/></a>Vom Onlinehändler zur Finanzinstitut: Der chinesische IT-Riese Alibaba hat seine Internetbank gestartet und vergibt nun Kredite an kleine und mittlere Unternehmen. Zehn Millionen Kunden will die Mybank bis 2020 gewinnen."
+ 			},
+ 			{
+ 				"Title": "Sparkassen gegen Santander: BGH prüft Streit um Banken-Rot",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/sparkassen-gegen-santander-bgh-prueft-streit-um-banken-rot/11971754.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/sparkassen-gegen-santander-bgh-prueft-streit-um-banken-rot/11971754.html",
+ 				"Description": "Zwei Banken sehen rot: Seit Jahren streiten die deutschen Sparkassen mit der spanischen Santander um die Verwendung der Farbe rot. Nun beschäftigt der Zwist den Bundesgerichtshof. Der könnte schnell entscheiden.",
+ 				"Category": "Banken + Versicherungen",
+ 				"Published": "Thu, 25 Jun 2015 18:52:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/wer-hats-erfunden/11971770/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 99388
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/banken-versicherungen/sparkassen-gegen-santander-bgh-prueft-streit-um-banken-rot/11971754.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/wer-hats-erfunden/11971770/3-format7.jpg?format=format7\"/></a>Zwei Banken sehen rot: Seit Jahren streiten die deutschen Sparkassen mit der spanischen Santander um die Verwendung der Farbe rot. Nun beschäftigt der Zwist den Bundesgerichtshof. Der könnte schnell entscheiden."
+ 			},
+ 			{
+ 				"Title": "Synlab: Augsburger Laborkonzern wird für 1,8 Mrd verkauft",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/dienstleister/synlab-augsburger-laborkonzern-wird-fuer-1-8-mrd-verkauft/11971722.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/dienstleister/synlab-augsburger-laborkonzern-wird-fuer-1-8-mrd-verkauft/11971722.html",
+ 				"Description": "Der US-Finanzinvestor Cinven geht in Europa auf Einkaufstour – und kauft nach dem französischen Medizinlabor-Betreiber Labco nun auch den deutschen Konkurrenten Synlab. Zusammen kommen sie auf fünf Prozent Marktanteil.",
+ 				"Category": "Dienstleister",
+ 				"Published": "Thu, 25 Jun 2015 18:42:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/kleine-schritte/11971744/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 145333
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/dienstleister/synlab-augsburger-laborkonzern-wird-fuer-1-8-mrd-verkauft/11971722.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/kleine-schritte/11971744/2-format7.jpg?format=format7\"/></a>Der US-Finanzinvestor Cinven geht in Europa auf Einkaufstour – und kauft nach dem französischen Medizinlabor-Betreiber Labco nun auch den deutschen Konkurrenten Synlab. Zusammen kommen sie auf fünf Prozent Marktanteil."
+ 			},
+ 			{
+ 				"Title": "Griechenland und die Renten: „Ist Kürzen eine Reform? Ich glaube nicht!“",
+ 				"Link": "http://www.handelsblatt.com/politik/international/griechenland-und-die-renten-ist-kuerzen-eine-reform-ich-glaube-nicht/11967312.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/griechenland-und-die-renten-ist-kuerzen-eine-reform-ich-glaube-nicht/11967312.html",
+ 				"Description": "Bang warten viele Griechen auf die Ergebnisse aus Brüssel. Die Gläubiger fordern weitere Kürzungen. Vor allem die griechischen Rentner sind besorgt. Denn für viele Familien sind sie der letzte Schutz vor der Armut.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 18:37:17 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/greek-pensioners-protest-in-central-athens/11967354/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 450659
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/griechenland-und-die-renten-ist-kuerzen-eine-reform-ich-glaube-nicht/11967312.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/greek-pensioners-protest-in-central-athens/11967354/2-format7.jpg?format=format7\"/></a>Bang warten viele Griechen auf die Ergebnisse aus Brüssel. Die Gläubiger fordern weitere Kürzungen. Vor allem die griechischen Rentner sind besorgt. Denn für viele Familien sind sie der letzte Schutz vor der Armut."
+ 			},
+ 			{
+ 				"Title": "„Weckruf 2015“: Luckes Initiative kurz vor Parteitag gerettet",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/weckruf-2015-luckes-initiative-kurz-vor-parteitag-gerettet/11971674.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/weckruf-2015-luckes-initiative-kurz-vor-parteitag-gerettet/11971674.html",
+ 				"Description": "Sieg für Bernd Lucke: Im Streit mit der sächsischen AfD-Landesvorsitzenden Frauke Petry stärkt ihm der Bundesvorstand den Rücken – seine Initiative „Weckruf“ sei satzungsgemäß. Plant er womöglich die Abspaltung?",
+ 				"Category": "Deutschland",
+ 				"Published": "Thu, 25 Jun 2015 18:32:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/rivalen-in-der-afd/11971706/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 226349
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/weckruf-2015-luckes-initiative-kurz-vor-parteitag-gerettet/11971674.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/rivalen-in-der-afd/11971706/2-format7.jpg?format=format7\"/></a>Sieg für Bernd Lucke: Im Streit mit der sächsischen AfD-Landesvorsitzenden Frauke Petry stärkt ihm der Bundesvorstand den Rücken – seine Initiative „Weckruf“ sei satzungsgemäß. Plant er womöglich die Abspaltung?"
+ 			},
+ 			{
+ 				"Title": "Wechsel im operativen Geschäft: Evonik ernennt neuen Vorstand",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/wechsel-im-operativen-geschaeft-evonik-ernennt-neuen-vorstand/11971640.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/wechsel-im-operativen-geschaeft-evonik-ernennt-neuen-vorstand/11971640.html",
+ 				"Description": "Der Hauptanteilseigner von Evonik, die RAG-Stiftung, sähe den Chemiekonzern am liebsten im Dax. Nun wechselt der Vorstand für das operative Geschäft: Mit Raph Sven Kaufmann zieht ein Unternehmensberater nach Essen.",
+ 				"Category": "Industrie",
+ 				"Published": "Thu, 25 Jun 2015 18:23:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/haupteigner-sieht-evonik-im-dax/11971652/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 254163
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/wechsel-im-operativen-geschaeft-evonik-ernennt-neuen-vorstand/11971640.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/haupteigner-sieht-evonik-im-dax/11971652/2-format7.jpg?format=format7\"/></a>Der Hauptanteilseigner von Evonik, die RAG-Stiftung, sähe den Chemiekonzern am liebsten im Dax. Nun wechselt der Vorstand für das operative Geschäft: Mit Raph Sven Kaufmann zieht ein Unternehmensberater nach Essen."
+ 			},
+ 			{
+ 				"Title": "Ex-Arcandor-Chef: Middelhoff verliert chinesischen Geschäftspartner",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/management/ex-arcandor-chef-middelhoff-verliert-chinesischen-geschaeftspartner/11971604.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/management/ex-arcandor-chef-middelhoff-verliert-chinesischen-geschaeftspartner/11971604.html",
+ 				"Description": "Die Verurteilung wegen Untreue und Steuerhinterziehung kommt Thomas Middelhoff noch teurer zu stehen: Durch diesen Reputationsverlust verliert der Ex-Arcandor-Chef einen wichtigen Geschäftspartner aus China.",
+ 				"Category": "Management",
+ 				"Published": "Thu, 25 Jun 2015 18:15:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/rennen-hilft-auch-nicht-mehr/11971636/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 261212
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/management/ex-arcandor-chef-middelhoff-verliert-chinesischen-geschaeftspartner/11971604.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/rennen-hilft-auch-nicht-mehr/11971636/2-format7.jpg?format=format7\"/></a>Die Verurteilung wegen Untreue und Steuerhinterziehung kommt Thomas Middelhoff noch teurer zu stehen: Durch diesen Reputationsverlust verliert der Ex-Arcandor-Chef einen wichtigen Geschäftspartner aus China."
+ 			},
+ 			{
+ 				"Title": "Christian Wulff: Ex-Bundespräsident ist jetzt Berater",
+ 				"Link": "http://www.handelsblatt.com/politik/deutschland/christian-wulff-ex-bundespraesident-ist-jetzt-berater/11971602.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/deutschland/christian-wulff-ex-bundespraesident-ist-jetzt-berater/11971602.html",
+ 				"Description": "Als Bundespräsident fiel er tief. Nun ist er offenbar als Berater weich gefallen – beim Schweizer Immobilienunternehmen Corestate Capital. Doch das ist nicht das einzige Standbein des einst „höchsten Mannes im Staate“.",
+ 				"Category": "Deutschland",
+ 				"Published": "Thu, 25 Jun 2015 18:14:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/die-wulff-affaere/11971624/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 349301
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/deutschland/christian-wulff-ex-bundespraesident-ist-jetzt-berater/11971602.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/die-wulff-affaere/11971624/2-format7.jpg?format=format7\"/></a>Als Bundespräsident fiel er tief. Nun ist er offenbar als Berater weich gefallen – beim Schweizer Immobilienunternehmen Corestate Capital. Doch das ist nicht das einzige Standbein des einst „höchsten Mannes im Staate“."
+ 			},
+ 			{
+ 				"Title": "Einheitlicher Standard geplant: Datenschützer nehmen Internet-Singlebörsen ins Visier",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/it-medien/einheitlicher-standard-geplant-datenschuetzer-nehmen-internet-singleboersen-ins-visier/11971530.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/it-medien/einheitlicher-standard-geplant-datenschuetzer-nehmen-internet-singleboersen-ins-visier/11971530.html",
+ 				"Description": "Bei der Suche nach einem Partner im Internet geben Nutzer oft viele Daten von sich preis. Datenschutzbehörden wollen nun prüfen: Wie verarbeiten Partnerbörsen diese Daten? Und was stellen sie mit ihnen an?",
+ 				"Category": "IT + Medien",
+ 				"Published": "Thu, 25 Jun 2015 18:03:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/dating-portale/11971580/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 307326
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/it-medien/einheitlicher-standard-geplant-datenschuetzer-nehmen-internet-singleboersen-ins-visier/11971530.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/dating-portale/11971580/2-format7.jpg?format=format7\"/></a>Bei der Suche nach einem Partner im Internet geben Nutzer oft viele Daten von sich preis. Datenschutzbehörden wollen nun prüfen: Wie verarbeiten Partnerbörsen diese Daten? Und was stellen sie mit ihnen an?"
+ 			},
+ 			{
+ 				"Title": "K+S: Angriff aus Kanada",
+ 				"Link": "http://www.handelsblatt.com/my/unternehmen/industrie/ks-angriff-aus-kanada/11971132.html",
+ 				"GUID": "http://www.handelsblatt.com/my/unternehmen/industrie/ks-angriff-aus-kanada/11971132.html",
+ 				"Description": "Alarm im Dax-Konzern: Der Düngemittelhersteller K+S muss sich mit einem neuen Käufer auseinander setzen. Der kanadische Rivale Potash will mit einer Milliardenofferte wieder Weltmarktführer werden.",
+ 				"Category": "Industrie",
+ 				"Published": "Thu, 25 Jun 2015 18:00:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/kaliwerk-von-ks/11971282/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 438011
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/unternehmen/industrie/ks-angriff-aus-kanada/11971132.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/kaliwerk-von-ks/11971282/2-format7.jpg?format=format7\"/></a>Alarm im Dax-Konzern: Der Düngemittelhersteller K+S muss sich mit einem neuen Käufer auseinander setzen. Der kanadische Rivale Potash will mit einer Milliardenofferte wieder Weltmarktführer werden."
+ 			},
+ 			{
+ 				"Title": "Gesundheitsreform bestätigt: Obamacare siegt vor dem obersten US-Gericht",
+ 				"Link": "http://www.handelsblatt.com/politik/international/gesundheitsreform-bestaetigt-obamacare-siegt-vor-dem-obersten-us-gericht/11971434.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/gesundheitsreform-bestaetigt-obamacare-siegt-vor-dem-obersten-us-gericht/11971434.html",
+ 				"Description": "Vor dem höchsten Gericht seines Landes hat Barack Obama – und sechs Millionen Versicherte – einen wichtigen Erfolg errungen: Zentrale Punkte seiner Gesundheitsreform wurden für verfassungskonform erklärt.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 17:50:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/wichtiger-erfolg/11971508/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 283907
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/gesundheitsreform-bestaetigt-obamacare-siegt-vor-dem-obersten-us-gericht/11971434.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/wichtiger-erfolg/11971508/2-format7.jpg?format=format7\"/></a>Vor dem höchsten Gericht seines Landes hat Barack Obama – und sechs Millionen Versicherte – einen wichtigen Erfolg errungen: Zentrale Punkte seiner Gesundheitsreform wurden für verfassungskonform erklärt."
+ 			},
+ 			{
+ 				"Title": "Fußball EM: EM: Deutsche U17-Juniorinnen verlieren",
+ 				"Link": "http://www.handelsblatt.com/fussball-em-em-deutsche-u17-juniorinnen-verlieren/11971360.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-em-em-deutsche-u17-juniorinnen-verlieren/11971360.html",
+ 				"Description": "Die U17-Juniorinnen des Deutschen Fußball-Bundes (DFB) haben ihr zweites Gruppenspiel bei der Europameisterschaft auf Island klar verloren.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 17:42:31 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/u-17-juniorinnen-verlieren-deutlich-gegen-spanien/11971356/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 33234
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-em-em-deutsche-u17-juniorinnen-verlieren/11971360.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/u-17-juniorinnen-verlieren-deutlich-gegen-spanien/11971356/1-format7.jpg?format=format7\"/></a>Die U17-Juniorinnen des Deutschen Fußball-Bundes (DFB) haben ihr zweites Gruppenspiel bei der Europameisterschaft auf Island klar verloren."
+ 			},
+ 			{
+ 				"Title": "Tennis WTA: Petkovic scheitert im Viertelfinale von Eastbourne",
+ 				"Link": "http://www.handelsblatt.com/tennis-wta-petkovic-scheitert-im-viertelfinale-von-eastbourne/11971362.html",
+ 				"GUID": "http://www.handelsblatt.com/tennis-wta-petkovic-scheitert-im-viertelfinale-von-eastbourne/11971362.html",
+ 				"Description": "Fed-Cup-Spielerin Andrea Petkovic ist beim WTA-Rasenturnier in Eastbourne als letzte verbliebene Deutsche gescheitert.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 17:41:42 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/auch-petkovic-scheitert-niederlage-gegen-wozniacki/11971358/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 45315
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/tennis-wta-petkovic-scheitert-im-viertelfinale-von-eastbourne/11971362.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/auch-petkovic-scheitert-niederlage-gegen-wozniacki/11971358/1-format7.jpg?format=format7\"/></a>Fed-Cup-Spielerin Andrea Petkovic ist beim WTA-Rasenturnier in Eastbourne als letzte verbliebene Deutsche gescheitert."
+ 			},
+ 			{
+ 				"Title": "Meissen-Porzellan beantragt Kurzarbeit: Keine Entlassungen geplant",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/meissen-porzellan-beantragt-kurzarbeit-keine-entlassungen-geplant/11971258.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/meissen-porzellan-beantragt-kurzarbeit-keine-entlassungen-geplant/11971258.html",
+ 				"Description": "Kurzarbeit in der Porzellan-Manufaktur Meissen: Für eine Umstrukturierung schickt der Traditionshersteller 90 seiner Mitarbeiter ein Jahr lang in Kurzarbeit. Statt auf Geschirr setzt der Konzern nun auf Kunstwerke.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 17:38:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/umstrukturierungen/11971324/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 412796
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/handel-konsumgueter/meissen-porzellan-beantragt-kurzarbeit-keine-entlassungen-geplant/11971258.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/umstrukturierungen/11971324/2-format7.jpg?format=format7\"/></a>Kurzarbeit in der Porzellan-Manufaktur Meissen: Für eine Umstrukturierung schickt der Traditionshersteller 90 seiner Mitarbeiter ein Jahr lang in Kurzarbeit. Statt auf Geschirr setzt der Konzern nun auf Kunstwerke."
+ 			},
+ 			{
+ 				"Title": "Terrornetzwerk: IS wirbt gezielt junge Frauen an",
+ 				"Link": "http://www.handelsblatt.com/politik/international/terrornetzwerk-is-wirbt-gezielt-junge-frauen-an/11971216.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/terrornetzwerk-is-wirbt-gezielt-junge-frauen-an/11971216.html",
+ 				"Description": "Aus Deutschland in die Kampfgebiete der Terrormiliz – diese Route nehmen immer mehr Frauen, die sich dem „Islamischen Staat“ anschließen. Sie werden gezielt angesprochen – per Online-Netzwerk.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 17:31:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/maedchenhandel/11971244/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 275389
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/terrornetzwerk-is-wirbt-gezielt-junge-frauen-an/11971216.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/maedchenhandel/11971244/2-format7.jpg?format=format7\"/></a>Aus Deutschland in die Kampfgebiete der Terrormiliz – diese Route nehmen immer mehr Frauen, die sich dem „Islamischen Staat“ anschließen. Sie werden gezielt angesprochen – per Online-Netzwerk."
+ 			},
+ 			{
+ 				"Title": "Elizabeth II. am Römer: Frankfurt feiert die Queen",
+ 				"Link": "http://www.handelsblatt.com/panorama/aus-aller-welt/elizabeth-ii-am-roemer-frankfurt-feiert-die-queen/11970698.html",
+ 				"GUID": "http://www.handelsblatt.com/panorama/aus-aller-welt/elizabeth-ii-am-roemer-frankfurt-feiert-die-queen/11970698.html",
+ 				"Description": "Der Deutschland-Besuch von Großbritanniens Königin geht in Frankfurt weiter. Bei der Stippvisite am Main bleibt bei strahlendem Sonnenschein jedoch wenig Zeit für das jubelnde Volk. Die Stimmung? Trotzdem gut.",
+ 				"Category": "Aus aller Welt",
+ 				"Published": "Thu, 25 Jun 2015 17:27:28 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/koenigin-elizabeth-ii-und-prinz-philip-in-frankfurt/11970700/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 263803
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/panorama/aus-aller-welt/elizabeth-ii-am-roemer-frankfurt-feiert-die-queen/11970698.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/koenigin-elizabeth-ii-und-prinz-philip-in-frankfurt/11970700/2-format7.jpg?format=format7\"/></a>Der Deutschland-Besuch von Großbritanniens Königin geht in Frankfurt weiter. Bei der Stippvisite am Main bleibt bei strahlendem Sonnenschein jedoch wenig Zeit für das jubelnde Volk. Die Stimmung? Trotzdem gut."
+ 			},
+ 			{
+ 				"Title": "David Cameron: Gipfel ist „Meilenstein“ auf Weg zu EU-Reform",
+ 				"Link": "http://www.handelsblatt.com/politik/international/david-cameron-gipfel-ist-meilenstein-auf-weg-zu-eu-reform/11970730.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/david-cameron-gipfel-ist-meilenstein-auf-weg-zu-eu-reform/11970730.html",
+ 				"Description": "Der britische Premier David Cameron ist zufrieden: Am Donnerstag darf er seinen Kollegen seine Idee einer reformierten EU-Mitgliedschaft Großbritanniens vorstellen. Das Ziel: Ein noch „besserer Deal“ für die Briten.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 17:24:24 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/cameron-zufrieden/11970806/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 180535
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/david-cameron-gipfel-ist-meilenstein-auf-weg-zu-eu-reform/11970730.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/cameron-zufrieden/11970806/2-format7.jpg?format=format7\"/></a>Der britische Premier David Cameron ist zufrieden: Am Donnerstag darf er seinen Kollegen seine Idee einer reformierten EU-Mitgliedschaft Großbritanniens vorstellen. Das Ziel: Ein noch „besserer Deal“ für die Briten."
+ 			},
+ 			{
+ 				"Title": "Pimco: Euro-Parität zum Dollar 2015 möglich",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/devisen-rohstoffe/pimco-euro-paritaet-zum-dollar-2015-moeglich/11970562.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/devisen-rohstoffe/pimco-euro-paritaet-zum-dollar-2015-moeglich/11970562.html",
+ 				"Description": "Eine gewagte Prognose: Noch in diesem Jahr könne es zu einer Parität zwischen Dollar- und Euro-Kurs kommen, schätzt die Allianz-Tochter Pimco. Grund dafür ist die unterschiedliche Strategie der Notenbanken.",
+ 				"Category": "Devisen + Rohstoffe",
+ 				"Published": "Thu, 25 Jun 2015 17:24:01 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/eins-zu-eins/11970618/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 233699
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/devisen-rohstoffe/pimco-euro-paritaet-zum-dollar-2015-moeglich/11970562.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/eins-zu-eins/11970618/2-format7.jpg?format=format7\"/></a>Eine gewagte Prognose: Noch in diesem Jahr könne es zu einer Parität zwischen Dollar- und Euro-Kurs kommen, schätzt die Allianz-Tochter Pimco. Grund dafür ist die unterschiedliche Strategie der Notenbanken."
+ 			},
+ 			{
+ 				"Title": "Nestle und Co.: Lebensmittelhersteller wollen Abfall halbieren",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/nestle-und-co-lebensmittelhersteller-wollen-abfall-halbieren/11971124.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/nestle-und-co-lebensmittelhersteller-wollen-abfall-halbieren/11971124.html",
+ 				"Description": "Es ist eine Allianz der Giganten: Die größten Lebensmittel- und Getränke-Hersteller der Welt schließen sich zusammen, um einen Beitrag zum Umweltschutz zu leisten. Trotz großer Marktmacht ist das Vorhaben ambitioniert.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 17:23:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/gegen-die-klimaerwaermung/11971170/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 245579
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/handel-konsumgueter/nestle-und-co-lebensmittelhersteller-wollen-abfall-halbieren/11971124.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/gegen-die-klimaerwaermung/11971170/3-format7.jpg?format=format7\"/></a>Es ist eine Allianz der Giganten: Die größten Lebensmittel- und Getränke-Hersteller der Welt schließen sich zusammen, um einen Beitrag zum Umweltschutz zu leisten. Trotz großer Marktmacht ist das Vorhaben ambitioniert."
+ 			},
+ 			{
+ 				"Title": "Briten-Referendum: Europas Banker fürchten „Brexit“ mehr als „Grexit“",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/briten-referendum-europas-banker-fuerchten-brexit-mehr-als-grexit/11970342.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/briten-referendum-europas-banker-fuerchten-brexit-mehr-als-grexit/11970342.html",
+ 				"Description": "In Grexit mag ein zwar großes, doch im Ganzen beherrschbares Risiko sein – aber ein Brexit? Zumindest europäische Banker fürchten sich stärker vor letzterem. Auf einen griechischen Austritt sei man gut vorbereitet.",
+ 				"Category": "Banken + Versicherungen",
+ 				"Published": "Thu, 25 Jun 2015 17:22:24 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/eins-weniger/11970486/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 190251
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/banken-versicherungen/briten-referendum-europas-banker-fuerchten-brexit-mehr-als-grexit/11970342.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/eins-weniger/11970486/2-format7.jpg?format=format7\"/></a>In Grexit mag ein zwar großes, doch im Ganzen beherrschbares Risiko sein – aber ein Brexit? Zumindest europäische Banker fürchten sich stärker vor letzterem. Auf einen griechischen Austritt sei man gut vorbereitet."
+ 			},
+ 			{
+ 				"Title": "Präsenz in Osteuropa: Russland will auf Nato-Aufrüstung reagieren",
+ 				"Link": "http://www.handelsblatt.com/politik/international/praesenz-in-osteuropa-russland-will-auf-nato-aufruestung-reagieren/11970962.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/international/praesenz-in-osteuropa-russland-will-auf-nato-aufruestung-reagieren/11970962.html",
+ 				"Description": "Die Spannungen zwischen Russland und dem Westen schaukeln sich weiter hoch. Die Muskelspiele der Nato im Osten will Moskau nicht unbeantwortet lassen. Doch die USA verzichten auf eine Aufstockung ihrer Europa-Truppe.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 17:13:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/nato-uebung-in-polen/11971048/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 360423
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/international/praesenz-in-osteuropa-russland-will-auf-nato-aufruestung-reagieren/11970962.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/nato-uebung-in-polen/11971048/2-format7.jpg?format=format7\"/></a>Die Spannungen zwischen Russland und dem Westen schaukeln sich weiter hoch. Die Muskelspiele der Nato im Osten will Moskau nicht unbeantwortet lassen. Doch die USA verzichten auf eine Aufstockung ihrer Europa-Truppe."
+ 			},
+ 			{
+ 				"Title": "Europäische Bankenaufsicht: EZB bricht mit deutscher Aufsichtspraxis",
+ 				"Link": "http://www.handelsblatt.com/politik/konjunktur/europaeische-bankenaufsicht-ezb-bricht-mit-deutscher-aufsichtspraxis/11970672.html",
+ 				"GUID": "http://www.handelsblatt.com/politik/konjunktur/europaeische-bankenaufsicht-ezb-bricht-mit-deutscher-aufsichtspraxis/11970672.html",
+ 				"Description": "In der Griechenland-Krise setzt die EZB ein Zeichen des Vertrauens. Nach Handelsblatt-Informationen werden Aufsichtsratssitzungen von Banken weniger streng überwacht. Trotzdem haben Aufsichtsräte keinen Freifahrtschein.",
+ 				"Category": "Konjunktur + Geldpolitik",
+ 				"Published": "Thu, 25 Jun 2015 17:06:43 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ezb-und-die-banken/11970732/4-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 81745
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/politik/konjunktur/europaeische-bankenaufsicht-ezb-bricht-mit-deutscher-aufsichtspraxis/11970672.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ezb-und-die-banken/11970732/4-format7.jpg?format=format7\"/></a>In der Griechenland-Krise setzt die EZB ein Zeichen des Vertrauens. Nach Handelsblatt-Informationen werden Aufsichtsratssitzungen von Banken weniger streng überwacht. Trotzdem haben Aufsichtsräte keinen Freifahrtschein."
+ 			},
+ 			{
+ 				"Title": "Chips, Tampons, Energy-Drink billiger: Lidl verschärft den Preiskrieg mit Aldi",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/chips-tampons-energy-drink-billiger-lidl-verschaerft-den-preiskrieg-mit-aldi/11970676.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/handel-konsumgueter/chips-tampons-energy-drink-billiger-lidl-verschaerft-den-preiskrieg-mit-aldi/11970676.html",
+ 				"Description": "Die großen Discounter verlieren erstmals seit Jahren wieder an Marktanteilen. Mit aggressiven Preissenkungen bei Markenprodukten wollen sie wieder den Umsatz steigern. Jetzt schlägt Lidl zu – die Branche zittert.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 17:02:04 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/discounter-wahl/11970734/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 244722
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/handel-konsumgueter/chips-tampons-energy-drink-billiger-lidl-verschaerft-den-preiskrieg-mit-aldi/11970676.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/discounter-wahl/11970734/2-format7.jpg?format=format7\"/></a>Die großen Discounter verlieren erstmals seit Jahren wieder an Marktanteilen. Mit aggressiven Preissenkungen bei Markenprodukten wollen sie wieder den Umsatz steigern. Jetzt schlägt Lidl zu – die Branche zittert."
+ 			},
+ 			{
+ 				"Title": "Fußball Bundesliga: Bayern verpflichten Dortmunds Fitness-Coach",
+ 				"Link": "http://www.handelsblatt.com/fussball-bundesliga-bayern-verpflichten-dortmunds-fitness-coach/11970670.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-bundesliga-bayern-verpflichten-dortmunds-fitness-coach/11970670.html",
+ 				"Description": "Bayern München hat seinen Betreuerstab mit Dr. Andreas Schlumberger vom Liga-Konkurrenten Dortmund für den Bereich Gesundheit und Fitness verstärkt.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 16:45:24 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/bayern-verpflichten-fitness-coach-von-borussia-dortmund/11970668/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 69761
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-bundesliga-bayern-verpflichten-dortmunds-fitness-coach/11970670.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/bayern-verpflichten-fitness-coach-von-borussia-dortmund/11970668/1-format7.jpg?format=format7\"/></a>Bayern München hat seinen Betreuerstab mit Dr. Andreas Schlumberger vom Liga-Konkurrenten Dortmund für den Bereich Gesundheit und Fitness verstärkt."
+ 			},
+ 			{
+ 				"Title": "Tinder: Dating-App geht an die Börse",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/ipo/tinder-dating-app-geht-an-die-boerse/11970642.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/ipo/tinder-dating-app-geht-an-die-boerse/11970642.html",
+ 				"Description": "Digitale Flirt-Portale fürs Smartphone wirbeln nicht nur den eingestaubten Markt der Online-Partnerbörsen auf – auch die New Yorker Börse steht künftig auf dem Plan des Tinder-Mutterkonzerns IAC.",
+ 				"Category": "Special IPO",
+ 				"Published": "Thu, 25 Jun 2015 16:42:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/mobile-only/11970702/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 130425
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/ipo/tinder-dating-app-geht-an-die-boerse/11970642.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/mobile-only/11970702/2-format7.jpg?format=format7\"/></a>Digitale Flirt-Portale fürs Smartphone wirbeln nicht nur den eingestaubten Markt der Online-Partnerbörsen auf – auch die New Yorker Börse steht künftig auf dem Plan des Tinder-Mutterkonzerns IAC."
+ 			},
+ 			{
+ 				"Title": "EZB als Bankenaufseher: Bankenwächter lassen Leinen locker",
+ 				"Link": "http://www.handelsblatt.com/my/politik/konjunktur/ezb-als-bankenaufseher-bankenwaechter-lassen-leinen-locker/11970546.html",
+ 				"GUID": "http://www.handelsblatt.com/my/politik/konjunktur/ezb-als-bankenaufseher-bankenwaechter-lassen-leinen-locker/11970546.html",
+ 				"Description": "Statt auf die Teilnahme an Aufsichtsratssitzungen zu setzen, wie die deutsche Finanzaufsicht, treffen die europäischen Bankaufseher Aufsichtsratsmitglieder lieber mal persönlich. Das macht Mandatsträger nervös.",
+ 				"Category": "Konjunktur + Geldpolitik",
+ 				"Published": "Thu, 25 Jun 2015 16:32:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/daniele-nouy/11971052/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 186395
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/politik/konjunktur/ezb-als-bankenaufseher-bankenwaechter-lassen-leinen-locker/11970546.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/daniele-nouy/11971052/2-format7.jpg?format=format7\"/></a>Statt auf die Teilnahme an Aufsichtsratssitzungen zu setzen, wie die deutsche Finanzaufsicht, treffen die europäischen Bankaufseher Aufsichtsratsmitglieder lieber mal persönlich. Das macht Mandatsträger nervös."
+ 			},
+ 			{
+ 				"Title": "Unilever und Verpackungen: Die Krux mit der Deo-Dose",
+ 				"Link": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/unilever-und-verpackungen-die-krux-mit-der-deo-dose/11967402.html",
+ 				"GUID": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/unilever-und-verpackungen-die-krux-mit-der-deo-dose/11967402.html",
+ 				"Description": "Konsumhersteller, die an der Verpackung und der Größe ihrer Produkte sparen, haben es schwer. Kunden greifen lieber zur größeren Packung. Unilever verschenkt darum seine platzsparende Deo-Dose an die Konkurrenz.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 16:28:20 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/das-deo-dilemma/11967434/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 169805
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/unilever-und-verpackungen-die-krux-mit-der-deo-dose/11967402.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/das-deo-dilemma/11967434/2-format7.jpg?format=format7\"/></a>Konsumhersteller, die an der Verpackung und der Größe ihrer Produkte sparen, haben es schwer. Kunden greifen lieber zur größeren Packung. Unilever verschenkt darum seine platzsparende Deo-Dose an die Konkurrenz."
+ 			},
+ 			{
+ 				"Title": "Leichtathletik National: Schrader heiß auf Zehnkampf-Showdown, Duell zwischen Schwarzkopf und Oeser",
+ 				"Link": "http://www.handelsblatt.com/leichtathletik-national-schrader-heiss-auf-zehnkampf-showdown-duell-zwischen-schwarzkopf-und-oeser/11970502.html",
+ 				"GUID": "http://www.handelsblatt.com/leichtathletik-national-schrader-heiss-auf-zehnkampf-showdown-duell-zwischen-schwarzkopf-und-oeser/11970502.html",
+ 				"Description": "Vize-Weltmeister Michael Schrader ist heiß auf den Zehnkampf in Ratingen.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 16:25:57 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/schrader-heiss-auf-zehnkampf-showdown-in-ratingen/11970500/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 61627
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/leichtathletik-national-schrader-heiss-auf-zehnkampf-showdown-duell-zwischen-schwarzkopf-und-oeser/11970502.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/schrader-heiss-auf-zehnkampf-showdown-in-ratingen/11970500/1-format7.jpg?format=format7\"/></a>Vize-Weltmeister Michael Schrader ist heiß auf den Zehnkampf in Ratingen."
+ 			},
+ 			{
+ 				"Title": "Einzelhändler Ahold und Delhaize: Heirat mit langem Anlauf",
+ 				"Link": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/einzelhaendler-ahold-und-delhaize-heirat-mit-langem-anlauf/11969126.html",
+ 				"GUID": "http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/einzelhaendler-ahold-und-delhaize-heirat-mit-langem-anlauf/11969126.html",
+ 				"Description": "375.000 Mitarbeiter, 6500 Filialen, 54,1 Milliarden Euro Umsatz: Durch die Fusion von Ahold und Delhaize entsteht in Europa ein neuer Lebensmittelriese. Doch es ist keine Liebesheirat, sondern eher eine Zweckehe.",
+ 				"Category": "Handel + Konsumgüter",
+ 				"Published": "Thu, 25 Jun 2015 16:23:45 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/filiale-von-albert-heijn-in-amsterdam/11969528/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 390576
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/unternehmen/handel-konsumgueter/einzelhaendler-ahold-und-delhaize-heirat-mit-langem-anlauf/11969126.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/filiale-von-albert-heijn-in-amsterdam/11969528/3-format7.jpg?format=format7\"/></a>375.000 Mitarbeiter, 6500 Filialen, 54,1 Milliarden Euro Umsatz: Durch die Fusion von Ahold und Delhaize entsteht in Europa ein neuer Lebensmittelriese. Doch es ist keine Liebesheirat, sondern eher eine Zweckehe."
+ 			},
+ 			{
+ 				"Title": "NSA-Spähskandal in Frankreich: Ein Freund, ein böser Freund",
+ 				"Link": "http://www.handelsblatt.com/my/politik/international/nsa-spaehskandal-in-frankreich-ein-freund-ein-boeser-freund/11967198.html",
+ 				"GUID": "http://www.handelsblatt.com/my/politik/international/nsa-spaehskandal-in-frankreich-ein-freund-ein-boeser-freund/11967198.html",
+ 				"Description": "Die NSA soll mehrere französische Präsidenten abgehört haben, auch François Hollande. Die Empörung ist groß, wurde der Élysée-Palast von der US-Botschaft ausspioniert? Die Enthüllung kommt zu einem delikaten Zeitpunkt.",
+ 				"Category": "International",
+ 				"Published": "Thu, 25 Jun 2015 16:20:11 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/praesident-francois-hollande/11967190/3-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 175066
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/my/politik/international/nsa-spaehskandal-in-frankreich-ein-freund-ein-boeser-freund/11967198.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/praesident-francois-hollande/11967190/3-format7.jpg?format=format7\"/></a>Die NSA soll mehrere französische Präsidenten abgehört haben, auch François Hollande. Die Empörung ist groß, wurde der Élysée-Palast von der US-Botschaft ausspioniert? Die Enthüllung kommt zu einem delikaten Zeitpunkt."
+ 			},
+ 			{
+ 				"Title": "Fußball 3. Liga: 3. Liga: Kiel holt Ex-Bremer Schmidt",
+ 				"Link": "http://www.handelsblatt.com/fussball-3-liga-3-liga-kiel-holt-ex-bremer-schmidt/11970282.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-3-liga-3-liga-kiel-holt-ex-bremer-schmidt/11970282.html",
+ 				"Description": "Drittligist Holstein Kiel hat Dominik Schmidt (27) von Preußen Münster verpflichtet. Der Abwehrspieler unterschrieb einen Zweijahresvertrag.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 16:09:42 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ex-bremer-dominik-schmidt-wechselt-von-muenster-nach-kiel/11970280/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 43648
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-3-liga-3-liga-kiel-holt-ex-bremer-schmidt/11970282.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ex-bremer-dominik-schmidt-wechselt-von-muenster-nach-kiel/11970280/1-format7.jpg?format=format7\"/></a>Drittligist Holstein Kiel hat Dominik Schmidt (27) von Preußen Münster verpflichtet. Der Abwehrspieler unterschrieb einen Zweijahresvertrag."
+ 			},
+ 			{
+ 				"Title": "Zonar Systems: Daimler Trucks kauft sich bei US-Telematikfirma ein",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/industrie/zonar-systems-daimler-trucks-kauft-sich-bei-us-telematikfirma-ein/11970256.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/industrie/zonar-systems-daimler-trucks-kauft-sich-bei-us-telematikfirma-ein/11970256.html",
+ 				"Description": "Im Rennen um neue Technologien in der Lkw-Industrie prescht Daimler nach vorn – und beteiligt sich am US-Telematik-Hersteller Zonar Systems. Doch der jüngste Zukauf wird wohl nicht der letzte bleiben.",
+ 				"Category": "Industrie",
+ 				"Published": "Thu, 25 Jun 2015 16:06:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/telematik/11970286/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 213835
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/industrie/zonar-systems-daimler-trucks-kauft-sich-bei-us-telematikfirma-ein/11970256.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/telematik/11970286/2-format7.jpg?format=format7\"/></a>Im Rennen um neue Technologien in der Lkw-Industrie prescht Daimler nach vorn – und beteiligt sich am US-Telematik-Hersteller Zonar Systems. Doch der jüngste Zukauf wird wohl nicht der letzte bleiben."
+ 			},
+ 			{
+ 				"Title": "Badminton Europaspiele: Europaspiele: Badminton-Doppel Beck/Heinz hat Bronze sicher",
+ 				"Link": "http://www.handelsblatt.com/badminton-europaspiele-europaspiele-badminton-doppel-beck-heinz-hat-bronze-sicher/11970258.html",
+ 				"GUID": "http://www.handelsblatt.com/badminton-europaspiele-europaspiele-badminton-doppel-beck-heinz-hat-bronze-sicher/11970258.html",
+ 				"Description": "Das Badminton-Doppel Raphael Beck/Andreas Heinz (Refrath/Bonn-Beuel) hat bei den Europaspielen in Baku die Bronzemedaille sicher.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 16:04:02 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/badminton-doppel-beck-heinz-hat-bronze-sicher/11368148/4-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 62564
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/badminton-europaspiele-europaspiele-badminton-doppel-beck-heinz-hat-bronze-sicher/11970258.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/badminton-doppel-beck-heinz-hat-bronze-sicher/11368148/4-format7.jpg?format=format7\"/></a>Das Badminton-Doppel Raphael Beck/Andreas Heinz (Refrath/Bonn-Beuel) hat bei den Europaspielen in Baku die Bronzemedaille sicher."
+ 			},
+ 			{
+ 				"Title": "Fußball Olympia: Ibrahimovic hofft auf Platz in Schwedens Olympia-Team",
+ 				"Link": "http://www.handelsblatt.com/fussball-olympia-ibrahimovic-hofft-auf-platz-in-schwedens-olympia-team/11970220.html",
+ 				"GUID": "http://www.handelsblatt.com/fussball-olympia-ibrahimovic-hofft-auf-platz-in-schwedens-olympia-team/11970220.html",
+ 				"Description": "Stürmerstar Zlatan Ibrahimovic (33) hofft nach der Olympia-Qualifikation der schwedischen U21-Nationalmannschaft auf einen Platz im Team für Rio.",
+ 				"Category": "Handelsblatt",
+ 				"Published": "Thu, 25 Jun 2015 16:00:09 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/ibrahimovic-hofft-auf-eine-olympia-teilnahme-in-rio/11970218/1-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 59469
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/fussball-olympia-ibrahimovic-hofft-auf-platz-in-schwedens-olympia-team/11970220.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/ibrahimovic-hofft-auf-eine-olympia-teilnahme-in-rio/11970218/1-format7.jpg?format=format7\"/></a>Stürmerstar Zlatan Ibrahimovic (33) hofft nach der Olympia-Qualifikation der schwedischen U21-Nationalmannschaft auf einen Platz im Team für Rio."
+ 			},
+ 			{
+ 				"Title": "Handelsblatt testet: Diese Banken bieten das sicherste Online-Banking an",
+ 				"Link": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/handelsblatt-testet-diese-banken-bieten-das-sicherste-online-banking-an/11969428.html",
+ 				"GUID": "http://www.handelsblatt.com/unternehmen/banken-versicherungen/handelsblatt-testet-diese-banken-bieten-das-sicherste-online-banking-an/11969428.html",
+ 				"Description": "Kundenkommunikation über Facebook, Kontodaten mit QR-Code scannen. Banken müssen Prävention betreiben – auch um Online-Banking sicherer zu machen. Der Handelsblatt-Test zeigt, welche großen Banken genau das können.",
+ 				"Category": "Banken + Versicherungen",
+ 				"Published": "Thu, 25 Jun 2015 15:59:00 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/1822/11970858/2-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 754792
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/unternehmen/banken-versicherungen/handelsblatt-testet-diese-banken-bieten-das-sicherste-online-banking-an/11969428.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/1822/11970858/2-format7.jpg?format=format7\"/></a>Kundenkommunikation über Facebook, Kontodaten mit QR-Code scannen. Banken müssen Prävention betreiben – auch um Online-Banking sicherer zu machen. Der Handelsblatt-Test zeigt, welche großen Banken genau das können."
+ 			},
+ 			{
+ 				"Title": "Börse New York: Griechenland-Krimi zwingt Anleger in Stand-By-Modus",
+ 				"Link": "http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-new-york-griechenland-krimi-zwingt-anleger-in-stand-by-modus/11969212.html",
+ 				"GUID": "http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-new-york-griechenland-krimi-zwingt-anleger-in-stand-by-modus/11969212.html",
+ 				"Description": "Die schleppenden Verhandlungen in der Griechenland-Krise lähmen den Handel in den USA und Europa. Doch überraschend hohe US-Konsumausgaben geben etwas Auftrieb – ebenso wie die Obamacare-Entscheidung des Supreme Courts.",
+ 				"Category": "Marktberichte",
+ 				"Published": "Thu, 25 Jun 2015 15:57:54 +0200",
+ 				"Enc": {
+ 					"Url": "http://www.handelsblatt.com/images/new-york-stock-exchange/11969308/4-format7.jpg?format=format7",
+ 					"Type": "image/jpeg",
+ 					"Len": 200251
+ 				},
+ 				"Content": "S<a href=\"http://www.handelsblatt.com/finanzen/maerkte/marktberichte/boerse-new-york-griechenland-krimi-zwingt-anleger-in-stand-by-modus/11969212.html\"><img alt=\"\" src=\"http://www.handelsblatt.com/images/new-york-stock-exchange/11969308/4-format7.jpg?format=format7\"/></a>Die schleppenden Verhandlungen in der Griechenland-Krise lähmen den Handel in den USA und Europa. Doch überraschend hohe US-Konsumausgaben geben etwas Auftrieb – ebenso wie die Obamacare-Entscheidung des Supreme Courts."
+ 			}
+ 		]
+ 	}
+ }

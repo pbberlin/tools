@@ -9,8 +9,8 @@ import (
 
 	"strings"
 
-	"github.com/pbberlin/tools/instance_mgt"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/appengine/instance_mgt"
+	"github.com/pbberlin/tools/logif"
 
 	"io/ioutil"
 	"net/http"
@@ -37,7 +37,7 @@ func BufPut(w http.ResponseWriter, r *http.Request, wb WrapBlob, skey string) (m
 			c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
 			return err
 		}, nil)
-	util_err.Err_panic(errClosure)
+	logif.F(errClosure)
 
 	return
 }
@@ -77,7 +77,7 @@ func BufGet(w http.ResponseWriter, r *http.Request, mkk string) (WrapBlob, error
 
 	key := datastore.NewKey(c, t, skey, 0, nil)
 	err := datastore.Get(c, key, &wb2)
-	util_err.Err_log(err)
+	logif.E(err)
 	// missing entity and a present entity will both work.
 	if err != nil && err != datastore.ErrNoSuchEntity {
 		return wb2, err

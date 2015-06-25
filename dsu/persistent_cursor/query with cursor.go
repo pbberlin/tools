@@ -10,9 +10,9 @@ import (
 	ds "appengine/datastore"
 	"appengine/memcache"
 
-	"github.com/pbberlin/tools/pbstrings"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/stringspb"
 
 	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
 )
@@ -31,9 +31,9 @@ func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interf
 		str_curs := string(cur_start.Value)
 		if len(cur_start.Value) > 0 {
 			cursor, err := ds.DecodeCursor(str_curs) //  inverse is string()
-			util_err.Err_http(w, r, err, false)
+			loghttp.E(w, r, err, false)
 			if err == nil {
-				b1.WriteString("found cursor from memcache -" + pbstrings.Ellipsoider(str_curs, 10) + "-<br>\n")
+				b1.WriteString("found cursor from memcache -" + stringspb.Ellipsoider(str_curs, 10) + "-<br>\n")
 				q = q.Start(cursor)
 			}
 		}
@@ -83,7 +83,7 @@ func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interf
 		if err := memcache.Set(c, mi_save); err != nil {
 			b1.WriteString("error adding memcache item " + err.Error() + "<br>\n")
 		} else {
-			b1.WriteString("wrote cursor to memcache -" + pbstrings.Ellipsoider(str_c_end, 10) + "-<br>\n")
+			b1.WriteString("wrote cursor to memcache -" + stringspb.Ellipsoider(str_c_end, 10) + "-<br>\n")
 		}
 
 	} else {

@@ -12,16 +12,16 @@ import (
 	"net/http"
 
 	bq "code.google.com/p/google-api-go-client/bigquery/v2"
-	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/pbstrings"
-	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
-	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
 
 	"appengine"
 
+	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/dsu"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/stringspb"
+	"github.com/pbberlin/tools/util"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
 	newappengine "google.golang.org/appengine" // https://github.com/golang/oauth2
 )
 
@@ -84,7 +84,7 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 
 	bigqueryService, err := bq.New(oauthHttpClient)
 
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	fmt.Fprint(w, "s1<br>\n")
 
@@ -99,7 +99,7 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 
 	fmt.Fprint(w, "s2 "+util.TimeMarker()+" <br>\n")
 	resp, err := jqc.Do()
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 
 	rows := resp.Rows
 	var vVDest [][]byte = make([][]byte, len(rows))
@@ -201,7 +201,7 @@ func regroupFromDatastore01(w http.ResponseWriter, r *http.Request, m map[string
 	for i0 := 0; i0 < len(vVSrc); i0++ {
 
 		s_row := string(vVSrc[i0])
-		v_row := pbstrings.SplitByWhitespace(s_row)
+		v_row := stringspb.SplitByWhitespace(s_row)
 		b_row := new(bytes.Buffer)
 
 		b_row.WriteString(fmt.Sprintf("%16.12s   ", v_row[3])) // leading spaces
@@ -229,7 +229,7 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 
 	var vVSrc [][]byte
 	dsObj1, err := dsu.BufGet(w, r, "dsu.WrapBlob__res_processed_01")
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	vVSrc = dsObj1.VVByte
 
 	d := make(map[string]map[string]float64)
@@ -240,7 +240,7 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 	for i0 := 0; i0 < len(vVSrc); i0++ {
 		//vVDest[i0] = []byte( b_row.Bytes() )
 		s_row := string(vVSrc[i0])
-		v_row := pbstrings.SplitByWhitespace(s_row)
+		v_row := stringspb.SplitByWhitespace(s_row)
 
 		lang := v_row[0]
 		period := v_row[1]

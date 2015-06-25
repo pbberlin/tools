@@ -11,12 +11,12 @@ import (
 
 	"net/http"
 
+	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/charting"
 	"github.com/pbberlin/tools/colors"
-	htmlpb "github.com/pbberlin/tools/pbhtml"
+	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/util_appengine"
-	"github.com/pbberlin/tools/util_err"
 
 	"appengine"
 )
@@ -67,16 +67,16 @@ func showAsChart(w http.ResponseWriter, r *http.Request, m map[string]interface{
 	}
 
 	f, err := os.Open(p)
-	util_err.Err_http(w, r, err, false)
+	loghttp.E(w, r, err, false)
 	defer f.Close()
 
 	imgRaw, whichFormat, err := image.Decode(f)
-	util_err.Err_http(w, r, err, false, "only jpeg and png are 'activated' ")
+	loghttp.E(w, r, err, false, "only jpeg and png are 'activated' ")
 	c.Infof("serving img format %v %T\n", whichFormat, imgRaw)
 
 	var img *image.RGBA
 	img, ok := imgRaw.(*image.RGBA)
-	util_err.Err_http(w, r, ok, false, "chart bg must have interal format RGBA")
+	loghttp.E(w, r, ok, false, "chart bg must have interal format RGBA")
 
 	for langIndex, lang := range cd.VLangs {
 

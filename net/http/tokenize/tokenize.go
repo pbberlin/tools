@@ -1,4 +1,5 @@
-// Package tokenize is a try in splitting a html file in to tokens, prior to building a dom
+// Package tokenize is a try in splitting a html file
+// into tokens, prior to building a dom.
 package tokenize
 
 import (

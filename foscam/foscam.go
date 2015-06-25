@@ -13,7 +13,7 @@ import (
 	_ "net/http/pprof"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
@@ -178,7 +178,7 @@ func logRetrieve(w http.ResponseWriter, r *http.Request) {
 
 func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	htmlpb.SetNocacheHeaders(w, false)
+	htmlfrag.SetNocacheHeaders(w, false)
 
 	logRetrieve(w, r)
 
@@ -207,7 +207,7 @@ func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	htmlpb.SetNocacheHeaders(w, false)
+	htmlfrag.SetNocacheHeaders(w, false)
 
 	ssecs := r.FormValue("sleep")
 	if ssecs != "" {
@@ -287,7 +287,7 @@ func init() {
 		dns_cam = "ds7934.myfoscam.org:8081"
 	}
 
-	http.HandleFunc("/foscam-status", util_appengine.Adapter(foscamStatus))
-	http.HandleFunc("/foscam-toggle", util_appengine.Adapter(foscamToggle))
+	http.HandleFunc("/foscam-status", loghttp.Adapter(foscamStatus))
+	http.HandleFunc("/foscam-toggle", loghttp.Adapter(foscamToggle))
 
 }

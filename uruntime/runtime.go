@@ -1,3 +1,4 @@
+// Package uruntime gives a stracktrace and traces memory allocactions.
 package uruntime
 
 import (

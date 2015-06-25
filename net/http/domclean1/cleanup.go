@@ -1,3 +1,4 @@
+// Package domclean1 normalizes html dom trees in a primitive way.
 package domclean1
 
 import (
@@ -6,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/pbberlin/tools/dom"
+	"github.com/pbberlin/tools/net/http/dom"
 	// "github.com/pbberlin/tools/util"
 	"golang.org/x/net/html"
 )

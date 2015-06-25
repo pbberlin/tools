@@ -8,17 +8,16 @@ import (
 	"net/url"
 	"strings"
 
-	"appengine"
 	"appengine/urlfetch"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/loghttp"
-
-	"github.com/mjibson/appstats"
 )
 
-func formRedirector(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c, _ := util_appengine.SafeGaeCheck(r)
 
 	var msg, cntnt, rURL string
 
@@ -88,5 +87,5 @@ func formRedirector(c appengine.Context, w http.ResponseWriter, r *http.Request)
 }
 
 func init() {
-	http.Handle("/blob2/form-redirector", appstats.NewHandler(formRedirector))
+	http.Handle("/blob2/form-redirector", loghttp.Adapter(formRedirector))
 }

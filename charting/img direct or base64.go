@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -130,10 +129,10 @@ func imageFromDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 
 func init() {
 
-	http.HandleFunc("/image/base64-from-file", util_appengine.Adapter(imagefileAsBase64))
-	http.HandleFunc("/image/base64-from-var", util_appengine.Adapter(imagevariAsBase64))
-	http.HandleFunc("/image/base64-from-datastore", util_appengine.Adapter(datastoreAsBase64))
+	http.HandleFunc("/image/base64-from-file", loghttp.Adapter(imagefileAsBase64))
+	http.HandleFunc("/image/base64-from-var", loghttp.Adapter(imagevariAsBase64))
+	http.HandleFunc("/image/base64-from-datastore", loghttp.Adapter(datastoreAsBase64))
 
-	http.HandleFunc("/image/img-from-datastore", util_appengine.Adapter(imageFromDatastore))
+	http.HandleFunc("/image/img-from-datastore", loghttp.Adapter(imageFromDatastore))
 
 }

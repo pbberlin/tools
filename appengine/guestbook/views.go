@@ -5,11 +5,10 @@ import (
 
 	"appengine"
 
+	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
 	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/tpl_html"
-
-	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
+	"github.com/pbberlin/tools/net/http/tplx"
 )
 
 const c_view_gbe = `
@@ -49,7 +48,7 @@ func guestEntry(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 	cntr, err := sc.Count(w, r, path)
 	loghttp.E(w, r, err, false)
 
-	tplAdder, tplExec := tpl_html.FuncTplBuilder(w, r)
+	tplAdder, tplExec := tplx.FuncTplBuilder(w, r)
 	tplAdder("n_html_title", "New guest book entry", nil)
 	tplAdder("n_cont_0", c_new_gbe, cntr)
 	tplExec(w, r)
@@ -77,7 +76,7 @@ func guestView(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	gbEntries, report := gbp.ListEntries(w, r)
 
-	tplAdder, tplExec := tpl_html.FuncTplBuilder(w, r)
+	tplAdder, tplExec := tplx.FuncTplBuilder(w, r)
 	tplAdder("n_html_title", "List of guest book entries", nil)
 	tplAdder("n_cont_0", c_view_gbe, gbEntries)
 	tplAdder("n_cont_1", "<pre>{{.}}</pre>", report)

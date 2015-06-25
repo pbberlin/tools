@@ -3,7 +3,7 @@ package ancestored_urls
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/net/http/tpl_html"
+	"github.com/pbberlin/tools/net/http/tplx"
 )
 
 func init() {
@@ -18,11 +18,11 @@ func init() {
 
 func backend(w http.ResponseWriter, r *http.Request) {
 
-	add, tplExec := tpl_html.FuncTplBuilder(w, r)
+	add, tplExec := tplx.FuncTplBuilder(w, r)
 
 	add("n_html_title", "Saving an URL into the datastore", "")
-	//add("n_cont_0", tpl_html.PrefixLff+"body_dsu_ancestored_urls", "")
-	add("n_cont_0", tpl_html.PrefixLff+"body_last_url", "")
+	//add("n_cont_0", tplx.PrefixLff+"body_dsu_ancestored_urls", "")
+	add("n_cont_0", tplx.PrefixLff+"body_last_url", "")
 
 	tplExec(w, r)
 

@@ -2,9 +2,9 @@ package backend
 
 import (
 	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/tpl_html"
+	"github.com/pbberlin/tools/net/http/tplx"
 	ss "github.com/pbberlin/tools/shared_structs"
 
 	"appengine"
@@ -14,7 +14,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/util"
 )
 
@@ -182,12 +181,12 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 	cntr, err := sc.Count(w, r, path)
 	loghttp.E(w, r, err, false)
 
-	add, tplExec := tpl_html.FuncTplBuilder(w, r)
+	add, tplExec := tplx.FuncTplBuilder(w, r)
 	add("n_html_title", "Backend", nil)
 
-	add("n_cont_0", "<style>"+htmlpb.CSSColumnsWidth(nColsViewport)+"</style>", "")
-	add("n_cont_1", tpl_html.PrefixLff+"backend3_body", myB0)
-	add("tpl_legend", tpl_html.PrefixLff+"backend3_body_embed01", "")
+	add("n_cont_0", "<style>"+htmlfrag.CSSColumnsWidth(nColsViewport)+"</style>", "")
+	add("n_cont_1", tplx.PrefixLff+"backend3_body", myB0)
+	add("tpl_legend", tplx.PrefixLff+"backend3_body_embed01", "")
 	add("n_cont_2", "<p>{{.}} views</p>", cntr)
 
 	sDumped := ""
@@ -204,7 +203,7 @@ func prepareLayout(l ss.B0) {
 
 func init() {
 	prepareLayout(myB0)
-	http.HandleFunc("/backend3", util_appengine.Adapter(backend3))
+	http.HandleFunc("/backend3", loghttp.Adapter(backend3))
 }
 
 func complementRowsOrCols(nBlocks int, nRowOrCol int) int {

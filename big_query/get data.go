@@ -286,8 +286,8 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 }
 
 func init() {
-	http.HandleFunc("/big-query/query-into-datastore", util_appengine.Adapter(queryIntoDatastore))
-	http.HandleFunc("/big-query/mock-data-into-datastore", util_appengine.Adapter(mockDateIntoDatastore))
-	http.HandleFunc("/big-query/regroup-data-01", util_appengine.Adapter(regroupFromDatastore01))
-	http.HandleFunc("/big-query/regroup-data-02", util_appengine.Adapter(regroupFromDatastore02))
+	http.HandleFunc("/big-query/query-into-datastore", loghttp.Adapter(queryIntoDatastore))
+	http.HandleFunc("/big-query/mock-data-into-datastore", loghttp.Adapter(mockDateIntoDatastore))
+	http.HandleFunc("/big-query/regroup-data-01", loghttp.Adapter(regroupFromDatastore01))
+	http.HandleFunc("/big-query/regroup-data-02", loghttp.Adapter(regroupFromDatastore02))
 }

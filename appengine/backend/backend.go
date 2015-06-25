@@ -6,9 +6,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/conv"
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/proxy1"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
@@ -21,58 +21,58 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1 := new(bytes.Buffer)
 
-	htmlpb.Wb(b1, "Diverse", "")
-	htmlpb.Wb(b1, "Login", "/login")
-	htmlpb.Wb(b1, "Schreib-Methoden", "/write-methods")
-	htmlpb.Wb(b1, "Letzte Email", "/email-view")
-	htmlpb.Wb(b1, "Blob List", "/blob2")
-	htmlpb.Wb(b1, "Template Demo 1", "/tpl/demo1")
-	htmlpb.Wb(b1, "Template Demo 2", "/tpl/demo2")
-	htmlpb.Wb(b1, "Http fetch", "/"+proxy1.FetchURL)
-	htmlpb.Wb(b1, "Instance Info", "/instance-info/view")
-	htmlpb.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
+	htmlfrag.Wb(b1, "Diverse", "")
+	htmlfrag.Wb(b1, "Login", "/login")
+	htmlfrag.Wb(b1, "Schreib-Methoden", "/write-methods")
+	htmlfrag.Wb(b1, "Letzte Email", "/email-view")
+	htmlfrag.Wb(b1, "Blob List", "/blob2")
+	htmlfrag.Wb(b1, "Template Demo 1", "/tpl/demo1")
+	htmlfrag.Wb(b1, "Template Demo 2", "/tpl/demo2")
+	htmlfrag.Wb(b1, "fetch via proxy", "/"+proxy1.FetchURL)
+	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
+	htmlfrag.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 
-	htmlpb.Wb(b1, "JSON encode", "/json-encode")
-	htmlpb.Wb(b1, "JSON decode", "/json-decode")
+	htmlfrag.Wb(b1, "JSON encode", "/json-encode")
+	htmlfrag.Wb(b1, "JSON decode", "/json-decode")
 
-	htmlpb.Wb(b1, "Fulltext put", "/fulltext-search/put")
-	htmlpb.Wb(b1, "Fulltext get", "/fulltext-search/get")
+	htmlfrag.Wb(b1, "Fulltext put", "/fulltext-search/put")
+	htmlfrag.Wb(b1, "Fulltext get", "/fulltext-search/get")
 
-	htmlpb.Wb(b1, "datastore object view quoted printabe", "/dsu/show")
+	htmlfrag.Wb(b1, "datastore object view quoted printabe", "/dsu/show")
 
-	htmlpb.Wb(b1, "Guest Book", "")
-	htmlpb.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
-	htmlpb.Wb(b1, "Einträge auflisten", "/guest-view")
-	htmlpb.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
+	htmlfrag.Wb(b1, "Guest Book", "")
+	htmlfrag.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
+	htmlfrag.Wb(b1, "Einträge auflisten", "/guest-view")
+	htmlfrag.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
 
-	htmlpb.Wb(b1, " ", "")
-	htmlpb.Wb(b1, "Drawing a static chart", "/image/draw-lines-example")
+	htmlfrag.Wb(b1, " ", "")
+	htmlfrag.Wb(b1, "Drawing a static chart", "/image/draw-lines-example")
 
-	htmlpb.Wb(b1, "Big Query ...", "")
-	htmlpb.Wb(b1, "Get real data", "/big-query/query-into-datastore")
-	htmlpb.Wb(b1, "Get mocked data", "/big-query/mock-data-into-datastore")
-	htmlpb.Wb(b1, "  &nbsp; &nbsp; &nbsp; ... with Chart", "")
-	htmlpb.Wb(b1, "Process Data 1 (mock=1)", "/big-query/regroup-data-01?mock=0")
-	htmlpb.Wb(b1, "Process Data 2", "/big-query/regroup-data-02?f=table")
-	htmlpb.Wb(b1, "Show as Table", "/big-query/show-table")
-	htmlpb.Wb(b1, "Show as Chart", "/big-query/show-chart")
-	htmlpb.Wb(b1, "As HTML", "/big-query/html")
+	htmlfrag.Wb(b1, "Big Query ...", "")
+	htmlfrag.Wb(b1, "Get real data", "/big-query/query-into-datastore")
+	htmlfrag.Wb(b1, "Get mocked data", "/big-query/mock-data-into-datastore")
+	htmlfrag.Wb(b1, "  &nbsp; &nbsp; &nbsp; ... with Chart", "")
+	htmlfrag.Wb(b1, "Process Data 1 (mock=1)", "/big-query/regroup-data-01?mock=0")
+	htmlfrag.Wb(b1, "Process Data 2", "/big-query/regroup-data-02?f=table")
+	htmlfrag.Wb(b1, "Show as Table", "/big-query/show-table")
+	htmlfrag.Wb(b1, "Show as Chart", "/big-query/show-chart")
+	htmlfrag.Wb(b1, "As HTML", "/big-query/html")
 
-	htmlpb.Wb(b1, "Request Images ", "")
-	htmlpb.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
-	htmlpb.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
-	htmlpb.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
-	htmlpb.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
+	htmlfrag.Wb(b1, "Request Images ", "")
+	htmlfrag.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
+	htmlfrag.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
+	htmlfrag.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
+	htmlfrag.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
 
-	htmlpb.Wb(b1, "Namespaces + Task Queues", "")
-	htmlpb.Wb(b1, "Increment", "/namespaced-counters/increment")
-	htmlpb.Wb(b1, "Read", "/namespaced-counters/read")
-	htmlpb.Wb(b1, "Push to task-queue", "/namespaced-counters/queue-push")
+	htmlfrag.Wb(b1, "Namespaces + Task Queues", "")
+	htmlfrag.Wb(b1, "Increment", "/namespaced-counters/increment")
+	htmlfrag.Wb(b1, "Read", "/namespaced-counters/read")
+	htmlfrag.Wb(b1, "Push to task-queue", "/namespaced-counters/queue-push")
 
-	htmlpb.Wb(b1, "URLs with/without ancestors", "")
-	htmlpb.Wb(b1, "Backend", "/save-url/backend")
+	htmlfrag.Wb(b1, "URLs with/without ancestors", "")
+	htmlfrag.Wb(b1, "Backend", "/save-url/backend")
 
-	htmlpb.Wb(b1, "Statistics", "/_ah/stats")
+	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")
@@ -126,5 +126,5 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 }
 
 func init() {
-	http.HandleFunc("/backend", util_appengine.Adapter(backend))
+	http.HandleFunc("/backend", loghttp.Adapter(backend))
 }

@@ -17,7 +17,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
@@ -69,5 +68,5 @@ func imgServingExample3(w http.ResponseWriter, r *http.Request, m map[string]int
 }
 
 func init() {
-	http.HandleFunc("/img-serve-example-3", util_appengine.Adapter(imgServingExample3))
+	http.HandleFunc("/img-serve-example-3", loghttp.Adapter(imgServingExample3))
 }

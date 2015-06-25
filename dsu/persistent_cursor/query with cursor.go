@@ -10,7 +10,6 @@ import (
 	ds "appengine/datastore"
 	"appengine/memcache"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 
@@ -98,5 +97,5 @@ func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interf
 }
 
 func init() {
-	http.HandleFunc("/guest-view-cursor", util_appengine.Adapter(guestViewCursor))
+	http.HandleFunc("/guest-view-cursor", loghttp.Adapter(guestViewCursor))
 }

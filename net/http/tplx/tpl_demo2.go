@@ -1,9 +1,9 @@
-package tpl_html
+package tplx
 
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 type GBEntry struct {
@@ -43,5 +43,5 @@ func templatesDemo2(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.HandleFunc("/tpl/demo2", util_appengine.Adapter(templatesDemo2))
+	http.HandleFunc("/tpl/demo2", loghttp.Adapter(templatesDemo2))
 }

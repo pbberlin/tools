@@ -1,4 +1,4 @@
-package tpl_html
+package tplx
 
 import (
 	"github.com/pbberlin/tools/shared_structs"

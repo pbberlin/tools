@@ -1,4 +1,5 @@
-package tpl_html
+// Package tplx makes composing templates more comfortable.
+package tplx
 
 import (
 	"fmt"

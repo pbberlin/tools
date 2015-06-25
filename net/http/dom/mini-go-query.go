@@ -1,3 +1,4 @@
+// Package dom supplies simple node manipulations.
 package dom
 
 import "golang.org/x/net/html"

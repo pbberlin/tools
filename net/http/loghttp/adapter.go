@@ -1,4 +1,5 @@
-package util_appengine
+// Package loghttp helps logging and or printing to the http response, branching for GAE.
+package loghttp
 
 import (
 	"fmt"
@@ -6,12 +7,17 @@ import (
 	"net/url"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/pbberlin/tools/appengine/util_appengine"
+
 	"appengine"
 )
+
+var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/]*)$`)
 
 // works like an interface - functions just have to fit in the signature
 type ExtendedHandler func(http.ResponseWriter, *http.Request, map[string]interface{})
@@ -58,10 +64,12 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		c := appengine.NewContext(r)
-
 		start := time.Now()
-		defer requestStats(c, start)
+
+		c, _ := util_appengine.SafeGaeCheck(r)
+		if c != nil {
+			defer logServerTime(c, start)
+		}
 
 		if !authenticate(w, r) {
 			return
@@ -130,4 +138,13 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		given(w, r, map1)
 
 	}
+}
+
+func authenticate(w http.ResponseWriter, r *http.Request) bool {
+	return true
+}
+
+func logServerTime(c appengine.Context, start time.Time) {
+	age := time.Now().Sub(start)
+	c.Infof("  request took %v", age)
 }

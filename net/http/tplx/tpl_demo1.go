@@ -1,11 +1,10 @@
-package tpl_html
+package tplx
 
 import (
 	"html"
 	tt "html/template"
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
@@ -95,5 +94,5 @@ func templatesCompileDemo(w http.ResponseWriter, r *http.Request, m map[string]i
 }
 
 func init() {
-	http.HandleFunc("/tpl/demo1", util_appengine.Adapter(templatesCompileDemo))
+	http.HandleFunc("/tpl/demo1", loghttp.Adapter(templatesCompileDemo))
 }

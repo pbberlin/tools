@@ -8,9 +8,10 @@ import (
 
 	"net/http"
 	//"appengine"
-	"github.com/pbberlin/tools/appengine/util_appengine"
+
 	"github.com/pbberlin/tools/colors"
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 var p func(a ...interface{}) string = fmt.Sprint
@@ -39,7 +40,7 @@ func disLegend(w http.ResponseWriter, r *http.Request) (b1 *bytes.Buffer, m map[
 	cd1 := GetChartDataFromDatastore(w, r, "chart_data_01")
 	cd := *cd1
 
-	span := htmlpb.GetSpanner()
+	span := htmlfrag.GetSpanner()
 
 	widthLabel := 80
 	widthColorBox := 120
@@ -70,5 +71,5 @@ func disLegend(w http.ResponseWriter, r *http.Request) (b1 *bytes.Buffer, m map[
 }
 
 func init() {
-	http.HandleFunc("/big-query/legend", util_appengine.Adapter(legendAsHTML))
+	http.HandleFunc("/big-query/legend", loghttp.Adapter(legendAsHTML))
 }

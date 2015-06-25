@@ -6,7 +6,7 @@ import (
 	"math"
 	"net/http"
 
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/util"
 )
 
@@ -232,7 +232,7 @@ func test(w http.ResponseWriter, r *http.Request) {
 
 		floatFormat, exp := practicalFormat(mv)
 
-		funcSpanner := htmlpb.GetSpanner()
+		funcSpanner := htmlfrag.GetSpanner()
 
 		fmt.Fprintf(w, "optimal scale for "+floatFormat+" (exp %d) is <br>", mv, exp)
 		for tick, val := range optScale {

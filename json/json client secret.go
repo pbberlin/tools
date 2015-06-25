@@ -1,10 +1,11 @@
 package json
 
 import (
-	"appengine"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"appengine"
 )
 
 const client_secret string = `{
@@ -60,6 +61,6 @@ func jsonDecode(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/json-decode", jsonDecode)
-	http.Handle("/json-encode", Servable_As_HTTP_JSON{Title: "unused", Body: client_secret})
+	http.HandleFunc("/json-decode", (jsonDecode))
+	http.Handle("/json-encode", (Servable_As_HTTP_JSON{Title: "unused", Body: client_secret}))
 }

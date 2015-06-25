@@ -1,3 +1,4 @@
+// Package stringspb has advanced string formatting and struct-dumping.
 package stringspb
 
 import (

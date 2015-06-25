@@ -1,3 +1,4 @@
+// Package proxy1 forwards html pages and reduces their size.
 package proxy1
 
 import (
@@ -5,13 +6,14 @@ import (
 	"net/http"
 	"strings"
 
+	_ "html"
+
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/fetch"
-	"github.com/pbberlin/tools/net/http/tpl_html"
-
-	_ "html"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/tplx"
 )
 
 var insertNewlines = strings.NewReplacer(
@@ -47,10 +49,9 @@ const c_formFetchURL = `
 
 const FetchURL = "fetch-url-x"
 
-func handleFetchURL(w http.ResponseWriter, r *http.Request) {
+func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	c, err := logif.SafeGaeCheck(r)
-	logif.E(err)
+	c, _ := util_appengine.SafeGaeCheck(r)
 	_ = c
 
 	if r.URL.Scheme != "https" && !util_appengine.IsLocalEnviron() {
@@ -88,7 +89,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request) {
 
 	if len(rURL) == 0 {
 
-		tplAdder, tplExec := tpl_html.FuncTplBuilder(w, r)
+		tplAdder, tplExec := tplx.FuncTplBuilder(w, r)
 		tplAdder("n_html_title", "Fetch some http data", nil)
 
 		m := map[string]string{"protocol": "https", "host": r.Host, "path": FetchURL, "val": "google.com"}
@@ -122,5 +123,5 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/"+FetchURL, handleFetchURL)
+	http.HandleFunc("/"+FetchURL, loghttp.Adapter(handleFetchURL))
 }

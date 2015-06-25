@@ -1,7 +1,7 @@
 package domclean2
 
 import (
-	"github.com/pbberlin/tools/dom"
+	"github.com/pbberlin/tools/net/http/dom"
 	"github.com/pbberlin/tools/util"
 	"golang.org/x/net/html"
 )

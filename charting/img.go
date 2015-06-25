@@ -21,7 +21,7 @@ import (
 	"os"
 
 	//"github.com/pbberlin/tools/util"
-	"github.com/pbberlin/tools/appengine/util_appengine"
+
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
@@ -161,6 +161,6 @@ func drawLinesOverGrid(w http.ResponseWriter, r *http.Request, m map[string]inte
 }
 
 func init() {
-	http.HandleFunc("/image/analyze", util_appengine.Adapter(imageAnalyze))
-	http.HandleFunc("/image/draw-lines-example", util_appengine.Adapter(drawLinesOverGrid))
+	http.HandleFunc("/image/analyze", loghttp.Adapter(imageAnalyze))
+	http.HandleFunc("/image/draw-lines-example", loghttp.Adapter(drawLinesOverGrid))
 }

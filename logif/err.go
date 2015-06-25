@@ -1,14 +1,12 @@
+// Package logif wrapps logging errors, saving the err != nil condition.
 package logif
 
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
-
-	"appengine"
 )
 
 func init() {
@@ -63,21 +61,4 @@ func inner(e error, msg ...string) {
 	log.Printf(s)
 	setFlags()
 
-}
-
-func SafeGaeCheck(r *http.Request) (appengine.Context, error) {
-	c := checkPanicking(r)
-	if c != nil {
-		return c, nil
-	} else {
-		return nil, fmt.Errorf("Request is not appengine")
-	}
-}
-
-func checkPanicking(r *http.Request) appengine.Context {
-	defer func() {
-		recover()
-	}()
-	c := appengine.NewContext(r)
-	return c
 }

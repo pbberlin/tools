@@ -6,8 +6,8 @@ import (
 
 	// sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/net/http/tpl_html"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/tplx"
 
 	"appengine"
 )
@@ -28,7 +28,7 @@ func view(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	// loghttp.E(w, r, err, false)
 	cntr := 1
 
-	tplAdder, tplExec := tpl_html.FuncTplBuilder(w, r)
+	tplAdder, tplExec := tplx.FuncTplBuilder(w, r)
 	tplAdder("n_html_title", "Application, Module and Instance Info", nil)
 	tplAdder("n_cont_1", "<pre>{{.}}</pre>", ii.String())
 	tplAdder("n_cont_2", "<p>{{.}} views</p>", cntr)
@@ -52,7 +52,7 @@ func view(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	 specifically via specific hostname
 	*/
 	SuppressPanicUponDoubleRegistration(
-		w, r, "/instance-info/"+ii.InstanceID, util_appengine.Adapter(view))
+		w, r, "/instance-info/"+ii.InstanceID, loghttp.Adapter(view))
 
 }
 

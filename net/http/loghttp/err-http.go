@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/appengine/util_appengine"
 )
 
 /*
@@ -73,14 +73,14 @@ func E(w http.ResponseWriter, r *http.Request,
 		}
 
 		if continueExecution {
-			c, _ := logif.SafeGaeCheck(r)
+			c, _ := util_appengine.SafeGaeCheck(r)
 			if c == nil {
 				log.Printf(s)
 			} else {
 				c.Infof(s)
 			}
 		} else {
-			c, _ := logif.SafeGaeCheck(r)
+			c, _ := util_appengine.SafeGaeCheck(r)
 			if c == nil {
 				log.Printf(s)
 			} else {
@@ -105,7 +105,7 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	}
 
 	// Log it
-	c, _ := logif.SafeGaeCheck(r)
+	c, _ := util_appengine.SafeGaeCheck(r)
 	if c == nil {
 		log.Printf(s)
 	} else {

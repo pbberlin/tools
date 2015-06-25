@@ -11,10 +11,9 @@ import (
 
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/charting"
 	"github.com/pbberlin/tools/colors"
-	"github.com/pbberlin/tools/net/http/htmlpb"
+	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
 
@@ -26,7 +25,7 @@ func showAsTable(w http.ResponseWriter, r *http.Request, m map[string]interface{
 	cd1 := GetChartDataFromDatastore(w, r, "chart_data_01")
 	cd := *cd1
 
-	span := htmlpb.GetSpanner()
+	span := htmlfrag.GetSpanner()
 	// Header row
 	fmt.Fprintf(w, span(" ", 164))
 	for _, lg := range cd.VLangs {
@@ -122,6 +121,6 @@ func showAsChart(w http.ResponseWriter, r *http.Request, m map[string]interface{
 }
 
 func init() {
-	http.HandleFunc("/big-query/show-chart", util_appengine.Adapter(showAsChart))
-	http.HandleFunc("/big-query/show-table", util_appengine.Adapter(showAsTable))
+	http.HandleFunc("/big-query/show-chart", loghttp.Adapter(showAsChart))
+	http.HandleFunc("/big-query/show-table", loghttp.Adapter(showAsTable))
 }

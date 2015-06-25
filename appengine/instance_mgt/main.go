@@ -24,7 +24,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
 
 	"appengine"
 )
@@ -102,8 +102,8 @@ func init() {
 
 	// InstanceId := appengine.InstanceID() // does not during init, only after a few seconds
 
-	http.HandleFunc("/instance-info/view", util_appengine.Adapter(view))
-	http.HandleFunc("/instance-info/collect", util_appengine.Adapter(collectInfo))
+	http.HandleFunc("/instance-info/view", loghttp.Adapter(view))
+	http.HandleFunc("/instance-info/collect", loghttp.Adapter(collectInfo))
 
 	http.HandleFunc("/_ah/start", onStart)
 	http.HandleFunc("/_ah/stop", onStop)

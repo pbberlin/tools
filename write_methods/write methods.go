@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 
 	"github.com/pbberlin/tools/appengine/instance_mgt"
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 
@@ -134,6 +133,6 @@ func writeMethodsResponder(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/write-methods", util_appengine.Adapter(writeMethods))
+	http.HandleFunc("/write-methods", loghttp.Adapter(writeMethods))
 	http.HandleFunc("/write-methods-read", writeMethodsResponder)
 }

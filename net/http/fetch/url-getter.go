@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/appengine/util_appengine"
 
 	"appengine/urlfetch"
 )
@@ -26,7 +26,7 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 	if gaeReq == nil {
 		client.Timeout = time.Duration(5 * time.Second) // GAE does not allow
 	} else {
-		c, _ := logif.SafeGaeCheck(gaeReq)
+		c, _ := util_appengine.SafeGaeCheck(gaeReq)
 		if c != nil {
 			client = urlfetch.Client(c)
 		}

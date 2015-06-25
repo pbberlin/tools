@@ -1,3 +1,4 @@
+// Package ioutilpb reads and writes files.
 package ioutilpb
 
 import (

@@ -3,10 +3,9 @@ package backend
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/tpl_html"
+	"github.com/pbberlin/tools/net/http/tplx"
 
 	"appengine"
 )
@@ -105,11 +104,11 @@ func backend2(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 	cntr, err := sc.Count(w, r, path)
 	loghttp.E(w, r, err, false)
 
-	add, tplExec := tpl_html.FuncTplBuilder(w, r)
+	add, tplExec := tplx.FuncTplBuilder(w, r)
 	add("n_html_title", "Backend", nil)
 	//add("n_cont_0", c_link, links)
-	add("n_cont_0", tpl_html.PrefixLff+"backend_body", blocks2)
-	add("tpl_legend", tpl_html.PrefixLff+"backend_body_embed01", "")
+	add("n_cont_0", tplx.PrefixLff+"backend_body", blocks2)
+	add("tpl_legend", tplx.PrefixLff+"backend_body_embed01", "")
 
 	//add("n_cont_1", "<pre>{{.}}</pre>", "pure text")
 	add("n_cont_2", "<p>{{.}} views</p>", cntr)
@@ -119,6 +118,6 @@ func backend2(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 }
 
 func init() {
-	http.HandleFunc("/backend2", util_appengine.Adapter(backend2))
+	http.HandleFunc("/backend2", loghttp.Adapter(backend2))
 
 }

@@ -3,13 +3,11 @@ package guestbook
 import (
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 func init() {
-
-	http.HandleFunc("/guest-entry", util_appengine.Adapter(guestEntry))
-	http.HandleFunc("/guest-save", util_appengine.Adapter(guestSave))
-	http.HandleFunc("/guest-view", util_appengine.Adapter(guestView))
-
+	http.HandleFunc("/guest-entry", loghttp.Adapter(guestEntry))
+	http.HandleFunc("/guest-save", loghttp.Adapter(guestSave))
+	http.HandleFunc("/guest-view", loghttp.Adapter(guestView))
 }

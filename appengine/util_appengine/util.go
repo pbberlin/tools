@@ -1,3 +1,5 @@
+// Package util_appengine reveals if requests come from appengine or plain http servers;
+// and if the gae development server is running.
 package util_appengine
 
 /*
@@ -6,17 +8,16 @@ package util_appengine
 */
 
 import (
+	"fmt"
 	"net/http"
-	"regexp"
-	"time"
 
 	"appengine"
 )
+
 import "os"
 import "strings"
 
 // http://regex101.com/
-var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/]*)$`)
 
 // IsLocalEnviron tells us, if we are on the
 // local development server, or on the google app engine cloud maschine
@@ -34,11 +35,19 @@ func IsLocalEnviron() bool {
 
 }
 
-func authenticate(w http.ResponseWriter, r *http.Request) bool {
-	return true
+func SafeGaeCheck(r *http.Request) (appengine.Context, error) {
+	c := checkPanicking(r)
+	if c != nil {
+		return c, nil
+	} else {
+		return nil, fmt.Errorf("Request is not appengine")
+	}
 }
 
-func requestStats(c appengine.Context, start time.Time) {
-	age := time.Now().Sub(start)
-	c.Infof("  request took %v", age)
+func checkPanicking(r *http.Request) appengine.Context {
+	defer func() {
+		recover()
+	}()
+	c := appengine.NewContext(r)
+	return c
 }

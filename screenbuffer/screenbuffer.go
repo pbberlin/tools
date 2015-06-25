@@ -1,3 +1,5 @@
+// Package screenbuffer is a ultra primitive columnar printing utility;
+// abandonded in favor of termbox-go.
 package screenbuffer
 
 import "fmt"

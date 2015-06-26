@@ -146,6 +146,15 @@ func Fetch(rssUrl string, numberArticles int) {
 		histoDir[dir]++
 	}
 	sr := sortmap.SortMapByCount(histoDir)
-	sr.Print(3)
+	{
+		bts := []byte{}
+		for _, v := range sr {
+			bts = append(bts, []byte(v.Key)...)
+			bts = append(bts, "\n"...)
+		}
+		// sr.Print(3)
+		fnDigest := filepath.Join(docRoot, "digest.txt")
+		ioutilpb.Bytes2File(fnDigest, bts)
+	}
 
 }

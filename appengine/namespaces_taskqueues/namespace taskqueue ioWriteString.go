@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 
 	"appengine"
 	"appengine/datastore"
@@ -60,7 +61,7 @@ func agnosticReadReset(c appengine.Context, doReset bool) (int64, error) {
 	return ctrRd.Count, err
 }
 
-func readBothNamespaces(w http.ResponseWriter, r *http.Request) {
+func readBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	var c1, c2 int64
 	var s1, s2 string
@@ -93,7 +94,7 @@ func readBothNamespaces(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func incrementBothNamespaces(w http.ResponseWriter, r *http.Request) {
+func incrementBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 	err := agnosticIncrement(c)
@@ -108,11 +109,11 @@ func incrementBothNamespaces(w http.ResponseWriter, r *http.Request) {
 
 	s := `counters updates für ns=''  and ns='ns01'.` + "\n"
 	io.WriteString(w, s)
-	readBothNamespaces(w, r)
+	readBothNamespaces(w, r, m)
 
 }
 
-func queuePush(w http.ResponseWriter, r *http.Request) {
+func queuePush(w http.ResponseWriter, r *http.Request, mx map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -128,15 +129,15 @@ func queuePush(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, "tasks enqueued\n")
 
 	io.WriteString(w, "\ncounter values now: \n")
-	readBothNamespaces(w, r)
+	readBothNamespaces(w, r, mx)
 
 	io.WriteString(w, "\n\n...sleeping... \n")
 	time.Sleep(time.Duration(400) * time.Millisecond)
-	readBothNamespaces(w, r)
+	readBothNamespaces(w, r, mx)
 
 }
 
-func queuePop(w http.ResponseWriter, r *http.Request) {
+func queuePop(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	c := appengine.NewContext(r)
 	err := agnosticIncrement(c)
 	c.Infof("qp")
@@ -144,10 +145,10 @@ func queuePop(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/namespaced-counters/increment", incrementBothNamespaces)
-	http.HandleFunc("/namespaced-counters/read", readBothNamespaces)
+	http.HandleFunc("/namespaced-counters/increment", loghttp.Adapter(incrementBothNamespaces))
+	http.HandleFunc("/namespaced-counters/read", loghttp.Adapter(readBothNamespaces))
 
-	http.HandleFunc("/_ah/namespaced-counters/queue-pop", queuePop)
-	http.HandleFunc("/namespaced-counters/queue-push", queuePush)
+	http.HandleFunc("/_ah/namespaced-counters/queue-pop", loghttp.Adapter(queuePop))
+	http.HandleFunc("/namespaced-counters/queue-push", loghttp.Adapter(queuePush))
 
 }

@@ -35,7 +35,7 @@ type TwiML struct {
 var twiml1 TwiML = TwiML{Say: "Hello World!"}
 var twiml2 TwiML = TwiML{Play: "http://demo.rickyrobinett.com/huh.mp3"}
 
-func twilioResponse(w http.ResponseWriter, r *http.Request) {
+func twilioResponse(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	x, err := xml.MarshalIndent(twiml1, "", "  ")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -45,7 +45,7 @@ func twilioResponse(w http.ResponseWriter, r *http.Request) {
 	w.Write(x)
 }
 
-func call(w http.ResponseWriter, r *http.Request) {
+func call(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	// params trial: https://www.twilio.com/user/account/developer-tools/api-explorer/call-create
 	// params docu:  https://www.twilio.com/docs/api/rest/making-calls
@@ -93,15 +93,15 @@ func call(w http.ResponseWriter, r *http.Request) {
 }
 
 func init() {
-	http.HandleFunc("/send-sms", sendSMS)
-	http.HandleFunc("/call", call)
-	http.HandleFunc("/twiml", twilioResponse)
+	http.HandleFunc("/send-sms", loghttp.Adapter(sendSMS))
+	http.HandleFunc("/call", loghttp.Adapter(call))
+	http.HandleFunc("/twiml", loghttp.Adapter(twilioResponse))
 }
 
 // unused
 // only here, we require the twilio package
 //   github.com/subosito/twilio"
-func sendSMS(w http.ResponseWriter, r *http.Request) {
+func sendSMS(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	/*
 		// Initialize twilio client

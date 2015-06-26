@@ -33,7 +33,7 @@ func ancKey(c appengine.Context) *ds.Key {
 
 // saving some data by kind and key
 //   without ancestor key
-func saveURLNoAnc(w http.ResponseWriter, r *http.Request) {
+func saveURLNoAnc(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -58,7 +58,7 @@ func saveURLNoAnc(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func saveURLWithAncestor(w http.ResponseWriter, r *http.Request) {
+func saveURLWithAncestor(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -76,7 +76,7 @@ func saveURLWithAncestor(w http.ResponseWriter, r *http.Request) {
 // get all URLs
 //  not just by ancestor
 //  results might be delayed
-func listURLNoAnc(w http.ResponseWriter, r *http.Request) {
+func listURLNoAnc(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
@@ -111,7 +111,7 @@ func listURLNoAnc(w http.ResponseWriter, r *http.Request) {
 // get all ancestor urls
 //  ordering possible
 //  distinction to above: *always* consistent
-func listURLWithAncestors(w http.ResponseWriter, r *http.Request) {
+func listURLWithAncestors(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 

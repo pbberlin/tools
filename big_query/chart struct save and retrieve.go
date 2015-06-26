@@ -73,7 +73,7 @@ func GetChartDataFromDatastore(w http.ResponseWriter, r *http.Request, key strin
 	return newCData
 }
 
-func testGobDecodeEncode(w http.ResponseWriter, r *http.Request) {
+func testGobDecodeEncode(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	nx := 24
 

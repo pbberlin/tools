@@ -42,7 +42,7 @@ import (
  	is routed to
    /_ah/mail/peter@libertarian-islands.appspotmail.com
 */
-func emailReceiveAndStore(w http.ResponseWriter, r *http.Request) {
+func emailReceiveAndStore(w http.ResponseWriter, r *http.Request, mx map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 	defer r.Body.Close()
@@ -104,7 +104,7 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request) {
 		emailSend(w, r, m)
 
 		parseFurther(w, r, true)
-		call(w, r)
+		call(w, r, mx)
 	} else {
 		blob := dsu.WrapBlob{Name: subject + "from " + from + "to " + to,
 			S: boundary, VByte: b1.Bytes()}
@@ -114,7 +114,7 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func emailReceiveSimple(w http.ResponseWriter, r *http.Request) {
+func emailReceiveSimple(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -160,6 +160,6 @@ func emailSend(w http.ResponseWriter, r *http.Request, m map[string]string) {
 }
 
 func init() {
-	http.HandleFunc("/_ah/mail/", emailReceiveAndStore)
-	//http.HandleFunc("/_ah/mail/"  , emailReceiveSimple)
+	http.HandleFunc("/_ah/mail/", loghttp.Adapter(emailReceiveAndStore))
+	//http.HandleFunc("/_ah/mail/"  , loghttp.Adapter(emailReceiveSimple))
 }

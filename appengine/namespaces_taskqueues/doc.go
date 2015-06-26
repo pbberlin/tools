@@ -1,5 +1,4 @@
-/*
-	A datastore counter value can be stored under nscStringKey.
+/*	A datastore counter value can be stored under nscStringKey.
 
 	Upon changing the namespace to altNamespace,
 	we have a different value for the same key.
@@ -15,5 +14,4 @@
 	*that* namespace.counter, under which namespace it was pushed/enqueued
 
 */
-
 package namespaces_taskqueues

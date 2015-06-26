@@ -1,15 +1,16 @@
-/*
-
-	Remember, there is a *quota* on getIntance...()  requests.
-
-	Make instance info available in Memory.
+/*  Package instance_mgt tries to send and receive data to sibling instances.
 
 
-	Have it refresh upon init and
-	 every xxx minutes.
+Remember, there is a *quota* on getIntance...()  requests.
 
-	There is a strange "version suffix".
-	We call it VersionMinor and chop it off.
+Make instance info available in Memory.
+
+
+Have it refresh upon init and
+ every xxx minutes.
+
+There is a strange "version suffix".
+We call it VersionMinor and chop it off.
 
 
 

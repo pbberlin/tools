@@ -1,13 +1,16 @@
-// Package sortablemap takes histogram data maps
-// with unpredictable *sparse* long tails,
-// and transforms them into a ordered and partially summed slice of struct.
-// Before using this package,
-// consider the documentation for util.StringKeysToSortedArray()
+// package sortmapx sorts maps into
+// an ordered *persistent* slice of KV-structs;
+// it also constructs slices of dense key ranges
+// with partial sums of values; see tests;
+// before using, consider the simpler sortmap.StringKeysToSortedArray()
+// or sortmap.StringKeysToSortedArray();
+// before using, consider the simpler sortmap.SortByCnt(map[string]int).
+// It is useful for with unpredictable *sparse* long tails.
 // This package only adds value, if we want *repeated* access to
 // specific sort offsets, or to min and max values.
 // The package furthermore *flattens* the map to a fully ranged array
 // of offsets.
-package sortablemap
+package sortmapx
 
 import "sort"
 

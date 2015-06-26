@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mjibson/appstats"
 	"github.com/pbberlin/tools/appengine/util_appengine"
 
 	"appengine"
@@ -21,6 +22,8 @@ var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/]*)$`)
 
 // works like an interface - functions just have to fit in the signature
 type ExtendedHandler func(http.ResponseWriter, *http.Request, map[string]interface{})
+type AppengineHandler1 func(appengine.Context, http.ResponseWriter, *http.Request)
+type AppengineHandler2 func(appengine.Context, http.ResponseWriter, *http.Request) http.HandlerFunc
 
 /*
 
@@ -74,6 +77,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		if !authenticate(w, r) {
 			return
 		}
+
 		//check_against := r.URL.String()
 		check_against := r.URL.Path
 		matches := validRequestPath.FindStringSubmatch(check_against)
@@ -88,17 +92,14 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		if err != nil {
 			panic("Could not url.Parse current url")
 		}
-		dir := path.Dir(s.Path)
-		base := path.Base(s.Path)
-
-		map1 := map[string]interface{}{
-			"dir":  dir,
-			"base": base,
+		mp := map[string]interface{}{
+			"dir":  path.Dir(s.Path),
+			"base": path.Base(s.Path),
 		}
 
 		defer func() {
 			// note: Println works even in panic
-			//fmt.Println("--apapter(): going to catch panic on higher level")
+			//fmt.Println("--adapter(): going to catch panic on higher level")
 
 			panicSignal := recover()
 			if panicSignal != nil {
@@ -135,7 +136,23 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			}
 		}()
 
-		given(w, r, map1)
+		if c == nil {
+			given(w, r, mp)
+		} else {
+
+			// given(w, r, mp)
+
+			// func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+			// 	given(w, r, mp)
+			// }(c, w, r)
+
+			var given1 AppengineHandler1
+			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+				given(w, r, mp)
+			}
+			httpHandler := appstats.NewHandler(given1)
+			httpHandler.ServeHTTP(w, r)
+		}
 
 	}
 }

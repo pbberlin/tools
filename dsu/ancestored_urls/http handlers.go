@@ -3,20 +3,21 @@ package ancestored_urls
 import (
 	"net/http"
 
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
 func init() {
-	http.HandleFunc("/save-url/save-no-anc", saveURLNoAnc)
-	http.HandleFunc("/save-url/save-wi-anc", saveURLWithAncestor)
-	http.HandleFunc("/save-url/view-no-anc", listURLNoAnc)
-	http.HandleFunc("/save-url/view-wi-anc", listURLWithAncestors)
-	http.HandleFunc("/save-url/backend", backend)
-	http.HandleFunc("/save-url/", backend)
+	http.HandleFunc("/save-url/save-no-anc", loghttp.Adapter(saveURLNoAnc))
+	http.HandleFunc("/save-url/save-wi-anc", loghttp.Adapter(saveURLWithAncestor))
+	http.HandleFunc("/save-url/view-no-anc", loghttp.Adapter(listURLNoAnc))
+	http.HandleFunc("/save-url/view-wi-anc", loghttp.Adapter(listURLWithAncestors))
+	http.HandleFunc("/save-url/backend", loghttp.Adapter(backend))
+	http.HandleFunc("/save-url/", loghttp.Adapter(backend))
 
 }
 
-func backend(w http.ResponseWriter, r *http.Request) {
+func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	add, tplExec := tplx.FuncTplBuilder(w, r)
 

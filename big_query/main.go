@@ -30,5 +30,5 @@ func ViewHTML(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 
 func init() {
 	http.HandleFunc("/big-query/html", loghttp.Adapter(ViewHTML))
-	http.HandleFunc("/big-query/test-gob-codec", testGobDecodeEncode)
+	http.HandleFunc("/big-query/test-gob-codec", loghttp.Adapter(testGobDecodeEncode))
 }

@@ -1,4 +1,10 @@
-package subsort
+// Adding a special case.
+// I often have map[string]int for counters. I.e.:
+//   mapX["someKey"]++
+// SortMapByCount sorts such a map by the integer.
+// It then returns the sorted data as a sorted slice of {int,key}.
+
+package sortmap
 
 import (
 	"fmt"
@@ -42,14 +48,14 @@ func SortMapByCount(m map[string]int) SortByCnt {
 	return sbc
 }
 
-func (sbc SortByCnt) Print() {
+func (sbc SortByCnt) Print(cols int) {
 	cntr := 0
 	for k, val := range sbc {
 		_ = k
 		// fmt.Printf("%2v: %14v %4v ", k, val.Key, val.Cnt)
 		fmt.Printf("%14v %4v ", val.Key, val.Cnt)
 		cntr++
-		if cntr%6 == 0 {
+		if cntr%cols == 0 {
 			fmt.Println()
 		}
 	}

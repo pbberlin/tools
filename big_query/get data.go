@@ -18,6 +18,7 @@ import (
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 	"golang.org/x/net/context"
@@ -262,8 +263,8 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 	//fmt.Fprintf(w,"%#v\n",d2)
 	//fmt.Fprintf(w,"%#v\n",f_max)
 
-	sortedPeriods := util.StringKeysToSortedArray(distinctPeriods)
-	sortedLangs := util.StringKeysToSortedArray(distinctLangs)
+	sortedPeriods := sortmap.StringKeysToSortedArray(distinctPeriods)
+	sortedLangs := sortmap.StringKeysToSortedArray(distinctLangs)
 
 	cd := CData{}
 	_ = cd

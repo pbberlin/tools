@@ -1,6 +1,7 @@
-// Package dsu contains data store utilities; 
+// Package dsu contains data store utilities;
 // formeost for the google app engine datastore.
 package dsu
+
 /*
 
 	Package dsu - datastore utiltiies for google's appengine datastore
@@ -81,5 +82,3 @@ package dsu
 
 
 */
-
-package dsu

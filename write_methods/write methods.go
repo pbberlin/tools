@@ -1,3 +1,5 @@
+// Package write_methods is a collection of ways to write
+// to different go types.
 package write_methods
 
 import (
@@ -128,11 +130,11 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 }
 
 // simple helper for reading http.response.Body
-func writeMethodsResponder(w http.ResponseWriter, r *http.Request) {
+func writeMethodsResponder(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	opf(w, "some http response body string")
 }
 
 func init() {
 	http.HandleFunc("/write-methods", loghttp.Adapter(writeMethods))
-	http.HandleFunc("/write-methods-read", writeMethodsResponder)
+	http.HandleFunc("/write-methods-read", loghttp.Adapter(writeMethodsResponder))
 }

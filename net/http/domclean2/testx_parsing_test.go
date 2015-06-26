@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"log"
 	"testing"
+	"time"
 
 	"github.com/pbberlin/tools/io/ioutilpb"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
+	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
-	"github.com/pbberlin/tools/subsort"
 	"golang.org/x/net/html"
 )
 
@@ -32,6 +33,9 @@ var numTotal = 0 // comparable html docs
 const stageMax = 3
 
 func main() {
+
+	pf("waiting for webserver\n")
+	time.Sleep(2 * time.Millisecond)
 
 	//
 	// ================================================
@@ -82,11 +86,11 @@ func main() {
 	}
 
 	// statistics on elements and attributes
-	sorted1 := subsort.SortMapByCount(attrDistinct)
-	sorted1.Print()
+	sorted1 := sortmap.SortMapByCount(attrDistinct)
+	sorted1.Print(6)
 	fmt.Println()
-	sorted2 := subsort.SortMapByCount(nodeDistinct)
-	sorted2.Print()
+	sorted2 := sortmap.SortMapByCount(nodeDistinct)
+	sorted2.Print(6)
 
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 

@@ -5,12 +5,14 @@ import (
 	"bytes"
 	"encoding/xml"
 	"net/url"
+	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/pbberlin/tools/io/ioutilpb"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
+	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
 
@@ -127,11 +129,23 @@ func Fetch(rssUrl string, numberArticles int) {
 
 	time.Sleep(3 * time.Millisecond) // not needed - workers spin down earlier
 
-	// saving as files
+	// Saving as files
 	for idx, a := range fullArticles {
 		orig, numbered := fetchFileName(a.Url, idx+len(testDocs))
 		ioutilpb.Bytes2File(orig, a.Body)
 		ioutilpb.Bytes2File(numbered, a.Body)
 	}
+
+	// Write out directory statistics
+	histoDir := map[string]int{}
+	for _, a := range fullArticles {
+		u, err := url.Parse(a.Url)
+		logif.E(err)
+		dir := filepath.Dir(u.RequestURI())
+		dir = filepath.Dir(dir)
+		histoDir[dir]++
+	}
+	sr := sortmap.SortMapByCount(histoDir)
+	sr.Print(3)
 
 }

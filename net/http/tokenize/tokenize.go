@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"strings"
 
+	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 
@@ -217,7 +218,7 @@ func decomposeHtml(r io.Reader) {
 		}
 	}
 
-	hSort := util.StringKeysToSortedArray(histogram)
+	hSort := sortmap.StringKeysToSortedArray(histogram)
 
 	pf("\n\n")
 	for _, v := range hSort {

@@ -24,8 +24,6 @@ import (
 
 	"appengine/datastore"
 	"appengine/user"
-
-	"github.com/mjibson/appstats"
 )
 
 const upload2HTML = `
@@ -67,9 +65,9 @@ const closeHTML = `
 	</body>
 </html>`
 
-func submitUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func submitUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	// c := appengine.NewContext(r)
+	c := appengine.NewContext(r)
 	uploadURL, err := blobstore.UploadURL(c, "/blob2/processing-new-upload", nil)
 	loghttp.E(w, r, err, false)
 
@@ -78,7 +76,7 @@ func submitUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 	loghttp.E(w, r, err, false)
 }
 
-func processUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func processUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1 := new(bytes.Buffer)
 	defer func() {
@@ -125,13 +123,15 @@ func processUpload(c appengine.Context, w http.ResponseWriter, r *http.Request) 
 	//http.Redirect(w, r, urlSuccess, http.StatusFound)
 }
 
-func serveFull(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func serveFull(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	blobstore.Send(w, appengine.BlobKey(r.FormValue("blobkey")))
 }
 
 // working differently as in Python
 //		//blob2s := blobstore.BlobInfo.gql("ORDER BY creation DESC")
-func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func blobList(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	b1 := new(bytes.Buffer)
 	defer func() {
@@ -268,7 +268,9 @@ func blobList(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 
 }
 
-func renameOrDelete(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func renameOrDelete(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	b1 := new(bytes.Buffer)
 	s1 := ""
@@ -367,7 +369,9 @@ func renameOrDelete(c appengine.Context, w http.ResponseWriter, r *http.Request)
 
 }
 
-func serveThumb(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+func serveThumb(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	// c := appengine.NewContext(r)
 	k := appengine.BlobKey(r.FormValue("blobkey"))
@@ -409,11 +413,11 @@ func dataStoreClone(w http.ResponseWriter, r *http.Request,
 }
 
 func init() {
-	http.Handle("/print", appstats.NewHandler(blobList))
-	http.Handle("/blob2", appstats.NewHandler(blobList))
-	http.Handle("/blob2/upload", appstats.NewHandler(submitUpload))
-	http.Handle("/blob2/processing-new-upload", appstats.NewHandler(processUpload))
-	http.Handle("/blob2/serve-full", appstats.NewHandler(serveFull))
-	http.Handle("/blob2/thumb", appstats.NewHandler(serveThumb))
-	http.Handle("/blob2/rename-delete", appstats.NewHandler(renameOrDelete))
+	http.Handle("/print", loghttp.Adapter(blobList))
+	http.Handle("/blob2", loghttp.Adapter(blobList))
+	http.Handle("/blob2/upload", loghttp.Adapter(submitUpload))
+	http.Handle("/blob2/processing-new-upload", loghttp.Adapter(processUpload))
+	http.Handle("/blob2/serve-full", loghttp.Adapter(serveFull))
+	http.Handle("/blob2/thumb", loghttp.Adapter(serveThumb))
+	http.Handle("/blob2/rename-delete", loghttp.Adapter(renameOrDelete))
 }

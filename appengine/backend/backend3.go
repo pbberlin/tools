@@ -201,11 +201,6 @@ func prepareLayout(l ss.B0) {
 
 }
 
-func init() {
-	prepareLayout(myB0)
-	http.HandleFunc("/backend3", loghttp.Adapter(backend3))
-}
-
 func complementRowsOrCols(nBlocks int, nRowOrCol int) int {
 	if nRowOrCol < 1 {
 		panic("Count of Cols or Rows must be given")
@@ -216,4 +211,9 @@ func complementRowsOrCols(nBlocks int, nRowOrCol int) int {
 	}
 	return nCompl
 
+}
+
+func init() {
+	prepareLayout(myB0)
+	http.HandleFunc("/backend3", loghttp.Adapter(backend3))
 }

@@ -3,6 +3,7 @@ package fetch_rss
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"net/url"
 	"path/filepath"
@@ -146,15 +147,31 @@ func Fetch(rssUrl string, numberArticles int) {
 		histoDir[dir]++
 	}
 	sr := sortmap.SortMapByCount(histoDir)
+
 	{
 		bts := []byte{}
 		for _, v := range sr {
 			bts = append(bts, []byte(v.Key)...)
-			bts = append(bts, "\n"...)
+			bts = append(bts, '\t')
+			bts = append(bts, []byte(spf("%v", v.Cnt))...)
+			bts = append(bts, '\n')
 		}
 		// sr.Print(3)
 		fnDigest := filepath.Join(docRoot, "digest.txt")
 		ioutilpb.Bytes2File(fnDigest, bts)
 	}
 
+	{
+		b, err := json.MarshalIndent(sr, "  ", "\t")
+		logif.E(err)
+		fnDigest := filepath.Join(docRoot, "digest1.json")
+		ioutilpb.Bytes2File(fnDigest, b)
+	}
+
+	{
+		b, err := json.MarshalIndent(histoDir, "  ", "\t")
+		logif.E(err)
+		fnDigest := filepath.Join(docRoot, "digest2.json")
+		ioutilpb.Bytes2File(fnDigest, b)
+	}
 }

@@ -5,12 +5,15 @@ package domclean2
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/pbberlin/tools/io/ioutilpb"
+	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/sort/sortmap"
@@ -134,6 +137,27 @@ func main() {
 		}
 		flattenTraverse(doc)
 		ioutilpb.Dom2File(fnOut, doc)
+	}
+
+	{
+		const jsonStream = `{
+		  	"\\": 11,
+		  	"\\panorama\\aus-aller-welt": 1,
+		  	"\\politik\\international": 3,
+		  	"\\politik\\konjunktur\\nachrichten": 1,
+		  	"\\sport\\fussball": 1,
+		  	"\\unternehmen\\dienstleister\\werber-rat": 1,
+		  	"\\unternehmen\\handel-konsumgueter": 1
+		}`
+		// type Message struct {
+		// 	Name, Text string
+		// }
+
+		dec := json.NewDecoder(strings.NewReader(jsonStream))
+		var mp map[string]int
+		err := dec.Decode(&mp)
+		logif.E(err)
+		fmt.Printf("%v\n", mp)
 	}
 
 	pf("correct finish\n")

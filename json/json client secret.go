@@ -26,8 +26,7 @@ type Servable_As_HTTP_JSON struct {
 }
 
 func (h Servable_As_HTTP_JSON) ServeHTTP(
-	w http.ResponseWriter,
-	r *http.Request,
+	w http.ResponseWriter, r *http.Request,
 ) {
 
 	c := appengine.NewContext(r)

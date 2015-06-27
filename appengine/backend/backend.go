@@ -75,6 +75,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
+	htmlfrag.Wb(b1, "Filesystem New", "/fs/new")
+
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")
 	b1.WriteString("<a target='_gae' href='https://console.developers.google.com/project/347979071940' ><b>global</b> developer console</a><br>\n")
@@ -121,7 +123,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	sEnc := "Theo - wir fahrn nach Łódź <  " + stringspb.IncrementString("Łódź") + x1 + x2 + x3 + x4
 	b1.WriteString(fmt.Sprint("restore string string(  []byte(sEnc) ): ", string([]byte(sEnc)), "<br>"))
 
-	logif.E(fmt.Errorf("fictive error that is *now* logged to GAE"))
+	logif.E(fmt.Errorf("fictive error that is *now* logged to gae. "))
 
 	w.Header().Set("Content-Type", "text/html")
 	w.Write(b1.Bytes())

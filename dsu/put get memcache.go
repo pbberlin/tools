@@ -30,8 +30,11 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 	if stMold != "int" &&
 		stMold != "string" &&
 		stMold != "dsu.WrapInt" &&
-		stMold != "dsu.WrapString" {
+		stMold != "dsu.WrapString" &&
+		stMold != "*filesys.fs" &&
+		stMold != "*filesys.fso" {
 		// struct - save it with JSON encoder
+		c.Infof("%v", stMold)
 		n := tMold.NumField()
 		_ = n
 		miPut := &memcache.Item{

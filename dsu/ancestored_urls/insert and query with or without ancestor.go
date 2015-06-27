@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
 
@@ -41,7 +40,7 @@ func saveURLNoAnc(w http.ResponseWriter, r *http.Request, m map[string]interface
 	e := new(LastURL)
 	err := ds.Get(c, k, e)
 	if err == ds.ErrNoSuchEntity {
-		logif.E(err)
+		c.Errorf("%v", err)
 	} else {
 		loghttp.E(w, r, err, false)
 	}

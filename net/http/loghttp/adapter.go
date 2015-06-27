@@ -3,6 +3,7 @@ package loghttp
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"path"
@@ -15,15 +16,16 @@ import (
 	"github.com/mjibson/appstats"
 	"github.com/pbberlin/tools/appengine/util_appengine"
 
-	"appengine"
+	"appengine" // mjibson
 )
 
 var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/]*)$`)
 
 // works like an interface - functions just have to fit in the signature
 type ExtendedHandler func(http.ResponseWriter, *http.Request, map[string]interface{})
-type AppengineHandler1 func(appengine.Context, http.ResponseWriter, *http.Request)
-type AppengineHandler2 func(appengine.Context, http.ResponseWriter, *http.Request) http.HandlerFunc
+
+// mjibson.appengine handler
+type AppengineHandler func(appengine.Context, http.ResponseWriter, *http.Request)
 
 /*
 
@@ -59,6 +61,8 @@ type AppengineHandler2 func(appengine.Context, http.ResponseWriter, *http.Reques
 
 */
 
+var C appengine.Context
+
 // Adapter() checks the path, takes the time, precomputes values into a map
 // provides a global panic catcher
 // The typed signature is cleaner than the long version:
@@ -70,8 +74,13 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		start := time.Now()
 
 		c, _ := util_appengine.SafeGaeCheck(r)
+		lgi := log.Printf
+		lge := log.Fatalf
 		if c != nil {
 			defer logServerTime(c, start)
+			lgi = c.Infof
+			lge = c.Errorf
+			C = c
 		}
 
 		if !authenticate(w, r) {
@@ -83,7 +92,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		matches := validRequestPath.FindStringSubmatch(check_against)
 		if matches == nil {
 			s := "illegal chars in path: " + check_against
-			c.Infof(s)
+			lgi(s)
 			http.Error(w, s, http.StatusInternalServerError)
 			return
 		}
@@ -99,7 +108,6 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 
 		defer func() {
 			// note: Println works even in panic
-			//fmt.Println("--adapter(): going to catch panic on higher level")
 
 			panicSignal := recover()
 			if panicSignal != nil {
@@ -119,17 +127,18 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 						miniStacktrace += fmt.Sprintf("<br>\n\t\t /%s:%d ", file, line)
 					}
 				}
+
 				// headers := w.Header()
 				// for k, v := range headers {
 				// 	miniStacktrace += fmt.Sprintf("%#v %#v<br>\n", k, v)
 				// }
 				if panicSignal == "abort_handler_processing" {
 					s := fmt.Sprint("\thttp processing aborted\n", miniStacktrace)
-					c.Errorf(s)
+					lge(s)
 					w.Write([]byte(s))
 				} else if panicSignal != nil {
 					s := fmt.Sprintf("\tPANIC caught by util_err.Adapter: %v %s\n", panicSignal, miniStacktrace)
-					c.Errorf(s)
+					lge(s)
 					w.Write([]byte(s))
 				}
 
@@ -140,13 +149,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			given(w, r, mp)
 		} else {
 
-			// given(w, r, mp)
-
-			// func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
-			// 	given(w, r, mp)
-			// }(c, w, r)
-
-			var given1 AppengineHandler1
+			var given1 AppengineHandler
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 				given(w, r, mp)
 			}

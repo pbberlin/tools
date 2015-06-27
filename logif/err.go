@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 func init() {
@@ -59,6 +61,16 @@ func inner(e error, msg ...string) {
 
 	log.SetFlags(0)
 	log.Printf(s)
-	setFlags()
+
+	if loghttp.C != nil {
+		// This is of course criminal,
+		// since loghttp.C is not syncronized.
+		// The message might appear under a *wrong* request.
+		// But it's the only way to make
+		// ordinary log messages available.
+		loghttp.C.Infof(fmt.Sprintf("volatile logif mapping: %s", s))
+	}
+
+	setFlags() // restore
 
 }

@@ -3,9 +3,9 @@ package filesys
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
-	"strings"
 	"time"
+
+	"github.com/pbberlin/tools/stringspb"
 
 	"appengine"
 	ds "appengine/datastore"
@@ -28,23 +28,6 @@ func NewFileSys(w http.ResponseWriter, r *http.Request, root string) FileSys {
 	fs.RootDir = fs.newFso(root, nil, true)
 
 	return fs
-}
-
-func (fs FileSys) getFso(path string) (FSysObj, error) {
-
-	base := filepath.Base(path)
-	par := filepath.Dir(path)
-
-	PKey := ds.NewKey(fs.c, t, fs.RootDir.SKey+","+par, 0, nil)
-	suggKey := ds.NewKey(fs.c, t, base, 0, PKey)
-	fo := FSysObj{}
-	err := ds.Get(fs.c, suggKey, &fo)
-
-	if err != nil {
-		return fo, nil
-	} else {
-		return fo, err
-	}
 }
 
 func (fs FileSys) newFso(name string, parent *ds.Key, isDir bool) FSysObj {
@@ -79,36 +62,35 @@ func (fs FileSys) GetFso(path string) (FSysObj, error) {
 
 	fo := FSysObj{}
 
-	if strings.HasPrefix(path, "/") {
-		path = path[1:]
+	rootKey := ds.NewKey(fs.c, t, fs.RootDir.Name, 0, nil)
+	pathInc := stringspb.IncrementString(path)
+
+	q := ds.NewQuery(t).
+		Ancestor(rootKey).
+		Filter("SKey >=", path).
+		Filter("SKey <", pathInc).
+		Order("SKey").
+		Limit(1)
+
+	if !appengine.IsDevAppServer() {
+		q = ds.NewQuery(t).
+			Ancestor(rootKey).
+			Filter("SKey >=", path).
+			Order("SKey").
+			Limit(10)
 	}
 
-	if path == "" {
-		return fs.RootDir, nil
-	}
-
-	if strings.HasSuffix(path, "/") {
-		path = path[:len(path)-2]
-	}
-
-	dir, file := filepath.Split(path)
-
-	if dir == "" && file == "" {
-		return fs.RootDir, nil
-	}
-
-	fs.c.Infof("%-44v --------- %-28v -- %v", path, dir, file)
-
-	par, err := fs.GetFso(dir) // recurse
+	var children []FSysObj
+	_, err := q.GetAll(fs.c, &children)
 	if err != nil {
-		fs.c.Errorf("err getting fso: %v", err)
+		fs.c.Errorf("Error getting all children of %v => %v", fs.RootDir.Name, err)
 		return fo, err
+	} else {
+		fs.c.Infof(" got %v fso's between %v and %v", len(children), path, pathInc)
 	}
 
-	err = ds.Get(fs.c, par.Key, &fo)
-	if err != nil {
-		fs.c.Errorf("err fetching parent: %v", err)
-		return fo, err
+	for k, v := range children {
+		fs.c.Infof("%-4v => %v", k, v.SKey)
 	}
 
 	return fo, nil

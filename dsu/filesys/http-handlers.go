@@ -11,6 +11,9 @@ import (
 var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 var spf func(format string, a ...interface{}) string = fmt.Sprintf
 
+func counterReset(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+}
+
 func createFileSystem(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	rt := <-util.Counter
@@ -27,10 +30,14 @@ func createFileSystem(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fso2b := fs.newFso("ch2b", fso1.Key, true)
 	w.Write([]byte("child created " + fso2b.Name + "<br>\n"))
 
+	fso2c := fs.newFso("ch2c", fso1.Key, true)
+	w.Write([]byte("child created " + fso2c.Name + "<br>\n"))
+
 	fso3 := fs.newFso("ch3", fso2.Key, true)
 	w.Write([]byte("child created " + fso3.Name + "<br>\n"))
 
-	path := `/fso,mount000/fso,ch1/fso,ch2a`
+	path := ""
+	path = `/fso,mount000/fso,ch1/fso,ch2a`
 	path = `/fso,mount000/fso,ch1/fso,ch2a/fso,ch3`
 
 	fso4, err := fs.GetFso(path)
@@ -42,4 +49,5 @@ func createFileSystem(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 func init() {
 	http.HandleFunc("/fs/new", loghttp.Adapter(createFileSystem))
+	http.HandleFunc("/fs/reset", loghttp.Adapter(counterReset))
 }

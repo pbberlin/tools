@@ -1,25 +1,15 @@
 package filesys
 
 import (
+	"fmt"
 	"net/http"
-	"os"
+	"strings"
 	"time"
 
 	"appengine"
 
 	ds "appengine/datastore"
 )
-
-type FileInfo interface {
-	Name() string       // base name of the file
-	Size() int64        // length in bytes for regular files; system-dependent for others
-	Mode() os.FileMode  // file mode bits
-	ModTime() time.Time // modification time
-	IsDir() bool        // abbreviation for Mode().IsDir()
-	Sys() interface{}   // underlying data source (can return nil)
-
-	Parent() string // Added
-}
 
 // Filesystem
 type FileSys struct {
@@ -39,4 +29,24 @@ type FSysObj struct {
 
 	Key  *ds.Key
 	SKey string // from *ds.Key.Encode()
+}
+
+var t string
+
+func init() {
+	fo := FSysObj{}
+	t = fmt.Sprintf("%T", fo) // "kind"
+	t = "fso"
+}
+
+func NewFileSys(w http.ResponseWriter, r *http.Request, root string) FileSys {
+	fs := FileSys{}
+	fs.w = w
+	fs.r = r
+	fs.c = appengine.NewContext(r)
+	if strings.Contains(root, "/") {
+		panic("root can't have slash in it")
+	}
+	fs.RootDir = fs.newFsoByParentKey(root, nil, true)
+	return fs
 }

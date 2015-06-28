@@ -21,29 +21,27 @@ func createFileSystem(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fs := NewFileSys(w, r, rts)
 	w.Write([]byte("root  created " + rts + "<br>\n"))
 
-	fso1 := fs.newFso("ch1", fs.RootDir.Key, true)
+	fso1 := fs.newFsoByParentKey("ch1", fs.RootDir.Key, true)
 	w.Write([]byte("child created " + fso1.Name + "<br>\n"))
 
-	fso2 := fs.newFso("ch2a", fso1.Key, true)
+	fso2 := fs.newFsoByParentKey("ch2a", fso1.Key, true)
 	w.Write([]byte("child created " + fso2.Name + "<br>\n"))
 
-	fso2b := fs.newFso("ch2b", fso1.Key, true)
+	fso2b := fs.newFsoByParentKey("ch2b", fso1.Key, true)
 	w.Write([]byte("child created " + fso2b.Name + "<br>\n"))
 
-	fso2c := fs.newFso("ch2c", fso1.Key, true)
+	fso2c := fs.newFsoByParentKey("ch2c", fso1.Key, true)
 	w.Write([]byte("child created " + fso2c.Name + "<br>\n"))
 
-	fso3 := fs.newFso("ch3", fso2.Key, true)
+	fso3 := fs.newFsoByParentKey("ch3", fso2.Key, true)
 	w.Write([]byte("child created " + fso3.Name + "<br>\n"))
 
 	path := ""
-	path = `/fso,mount000/fso,ch1/fso,ch2a`
-	path = `/fso,mount000/fso,ch1/fso,ch2a/fso,ch3`
+	path = spf("/fso,%s/fso,ch1/fso,ch2a/fso,ch3", rts)
 
-	fso4, err := fs.GetFso(path)
-	w.Write([]byte("child retrieved " + fso4.Name + "<br>\n"))
-	w.Write([]byte("child retrieved " + fso4.SKey + "<br>\n"))
-	w.Write([]byte(" &nbsp; &nbsp; err " + spf("%v", err) + "<br>\n"))
+	fso4, err := fs.GetFsoByQuery(path)
+	loghttp.E(w, r, err, true)
+	loghttp.Pf(w, r, "child retrieved %v, %v<br>\n", fso4.Name, fso4.SKey)
 
 }
 

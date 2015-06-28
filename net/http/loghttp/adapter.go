@@ -19,7 +19,8 @@ import (
 	"appengine" // mjibson
 )
 
-var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/]*)$`)
+// added @ for /_ah/mail
+var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/@]*)$`)
 
 // works like an interface - functions just have to fit in the signature
 type ExtendedHandler func(http.ResponseWriter, *http.Request, map[string]interface{})

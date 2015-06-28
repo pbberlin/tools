@@ -1,8 +1,6 @@
 package filesys
 
 import (
-	"fmt"
-	"net/http"
 	"time"
 
 	"github.com/pbberlin/tools/stringspb"
@@ -11,26 +9,7 @@ import (
 	ds "appengine/datastore"
 )
 
-var t string
-
-func init() {
-	fo := FSysObj{}
-	t = fmt.Sprintf("%T", fo) // "kind"
-	t = "fso"
-}
-
-func NewFileSys(w http.ResponseWriter, r *http.Request, root string) FileSys {
-	fs := FileSys{}
-	fs.w = w
-	fs.r = r
-	fs.c = appengine.NewContext(r)
-
-	fs.RootDir = fs.newFso(root, nil, true)
-
-	return fs
-}
-
-func (fs FileSys) newFso(name string, parent *ds.Key, isDir bool) FSysObj {
+func (fs FileSys) newFsoByParentKey(name string, parent *ds.Key, isDir bool) FSysObj {
 
 	fo := FSysObj{}
 	fo.IsDir = isDir
@@ -58,7 +37,7 @@ func (fs FileSys) newFso(name string, parent *ds.Key, isDir bool) FSysObj {
 	return fo
 }
 
-func (fs FileSys) GetFso(path string) (FSysObj, error) {
+func (fs FileSys) GetFsoByQuery(path string) (FSysObj, error) {
 
 	fo := FSysObj{}
 
@@ -67,17 +46,18 @@ func (fs FileSys) GetFso(path string) (FSysObj, error) {
 
 	q := ds.NewQuery(t).
 		Ancestor(rootKey).
-		Filter("SKey >=", path).
-		Filter("SKey <", pathInc).
+		Filter("SKey>=", path).
+		Filter("SKey<", pathInc).
 		Order("SKey").
-		Limit(1)
+		Limit(4)
 
-	if !appengine.IsDevAppServer() {
+	if appengine.IsDevAppServer() {
 		q = ds.NewQuery(t).
 			Ancestor(rootKey).
-			Filter("SKey >=", path).
+			Filter("SKey>=", path).
+			Filter("SKey<", pathInc).
 			Order("SKey").
-			Limit(10)
+			Limit(4)
 	}
 
 	var children []FSysObj
@@ -86,11 +66,15 @@ func (fs FileSys) GetFso(path string) (FSysObj, error) {
 		fs.c.Errorf("Error getting all children of %v => %v", fs.RootDir.Name, err)
 		return fo, err
 	} else {
-		fs.c.Infof(" got %v fso's between %v and %v", len(children), path, pathInc)
+		fs.c.Infof(" got %v fso's between %v --- %v", len(children), path, pathInc)
 	}
 
 	for k, v := range children {
 		fs.c.Infof("%-4v => %v", k, v.SKey)
+	}
+	for _, v := range children {
+		fo = v
+		break
 	}
 
 	return fo, nil

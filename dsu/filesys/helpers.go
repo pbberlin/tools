@@ -1,4 +1,4 @@
-package nested
+package filesys
 
 import "path/filepath"
 

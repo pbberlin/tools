@@ -10,9 +10,11 @@ import (
 	ds "appengine/datastore"
 )
 
+// Make it pluggable between nested and rooted
+// Currently rooted is prefixed with rooted...
 type LowLevelArchitecture interface {
-	dirByPath(string) (Directory, error)
-	saveDirByPath(string) Directory
+	getDirByPath(string) (Directory, error)
+	saveDirByPath(string) (Directory, error)
 }
 
 // Filesystem
@@ -21,13 +23,13 @@ type FileSys struct {
 	r *http.Request       `datastore:"-"`
 	c appengine.Context   `datastore:"-"`
 
-	RootDir Directory
-	mount   string // name of mount point, for remount
+	RootDir Directory `datastore:"-"`
+	Mount   string    // name of mount point, for remount
 	LowLevelArchitecture
 }
 
 type Directory struct {
-	Fs    *FileSys // Reference to root
+	Fs    *FileSys `datastore:"-"` // Reference to root
 	Dir   string
 	Name  string
 	IsDir bool
@@ -38,7 +40,7 @@ type Directory struct {
 }
 
 type File struct {
-	Fs    *FileSys // Reference to root
+	Fs    *FileSys `datastore:"-"` // Reference to root
 	Dir   string
 	Name  string
 	IsDir bool
@@ -56,11 +58,13 @@ func NewFileSys(w http.ResponseWriter, r *http.Request, mount string) FileSys {
 	if strings.Contains(mount, "/") {
 		panic("mount can't have slash in it")
 	}
-	fs.mount = mount
+	fs.Mount = mount
 
-	// fs.RootDir = fs.newFsoByParentKey(root, nil, true)
-	// fs.LowLevelArchitecture = nested.Arch
-	// fs.LowLevelArchitecture = rooted.Arch
+	var err error
+	fs.RootDir, err = fs.saveDirUnderParent(fs.Mount, nil)
+	if err != nil {
+		panic(spf("%v", err))
+	}
 	return fs
 }
 

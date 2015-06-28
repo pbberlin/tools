@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+// The package types <Directory> and <File> should
+// implement some of these methods.
+// I was hoping to plug my package into
+//    filepath.Walk(File,WalkFunc)
+// But it seems impossible :(
+
 type FileInfo interface {
 	Name() string       // base name of the file
 	Size() int64        // length in bytes for regular files; system-dependent for others

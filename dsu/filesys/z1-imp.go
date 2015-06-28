@@ -1,15 +1,15 @@
-package nested
+package filesys
 
 import ds "appengine/datastore"
 
-func (fs Nested) CreateDir(path string) {
+func (fs FileSys) CreateDir(path string) {
 }
 
-func (fs Nested) recurseMkDir(path string) {
+func (fs FileSys) recurseMkDir(path string) {
 	if path == "" {
 		return
 	}
-	par, err := fs.dirByPath(path)
+	par, err := fs.getDirByPath(path)
 	_ = par
 	if err == ds.ErrNoSuchEntity {
 		par := parent(path)

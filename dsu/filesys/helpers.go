@@ -2,6 +2,9 @@ package filesys
 
 import "path/filepath"
 
-func parent(p string) string {
-	return (filepath.Dir(p))
+func parent(path string) string {
+	return (filepath.Dir(path))
+}
+func fileN(path string) string {
+	return (filepath.Base(path))
 }

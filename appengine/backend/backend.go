@@ -75,7 +75,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
-	htmlfrag.Wb(b1, "Filesystem New", "/fs/new")
+	htmlfrag.Wb(b1, "Filesystem of nested directories", "/fs/demo-nested-dirs")
+	htmlfrag.Wb(b1, "Filesystem keyed by fullpath", "/fs/demo-fullpath")
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

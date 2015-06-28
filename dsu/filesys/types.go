@@ -22,7 +22,8 @@ type FileSys struct {
 
 // Filesystem Object - a directory or a file
 type FSysObj struct {
-	fs    *FileSys
+	fs    *FileSys // Reference to root
+	Dir   string
 	Name  string
 	IsDir bool
 	Mod   time.Time

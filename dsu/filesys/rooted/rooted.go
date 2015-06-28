@@ -1,7 +1,6 @@
-package filesys
+package rooted
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -9,10 +8,12 @@ import (
 	ds "appengine/datastore"
 )
 
-func (fs FileSys) saveFsoByPath(path string, isDir bool) FSysObj {
+type Rooted FileSys
 
-	fo := FSysObj{}
-	fo.IsDir = isDir
+func (fs Rooted) saveDirByPath(path string) Directory {
+
+	fo := Directory{}
+	fo.IsDir = true
 	fo.Dir = parent(path)
 	fo.Name = fileN(path)
 	fo.Mod = time.Now()
@@ -25,13 +26,13 @@ func (fs FileSys) saveFsoByPath(path string, isDir bool) FSysObj {
 	effKey, err := ds.Put(fs.c, perfKey, &fo)
 
 	if err != nil {
-		fs.c.Errorf("%v  [%s]", err, fo.Key)
+		Fs.c.Errorf("%v  [%s]", err, fo.Key)
 	} else {
-		// fs.c.Infof("fso ds-saved - key %v [%v]", effKey, effKey.Encode())
+		// Fs.c.Infof("fso ds-saved - key %v [%v]", effKey, effKey.Encode())
 	}
 
 	if !perfKey.Equal(effKey) {
-		fs.c.Errorf("keys unequal %v - %v", perfKey, effKey)
+		Fs.c.Errorf("keys unequal %v - %v", perfKey, effKey)
 	}
 
 	// fo.Key = effKey
@@ -42,14 +43,14 @@ func (fs FileSys) saveFsoByPath(path string, isDir bool) FSysObj {
 	return fo
 }
 
-func (fs FileSys) getFsoByPath(path string) (FSysObj, error) {
+func (fs Rooted) dirByPath(path string) (Directory, error) {
 
-	fo := new(FSysObj)
+	fo := new(Directory)
 	perfKey := ds.NewKey(fs.c, t, path, 0, fs.RootDir.Key)
 	err := ds.Get(fs.c, perfKey, fo)
-	logif.E(err)
-	if fo == nil {
-		err = fmt.Errorf("No fso for path %v", path)
+	if err == ds.ErrNoSuchEntity {
+		return *fo, err
+	} else if err != nil {
 		logif.E(err)
 	}
 

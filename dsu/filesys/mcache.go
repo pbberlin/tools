@@ -6,7 +6,7 @@ import (
 	"appengine/memcache"
 )
 
-func (fso *FSysObj) MemCacheSet() {
+func (fso *Directory) MemCacheSet() {
 
 	miPut := &memcache.Item{
 		Key:        fso.SKey,
@@ -14,12 +14,12 @@ func (fso *FSysObj) MemCacheSet() {
 		Object:     &fso,
 		Expiration: 3600 * time.Second,
 	}
-	err := memcache.JSON.Set(fso.fs.c, miPut)
+	err := memcache.JSON.Set(fso.Fs.c, miPut)
 
 	if err != nil {
-		fso.fs.c.Errorf("fso memcachd %v - key %v", err, fso.SKey)
+		fso.Fs.c.Errorf("fso memcachd %v - key %v", err, fso.SKey)
 	} else {
-		fso.fs.c.Infof("fso memcachd - key %v", fso.SKey)
+		// fso.Fs.c.Infof("fso memcachd - key %v", fso.SKey)
 	}
 
 }

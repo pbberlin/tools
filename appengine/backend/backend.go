@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
+	_ "github.com/pbberlin/tools/dsu/filesys/nested"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -75,7 +76,6 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
-	htmlfrag.Wb(b1, "Filesystem of nested directories", "/fs/demo-nested-dirs")
 	htmlfrag.Wb(b1, "Filesystem keyed by fullpath", "/fs/demo-fullpath")
 
 	b1.WriteString("<br>\n")

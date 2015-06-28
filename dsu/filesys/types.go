@@ -1,7 +1,6 @@
 package filesys
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -11,18 +10,24 @@ import (
 	ds "appengine/datastore"
 )
 
+type LowLevelArchitecture interface {
+	dirByPath(string) (Directory, error)
+	saveDirByPath(string) Directory
+}
+
 // Filesystem
 type FileSys struct {
 	w http.ResponseWriter `datastore:"-"`
 	r *http.Request       `datastore:"-"`
 	c appengine.Context   `datastore:"-"`
 
-	RootDir FSysObj
+	RootDir Directory
+	mount   string // name of mount point, for remount
+	LowLevelArchitecture
 }
 
-// Filesystem Object - a directory or a file
-type FSysObj struct {
-	fs    *FileSys // Reference to root
+type Directory struct {
+	Fs    *FileSys // Reference to root
 	Dir   string
 	Name  string
 	IsDir bool
@@ -32,22 +37,33 @@ type FSysObj struct {
 	SKey string // from *ds.Key.Encode()
 }
 
-var t string
+type File struct {
+	Fs    *FileSys // Reference to root
+	Dir   string
+	Name  string
+	IsDir bool
+	Mod   time.Time
 
-func init() {
-	fo := FSysObj{}
-	t = fmt.Sprintf("%T", fo) // "kind"
-	t = "fso"
+	Key  *ds.Key
+	SKey string // from *ds.Key.Encode()
 }
 
-func NewFileSys(w http.ResponseWriter, r *http.Request, root string) FileSys {
+func NewFileSys(w http.ResponseWriter, r *http.Request, mount string) FileSys {
 	fs := FileSys{}
 	fs.w = w
 	fs.r = r
 	fs.c = appengine.NewContext(r)
-	if strings.Contains(root, "/") {
-		panic("root can't have slash in it")
+	if strings.Contains(mount, "/") {
+		panic("mount can't have slash in it")
 	}
-	fs.RootDir = fs.newFsoByParentKey(root, nil, true)
+	fs.mount = mount
+
+	// fs.RootDir = fs.newFsoByParentKey(root, nil, true)
+	// fs.LowLevelArchitecture = nested.Arch
+	// fs.LowLevelArchitecture = rooted.Arch
 	return fs
+}
+
+func (fs *FileSys) Ctx() appengine.Context {
+	return fs.c
 }

@@ -1,4 +1,4 @@
-package filesys
+package rooted
 
 import "path/filepath"
 

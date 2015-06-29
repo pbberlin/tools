@@ -1,4 +1,4 @@
-package pboauth
+package oauthpb
 
 import (
 	"fmt"

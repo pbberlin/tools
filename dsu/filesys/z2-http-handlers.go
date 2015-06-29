@@ -52,7 +52,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"ch1", "ch2"})
 	fc2([]string{"ch1", "cha2"})
 	fc2([]string{"ch1", "ch2", "ch3"})
-	fc2([]string{"nfso,mount000", "nfso,ch1", "ch2", "ch3"})
+	fc2([]string{"fso,mount000", "fso,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
 
 	loghttp.Pf(w, r, "-----------------<br>\n")
@@ -66,8 +66,8 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.Dir)
 		}
 	}
-	fc3(spf(`/nfso,%v/nfso,ch1/nfso,ch2/nfso,ch3`, rts))
-	fc3(spf(`/nfso,%v/nfso,ch1/ch2/ch3`, rts))
+	fc3(spf(`/fso,%v/fso,ch1/fso,ch2/fso,ch3`, rts))
+	fc3(spf(`/fso,%v/fso,ch1/ch2/ch3`, rts))
 
 	//
 }

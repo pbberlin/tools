@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/uruntime"
+	"github.com/pbberlin/tools/runtimepb"
 )
 
 /*
@@ -58,7 +58,7 @@ func E(w http.ResponseWriter, r *http.Request,
 	}
 
 	if err != nil {
-		line, file := uruntime.LineFileXUp(1)
+		line, file := runtimepb.LineFileXUp(1)
 		// we cannot determine, whether html is already sent
 		// we cannot determine, whether we are in plaintext or html context
 		// thus we need the <br>
@@ -105,7 +105,7 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 
 	// Write to log/gae-log
 	// Adding src code info
-	line, file := uruntime.LineFileXUp(1)
+	line, file := runtimepb.LineFileXUp(1)
 	s = fmt.Sprintf("%v \t\t- %v:%v", s, file, line)
 
 	// Log it

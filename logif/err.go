@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/uruntime"
+	"github.com/pbberlin/tools/runtimepb"
 )
 
 func init() {
@@ -48,7 +48,7 @@ func inner(e error, msg ...string) {
 	// dirLast := filepath.Base(dir)
 	// file = filepath.Join(dirLast, filepath.Base(file))
 
-	line, file := uruntime.LineFileXUp(2) // TWO steps up, inner() and logif.F / logif.E
+	line, file := runtimepb.LineFileXUp(2) // TWO steps up, inner() and logif.F / logif.E
 	if len(msg) > 0 {
 		s = fmt.Sprintf("ERR: %v - %v  \n\tSRC: %s:%d ", msg[0], e, file, line)
 	} else {
@@ -76,7 +76,7 @@ func inner(e error, msg ...string) {
 
 func Pf(format string, a ...interface{}) {
 	s := fmt.Sprintf(format, a...)
-	line, file := uruntime.LineFileXUp(1)
+	line, file := runtimepb.LineFileXUp(1)
 	s = fmt.Sprintf("%v - %v:%v", s, file, line)
 	log.SetFlags(0)
 	if loghttp.C == nil {

@@ -1,5 +1,5 @@
 // Package uruntime gives a stracktrace and traces memory allocactions.
-package uruntime
+package runtimepb
 
 import (
 	"fmt"
@@ -51,7 +51,7 @@ func alloc() uint64 {
 	Otherwise we simplify the checkpointing.
 	Simply call as follows
 
-	fLogger, fDumper := uruntime.AllocLogger()  // init and first checkpoint
+	fLogger, fDumper := runtimepb.AllocLogger()  // init and first checkpoint
 
 	fLogger() // checkpoint
 	...

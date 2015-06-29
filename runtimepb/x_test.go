@@ -1,4 +1,4 @@
-package uruntime
+package runtimepb
 
 import (
 	"fmt"

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pbberlin/tools/uruntime"
+	"github.com/pbberlin/tools/runtimepb"
 )
 
 var spf func(format string, a ...interface{}) string = fmt.Sprintf // plain and unchanged
@@ -20,7 +20,7 @@ var pf = func(format string, a ...interface{}) (int, error) { // new - a wrapper
 
 	if len(appStageLogs) == 0 || len(appStageLogs) < currStage-1 {
 		fmt.Printf("Premature pf() or appStageLogs too small (%v,%v) %s\n", len(appStageLogs), currStage, s)
-		uruntime.StackTrace(3)
+		runtimepb.StackTrace(3)
 		ExitWithLogDump()
 	}
 

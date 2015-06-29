@@ -28,10 +28,10 @@ func (fs *FileSys) GetDirByPathQuery(path string) (Directory, error) {
 	fo := Directory{}
 	fo.Fs = fs
 
-	rootKey := datastore.NewKey(fs.Ctx(), t, fs.RootDir.Name, 0, nil)
+	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.Name, 0, nil)
 	pathInc := stringspb.IncrementString(path)
 
-	q := datastore.NewQuery(t).
+	q := datastore.NewQuery(tdir).
 		Ancestor(rootKey).
 		Filter("SKey>=", path).
 		Filter("SKey<", pathInc).

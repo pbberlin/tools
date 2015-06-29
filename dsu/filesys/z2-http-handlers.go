@@ -21,9 +21,9 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc1 := func(p []string) {
 		path := filepath.Join(p...)
 		path = filepath.ToSlash(path)
-		fso1, err := fs.SaveDirByPath(path)
+		dir, err := fs.SaveDirByPath(path)
 		loghttp.E(w, r, err, true)
-		loghttp.Pf(w, r, "child created %v - %v <br>", fso1.Name, fso1.Key)
+		loghttp.Pf(w, r, "child created %v - %v <br>", dir.Name, dir.Key)
 	}
 
 	loghttp.Pf(w, r, "-----------------<br>\n")
@@ -52,7 +52,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"ch1", "ch2"})
 	fc2([]string{"ch1", "cha2"})
 	fc2([]string{"ch1", "ch2", "ch3"})
-	fc2([]string{"fso,mount000", "fso,ch1", "ch2", "ch3"})
+	fc2([]string{"fsd,mount000", "fsd,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
 
 	loghttp.Pf(w, r, "-----------------<br>\n")
@@ -66,8 +66,8 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.Dir)
 		}
 	}
-	fc3(spf(`/fso,%v/fso,ch1/fso,ch2/fso,ch3`, rts))
-	fc3(spf(`/fso,%v/fso,ch1/ch2/ch3`, rts))
+	fc3(spf(`/fsd,%v/fsd,ch1/fsd,ch2/fsd,ch3`, rts))
+	fc3(spf(`/fsd,%v/fsd,ch1/ch2/ch3`, rts))
 
 	//
 }

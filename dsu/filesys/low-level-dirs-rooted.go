@@ -25,7 +25,7 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 	fo.Mod = time.Now()
 	fo.Fs = fs
 
-	perfKey := ds.NewKey(fs.c, t, path, 0, fs.RootDir.Key)
+	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)
 
 	fo.Key = perfKey
 	fo.SKey = spf("%v", perfKey) // not effKey.Encode()
@@ -50,7 +50,7 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 func (fs *FileSys) rootedGetDirByPath(path string) (Directory, error) {
 	fo := Directory{}
 	fo.Fs = fs
-	perfKey := ds.NewKey(fs.c, t, path, 0, fs.RootDir.Key)
+	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)
 	fo.Key = perfKey
 	err := ds.Get(fs.c, perfKey, &fo)
 	if err == ds.ErrNoSuchEntity {

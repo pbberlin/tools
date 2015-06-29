@@ -22,7 +22,7 @@ func (fs *FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) 
 }
 
 func (fs *FileSys) getDirUnderParent(parKey *datastore.Key, childName string) (Directory, error) {
-	childKey := datastore.NewKey(fs.Ctx(), t, childName, 0, parKey)
+	childKey := datastore.NewKey(fs.Ctx(), tdir, childName, 0, parKey)
 	return fs.getDirByExactKey(childKey)
 }
 
@@ -37,7 +37,7 @@ func (fs *FileSys) saveDirUnderParent(name string, parent *datastore.Key) (Direc
 	fo.Mod = time.Now()
 	fo.Fs = fs
 
-	suggKey := datastore.NewKey(fs.Ctx(), t, name, 0, parent)
+	suggKey := datastore.NewKey(fs.Ctx(), tdir, name, 0, parent)
 	fo.Key = suggKey
 	fo.SKey = spf("%v", suggKey)
 

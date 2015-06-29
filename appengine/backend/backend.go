@@ -12,6 +12,7 @@ import (
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/proxy1"
+	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 )
@@ -22,6 +23,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	w.WriteHeader(http.StatusOK)
 
 	b1 := new(bytes.Buffer)
+	b1.WriteString(tplx.Head)
 
 	htmlfrag.Wb(b1, "Diverse", "")
 	htmlfrag.Wb(b1, "Login", "/login")
@@ -126,7 +128,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	logif.E(fmt.Errorf("fictive error that is *now* logged to gae. "))
 
-	w.Header().Set("Content-Type", "text/html")
+	b1.WriteString(tplx.Foot)
+
 	w.Write(b1.Bytes())
 
 }

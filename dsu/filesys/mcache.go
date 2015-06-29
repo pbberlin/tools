@@ -21,6 +21,7 @@ func (fso *Directory) MemCacheSet() {
 		// fso.Fs.c.Infof("fso memcachd - key %v", fso.SKey)
 	}
 }
+
 func (fso *File) MemCacheSet() {
 
 	miPut := &memcache.Item{

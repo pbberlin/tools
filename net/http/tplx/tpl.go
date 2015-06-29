@@ -72,6 +72,19 @@ const FurtherDefinition = "Further_Definition_"
 
 var dbg bool = false
 
+const Head = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+	<link rel="icon" href="data:;base64,=">
+	<title>static-title</title>
+  </head>
+  <body>`
+
+const Foot = `
+  </body>
+</html>`
+
 const c_page_scaffold_01 = `<!DOCTYPE html>
 <html>
   <head>

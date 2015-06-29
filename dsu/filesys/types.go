@@ -46,8 +46,9 @@ type File struct {
 	IsDir bool
 	Mod   time.Time
 
-	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
-	SKey string  // readable form; not from *ds.Key.Encode()
+	Key     *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
+	SKey    string  // readable form; not from *ds.Key.Encode()
+	Content []byte
 }
 
 func NewFileSys(w http.ResponseWriter, r *http.Request, mount string) FileSys {

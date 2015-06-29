@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
 )
@@ -69,6 +70,25 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc3(spf(`/fsd,%v/fsd,ch1/fsd,ch2/fsd,ch3`, rts))
 	fc3(spf(`/fsd,%v/fsd,ch1/ch2/ch3`, rts))
 
+	loghttp.Pf(w, r, "-----------------<br>\n")
+
+	f := File{}
+	f.Name = "file1"
+	f.Content = []byte("file content")
+
+	err := fs.SaveFile(&f, "ch1/ch2/ch3")
+	logif.E(err)
+
+	f.Name = "file2"
+	err = fs.SaveFile(&f, "ch1/ch2/ch3")
+	logif.E(err)
+
+	files, err := fs.GetFiles("ch1/ch2/ch3")
+	logif.E(err)
+
+	for k, v := range files {
+		loghttp.Pf(w, r, "%v  -  %v", k, v)
+	}
 	//
 }
 

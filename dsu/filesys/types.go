@@ -19,35 +19,35 @@ type LowLevelArchitecture interface {
 
 // Filesystem
 type FileSys struct {
-	w http.ResponseWriter `datastore:"-"`
-	r *http.Request       `datastore:"-"`
-	c appengine.Context   `datastore:"-"`
+	w http.ResponseWriter `datastore:"-" json:"-"`
+	r *http.Request       `datastore:"-" json:"-"`
+	c appengine.Context   `datastore:"-" json:"-"`
 
-	RootDir Directory `datastore:"-"`
-	Mount   string    // name of mount point, for remount
+	RootDir Directory
+	Mount   string // name of mount point, for remount
 	LowLevelArchitecture
 }
 
 type Directory struct {
-	Fs    *FileSys `datastore:"-"` // Reference to root
+	Fs    *FileSys `datastore:"-" json:"-"` // Reference to root
 	Dir   string
 	Name  string
 	IsDir bool
 	Mod   time.Time
 
-	Key  *ds.Key
-	SKey string // from *ds.Key.Encode()
+	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
+	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
 type File struct {
-	Fs    *FileSys `datastore:"-"` // Reference to root
+	Fs    *FileSys `datastore:"-" json:"-"` // Reference to root
 	Dir   string
 	Name  string
 	IsDir bool
 	Mod   time.Time
 
-	Key  *ds.Key
-	SKey string // from *ds.Key.Encode()
+	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
+	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
 func NewFileSys(w http.ResponseWriter, r *http.Request, mount string) FileSys {

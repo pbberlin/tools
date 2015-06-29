@@ -8,8 +8,10 @@ import (
 	"appengine/datastore"
 )
 
-func (fs FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) {
+func (fs *FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) {
 	fo := Directory{}
+	fo.Fs = fs
+	fo.Key = exactKey
 	err := datastore.Get(fs.c, exactKey, &fo)
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
@@ -19,7 +21,7 @@ func (fs FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) {
 	return fo, err
 }
 
-func (fs FileSys) getDirUnderParent(parKey *datastore.Key, childName string) (Directory, error) {
+func (fs *FileSys) getDirUnderParent(parKey *datastore.Key, childName string) (Directory, error) {
 	childKey := datastore.NewKey(fs.Ctx(), t, childName, 0, parKey)
 	return fs.getDirByExactKey(childKey)
 }
@@ -37,7 +39,7 @@ func (fs *FileSys) saveDirUnderParent(name string, parent *datastore.Key) (Direc
 
 	suggKey := datastore.NewKey(fs.Ctx(), t, name, 0, parent)
 	fo.Key = suggKey
-	fo.SKey = spf("%v", suggKey) // not effKey.Encode()
+	fo.SKey = spf("%v", suggKey)
 
 	effKey, err := datastore.Put(fs.Ctx(), suggKey, &fo)
 
@@ -49,7 +51,7 @@ func (fs *FileSys) saveDirUnderParent(name string, parent *datastore.Key) (Direc
 		fs.Ctx().Errorf("keys unequal %v - %v", suggKey, effKey)
 	}
 
-	// fo.MemCacheSet()
+	fo.MemCacheSet()
 
 	return fo, nil
 }

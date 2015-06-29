@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"path/filepath"
-	"runtime"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/uruntime"
 )
 
 /*
@@ -59,11 +58,7 @@ func E(w http.ResponseWriter, r *http.Request,
 	}
 
 	if err != nil {
-		_, file, line, _ := runtime.Caller(1)
-		dir := filepath.Dir(file)
-		dirLast := filepath.Base(dir)
-		file = filepath.Join(dirLast, filepath.Base(file))
-
+		line, file := uruntime.LineFileXUp(1)
 		// we cannot determine, whether html is already sent
 		// we cannot determine, whether we are in plaintext or html context
 		// thus we need the <br>
@@ -99,19 +94,28 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	// Prepare the string
 	var s string
 	if len(vs) > 0 {
-		s = fmt.Sprintf(f, vs...) + "\n"
+		s = fmt.Sprintf(f, vs...)
 	} else {
 		s = f
 	}
 
+	// Write it to http response
+	w.Write([]byte(s))
+	w.Write([]byte{'\n'})
+
+	// Write to log/gae-log
+	// Adding src code info
+	line, file := uruntime.LineFileXUp(1)
+	s = fmt.Sprintf("%v \t\t- %v:%v", s, file, line)
+
 	// Log it
 	c, _ := util_appengine.SafeGaeCheck(r)
 	if c == nil {
+		// log.SetFlags(0)
 		log.Printf(s)
+		// log.SetFlags(log.Lshortfile)
 	} else {
 		c.Infof(s)
 	}
 
-	// Write it to http response
-	w.Write([]byte(s))
 }

@@ -5,18 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/uruntime"
 )
 
 func init() {
-	setFlags()
+	restoreLogFlags()
 	log.SetPrefix("#")
 }
 
-func setFlags() {
+func restoreLogFlags() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	log.SetFlags(log.Lshortfile)
 }
@@ -44,33 +43,46 @@ func F(e error, msg ...string) {
 
 func inner(e error, msg ...string) {
 	var s string
-	_, file, line, _ := runtime.Caller(2) // TWO steps up
-	dir := filepath.Dir(file)
-	dirLast := filepath.Base(dir)
-	file = filepath.Join(dirLast, filepath.Base(file))
+	// _, file, line, _ := runtime.Caller(2) // TWO steps up
+	// dir := filepath.Dir(file)
+	// dirLast := filepath.Base(dir)
+	// file = filepath.Join(dirLast, filepath.Base(file))
+
+	line, file := uruntime.LineFileXUp(2) // TWO steps up, inner() and logif.F / logif.E
 	if len(msg) > 0 {
-		s = fmt.Sprintf("ERR: %v - %v  \n\tSRC: %s:%d \n", msg[0], e, file, line)
+		s = fmt.Sprintf("ERR: %v - %v  \n\tSRC: %s:%d ", msg[0], e, file, line)
 	} else {
-		s = fmt.Sprintf("ERR: %v  \n\tSRC: %s:%d \n", e, file, line)
+		s = fmt.Sprintf("ERR: %v  \n\tSRC: %s:%d ", e, file, line)
 	}
 
 	// Since codeline points to *this* helper-func
 	// we would like to logger with time only.
 	//   lg1 = log.New(os.Stdout, "#", 0)
 	// but it would not be  written under appengine, because of os.Stdout
-
 	log.SetFlags(0)
-	log.Printf(s)
-
-	if loghttp.C != nil {
+	if loghttp.C == nil {
+		log.Printf(s)
+	} else {
 		// This is of course criminal,
 		// since loghttp.C is not syncronized.
 		// The message might appear under a *wrong* request.
 		// But it's the only way to make
 		// ordinary log messages available.
-		loghttp.C.Infof(fmt.Sprintf("volatile logif mapping: %s", s))
+		loghttp.C.Infof(fmt.Sprintf("%s - volat req assign", s))
 	}
+	restoreLogFlags() // restore
 
-	setFlags() // restore
+}
 
+func Pf(format string, a ...interface{}) {
+	s := fmt.Sprintf(format, a...)
+	line, file := uruntime.LineFileXUp(1)
+	s = fmt.Sprintf("%v - %v:%v", s, file, line)
+	log.SetFlags(0)
+	if loghttp.C == nil {
+		log.Printf(s)
+	} else {
+		loghttp.C.Infof(fmt.Sprintf("%s - volat req assign", s))
+	}
+	restoreLogFlags() // restore
 }

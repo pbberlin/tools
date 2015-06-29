@@ -1,6 +1,7 @@
 package filesys
 
 import (
+	"path/filepath"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -18,8 +19,9 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 
 	fo := Directory{}
 	fo.IsDir = true
-	fo.Dir = parent(path)
-	fo.Name = fileN(path)
+	dir, base := filepath.Split(path)
+	fo.Dir = dir
+	fo.Name = base
 	fo.Mod = time.Now()
 	fo.Fs = fs
 
@@ -45,10 +47,12 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 
 // Retrieves a directory in one go.
 // But only if it was saved with rootedSaveDirByPath.
-func (fs FileSys) rootedGetDirByPath(path string) (Directory, error) {
+func (fs *FileSys) rootedGetDirByPath(path string) (Directory, error) {
 	fo := Directory{}
+	fo.Fs = fs
 	perfKey := ds.NewKey(fs.c, t, path, 0, fs.RootDir.Key)
-	err := ds.Get(fs.c, perfKey, fo)
+	fo.Key = perfKey
+	err := ds.Get(fs.c, perfKey, &fo)
 	if err == ds.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {

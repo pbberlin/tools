@@ -23,9 +23,10 @@ import (
 //
 // If a range scan over a huge directory tree is neccessary,
 // the func could easily be enhanced for range scans.
-func (fs FileSys) GetDirByPathQuery(path string) (Directory, error) {
+func (fs *FileSys) GetDirByPathQuery(path string) (Directory, error) {
 
 	fo := Directory{}
+	fo.Fs = fs
 
 	rootKey := datastore.NewKey(fs.Ctx(), t, fs.RootDir.Name, 0, nil)
 	pathInc := stringspb.IncrementString(path)
@@ -42,7 +43,7 @@ func (fs FileSys) GetDirByPathQuery(path string) (Directory, error) {
 	}
 
 	var children []Directory
-	_, err := q.GetAll(fs.Ctx(), &children)
+	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
 		fs.Ctx().Errorf("Error getting all children of %v => %v", fs.RootDir.Name, err)
 		return fo, err
@@ -57,6 +58,10 @@ func (fs FileSys) GetDirByPathQuery(path string) (Directory, error) {
 		return fo, fmt.Errorf(
 			"Query found no result. The SKey index is only eventual consistent.")
 	}
+
+	children[0].Fs = fs
+	children[0].Key = keys[0]
+
 	return children[0], nil
 
 }

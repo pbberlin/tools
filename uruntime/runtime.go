@@ -4,6 +4,7 @@ package uruntime
 import (
 	"fmt"
 	"log"
+	"path/filepath"
 	"runtime"
 )
 
@@ -16,6 +17,14 @@ func StackTrace(max int) {
 		_, file, line, _ := runtime.Caller(i)
 		log.Printf("        %s:%d ", file, line)
 	}
+}
+
+func LineFileXUp(levelsUp int) (int, string) {
+	_, file, line, _ := runtime.Caller(levelsUp + 1) // plus one for myself-func
+	dir := filepath.Dir(file)
+	dirLast := filepath.Base(dir)
+	file = filepath.Join(dirLast, filepath.Base(file))
+	return line, file
 }
 
 /*

@@ -1,4 +1,4 @@
-package filesys
+package gaefs
 
 import "fmt"
 

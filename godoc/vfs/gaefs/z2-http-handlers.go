@@ -1,9 +1,11 @@
-package filesys
+package gaefs
 
 import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+
+	"appengine"
 
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -11,15 +13,17 @@ import (
 	"github.com/pbberlin/tools/util"
 )
 
+var nestedOrRooted = true
+
 func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	fmt.Fprint(w, tplx.Head)
 
-	NestedOrRooted = !NestedOrRooted
+	nestedOrRooted = !nestedOrRooted
 
 	rt := <-util.Counter
 	rts := fmt.Sprintf("mount%03v", rt)
-	fs := NewFileSys(w, r, rts)
+	fs := NewFs(rts, appengine.NewContext(r), nestedOrRooted)
 	loghttp.Pf(w, r, "created fs %v<br>\n", rts)
 
 	fc1 := func(p []string) {
@@ -79,7 +83,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	f.Name = "file1"
 	f.Content = []byte("file content")
 
-	err := fs.SaveFile(&f, "ch1/ch2/ch3")
+	err := fs.SaveFile(&f, "ch1/ch2")
 	logif.E(err)
 
 	f.Name = "file2"

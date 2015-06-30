@@ -1,7 +1,6 @@
-package filesys
+package gaefs
 
 import (
-	"net/http"
 	"strings"
 	"time"
 
@@ -19,9 +18,11 @@ type LowLevelArchitecture interface {
 
 // Filesystem
 type FileSys struct {
-	w http.ResponseWriter `datastore:"-" json:"-"`
-	r *http.Request       `datastore:"-" json:"-"`
-	c appengine.Context   `datastore:"-" json:"-"`
+	// w http.ResponseWriter `datastore:"-" json:"-"`
+	// r *http.Request       `datastore:"-" json:"-"`
+	c appengine.Context `datastore:"-" json:"-"`
+
+	rooted bool // default would be nested; <nested, rooted>
 
 	RootDir Directory
 	Mount   string // name of mount point, for remount
@@ -51,11 +52,18 @@ type File struct {
 	Content []byte
 }
 
-func NewFileSys(w http.ResponseWriter, r *http.Request, mount string) FileSys {
+func OS(mount string) FileSys {
+	panic(`
+		Sadly, google app engine file system requires a
+	 	http.Request based context object.
+	 	Use NewFs(string, appengine.Context) instead of OS.
+	`)
+}
+
+func NewFs(mount string, c appengine.Context, rooted bool) FileSys {
 	fs := FileSys{}
-	fs.w = w
-	fs.r = r
-	fs.c = appengine.NewContext(r)
+	fs.c = c
+	fs.rooted = rooted
 	if strings.Contains(mount, "/") {
 		panic("mount can't have slash in it")
 	}

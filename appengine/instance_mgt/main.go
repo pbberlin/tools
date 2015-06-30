@@ -80,7 +80,7 @@ func (i *Instance) String() string {
 }
 
 func collectInfo(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	Get(w, r, m)
+	Get(appengine.NewContext(r), m)
 }
 
 func onStart(w http.ResponseWriter, r *http.Request) {

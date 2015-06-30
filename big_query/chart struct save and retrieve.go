@@ -24,6 +24,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"appengine"
+
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
@@ -41,6 +43,8 @@ type CData struct {
 
 func SaveChartDataToDatastore(w http.ResponseWriter, r *http.Request, cd CData, key string) string {
 
+	c := appengine.NewContext(r)
+
 	internalType := fmt.Sprintf("%T", cd)
 	//buffBytes, _	 := StringToVByte(s)  // instead of []byte(s)
 
@@ -50,7 +54,7 @@ func SaveChartDataToDatastore(w http.ResponseWriter, r *http.Request, cd CData, 
 	err := enc.Encode(cd)
 	loghttp.E(w, r, err, false)
 
-	key_combi, err := dsu.BufPut(w, r,
+	key_combi, err := dsu.BufPut(c,
 		dsu.WrapBlob{Name: key, VByte: serializedStruct.Bytes(), S: internalType}, key)
 	loghttp.E(w, r, err, false)
 
@@ -59,9 +63,11 @@ func SaveChartDataToDatastore(w http.ResponseWriter, r *http.Request, cd CData, 
 
 func GetChartDataFromDatastore(w http.ResponseWriter, r *http.Request, key string) *CData {
 
+	c := appengine.NewContext(r)
+
 	key_combi := "dsu.WrapBlob__" + key
 
-	dsObj, err := dsu.BufGet(w, r, key_combi)
+	dsObj, err := dsu.BufGet(c, key_combi)
 	loghttp.E(w, r, err, false)
 
 	serializedStruct := bytes.NewBuffer(dsObj.VByte)
@@ -74,6 +80,8 @@ func GetChartDataFromDatastore(w http.ResponseWriter, r *http.Request, key strin
 }
 
 func testGobDecodeEncode(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	nx := 24
 
@@ -99,11 +107,11 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request, m map[string]in
 	fmt.Fprintf(w, "byte data: \n%#v...%#v\n", sx[0:nx], sx[lx-nx:])
 
 	// saving to ds
-	key_combi, err := dsu.BufPut(w, r,
+	key_combi, err := dsu.BufPut(c,
 		dsu.WrapBlob{Name: "chart_data_test_1", VByte: serializedStruct.Bytes(), S: "chart data"}, "chart_data_test_1")
 	loghttp.E(w, r, err, false)
 	// restoring from ds
-	dsObj, err := dsu.BufGet(w, r, key_combi)
+	dsObj, err := dsu.BufGet(c, key_combi)
 	loghttp.E(w, r, err, false)
 
 	p := r.FormValue("p")
@@ -131,7 +139,7 @@ func testGobDecodeEncode(w http.ResponseWriter, r *http.Request, m map[string]in
 	fmt.Fprintf(w, "\n\n")
 	SaveChartDataToDatastore(w, r, orig, "chart_data_test_2")
 
-	dsObj2, err := dsu.BufGet(w, r, "dsu.WrapBlob__chart_data_test_2")
+	dsObj2, err := dsu.BufGet(c, "dsu.WrapBlob__chart_data_test_2")
 	loghttp.E(w, r, err, false)
 	{
 

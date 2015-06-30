@@ -109,7 +109,7 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request, mx map[string]
 		blob := dsu.WrapBlob{Name: subject + "from " + from + "to " + to,
 			S: boundary, VByte: b1.Bytes()}
 		blob.VVByte, _ = conv.String_to_VVByte(b1.String())
-		dsu.BufPut(w, r, blob, "email-"+util.TimeMarker())
+		dsu.BufPut(c, blob, "email-"+util.TimeMarker())
 	}
 
 }

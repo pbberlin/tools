@@ -7,7 +7,7 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
-	_ "github.com/pbberlin/tools/dsu/filesys" // only http handler registration
+	_ "github.com/pbberlin/tools/godoc/vfs/gaefs" // only http handler registration
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"

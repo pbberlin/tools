@@ -1,8 +1,6 @@
 package instance_mgt
 
 import (
-	"net/http"
-
 	"appengine"
 	"appengine/module"
 
@@ -11,15 +9,13 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/stringspb"
 )
 
 var ii = new(Instance)
 
-func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Instance {
-
-	c := appengine.NewContext(r)
+func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
 	startFunc := time.Now()
 
@@ -64,7 +60,7 @@ func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Inst
 
 		if !util_appengine.IsLocalEnviron() {
 			ii.NumInstances, err = module.NumInstances(c, ii.ModuleName, ii.VersionMajor)
-			loghttp.E(w, r, err, true, "get num instances works only live and without autoscale")
+			logif.E(err, "get num instances works only live and without autoscale")
 		}
 
 	}
@@ -79,7 +75,7 @@ func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Inst
 
 	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName,
 		ii.VersionMajor, "")
-	loghttp.E(w, r, err, false)
+	logif.F(err)
 
 	if !util_appengine.IsLocalEnviron() {
 		ii.HostnameInst0, err = appengine.ModuleHostname(c, ii.ModuleName,
@@ -88,7 +84,7 @@ func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Inst
 			c.Infof("inst 0: " + autoScalingErrMsg)
 			err = nil
 		}
-		loghttp.E(w, r, err, true)
+		logif.E(err)
 
 		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName,
 			ii.VersionMajor, "1")
@@ -96,10 +92,10 @@ func Get(w http.ResponseWriter, r *http.Request, m map[string]interface{}) *Inst
 			c.Infof("inst 1: " + autoScalingErrMsg)
 			err = nil
 		}
-		loghttp.E(w, r, err, true)
+		logif.E(err)
 
 		ii.HostnameMod02, err = appengine.ModuleHostname(c, "mod02", "", "")
-		loghttp.E(w, r, err, true)
+		logif.E(err)
 
 	}
 

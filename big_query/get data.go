@@ -120,8 +120,8 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 		vVDest[i0] = []byte(b_row.Bytes())
 	}
 
-	key_combi, _ := dsu.BufPut(w, r, dsu.WrapBlob{Name: "bq_res1", VVByte: vVDest}, "bq_res1")
-	dsObj, _ := dsu.BufGet(w, r, key_combi)
+	key_combi, _ := dsu.BufPut(c, dsu.WrapBlob{Name: "bq_res1", VVByte: vVDest}, "bq_res1")
+	dsObj, _ := dsu.BufGet(c, key_combi)
 
 	printPlaintextTable(w, r, dsObj.VVByte)
 
@@ -130,6 +130,8 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 }
 
 func mockDateIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -168,14 +170,16 @@ func mockDateIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]
 
 	}
 
-	key_combi, _ := dsu.BufPut(w, r, dsu.WrapBlob{Name: "bq_res_test", VVByte: vVDest}, "bq_res_test")
-	dsObj, _ := dsu.BufGet(w, r, key_combi)
+	key_combi, _ := dsu.BufPut(c, dsu.WrapBlob{Name: "bq_res_test", VVByte: vVDest}, "bq_res_test")
+	dsObj, _ := dsu.BufGet(c, key_combi)
 
 	printPlaintextTable(w, r, dsObj.VVByte)
 
 }
 
 func regroupFromDatastore01(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	b1 := new(bytes.Buffer)
 	defer func() {
@@ -188,12 +192,12 @@ func regroupFromDatastore01(w http.ResponseWriter, r *http.Request, m map[string
 	if util_appengine.IsLocalEnviron() {
 		vVSrc = bq_statified_res1
 	} else {
-		dsObj1, _ := dsu.BufGet(w, r, "dsu.WrapBlob__bq_res1")
+		dsObj1, _ := dsu.BufGet(c, "dsu.WrapBlob__bq_res1")
 		vVSrc = dsObj1.VVByte
 	}
 
 	if r.FormValue("mock") == "1" {
-		dsObj1, _ := dsu.BufGet(w, r, "dsu.WrapBlob__bq_res_test")
+		dsObj1, _ := dsu.BufGet(c, "dsu.WrapBlob__bq_res_test")
 		vVSrc = dsObj1.VVByte
 	}
 
@@ -213,14 +217,16 @@ func regroupFromDatastore01(w http.ResponseWriter, r *http.Request, m map[string
 
 	}
 
-	key_combi, _ := dsu.BufPut(w, r, dsu.WrapBlob{Name: "res_processed_01", S: "[][]byte", VVByte: vVDest}, "res_processed_01")
-	dsObj2, _ := dsu.BufGet(w, r, key_combi)
+	key_combi, _ := dsu.BufPut(c, dsu.WrapBlob{Name: "res_processed_01", S: "[][]byte", VVByte: vVDest}, "res_processed_01")
+	dsObj2, _ := dsu.BufGet(c, key_combi)
 
 	printPlaintextTable(w, r, dsObj2.VVByte)
 
 }
 
 func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
 
 	b1 := new(bytes.Buffer)
 	defer func() {
@@ -229,7 +235,7 @@ func regroupFromDatastore02(w http.ResponseWriter, r *http.Request, m map[string
 	}()
 
 	var vVSrc [][]byte
-	dsObj1, err := dsu.BufGet(w, r, "dsu.WrapBlob__res_processed_01")
+	dsObj1, err := dsu.BufGet(c, "dsu.WrapBlob__res_processed_01")
 	loghttp.E(w, r, err, false)
 	vVSrc = dsObj1.VVByte
 

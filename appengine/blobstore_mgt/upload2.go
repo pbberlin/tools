@@ -396,6 +396,8 @@ func dataStoreClone(w http.ResponseWriter, r *http.Request,
 
 	return
 
+	c := appengine.NewContext(r)
+
 	wbl := dsu.WrapBlob{}
 	wbl.Category = "print"
 	wbl.Name = otherFormFields["title"][0] + " - " + otherFormFields["descr"][0]
@@ -407,7 +409,7 @@ func dataStoreClone(w http.ResponseWriter, r *http.Request,
 		wbl.VByte = []byte(filecontent)
 	}
 	keyX2 := "bl" + time.Now().Format("060102_1504-05")
-	_, errDS := dsu.BufPut(w, r, wbl, keyX2)
+	_, errDS := dsu.BufPut(c, wbl, keyX2)
 	loghttp.E(w, r, errDS, false)
 
 }

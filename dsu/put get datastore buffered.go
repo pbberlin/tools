@@ -19,9 +19,7 @@ import (
 
 // BufPut - buffered put - saves its contents to memory, to memcache and the datastore
 //   Todo: Don't buffer in local memory.
-func BufPut(w http.ResponseWriter, r *http.Request, wb WrapBlob, skey string) (mkk string, errClosure error) {
-
-	c := appengine.NewContext(r)
+func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosure error) {
 
 	t := fmt.Sprintf("%T", wb)
 	mkk = t + "__" + skey // kombi key
@@ -32,7 +30,7 @@ func BufPut(w http.ResponseWriter, r *http.Request, wb WrapBlob, skey string) (m
 			_, err := datastore.Put(c, dskey1, &wb)
 			McacheSet(c, mkk, wb)
 			memoryInstanceStore[mkk] = &wb
-			multiCastInstanceCacheChange(w, r, mkk)
+			multiCastInstanceCacheChange(c, mkk)
 			c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
 			return err
 		}, nil)
@@ -43,9 +41,8 @@ func BufPut(w http.ResponseWriter, r *http.Request, wb WrapBlob, skey string) (m
 
 // BufGet - buffered get - fetches value from memory, or from memcache or from the datastore
 //   todo: Paramter to reach "through" to datastore - without the buffer layers
-func BufGet(w http.ResponseWriter, r *http.Request, mkk string) (WrapBlob, error) {
+func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 
-	c := appengine.NewContext(r)
 	wb1 := new(WrapBlob)
 
 	// first check instance memory
@@ -89,11 +86,9 @@ func BufGet(w http.ResponseWriter, r *http.Request, mkk string) (WrapBlob, error
 	return wb2, nil
 }
 
-func multiCastInstanceCacheChange(w http.ResponseWriter, r *http.Request, mkk string) {
+func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 
-	c := appengine.NewContext(r)
-
-	ii := instance_mgt.Get(w, r, map[string]interface{}{})
+	ii := instance_mgt.Get(c, map[string]interface{}{})
 
 	/*
 		making a get request to all instances
@@ -144,7 +139,7 @@ func invalidate(w http.ResponseWriter, r *http.Request) {
 
 	c := appengine.NewContext(r)
 
-	ii := instance_mgt.Get(w, r, map[string]interface{}{})
+	ii := instance_mgt.Get(c, map[string]interface{}{})
 
 	mkk := r.FormValue("mkk")
 	sii := r.FormValue("senderInstanceId")
@@ -171,7 +166,8 @@ func showDsuObject(w http.ResponseWriter, r *http.Request) {
 	if r.FormValue("mkk") != "" {
 		mkk = r.FormValue("mkk")
 
-		b, err := BufGet(w, r, mkk)
+		c := appengine.NewContext(r)
+		b, err := BufGet(c, mkk)
 		if err != nil {
 			w.Write([]byte(fmt.Sprintf("%v", err)))
 			return

@@ -97,12 +97,14 @@ func imagevariAsBase64(w http.ResponseWriter, r *http.Request, m map[string]inte
 
 func datastoreAsBase64(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	c := appengine.NewContext(r)
+
 	p := r.FormValue("p")
 	if p == "" {
 		p = "chart1"
 	}
 
-	dsObj, _ := dsu.BufGet(w, r, "dsu.WrapBlob__"+p)
+	dsObj, _ := dsu.BufGet(c, "dsu.WrapBlob__"+p)
 
 	w.Header().Set("Content-Type", "text/html")
 	io.WriteString(w, "<p>Image embedded in HTML as Base64:</p><img width=200px src=\"")

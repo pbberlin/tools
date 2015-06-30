@@ -20,10 +20,12 @@ import (
 
 func SaveImageToDatastore(w http.ResponseWriter, r *http.Request, i *image.RGBA, key string) string {
 
+	c := appengine.NewContext(r)
+
 	s := conv.Rgba_img_to_base64_str(i)
 	internalType := fmt.Sprintf("%T", i)
 	//buffBytes, _     := StringToVByte(s)  // instead of []byte(s)
-	key_combi, err := dsu.BufPut(w, r, dsu.WrapBlob{Name: key, VByte: []byte(s), S: internalType}, key)
+	key_combi, err := dsu.BufPut(c, dsu.WrapBlob{Name: key, VByte: []byte(s), S: internalType}, key)
 	loghttp.E(w, r, err, false)
 
 	return key_combi
@@ -34,7 +36,7 @@ func GetImageFromDatastore(w http.ResponseWriter, r *http.Request, key string) *
 
 	c := appengine.NewContext(r)
 
-	dsObj, err := dsu.BufGet(w, r, "dsu.WrapBlob__"+key)
+	dsObj, err := dsu.BufGet(c, "dsu.WrapBlob__"+key)
 	loghttp.E(w, r, err, false)
 
 	s := string(dsObj.VByte)

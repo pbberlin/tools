@@ -6,6 +6,7 @@ import (
 	pth "path"
 
 	"appengine"
+	"appengine/datastore"
 
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -15,6 +16,31 @@ import (
 
 var nestedOrRooted = true
 
+func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	c := appengine.NewContext(r)
+
+	{
+		q := datastore.NewQuery(tfil).KeysOnly()
+		var files []File
+		keys, err := q.GetAll(c, &files)
+		loghttp.E(w, r, err, false)
+		err = datastore.DeleteMulti(c, keys)
+		loghttp.E(w, r, err, false)
+		loghttp.Pf(w, r, "%v files deleted", len(keys))
+	}
+
+	{
+		q := datastore.NewQuery(tdir).KeysOnly()
+		var dirs []Directory
+		keys, err := q.GetAll(c, &dirs)
+		loghttp.E(w, r, err, false)
+		err = datastore.DeleteMulti(c, keys)
+		loghttp.E(w, r, err, false)
+		loghttp.Pf(w, r, "%v directories deleted", len(keys))
+	}
+
+}
 func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	fmt.Fprint(w, tplx.Head)
@@ -103,5 +129,6 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 }
 
 func init() {
-	http.HandleFunc("/fs/demo-fullpath", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/vfs-gae-demo", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/delete-all", loghttp.Adapter(deleteAll))
 }

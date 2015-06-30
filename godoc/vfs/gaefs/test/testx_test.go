@@ -22,11 +22,24 @@ func Test1(t *testing.T) {
 
 	fs := gaefs.NewFs("rootX", c, false)
 
-	// note: paths must start with a slash!
-	f, err := fs.Open("/test.txt")
+	dir, err := fs.SaveDirByPath("/xx")
+	_ = dir
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer f.Close()
-	io.Copy(os.Stdout, f)
+
+	f := gaefs.File{}
+	f.Name = "test.txt"
+	f.Content = []byte("\tsome text content\n")
+	err = fs.SaveFile(&f, "/xx")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	rdr, err := fs.Open("xx/test.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// defer rdr.Close()
+	io.Copy(os.Stdout, rdr)
 }

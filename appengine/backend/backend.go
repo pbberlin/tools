@@ -78,7 +78,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
-	htmlfrag.Wb(b1, "Filesystem keyed by fullpath", "/fs/demo-fullpath")
+	htmlfrag.Wb(b1, "Filesystem on gae", "/fs/vfs-gae-demo")
+	htmlfrag.Wb(b1, "Delete fs on gae", "/fs/delete-all")
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

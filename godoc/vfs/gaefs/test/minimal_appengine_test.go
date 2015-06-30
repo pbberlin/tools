@@ -7,7 +7,7 @@ import (
 	"appengine/aetest"
 )
 
-func XXX_TestMyFunction(t *testing.T) {
+func UncommentThis_TestMyFunction(t *testing.T) {
 	c, err := aetest.NewContext(nil)
 	if err != nil {
 		log.Printf("%v\n", err)

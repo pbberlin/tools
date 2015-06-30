@@ -107,7 +107,7 @@ func (fs *FileSys) SaveFile(f *File, path string) error {
 		fs.Ctx().Errorf("keys unequal %v - %v", suggKey, effKey)
 	}
 
-	f.MemCacheSet()
+	// f.MemCacheSet()
 
 	return nil
 }

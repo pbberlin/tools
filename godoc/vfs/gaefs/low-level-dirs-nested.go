@@ -4,8 +4,6 @@ import (
 	pth "path"
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
-
 	"appengine/datastore"
 )
 
@@ -19,7 +17,7 @@ func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 	// moving top down
 	for {
 		dirs := strings.Split(path, sep)
-		logif.Pf("so far 2 %v - %v - --%v--", path, dirs, childDir.Key)
+		// logif.Pf("so far 2 %v - %v - --%v--", path, dirs, childDir.Key)
 		childDir, err = fs.getDirUnderParent(childDir.Key, dirs[0])
 		if err != nil {
 			return childDir, err

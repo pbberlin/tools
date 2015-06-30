@@ -9,13 +9,6 @@ import (
 	ds "appengine/datastore"
 )
 
-// Make it pluggable between nested and rooted
-// Currently rooted is prefixed with rooted...
-type LowLevelArchitecture interface {
-	getDirByPath(string) (Directory, error)
-	saveDirByPath(string) (Directory, error)
-}
-
 // Filesystem
 type FileSys struct {
 	// w http.ResponseWriter `datastore:"-" json:"-"`
@@ -26,7 +19,6 @@ type FileSys struct {
 
 	RootDir Directory
 	Mount   string // name of mount point, for remount
-	LowLevelArchitecture
 }
 
 type Directory struct {

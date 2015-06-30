@@ -11,7 +11,7 @@ import (
 	"github.com/pbberlin/tools/godoc/vfs/gaefs"
 )
 
-func Test1(t *testing.T) {
+func TestWriteRead(t *testing.T) {
 
 	c, err := aetest.NewContext(nil)
 	if err != nil {

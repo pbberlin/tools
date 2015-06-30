@@ -1,10 +1,11 @@
 package gaefs
 
 import (
-	"path/filepath"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
+
+	pth "path"
 
 	ds "appengine/datastore"
 )
@@ -19,7 +20,7 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 
 	fo := Directory{}
 	fo.IsDir = true
-	dir, base := filepath.Split(path)
+	dir, base := pth.Split(path)
 	fo.Dir = dir
 	fo.Name = base
 	fo.Mod = time.Now()
@@ -46,7 +47,7 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 }
 
 // Retrieves a directory in one go.
-// But only if it was saved with rootedSaveDirByPath.
+// But only if it was saved with rootedSaveDirBypth.
 func (fs *FileSys) rootedGetDirByPath(path string) (Directory, error) {
 	fo := Directory{}
 	fo.Fs = fs

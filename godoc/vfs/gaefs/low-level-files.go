@@ -2,6 +2,7 @@ package gaefs
 
 import (
 	"fmt"
+	pth "path"
 
 	"github.com/pbberlin/tools/logif"
 
@@ -9,6 +10,8 @@ import (
 )
 
 func (fs *FileSys) GetFiles(path string) ([]File, error) {
+
+	path = cleanseLeadingSlash(path)
 
 	var files []File
 
@@ -31,10 +34,50 @@ func (fs *FileSys) GetFiles(path string) ([]File, error) {
 	return files, err
 }
 
+func (fs *FileSys) GetFile(path string) (File, error) {
+
+	path = cleanseLeadingSlash(path)
+
+	fo := File{}
+	fo.Fs = fs
+
+	sdir, base := pth.Split(path)
+
+	var dir Directory
+	var err error
+	if sdir == "" {
+		dir = fs.RootDir
+	} else {
+		dir, err = fs.GetDirByPath(sdir)
+		if err == datastore.ErrNoSuchEntity {
+			return fo, err
+		} else if err != nil {
+			logif.E(err)
+			return fo, err
+		}
+	}
+
+	fileKey := datastore.NewKey(fs.Ctx(), tfil, base, 0, dir.Key)
+	fo.Key = fileKey
+	err = datastore.Get(fs.c, fileKey, &fo)
+	if err == datastore.ErrNoSuchEntity {
+		return fo, err
+	} else if err != nil {
+		s := fmt.Sprintf("%v", fileKey)
+		logif.E(err, s)
+	}
+
+	return fo, err
+
+}
+
+//
 // The nested approach requires recursing directories.
 // Retrieval is then possible via recurring dirByPathRecursive()
 // or via GetDirByPathQuery()
 func (fs *FileSys) SaveFile(f *File, path string) error {
+
+	path = cleanseLeadingSlash(path)
 
 	if f.Name == "" {
 		return fmt.Errorf("file needs name")

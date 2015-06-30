@@ -1,8 +1,10 @@
 package gaefs
 
 import (
-	"path/filepath"
+	pth "path"
 	"strings"
+
+	"github.com/pbberlin/tools/logif"
 
 	"appengine/datastore"
 )
@@ -10,20 +12,22 @@ import (
 func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 
 	// prepare
-	path = filepath.Join(path, "") // cleanse
+	path = pth.Join(path)
 	var err error
 	childDir := fs.RootDir
 
 	// moving top down
 	for {
-		dirs := strings.Split(path, string(filepath.Separator))
+		dirs := strings.Split(path, sep)
+		logif.Pf("so far 2 %v - %v - --%v--", path, dirs, childDir.Key)
 		childDir, err = fs.getDirUnderParent(childDir.Key, dirs[0])
 		if err != nil {
 			return childDir, err
 		}
 
 		dirs = dirs[1:]
-		path = filepath.Join(dirs...)
+		path = pth.Join(dirs...)
+
 		if len(dirs) < 1 {
 			break
 		}
@@ -34,14 +38,14 @@ func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 func (fs FileSys) nestedSaveDirByPath(path string) (Directory, error) {
 
 	// prepare
-	path = filepath.Join(path, "") // cleanse
+	path = pth.Join(path) // cleanse
 	var err error
 	childDir := fs.RootDir
 	childDirPrev := fs.RootDir
 
 	// moving top down
 	for {
-		dirs := strings.Split(path, string(filepath.Separator))
+		dirs := strings.Split(path, sep)
 
 		childDirPrev = childDir
 		childDir, err = fs.getDirUnderParent(childDir.Key, dirs[0])
@@ -53,7 +57,7 @@ func (fs FileSys) nestedSaveDirByPath(path string) (Directory, error) {
 		}
 
 		dirs = dirs[1:]
-		path = filepath.Join(dirs...)
+		path = pth.Join(dirs...)
 		if len(dirs) < 1 {
 			break
 		}

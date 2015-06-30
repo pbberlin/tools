@@ -1,6 +1,7 @@
 package gaefs
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -16,7 +17,8 @@ func (fs *FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) 
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {
-		logif.E(err)
+		s := fmt.Sprintf("%v", exactKey)
+		logif.E(err, s)
 	}
 	return fo, err
 }

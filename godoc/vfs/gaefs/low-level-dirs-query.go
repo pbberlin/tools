@@ -11,7 +11,7 @@ import (
 
 // GetDirByPathQuery retrieves a directory *at once*.
 // It is relying on an indexed string property "SKey"
-// containing a string representation of the full path.
+// containing a string representation of the full pth.
 //
 // It might be fast for deep, uncached directory trees,
 // that have been saved in nested manner.

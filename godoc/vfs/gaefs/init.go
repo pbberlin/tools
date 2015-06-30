@@ -8,3 +8,5 @@ var spf func(format string, a ...interface{}) string = fmt.Sprintf
 
 var tdir string = "fsd" // FileSys filesystem directory
 var tfil string = "fsf" // FileSys filesystem file
+
+const sep = "/"

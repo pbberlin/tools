@@ -52,14 +52,6 @@ type File struct {
 	Content []byte
 }
 
-func OS(mount string) FileSys {
-	panic(`
-		Sadly, google app engine file system requires a
-	 	http.Request based context object.
-	 	Use NewFs(string, appengine.Context) instead of OS.
-	`)
-}
-
 func NewFs(mount string, c appengine.Context, rooted bool) FileSys {
 	fs := FileSys{}
 	fs.c = c

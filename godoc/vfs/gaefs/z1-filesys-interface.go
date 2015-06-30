@@ -8,7 +8,7 @@ import (
 // The package types <Directory> and <File> should
 // implement some of these methods.
 // I was hoping to plug my package into
-//    filepath.Walk(File,WalkFunc)
+//    pth.Walk(File,WalkFunc)
 // But it seems impossible :(
 
 type FileInfo interface {

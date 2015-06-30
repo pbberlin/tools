@@ -3,7 +3,7 @@ package gaefs
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
+	pth "path"
 
 	"appengine"
 
@@ -27,8 +27,9 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	loghttp.Pf(w, r, "created fs %v<br>\n", rts)
 
 	fc1 := func(p []string) {
-		path := filepath.Join(p...)
-		path = filepath.ToSlash(path)
+		path := pth.Join(p...)
+		path = cleanseLeadingSlash(path)
+
 		dir, err := fs.SaveDirByPath(path)
 		loghttp.E(w, r, err, true)
 		loghttp.Pf(w, r, "child created %v - %v <br>", dir.Name, dir.Key)
@@ -45,8 +46,8 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 	// retrieval
 	fc2 := func(p []string) {
-		path := filepath.Join(p...)
-		path = filepath.ToSlash(path)
+		path := pth.Join(p...)
+		path = cleanseLeadingSlash(path)
 
 		loghttp.Pf(w, r, "searching  %v<br>", path)
 		f, err := fs.GetDirByPath(path)

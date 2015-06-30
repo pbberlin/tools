@@ -20,10 +20,11 @@ func (fs FileSys) Open(path string) (io.Reader, error) {
 
 	var b []byte
 
-	files, err := fs.GetFiles(path)
+	file, err := fs.GetFile(path)
 	if err != nil {
 		return bytes.NewReader(b), err
 	}
-	b = files[0].Content
+
+	b = file.Content
 	return bytes.NewReader(b), nil
 }

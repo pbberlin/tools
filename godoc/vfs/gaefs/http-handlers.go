@@ -106,22 +106,38 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 	loghttp.Pf(w, r, "-----------------<br>\n")
 
-	f := File{}
-	f.Name = "file1"
-	f.Content = []byte("file content")
+	fc4 := func(name, content string) {
+		f := File{}
+		dir, base := pth.Split(name)
+		f.Name = base
+		f.Content = []byte(content)
 
-	err := fs.SaveFile(&f, "ch1/ch2")
-	logif.E(err)
+		err := fs.SaveFile(&f, dir)
+		logif.E(err)
+	}
 
-	f.Name = "file2"
-	err = fs.SaveFile(&f, "ch1/ch2")
-	logif.E(err)
+	fc4("ch1/ch2/file1", "content 1")
+	fc4("ch1/ch2/file2", "content 2")
+	fc4("ch1/ch2/file3", "another content")
 
-	files, err := fs.GetFiles("ch1/ch2")
-	logif.E(err)
+	fc4("file4", "root content")
 
-	for k, v := range files {
-		loghttp.Pf(w, r, "%v  -  %+v<br>\n", k, v)
+	//____________________
+
+	{
+		files, err := fs.GetFiles("ch1/ch2")
+		logif.E(err)
+		for k, v := range files {
+			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.Content)
+		}
+	}
+
+	{
+		files, err := fs.GetFiles("")
+		logif.E(err)
+		for k, v := range files {
+			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.Content)
+		}
 	}
 
 	fmt.Fprint(w, tplx.Foot)

@@ -3,6 +3,7 @@ package gaefs
 import (
 	"fmt"
 	pth "path"
+	"time"
 
 	"github.com/pbberlin/tools/logif"
 
@@ -85,6 +86,7 @@ func (fs *FileSys) SaveFile(f *File, path string) error {
 
 	f.Fs = fs
 	f.Dir = path
+	f.Mod = time.Now()
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {

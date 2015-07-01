@@ -18,6 +18,10 @@ import (
 // If you anticipate fewer directory changes, consider it.
 func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 
+	if path == "" {
+		return fs.RootDir, nil
+	}
+
 	fo := Directory{}
 	fo.IsDir = true
 	dir, base := pth.Split(path)
@@ -49,6 +53,11 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 // Retrieves a directory in one go.
 // But only if it was saved with rootedSaveDirBypth.
 func (fs *FileSys) rootedGetDirByPath(path string) (Directory, error) {
+
+	if path == "" {
+		return fs.RootDir, nil
+	}
+
 	fo := Directory{}
 	fo.Fs = fs
 	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)

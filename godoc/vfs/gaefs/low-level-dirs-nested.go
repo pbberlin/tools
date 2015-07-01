@@ -9,15 +9,17 @@ import (
 
 func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 
+	if path == "" {
+		return fs.RootDir, nil
+	}
+
 	// prepare
-	path = pth.Join(path)
 	var err error
 	childDir := fs.RootDir
 
 	// moving top down
 	for {
 		dirs := strings.Split(path, sep)
-		// logif.Pf("so far 2 %v - %v - --%v--", path, dirs, childDir.Key)
 		childDir, err = fs.getDirUnderParent(childDir.Key, dirs[0])
 		if err != nil {
 			return childDir, err
@@ -35,8 +37,11 @@ func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 
 func (fs FileSys) nestedSaveDirByPath(path string) (Directory, error) {
 
+	if path == "" {
+		return fs.RootDir, nil
+	}
+
 	// prepare
-	path = pth.Join(path) // cleanse
 	var err error
 	childDir := fs.RootDir
 	childDirPrev := fs.RootDir

@@ -36,6 +36,8 @@ func (fs *FileSys) saveDirUnderParent(name string, parent *datastore.Key) (Direc
 	fo := Directory{}
 	fo.IsDir = true
 	fo.Name = name
+
+	fo.Dir = dirFromKey(parent)
 	fo.Mod = time.Now()
 	fo.Fs = fs
 

@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -42,4 +43,12 @@ func TestWriteRead(t *testing.T) {
 	}
 	// defer rdr.Close()
 	io.Copy(os.Stdout, rdr)
+
+	bts, err := gaefs.ReadFile(fs, "xx/test.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// defer rdr.Close()
+	fmt.Printf("2nd: %v", string(bts))
+
 }

@@ -19,6 +19,7 @@ type FileSys struct {
 
 	RootDir Directory
 	Mount   string // name of mount point, for remount
+	Opener         // implicit
 }
 
 type Directory struct {
@@ -46,6 +47,7 @@ type File struct {
 
 func NewFs(mount string, c appengine.Context, rooted bool) FileSys {
 	fs := FileSys{}
+	// fs.Opener = fs.Open // implicit
 	fs.c = c
 	fs.rooted = rooted
 	if strings.Contains(mount, "/") {

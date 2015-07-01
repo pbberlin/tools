@@ -2,6 +2,7 @@ package gaefs
 
 import (
 	"bytes"
+	"io/ioutil"
 
 	"golang.org/x/tools/godoc/vfs"
 )
@@ -20,6 +21,21 @@ func OS(mount string) FileSys {
 	 	http.Request based context object.
 	 	Use NewFs(string, appengine.Context) instead of OS.
 	`)
+}
+
+func ReadFile(fs FileSys, path string) ([]byte, error) {
+	rsc, err := fs.Open(path)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	defer rsc.Close()
+	b, err := ioutil.ReadAll(rsc)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return b, nil
 }
 
 func (fs FileSys) Open(path string) (vfs.ReadSeekCloser, error) {

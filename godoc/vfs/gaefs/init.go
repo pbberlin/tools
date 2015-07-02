@@ -1,6 +1,10 @@
 package gaefs
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os"
+)
 
 var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 var pfRestore func(format string, a ...interface{}) (int, error) = fmt.Printf
@@ -14,3 +18,12 @@ var (
 )
 
 const sep = "/" // no, package path does not provide it; yes, we do need it.
+
+var (
+	ErrFileClosed        = errors.New("File is closed")
+	ErrOutOfRange        = errors.New("Out of range")
+	ErrTooLarge          = errors.New("Too large")
+	ErrFileNotFound      = os.ErrNotExist
+	ErrFileExists        = os.ErrExist
+	ErrDestinationExists = os.ErrExist
+)

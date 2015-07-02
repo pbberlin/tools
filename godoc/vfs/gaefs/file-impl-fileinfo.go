@@ -36,7 +36,7 @@ func (d Directory) Mode() os.FileMode {
 	return os.ModePerm
 }
 func (f File) Mode() os.FileMode {
-	return os.ModePerm
+	return f.mode
 }
 
 func (d Directory) ModTime() time.Time {

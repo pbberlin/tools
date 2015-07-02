@@ -1,7 +1,9 @@
 package gaefs
 
 import (
+	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"appengine"
@@ -43,6 +45,26 @@ type File struct {
 	Key     *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey    string  // readable form; not from *ds.Key.Encode()
 	Content []byte
+
+	/*
+		for
+			io.Closer
+			io.Reader
+			io.ReaderAt
+			io.Seeker
+			io.Writer
+			io.WriterAt
+	*/
+	sync.Mutex
+	at int64
+	// name    string
+	// data    []byte
+	// memDir  MemDir
+	// dir     bool
+	closed bool
+	mode   os.FileMode
+	// modtime time.Time
+
 }
 
 func NewFs(mount string, c appengine.Context, rooted bool) FileSys {

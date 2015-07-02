@@ -30,7 +30,7 @@ func TestWriteRead(t *testing.T) {
 	}
 
 	f := gaefs.File{}
-	f.Name = "test.txt"
+	f.BName = "test.txt"
 	f.Content = []byte("\tsome text content\n")
 	err = fs.SaveFile(&f, "/xx")
 	if err != nil {

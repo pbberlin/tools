@@ -23,22 +23,22 @@ type FileSys struct {
 }
 
 type Directory struct {
-	Fs    *FileSys `datastore:"-" json:"-"` // Reference to root
-	Dir   string
-	Name  string
-	IsDir bool
-	Mod   time.Time
+	Fs          *FileSys `datastore:"-" json:"-"` // Reference to root
+	Dir         string
+	BName       string // BaseeName - distinct from os.FileInfo method Name()
+	IsDirectory bool   // distinct from os.FileInfo method IsDir()
+	Mod         time.Time
 
 	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
 type File struct {
-	Fs    *FileSys `datastore:"-" json:"-"` // Reference to root
-	Dir   string
-	Name  string
-	IsDir bool
-	Mod   time.Time
+	Fs          *FileSys `datastore:"-" json:"-"` // Reference to root
+	Dir         string
+	BName       string // BaseeName - distinct from os.FileInfo method Name()
+	IsDirectory bool   // distinct from os.FileInfo method IsDir()
+	Mod         time.Time
 
 	Key     *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey    string  // readable form; not from *ds.Key.Encode()

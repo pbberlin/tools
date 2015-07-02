@@ -109,7 +109,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc4 := func(name, content string) {
 		f := File{}
 		dir, base := pth.Split(name)
-		f.Name = base
+		f.BName = base
 		f.Content = []byte(content)
 
 		err := fs.SaveFile(&f, dir)

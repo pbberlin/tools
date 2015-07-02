@@ -27,9 +27,6 @@ func dirFromKey(key *datastore.Key) string {
 	dir = strings.Replace(dir, tdirsep, "", -1) // removing all fsd,
 	dirs := strings.Split(dir, sep)
 
-	// logif.Pf("AAAAAAAAAA %#v", dirs)
-	// logif.Pf("  ")
-
 	if len(dirs) > 1 {
 		dirs = dirs[1:]
 		dir = path.Join(dirs...)

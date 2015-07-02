@@ -10,6 +10,7 @@ import (
 	"appengine/datastore"
 )
 
+// similar to ReadDir
 func (fs *FileSys) GetFiles(path string) ([]File, error) {
 
 	path = cleanseLeadingSlash(path)
@@ -80,7 +81,7 @@ func (fs *FileSys) SaveFile(f *File, path string) error {
 
 	path = cleanseLeadingSlash(path)
 
-	if f.Name == "" {
+	if f.BName == "" {
 		return fmt.Errorf("file needs name")
 	}
 
@@ -96,7 +97,7 @@ func (fs *FileSys) SaveFile(f *File, path string) error {
 		return err
 	}
 
-	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.Name, 0, dir.Key)
+	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, dir.Key)
 	f.Key = suggKey
 	f.SKey = spf("%v", suggKey)
 

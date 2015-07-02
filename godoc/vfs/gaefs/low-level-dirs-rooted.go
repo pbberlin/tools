@@ -23,10 +23,10 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 	}
 
 	fo := Directory{}
-	fo.IsDir = true
+	fo.IsDirectory = true
 	dir, base := pth.Split(path)
 	fo.Dir = dir
-	fo.Name = base
+	fo.BName = base
 	fo.Mod = time.Now()
 	fo.Fs = fs
 

@@ -9,8 +9,8 @@ import (
 	"time"
 )
 
-func createTestFile(name string) *File {
-	return &File{BName: name, mode: os.ModeTemporary, Mod: time.Now()}
+func createTestFile(name string) *AeFile {
+	return &AeFile{BName: name, mode: os.ModeTemporary, Mod: time.Now()}
 }
 
 func TestFileRead(t *testing.T) {
@@ -121,21 +121,19 @@ func TestWriteAt(t *testing.T) {
 		t.Fatalf("WriteAt 7: %d, %v", n, err)
 	}
 
-	f2 := createTestFile("TestWriteAt2")
-	defer f2.Close()
+	f.Close()
+	f.Open()
+
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(f2)
+	buf.ReadFrom(f)
 	b := buf.Bytes()
-	if err != nil {
-		t.Fatalf("ReadFile %s: %v", f.Name(), err)
-	}
 	if string(b) != "hello, WORLD\n" {
 		t.Fatalf("after write: have %q want %q", string(b), "hello, WORLD\n")
 	}
 
 }
 
-func checkSize(t *testing.T, f *File, size int64) {
+func checkSize(t *testing.T, f *AeFile, size int64) {
 
 	got := f.Size()
 

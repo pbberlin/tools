@@ -29,7 +29,7 @@ func NopCloser(r io.ReadSeeker) vfs.ReadSeekCloser {
 
 // satisfy vfs.Opener
 // Conflicts with Afero Open method
-func (fs FileSys) OpenVFS(path string) (vfs.ReadSeekCloser, error) {
+func (fs AeFileSys) OpenVFS(path string) (vfs.ReadSeekCloser, error) {
 
 	var b []byte
 
@@ -42,7 +42,7 @@ func (fs FileSys) OpenVFS(path string) (vfs.ReadSeekCloser, error) {
 	return NopCloser(bytes.NewReader(b)), nil
 }
 
-func ReadFileVFS(fs FileSys, path string) ([]byte, error) {
+func ReadFileVFS(fs AeFileSys, path string) ([]byte, error) {
 
 	// via read-seak-closer:
 	rsc, err := fs.OpenVFS(path)

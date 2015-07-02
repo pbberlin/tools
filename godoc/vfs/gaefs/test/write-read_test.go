@@ -29,7 +29,7 @@ func TestWriteRead(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	f := gaefs.File{}
+	f := gaefs.AeFile{}
 	f.BName = "test.txt"
 	f.Content = []byte("\tsome text content\n")
 	err = fs.SaveFile(&f, "/xx")
@@ -37,12 +37,12 @@ func TestWriteRead(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	rdr, err := fs.Open("xx/test.txt")
+	f2, err := fs.Open("xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer rdr.Close()
-	io.Copy(os.Stdout, rdr)
+	defer f2.Close()
+	io.Copy(os.Stdout, &f2)
 
 	bts, err := gaefs.ReadFile(fs, "xx/test.txt")
 	if err != nil {

@@ -6,7 +6,7 @@ import (
 )
 
 // File represents a file in the filesystem.
-type AferoFile interface {
+type File interface {
 	io.Closer
 	io.Reader
 	io.ReaderAt

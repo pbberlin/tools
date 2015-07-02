@@ -1,31 +1,25 @@
 // Package gaefs builds a filesystem layer on top of appengine datastore.
 //
 // Todos:
+//
+// Implement AeFile.ReadDir
+// Integrate into Afero
+
+// Add a Walk function, similar to filepath.Walk(root string, walkFunc)
+// 	Use this "walker" to implement removals
+
 // SaveFile => optionally create non-existing directories
 //   or return at least path.Error
 //
-// Add a Walk function, similar to filepath.Walk(root string, walkFunc)
-//
-// Add a "block"-layer under file, so that more than 1MB byte files can be used.
+// Add a "block"-layer under file, so that more than 1MB byte files can be writtens.
 //
 // Mem Caching for directories
 // Mem Caching for files - beware of cost
 //
 // Instance Caching with broadcasting instances via http request to instances.
 //
-// ReadDir, GetFiles should sort resulting directories/files by name.
+// ReadDir and GetFiles should sort resulting directories/files by name.
 
-/*
-	File should support
-
-	io.ReaderAt,
-	io.Seeker
-	io.Writer
-	io.WriterAt
-	WriteString(s string) (ret int, err error)
-	Truncate(size int64) error
-*/
-
-// Nice to have: Links
+// Nice to have: FileLinks
 
 package gaefs

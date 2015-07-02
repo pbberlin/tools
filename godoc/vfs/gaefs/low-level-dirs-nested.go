@@ -7,7 +7,7 @@ import (
 	"appengine/datastore"
 )
 
-func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
+func (fs AeFileSys) nestedGetDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
 		return fs.RootDir, nil
@@ -35,7 +35,7 @@ func (fs FileSys) nestedGetDirByPath(path string) (Directory, error) {
 	return childDir, nil
 }
 
-func (fs FileSys) nestedSaveDirByPath(path string) (Directory, error) {
+func (fs AeFileSys) nestedSaveDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
 		return fs.RootDir, nil

@@ -6,7 +6,7 @@ import (
 	"appengine/memcache"
 )
 
-func (fso *Directory) MemCacheSet() {
+func (fso *AeDir) MemCacheSet() {
 
 	miPut := &memcache.Item{
 		Key:        fso.SKey,
@@ -22,7 +22,7 @@ func (fso *Directory) MemCacheSet() {
 	}
 }
 
-func (fso *File) MemCacheSet() {
+func (fso *AeFile) MemCacheSet() {
 
 	miPut := &memcache.Item{
 		Key:        fso.SKey,

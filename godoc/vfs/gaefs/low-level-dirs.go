@@ -1,6 +1,6 @@
 package gaefs
 
-func (fs FileSys) GetDirByPath(path string) (Directory, error) {
+func (fs AeFileSys) GetDirByPath(path string) (AeDir, error) {
 	path = cleanseLeadingSlash(path)
 
 	if fs.rooted {
@@ -9,7 +9,7 @@ func (fs FileSys) GetDirByPath(path string) (Directory, error) {
 	return fs.nestedGetDirByPath(path)
 }
 
-func (fs FileSys) SaveDirByPath(path string) (Directory, error) {
+func (fs AeFileSys) SaveDirByPath(path string) (AeDir, error) {
 	path = cleanseLeadingSlash(path)
 
 	if fs.rooted {

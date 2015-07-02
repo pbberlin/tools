@@ -23,9 +23,9 @@ import (
 //
 // If a range scan over a huge directory tree is neccessary,
 // the func could easily be enhanced for range scans.
-func (fs *FileSys) GetDirByPathQuery(path string) (Directory, error) {
+func (fs *AeFileSys) GetDirByPathQuery(path string) (AeDir, error) {
 
-	fo := Directory{}
+	fo := AeDir{}
 	fo.Fs = fs
 
 	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.BName, 0, nil)
@@ -42,7 +42,7 @@ func (fs *FileSys) GetDirByPathQuery(path string) (Directory, error) {
 		// query variation
 	}
 
-	var children []Directory
+	var children []AeDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
 		fs.Ctx().Errorf("Error getting all children of %v => %v", fs.RootDir.Name, err)

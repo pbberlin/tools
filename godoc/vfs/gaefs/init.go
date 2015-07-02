@@ -27,3 +27,15 @@ var (
 	ErrFileExists        = os.ErrExist
 	ErrDestinationExists = os.ErrExist
 )
+
+func init() {
+
+	f := AeFile{}
+	ifa := File(&f)
+	_ = ifa
+
+	fs := AeFileSys{}
+	ifs := FileSystem(&fs)
+	_ = ifs
+
+}

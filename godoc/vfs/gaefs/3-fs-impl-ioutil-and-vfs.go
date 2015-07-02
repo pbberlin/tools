@@ -10,7 +10,7 @@ import (
 	pth "path"
 )
 
-func OS(mount string) FileSys {
+func OS(mount string) AeFileSys {
 	panic(`
 		Sadly, google app engine file system requires a
 	 	http.Request based context object.
@@ -18,7 +18,7 @@ func OS(mount string) FileSys {
 	`)
 }
 
-func ReadFile(fs FileSys, path string) ([]byte, error) {
+func ReadFile(fs *AeFileSys, path string) ([]byte, error) {
 
 	file, err := fs.GetFile(path)
 	if err != nil {
@@ -31,11 +31,11 @@ func ReadFile(fs FileSys, path string) ([]byte, error) {
 // and ioutil.ReadDir.
 // It is similar to GetFiles, but returning only dirs
 // Todo: Sort dirs by name
-func (fs *FileSys) ReadDir(path string) ([]os.FileInfo, error) {
+func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 	path = cleanseLeadingSlash(path)
 
-	var dirs []Directory
+	var dirs []AeDir
 	var fis []os.FileInfo
 
 	dir, err := fs.GetDirByPath(path)
@@ -63,8 +63,8 @@ func (fs *FileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 }
 
-func (fs *FileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
-	f := File{}
+func (fs *AeFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
+	f := AeFile{}
 	f.BName = pth.Base(filename)
 	f.Dir = pth.Dir(filename)
 	f.Content = data

@@ -22,7 +22,7 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	{
 		q := datastore.NewQuery(tfil).KeysOnly()
-		var files []File
+		var files []AeFile
 		keys, err := q.GetAll(c, &files)
 		loghttp.E(w, r, err, false)
 		err = datastore.DeleteMulti(c, keys)
@@ -32,7 +32,7 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	{
 		q := datastore.NewQuery(tdir).KeysOnly()
-		var dirs []Directory
+		var dirs []AeDir
 		keys, err := q.GetAll(c, &dirs)
 		loghttp.E(w, r, err, false)
 		err = datastore.DeleteMulti(c, keys)
@@ -107,7 +107,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	loghttp.Pf(w, r, "-----------------<br>\n")
 
 	fc4 := func(name, content string) {
-		f := File{}
+		f := AeFile{}
 		dir, base := pth.Split(name)
 		f.BName = base
 		f.Content = []byte(content)

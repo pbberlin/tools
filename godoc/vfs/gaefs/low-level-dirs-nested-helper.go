@@ -9,8 +9,8 @@ import (
 	"appengine/datastore"
 )
 
-func (fs *FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) {
-	fo := Directory{}
+func (fs *AeFileSys) getDirByExactKey(exactKey *datastore.Key) (AeDir, error) {
+	fo := AeDir{}
 	fo.Fs = fs
 	fo.Key = exactKey
 	err := datastore.Get(fs.c, exactKey, &fo)
@@ -23,7 +23,7 @@ func (fs *FileSys) getDirByExactKey(exactKey *datastore.Key) (Directory, error) 
 	return fo, err
 }
 
-func (fs *FileSys) getDirUnderParent(parKey *datastore.Key, childName string) (Directory, error) {
+func (fs *AeFileSys) getDirUnderParent(parKey *datastore.Key, childName string) (AeDir, error) {
 	childKey := datastore.NewKey(fs.Ctx(), tdir, childName, 0, parKey)
 	return fs.getDirByExactKey(childKey)
 }
@@ -31,9 +31,9 @@ func (fs *FileSys) getDirUnderParent(parKey *datastore.Key, childName string) (D
 // The nested approach requires recursing directories.
 // Retrieval is then possible via recurring dirByPathRecursive()
 // or via GetDirByPathQuery()
-func (fs *FileSys) saveDirUnderParent(name string, parent *datastore.Key) (Directory, error) {
+func (fs *AeFileSys) saveDirUnderParent(name string, parent *datastore.Key) (AeDir, error) {
 
-	fo := Directory{}
+	fo := AeDir{}
 	fo.IsDirectory = true
 	fo.BName = name
 

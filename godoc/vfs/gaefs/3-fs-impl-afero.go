@@ -6,8 +6,8 @@ import (
 )
 import pth "path"
 
-func (fs *FileSys) Create(name string) (File, error) {
-	f := File{}
+func (fs *AeFileSys) Create(name string) (AeFile, error) {
+	f := AeFile{}
 	dir, base := pth.Split(name)
 	f.BName = base
 	err := fs.SaveFile(&f, dir)
@@ -17,7 +17,7 @@ func (fs *FileSys) Create(name string) (File, error) {
 	return f, err
 }
 
-func (fs FileSys) Lstat(path string) (os.FileInfo, error) {
+func (fs *AeFileSys) Lstat(path string) (os.FileInfo, error) {
 	panic(spf("Links not implemented for %v", fs))
 	var fi os.FileInfo
 	return fi, nil
@@ -26,49 +26,49 @@ func (fs FileSys) Lstat(path string) (os.FileInfo, error) {
 // Strangely, neither MkdirAll nor Mkdir seem to have
 // any concept of current working directory.
 // They seem to operate relative to root.
-func (fs *FileSys) Mkdir(name string, perm os.FileMode) error {
+func (fs *AeFileSys) Mkdir(name string, perm os.FileMode) error {
 	_, err := fs.SaveDirByPath(name)
 	return err
 }
 
-func (fs *FileSys) MkdirAll(path string, perm os.FileMode) error {
+func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 	_, err := fs.SaveDirByPath(path)
 	return err
 }
 
-func (fs FileSys) String() string {
+func (fs AeFileSys) String() string {
 	return "gaefs"
 }
 
-func (fs *FileSys) Name() string {
+func (fs AeFileSys) Name() string {
 	return fs.String()
 }
 
 // conflicts with Open() interface of VFS
-func (fs *FileSys) Open(name string) (File, error) {
-	return File{}, nil
+func (fs *AeFileSys) Open(name string) (AeFile, error) {
+	return AeFile{}, nil
 }
 
-func (fs *FileSys) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
+func (fs *AeFileSys) OpenFile(name string, flag int, perm os.FileMode) (AeFile, error) {
 	return fs.GetFile(name)
 }
 
-func (fs *FileSys) Remove(name string) error {
+func (fs *AeFileSys) Remove(name string) error {
 	panic(spf("Remove not (yet) implemented for %v", fs))
 	return nil
 }
 
-func (fs *FileSys) RemoveAll(path string) error {
+func (fs *AeFileSys) RemoveAll(path string) error {
 	panic(spf("RemoveAll not (yet) implemented for %v", fs))
 	return nil
 }
 
-func (fs *FileSys) Rename(oldname, newname string) error {
+func (fs *AeFileSys) Rename(oldname, newname string) error {
 	panic(spf("Rename not (yet) implemented for %v", fs))
 	return nil
 }
 
-func (fs FileSys) Stat(path string) (os.FileInfo, error) {
+func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
 	f, err := fs.GetFile(path)
 	if err != nil {
 		dir, err := fs.GetDirByPath(path)
@@ -81,12 +81,12 @@ func (fs FileSys) Stat(path string) (os.FileInfo, error) {
 	}
 }
 
-func (fs *FileSys) Chmod(name string, mode os.FileMode) error {
+func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
 	panic(spf("Chmod not (yet) implemented for %v", fs))
 	return nil
 }
 
-func (fs *FileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
+func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
 	panic(spf("Chtimes not (yet) implemented for %v", fs))
 	return nil
 }

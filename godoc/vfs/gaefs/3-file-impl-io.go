@@ -2,10 +2,11 @@ package gaefs
 
 import (
 	"io"
+	"os"
 	"sync/atomic"
 )
 
-func (f *File) Open() error {
+func (f *AeFile) Open() error {
 	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
 	f.closed = false
@@ -13,7 +14,7 @@ func (f *File) Open() error {
 	return nil
 }
 
-func (f *File) Close() error {
+func (f *AeFile) Close() error {
 	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
 	f.closed = true
@@ -21,17 +22,13 @@ func (f *File) Close() error {
 	return nil
 }
 
-// func (f *File) Stat() (os.FileInfo, error) {
-// 	return &InMemoryFileInfo{f}, nil
-// }
-
 // func (f *File) Readdir(count int) (res []os.FileInfo, err error) {
 // }
 
 // func (f *File) Readdirnames(n int) (names []string, err error) {
 // }
 
-func (f *File) Read(b []byte) (n int, err error) {
+func (f *AeFile) Read(b []byte) (n int, err error) {
 	f.Lock()
 	defer f.Unlock()
 	if f.closed == true {
@@ -50,12 +47,12 @@ func (f *File) Read(b []byte) (n int, err error) {
 	return
 }
 
-func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
+func (f *AeFile) ReadAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Read(b)
 }
 
-func (f *File) Truncate(size int64) error {
+func (f *AeFile) Truncate(size int64) error {
 	if f.closed == true {
 		return ErrFileClosed
 	}
@@ -73,7 +70,7 @@ func (f *File) Truncate(size int64) error {
 	return nil
 }
 
-func (f *File) Seek(offset int64, whence int) (int64, error) {
+func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	if f.closed == true {
 		return 0, ErrFileClosed
 	}
@@ -88,7 +85,11 @@ func (f *File) Seek(offset int64, whence int) (int64, error) {
 	return f.at, nil
 }
 
-func (f *File) Write(b []byte) (n int, err error) {
+func (f *AeFile) Stat() (os.FileInfo, error) {
+	return os.FileInfo(*f), nil
+}
+
+func (f *AeFile) Write(b []byte) (n int, err error) {
 	n = len(b)
 	cur := atomic.LoadInt64(&f.at)
 	f.Lock()
@@ -112,11 +113,11 @@ func (f *File) Write(b []byte) (n int, err error) {
 	return
 }
 
-func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
+func (f *AeFile) WriteAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Write(b)
 }
 
-func (f *File) WriteString(s string) (ret int, err error) {
+func (f *AeFile) WriteString(s string) (ret int, err error) {
 	return f.Write([]byte(s))
 }

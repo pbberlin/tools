@@ -12,20 +12,20 @@ import (
 )
 
 // Filesystem
-type FileSys struct {
+type AeFileSys struct {
 	// w http.ResponseWriter `datastore:"-" json:"-"`
 	// r *http.Request       `datastore:"-" json:"-"`
 	c appengine.Context `datastore:"-" json:"-"`
 
 	rooted bool // default would be nested; <nested, rooted>
 
-	RootDir Directory
+	RootDir AeDir
 	Mount   string // name of mount point, for remount
 	Opener         // implicit
 }
 
-type Directory struct {
-	Fs          *FileSys `datastore:"-" json:"-"` // Reference to root
+type AeDir struct {
+	Fs          *AeFileSys `datastore:"-" json:"-"` // Reference to root
 	Dir         string
 	BName       string // BaseeName - distinct from os.FileInfo method Name()
 	IsDirectory bool   // distinct from os.FileInfo method IsDir()
@@ -35,8 +35,8 @@ type Directory struct {
 	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
-type File struct {
-	Fs          *FileSys `datastore:"-" json:"-"` // Reference to root
+type AeFile struct {
+	Fs          *AeFileSys `datastore:"-" json:"-"` // Reference to root
 	Dir         string
 	BName       string // BaseeName - distinct from os.FileInfo method Name()
 	IsDirectory bool   // distinct from os.FileInfo method IsDir()
@@ -67,8 +67,8 @@ type File struct {
 
 }
 
-func NewFs(mount string, c appengine.Context, rooted bool) FileSys {
-	fs := FileSys{}
+func NewFs(mount string, c appengine.Context, rooted bool) AeFileSys {
+	fs := AeFileSys{}
 	// fs.Opener = fs.Open // implicit
 	fs.c = c
 	fs.rooted = rooted
@@ -85,6 +85,6 @@ func NewFs(mount string, c appengine.Context, rooted bool) FileSys {
 	return fs
 }
 
-func (fs *FileSys) Ctx() appengine.Context {
+func (fs *AeFileSys) Ctx() appengine.Context {
 	return fs.c
 }

@@ -17,44 +17,44 @@ type FileInfo interface {
 
 // All of them: NO pointer receiver
 
-func (d Directory) Name() string {
+func (d AeDir) Name() string {
 	return d.BName
 }
-func (f File) Name() string {
+func (f AeFile) Name() string {
 	return f.BName
 }
 
-func (d Directory) Size() int64 {
+func (d AeDir) Size() int64 {
 	return int64(len(d.BName))
 }
-func (f File) Size() int64 {
+func (f AeFile) Size() int64 {
 	return int64(len(f.Content))
 }
 
 // no rights implemented
-func (d Directory) Mode() os.FileMode {
+func (d AeDir) Mode() os.FileMode {
 	return os.ModePerm
 }
-func (f File) Mode() os.FileMode {
+func (f AeFile) Mode() os.FileMode {
 	return f.mode
 }
 
-func (d Directory) ModTime() time.Time {
+func (d AeDir) ModTime() time.Time {
 	return d.Mod
 }
-func (f File) ModTime() time.Time {
+func (f AeFile) ModTime() time.Time {
 	return f.Mod
 }
 
-func (d Directory) IsDir() bool {
+func (d AeDir) IsDir() bool {
 	return true
 }
-func (f File) IsDir() bool {
+func (f AeFile) IsDir() bool {
 	return false
 }
-func (d Directory) Sys() interface{} {
+func (d AeDir) Sys() interface{} {
 	return nil
 }
-func (f File) Sys() interface{} {
+func (f AeFile) Sys() interface{} {
 	return nil
 }

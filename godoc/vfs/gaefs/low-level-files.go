@@ -12,11 +12,11 @@ import (
 
 // similar to ReadDir but returning only files
 // Todo: Sort files by name
-func (fs *FileSys) GetFiles(path string) ([]File, error) {
+func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 
 	path = cleanseLeadingSlash(path)
 
-	var files []File
+	var files []AeFile
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {
@@ -37,16 +37,16 @@ func (fs *FileSys) GetFiles(path string) ([]File, error) {
 	return files, err
 }
 
-func (fs *FileSys) GetFile(path string) (File, error) {
+func (fs *AeFileSys) GetFile(path string) (AeFile, error) {
 
 	path = cleanseLeadingSlash(path)
 
-	fo := File{}
+	fo := AeFile{}
 	fo.Fs = fs
 
 	sdir, base := pth.Split(path)
 
-	var dir Directory
+	var dir AeDir
 	var err error
 	if sdir == "" {
 		dir = fs.RootDir
@@ -78,7 +78,7 @@ func (fs *FileSys) GetFile(path string) (File, error) {
 // The nested approach requires recursing directories.
 // Retrieval is then possible via recurring dirByPathRecursive()
 // or via GetDirByPathQuery()
-func (fs *FileSys) SaveFile(f *File, path string) error {
+func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 
 	path = cleanseLeadingSlash(path)
 

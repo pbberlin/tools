@@ -16,13 +16,13 @@ import (
 // The main disadvantage is that "ancestor group updates"
 // in google datastore are restricted to frequency "~ five per second".
 // If you anticipate fewer directory changes, consider it.
-func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
+func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
 		return fs.RootDir, nil
 	}
 
-	fo := Directory{}
+	fo := AeDir{}
 	fo.IsDirectory = true
 	dir, base := pth.Split(path)
 	fo.Dir = dir
@@ -52,13 +52,13 @@ func (fs *FileSys) rootedSaveDirByPath(path string) (Directory, error) {
 
 // Retrieves a directory in one go.
 // But only if it was saved with rootedSaveDirBypth.
-func (fs *FileSys) rootedGetDirByPath(path string) (Directory, error) {
+func (fs *AeFileSys) rootedGetDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
 		return fs.RootDir, nil
 	}
 
-	fo := Directory{}
+	fo := AeDir{}
 	fo.Fs = fs
 	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)
 	fo.Key = perfKey

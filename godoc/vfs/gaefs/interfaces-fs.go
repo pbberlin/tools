@@ -6,8 +6,9 @@ import (
 	"golang.org/x/tools/godoc/vfs"
 )
 
+// method signiture conflicted with Afero Open()
 type Opener interface {
-	Open(name string) (vfs.ReadSeekCloser, error)
+	OpenVFS(name string) (vfs.ReadSeekCloser, error)
 }
 
 // I wanted my package types <Directory> and <File>
@@ -17,8 +18,8 @@ type Opener interface {
 
 //
 // from golang.org/x/tools/godoc/vfs
-type T_Readfile func(Opener, string) ([]byte, error)
 type T_OS func(string) FileSys
+type T_Readfile func(Opener, string) ([]byte, error)
 type FileSystem interface {
 	Opener
 	Lstat(path string) (os.FileInfo, error)

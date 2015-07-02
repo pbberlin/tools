@@ -10,7 +10,8 @@ import (
 	"appengine/datastore"
 )
 
-// similar to ReadDir
+// similar to ReadDir but returning only files
+// Todo: Sort files by name
 func (fs *FileSys) GetFiles(path string) ([]File, error) {
 
 	path = cleanseLeadingSlash(path)

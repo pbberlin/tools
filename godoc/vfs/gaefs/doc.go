@@ -1,8 +1,10 @@
 // Package gaefs builds a filesystem layer on top of appengine datastore.
 //
 // Todos:
-//
+// Rename members of AeFile
 // Implement AeFile.ReadDir
+
+//
 // Integrate into Afero
 
 // Add a Walk function, similar to filepath.Walk(root string, walkFunc)

@@ -7,9 +7,12 @@ import (
 import pth "path"
 
 func (fs *AeFileSys) Create(name string) (AeFile, error) {
+
+	name = cleanseLeadingSlash(name)
+
 	f := AeFile{}
 	dir, base := pth.Split(name)
-	f.BName = base
+	f.name = base
 	err := fs.SaveFile(&f, dir)
 	if err != nil {
 		return f, err

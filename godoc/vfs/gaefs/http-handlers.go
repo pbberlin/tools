@@ -80,7 +80,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		if err != nil {
 			loghttp.Pf(w, r, "  nothing retrieved - err %v<br>", err)
 		} else {
-			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.Dir)
+			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.dir)
 		}
 	}
 	fc2([]string{"ch1"})
@@ -98,7 +98,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		if err != nil {
 			loghttp.Pf(w, r, "  nothing retrieved - err %v<br>", err)
 		} else {
-			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.Dir)
+			loghttp.Pf(w, r, "  child retrieved %v, %v<br>", f.Name, f.dir)
 		}
 	}
 	fc3(spf(`/fsd,%v/fsd,ch1/fsd,ch2/fsd,ch3`, rts))
@@ -109,8 +109,8 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc4 := func(name, content string) {
 		f := AeFile{}
 		dir, base := pth.Split(name)
-		f.BName = base
-		f.Content = []byte(content)
+		f.name = base
+		f.data = []byte(content)
 
 		err := fs.SaveFile(&f, dir)
 		logif.E(err)
@@ -128,7 +128,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		files, err := fs.GetFiles("ch1/ch2")
 		logif.E(err)
 		for k, v := range files {
-			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.Content)
+			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.data)
 		}
 	}
 
@@ -136,7 +136,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		files, err := fs.GetFiles("")
 		logif.E(err)
 		for k, v := range files {
-			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.Content)
+			loghttp.Pf(w, r, "%v  -  %v %s<br>\n", k, v.Name, v.data)
 		}
 	}
 

@@ -28,7 +28,7 @@ func (fs *AeFileSys) GetDirByPathQuery(path string) (AeDir, error) {
 	fo := AeDir{}
 	fo.Fs = fs
 
-	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.BName, 0, nil)
+	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.name, 0, nil)
 	pathInc := stringspb.IncrementString(path)
 
 	q := datastore.NewQuery(tdir).

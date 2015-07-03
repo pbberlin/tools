@@ -82,13 +82,13 @@ func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 
 	path = cleanseLeadingSlash(path)
 
-	if f.BName == "" {
+	if f.name == "" {
 		return fmt.Errorf("file needs name")
 	}
 
 	f.Fs = fs
-	f.Dir = path
-	f.Mod = time.Now()
+	f.dir = path
+	f.modTime = time.Now()
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {
@@ -98,7 +98,7 @@ func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 		return err
 	}
 
-	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, dir.Key)
+	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.name, 0, dir.Key)
 	f.Key = suggKey
 	f.SKey = spf("%v", suggKey)
 

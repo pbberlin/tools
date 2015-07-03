@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -29,10 +28,13 @@ func TestWriteRead(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	f := gaefs.AeFile{}
-	f.BName = "test.txt"
-	f.Content = []byte("\tsome text content\n")
-	err = fs.SaveFile(&f, "/xx")
+	f, err := fs.Create("xx/test.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	f.WriteString("some text content")
+	f.Close()
+	err = fs.SaveFile(&f, "xx")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,11 +46,11 @@ func TestWriteRead(t *testing.T) {
 	defer f2.Close()
 	io.Copy(os.Stdout, &f2)
 
-	bts, err := gaefs.ReadFile(fs, "xx/test.txt")
+	bts, err := gaefs.ReadFile(&fs, "xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	// defer rdr.Close()
-	fmt.Printf("2nd: %v", string(bts))
+	log.Printf("2nd: %v", string(bts))
 
 }

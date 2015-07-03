@@ -34,15 +34,15 @@ func (f *AeFile) Read(b []byte) (n int, err error) {
 	if f.closed == true {
 		return 0, ErrFileClosed
 	}
-	if len(b) > 0 && int(f.at) == len(f.Content) {
+	if len(b) > 0 && int(f.at) == len(f.data) {
 		return 0, io.EOF
 	}
-	if len(f.Content)-int(f.at) >= len(b) {
+	if len(f.data)-int(f.at) >= len(b) {
 		n = len(b)
 	} else {
-		n = len(f.Content) - int(f.at)
+		n = len(f.data) - int(f.at)
 	}
-	copy(b, f.Content[f.at:f.at+int64(n)])
+	copy(b, f.data[f.at:f.at+int64(n)])
 	atomic.AddInt64(&f.at, int64(n))
 	return
 }
@@ -59,13 +59,13 @@ func (f *AeFile) Truncate(size int64) error {
 	if size < 0 {
 		return ErrOutOfRange
 	}
-	if size > int64(len(f.Content)) {
-		diff := size - int64(len(f.Content))
+	if size > int64(len(f.data)) {
+		diff := size - int64(len(f.data))
 		// f.Content = append(f.Content, bytes.Repeat([]byte{00}, int(diff))...)
 		sb := make([]byte, int(diff))
-		f.Content = append(f.Content, sb...)
+		f.data = append(f.data, sb...)
 	} else {
-		f.Content = f.Content[0:size]
+		f.data = f.data[0:size]
 	}
 	return nil
 }
@@ -80,7 +80,7 @@ func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	case 1:
 		atomic.AddInt64(&f.at, int64(offset))
 	case 2:
-		atomic.StoreInt64(&f.at, int64(len(f.Content))+offset)
+		atomic.StoreInt64(&f.at, int64(len(f.data))+offset)
 	}
 	return f.at, nil
 }
@@ -94,22 +94,22 @@ func (f *AeFile) Write(b []byte) (n int, err error) {
 	cur := atomic.LoadInt64(&f.at)
 	f.Lock()
 	defer f.Unlock()
-	diff := cur - int64(len(f.Content))
+	diff := cur - int64(len(f.data))
 	var tail []byte
-	if n+int(cur) < len(f.Content) {
-		tail = f.Content[n+int(cur):]
+	if n+int(cur) < len(f.data) {
+		tail = f.data[n+int(cur):]
 	}
 	if diff > 0 {
 		sb := make([]byte, int(diff))
-		f.Content = append(sb, b...)
+		f.data = append(sb, b...)
 		// f.Content = append(bytes.Repeat([]byte{00}, int(diff)), b...)
-		f.Content = append(f.Content, tail...)
+		f.data = append(f.data, tail...)
 	} else {
-		f.Content = append(f.Content[:cur], b...)
-		f.Content = append(f.Content, tail...)
+		f.data = append(f.data[:cur], b...)
+		f.data = append(f.data, tail...)
 	}
 
-	atomic.StoreInt64(&f.at, int64(len(f.Content)))
+	atomic.StoreInt64(&f.at, int64(len(f.data)))
 	return
 }
 

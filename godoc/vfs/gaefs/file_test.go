@@ -10,7 +10,7 @@ import (
 )
 
 func createTestFile(name string) *AeFile {
-	return &AeFile{BName: name, mode: os.ModeTemporary, Mod: time.Now()}
+	return &AeFile{name: name, mode: os.ModeTemporary, modTime: time.Now()}
 }
 
 func TestFileRead(t *testing.T) {

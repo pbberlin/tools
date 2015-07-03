@@ -25,46 +25,32 @@ type AeFileSys struct {
 }
 
 type AeDir struct {
-	Fs          *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	Dir         string
-	BName       string // BaseeName - distinct from os.FileInfo method Name()
-	IsDirectory bool   // distinct from os.FileInfo method IsDir()
-	Mod         time.Time
+	Fs      *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	dir     string
+	name    string // BaseeName - distinct from os.FileInfo method Name()
+	isDir   bool   // distinct from os.FileInfo method IsDir()
+	modTime time.Time
+	mode    os.FileMode
 
 	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
 type AeFile struct {
-	Fs          *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	Dir         string
-	BName       string // BaseeName - distinct from os.FileInfo method Name()
-	IsDirectory bool   // distinct from os.FileInfo method IsDir()
-	Mod         time.Time
+	Fs      *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	dir     string     // memDir  MemDir
+	name    string     // BaseeName - distinct from os.FileInfo method Name()
+	isDir   bool       // distinct from os.FileInfo method IsDir()
+	modTime time.Time
+	mode    os.FileMode
 
-	Key     *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
-	SKey    string  // readable form; not from *ds.Key.Encode()
-	Content []byte
-
-	/*
-		for
-			io.Closer
-			io.Reader
-			io.ReaderAt
-			io.Seeker
-			io.Writer
-			io.WriterAt
-	*/
+	data []byte
 	sync.Mutex
-	at int64
-	// name    string
-	// data    []byte
-	// memDir  MemDir
-	// dir     bool
-	closed bool
-	mode   os.FileMode
-	// modtime time.Time
+	at     int64
+	closed bool // default open
 
+	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
+	SKey string  // readable form; not from *ds.Key.Encode()
 }
 
 func NewFs(mount string, c appengine.Context, rooted bool) AeFileSys {

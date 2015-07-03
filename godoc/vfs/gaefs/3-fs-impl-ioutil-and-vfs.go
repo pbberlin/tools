@@ -24,7 +24,7 @@ func ReadFile(fs *AeFileSys, path string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	return file.Content, err
+	return file.data, err
 }
 
 // ReadDir satisfies the vfs interface
@@ -65,9 +65,9 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 func (fs *AeFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
 	f := AeFile{}
-	f.BName = pth.Base(filename)
-	f.Dir = pth.Dir(filename)
-	f.Content = data
+	f.name = pth.Base(filename)
+	f.dir = pth.Dir(filename)
+	f.data = data
 
 	err := fs.SaveFile(&f, filename)
 	return err

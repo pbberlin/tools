@@ -23,11 +23,11 @@ func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 	}
 
 	fo := AeDir{}
-	fo.IsDirectory = true
+	fo.isDir = true
 	dir, base := pth.Split(path)
-	fo.Dir = dir
-	fo.BName = base
-	fo.Mod = time.Now()
+	fo.dir = dir
+	fo.name = base
+	fo.modTime = time.Now()
 	fo.Fs = fs
 
 	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)

@@ -25,10 +25,11 @@ func (fs *AeFileSys) Create(name string) (AeFile, error) {
 	return f, err
 }
 
+// No distinction between Stat (links are followed)
+// and LStat (links go unresolved)
+// We don't support links yet, anyway
 func (fs *AeFileSys) Lstat(path string) (os.FileInfo, error) {
-	panic(spf("Links not implemented for %v", fs))
-	var fi os.FileInfo
-	return fi, nil
+	return fs.Stat(path)
 }
 
 // Strangely, neither MkdirAll nor Mkdir seem to have

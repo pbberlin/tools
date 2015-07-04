@@ -1,6 +1,7 @@
 package gaefs
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -143,6 +144,8 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 	loghttp.Pf(w, r, "-------filewalk----<br>\n")
 
+	bb := bytes.Buffer{}
+
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		tp := "file"
 		if f != nil {
@@ -150,11 +153,13 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 				tp = "dir "
 			}
 		}
-		logif.Pf("Visited: %s %s \n", tp, path)
+		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
 		return nil
 	}
 	err := fs.Walk("ch1", walkFunc)
-	logif.Pf("fs.Walk() returned %v\n", err)
+	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
+
+	w.Write(bb.Bytes())
 
 }
 

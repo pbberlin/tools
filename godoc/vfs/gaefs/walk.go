@@ -6,16 +6,17 @@ import (
 	"os"
 	pth "path"
 	"path/filepath"
+
+	"github.com/pbberlin/tools/logif"
 )
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
 
-var SkipDir = errors.New("skip this directory")
-
-var lstat = os.Lstat // for testing
+var SkipDir = errors.New("skip this directory") // walk func signalling: omit this dir
 
 // walk recursively descends path, calling walkFn.
 func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error {
+
 	err := walkFn(path, info, nil)
 	if err != nil {
 		if info.IsDir() && err == SkipDir {
@@ -29,13 +30,14 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 	}
 
 	names, err := fs.Readdirnames(path)
+	logif.Pf("%v => %+v", path, names)
 	if err != nil {
 		return walkFn(path, info, err)
 	}
 
 	for _, name := range names {
 		filename := pth.Join(path, name)
-		fileInfo, err := lstat(filename)
+		fileInfo, err := fs.Lstat(filename)
 		if err != nil {
 			if err := walkFn(filename, fileInfo, err); err != nil && err != SkipDir {
 				return err
@@ -59,8 +61,9 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 // large directories Walk can be inefficient.
 // Walk does not follow symbolic links.
 func (fs *AeFileSys) Walk(root string, walkFn WalkFunc) error {
-	info, err := os.Lstat(root)
+	info, err := fs.Lstat(root)
 	if err != nil {
+		// logif.Pf("walk start error %v", err)
 		return walkFn(root, nil, err)
 	}
 	return fs.walk(root, info, walkFn)

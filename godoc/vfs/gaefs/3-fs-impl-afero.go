@@ -3,8 +3,13 @@ package gaefs
 import (
 	"os"
 	"time"
+
+	"github.com/pbberlin/tools/logif"
 )
-import pth "path"
+import (
+	pth "path"
+	"path/filepath"
+)
 
 func (fs *AeFileSys) Create(name string) (AeFile, error) {
 
@@ -61,8 +66,19 @@ func (fs *AeFileSys) Remove(name string) error {
 	return nil
 }
 
+// func (fs *AeFileSys) walkRemove() appengine.Context {
+func walkRemove(path string, f os.FileInfo, err error) error {
+	tp := "file"
+	if f.IsDir() {
+		tp = "dir "
+	}
+	logif.Pf("Visited: %s %s \n", tp, path)
+	return nil
+}
+
 func (fs *AeFileSys) RemoveAll(path string) error {
-	panic(spf("RemoveAll not (yet) implemented for %v", fs))
+	err := filepath.Walk(path, walkRemove)
+	logif.Pf("filepath.Walk() returned %v\n", err)
 	return nil
 }
 

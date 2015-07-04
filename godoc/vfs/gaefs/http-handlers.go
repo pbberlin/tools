@@ -3,6 +3,7 @@ package gaefs
 import (
 	"fmt"
 	"net/http"
+	"os"
 	pth "path"
 
 	"appengine"
@@ -139,6 +140,22 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 	fmt.Fprint(w, tplx.Foot)
 	//
+
+	loghttp.Pf(w, r, "-------filewalk----<br>\n")
+
+	walkFunc := func(path string, f os.FileInfo, err error) error {
+		tp := "file"
+		if f != nil {
+			if f.IsDir() {
+				tp = "dir "
+			}
+		}
+		logif.Pf("Visited: %s %s \n", tp, path)
+		return nil
+	}
+	err := fs.Walk("ch1", walkFunc)
+	logif.Pf("fs.Walk() returned %v\n", err)
+
 }
 
 func init() {

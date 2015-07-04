@@ -37,9 +37,9 @@ func (f *AeFile) Readdir(count int) (res []os.FileInfo, err error) {
 
 func (f *AeFile) Readdirnames(n int) (names []string, err error) {
 	fis, err := f.Readdir(n)
-	names = make([]string, len(fis))
-	for i, f := range fis {
-		names[i] = f.Name()
+	names = make([]string, 0, len(fis))
+	for _, lp := range fis {
+		names = append(names, lp.Name())
 	}
 	return names, err
 }

@@ -66,6 +66,15 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 }
 
+func (fs *AeFileSys) Readdirnames(path string) (names []string, err error) {
+	fis, err := fs.ReadDir(path)
+	names = make([]string, 0, len(fis))
+	for _, lp := range fis {
+		names = append(names, lp.Name())
+	}
+	return names, err
+}
+
 func (fs *AeFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
 	f := AeFile{}
 	f.BName = pth.Base(filename)

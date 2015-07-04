@@ -7,12 +7,12 @@ import pth "path"
 func (fs AeFileSys) nestedGetDirByPath_OOOOOOLD(path string) (AeDir, error) {
 
 	if path == "" {
-		return fs.RootDir, nil
+		return fs.rootDir, nil
 	}
 
 	// prepare
 	var err error
-	childDir := fs.RootDir
+	childDir := fs.rootDir
 
 	// moving top down
 	for {

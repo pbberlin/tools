@@ -28,7 +28,7 @@ func (fs *AeFileSys) GetDirByPathQuery(path string) (AeDir, error) {
 	fo := AeDir{}
 	fo.Fs = fs
 
-	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.BName, 0, nil)
+	rootKey := datastore.NewKey(fs.Ctx(), tdir, fs.rootDir.BName, 0, nil)
 	pathInc := stringspb.IncrementString(path)
 
 	q := datastore.NewQuery(tdir).
@@ -45,7 +45,7 @@ func (fs *AeFileSys) GetDirByPathQuery(path string) (AeDir, error) {
 	var children []AeDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
-		fs.Ctx().Errorf("Error getting all children of %v => %v", fs.RootDir.Name, err)
+		fs.Ctx().Errorf("Error getting all children of %v => %v", fs.rootDir.Name, err)
 		return fo, err
 	}
 

@@ -52,7 +52,7 @@ func (fs *AeFileSys) GetFile(path string) (AeFile, error) {
 	var dir AeDir
 	var err error
 	if sdir == "" {
-		dir = fs.RootDir
+		dir = fs.rootDir
 	} else {
 		dir, err = fs.GetDirByPath(sdir)
 		if err == datastore.ErrNoSuchEntity {

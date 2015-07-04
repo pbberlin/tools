@@ -49,7 +49,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 	rt := <-util.Counter
 	rts := fmt.Sprintf("mount%03v", rt)
-	fs := NewFs(rts, appengine.NewContext(r), nestedOrRooted)
+	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)), Rooted(nestedOrRooted))
 	loghttp.Pf(w, r, "created fs %v<br>\n", rts)
 
 	fc1 := func(p []string) {

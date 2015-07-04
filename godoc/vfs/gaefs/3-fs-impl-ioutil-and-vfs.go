@@ -15,7 +15,7 @@ func OS(mount string) AeFileSys {
 	panic(`
 		Sadly, google app engine file system requires a
 	 	http.Request based context object.
-	 	Use NewFs(string, appengine.Context) instead of OS.
+	 	Use NewFs(string, AeContext(c)) instead of OS.
 	`)
 }
 

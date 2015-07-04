@@ -20,7 +20,7 @@ func TestWriteRead(t *testing.T) {
 	}
 	defer c.Close()
 
-	fs := gaefs.NewFs("rootX", c, false)
+	fs := gaefs.NewAeFs("rootX", gaefs.AeContext(c))
 
 	dir, err := fs.SaveDirByPath("/xx")
 	_ = dir
@@ -46,7 +46,7 @@ func TestWriteRead(t *testing.T) {
 	defer f2.Close()
 	io.Copy(os.Stdout, &f2)
 
-	bts, err := gaefs.ReadFile(&fs, "xx/test.txt")
+	bts, err := gaefs.ReadFile(fs, "xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

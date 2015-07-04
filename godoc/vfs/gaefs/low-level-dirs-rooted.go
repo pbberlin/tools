@@ -19,7 +19,7 @@ import (
 func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
-		return fs.RootDir, nil
+		return fs.rootDir, nil
 	}
 
 	fo := AeDir{}
@@ -30,7 +30,7 @@ func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 	fo.MModTime = time.Now()
 	fo.Fs = fs
 
-	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)
+	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.rootDir.Key)
 
 	fo.Key = perfKey
 	fo.SKey = spf("%v", perfKey) // not effKey.Encode()
@@ -55,12 +55,12 @@ func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 func (fs *AeFileSys) rootedGetDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
-		return fs.RootDir, nil
+		return fs.rootDir, nil
 	}
 
 	fo := AeDir{}
 	fo.Fs = fs
-	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.RootDir.Key)
+	perfKey := ds.NewKey(fs.c, tdir, path, 0, fs.rootDir.Key)
 	fo.Key = perfKey
 	err := ds.Get(fs.c, perfKey, &fo)
 	if err == ds.ErrNoSuchEntity {

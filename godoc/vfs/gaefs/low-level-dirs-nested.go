@@ -19,7 +19,7 @@ func (fs AeFileSys) nestedGetDirByPath(path string) (AeDir, error) {
 func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 
 	// always starting with root
-	k = datastore.NewKey(fs.Ctx(), tdir, fs.RootDir.BName, 0, nil)
+	k = datastore.NewKey(fs.Ctx(), tdir, fs.rootDir.BName, 0, nil)
 
 	if path == "" {
 		return
@@ -41,13 +41,13 @@ func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 func (fs AeFileSys) nestedSaveDirByPath(path string) (AeDir, error) {
 
 	if path == "" {
-		return fs.RootDir, nil
+		return fs.rootDir, nil
 	}
 
 	// prepare
 	var err error
-	childDir := fs.RootDir
-	childDirPrev := fs.RootDir
+	childDir := fs.rootDir
+	childDirPrev := fs.rootDir
 
 	// moving top down
 	for {

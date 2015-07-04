@@ -2,7 +2,6 @@ package gaefs
 
 import (
 	"os"
-	"strings"
 	"sync"
 	"time"
 
@@ -17,31 +16,34 @@ type AeFileSys struct {
 	// r *http.Request       `datastore:"-" json:"-"`
 	c appengine.Context `datastore:"-" json:"-"`
 
-	Rooted bool // default would be nested; <nested, rooted>
+	rooted bool // default would be nested; <nested, rooted>
 
-	RootDir AeDir
-	Mount   string // name of mount point, for remount
+	rootDir AeDir
+	mount   string // name of mount point, for remount
 	// Opener         // forcing implementation of Open()
 }
 
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeDir struct {
-	Fs       *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Fs   *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	SKey string     // readable form; not *ds.Key.Encode()
+	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from SKey
+
 	Dir      string
 	BName    string      // BaseName - distinct from os.FileInfo method Name()
 	isDir    bool        // distinct from os.FileInfo method IsDir()
 	MModTime time.Time   `datastore:"ModTime" json:"ModTime"`
 	MMode    os.FileMode `datastore:"-" json:"-"` // SaveProperty must be implemented
-
-	SKey string  // readable form; not from *ds.Key.Encode()
-	Key  *ds.Key `datastore:"-" json:"-"` // throw out? Can be constructed from SKey
 }
 
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeFile struct {
-	Fs       *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Fs   *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	SKey string     // readable form; not *ds.Key.Encode()
+	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from SKey.
+
 	Dir      string
 	BName    string      // BaseName - distinct from os.FileInfo method Name()
 	isDir    bool        // distinct from os.FileInfo method IsDir()
@@ -53,28 +55,4 @@ type AeFile struct {
 	at     int64
 	closed bool // default open
 
-	SKey string  // readable form; not from *ds.Key.Encode()
-	Key  *ds.Key `datastore:"-" json:"-"` // throw out? Can be constructed from SKey.
-}
-
-func NewFs(mount string, c appengine.Context, rooted bool) AeFileSys {
-	fs := AeFileSys{}
-	// fs.Opener = fs.Open // implicit
-	fs.c = c
-	fs.Rooted = rooted
-	if strings.Contains(mount, "/") {
-		panic("mount can't have slash in it")
-	}
-	fs.Mount = mount
-
-	var err error
-	fs.RootDir, err = fs.saveDirUnderParent(fs.Mount, nil)
-	if err != nil {
-		panic(spf("%v", err))
-	}
-	return fs
-}
-
-func (fs *AeFileSys) Ctx() appengine.Context {
-	return fs.c
 }

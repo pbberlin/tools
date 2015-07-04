@@ -12,7 +12,7 @@ func (fs *AeFileSys) Create(name string) (AeFile, error) {
 
 	f := AeFile{}
 	dir, base := pth.Split(name)
-	f.name = base
+	f.BName = base
 	err := fs.SaveFile(&f, dir)
 	if err != nil {
 		return f, err

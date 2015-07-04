@@ -18,17 +18,17 @@ type FileInfo interface {
 // All of them: NO pointer receiver
 
 func (d AeDir) Name() string {
-	return d.name
+	return d.BName
 }
 func (f AeFile) Name() string {
-	return f.name
+	return f.BName
 }
 
 func (d AeDir) Size() int64 {
-	return int64(len(d.name))
+	return int64(len(d.BName))
 }
 func (f AeFile) Size() int64 {
-	return int64(len(f.data))
+	return int64(len(f.Data))
 }
 
 // no rights implemented
@@ -36,14 +36,14 @@ func (d AeDir) Mode() os.FileMode {
 	return os.ModePerm
 }
 func (f AeFile) Mode() os.FileMode {
-	return f.mode
+	return f.MMode
 }
 
 func (d AeDir) ModTime() time.Time {
-	return d.modTime
+	return d.MModTime
 }
 func (f AeFile) ModTime() time.Time {
-	return f.modTime
+	return f.MModTime
 }
 
 func (d AeDir) IsDir() bool {

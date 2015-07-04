@@ -2,7 +2,6 @@
 //
 // Todos:
 // Rename members of AeFile
-// Implement AeFile.ReadDir
 
 //
 // Integrate into Afero
@@ -20,7 +19,6 @@
 //
 // Instance Caching with broadcasting instances via http request to instances.
 //
-// ReadDir and GetFiles should sort resulting directories/files by name.
 
 // Nice to have: FileLinks
 

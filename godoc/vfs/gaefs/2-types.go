@@ -17,47 +17,51 @@ type AeFileSys struct {
 	// r *http.Request       `datastore:"-" json:"-"`
 	c appengine.Context `datastore:"-" json:"-"`
 
-	rooted bool // default would be nested; <nested, rooted>
+	Rooted bool // default would be nested; <nested, rooted>
 
 	RootDir AeDir
 	Mount   string // name of mount point, for remount
-	Opener         // implicit
+	// Opener         // forcing implementation of Open()
 }
 
+// Upper case field names sadly
+// inevitable, for ae datastore :(
 type AeDir struct {
-	Fs      *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	dir     string
-	name    string // BaseeName - distinct from os.FileInfo method Name()
-	isDir   bool   // distinct from os.FileInfo method IsDir()
-	modTime time.Time
-	mode    os.FileMode
+	Fs       *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Dir      string
+	BName    string      // BaseName - distinct from os.FileInfo method Name()
+	isDir    bool        // distinct from os.FileInfo method IsDir()
+	MModTime time.Time   `datastore:"ModTime" json:"ModTime"`
+	MMode    os.FileMode `datastore:"-" json:"-"` // SaveProperty must be implemented
 
-	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey string  // readable form; not from *ds.Key.Encode()
+	Key  *ds.Key `datastore:"-" json:"-"` // throw out? Can be constructed from SKey
 }
 
+// Upper case field names sadly
+// inevitable, for ae datastore :(
 type AeFile struct {
-	Fs      *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	dir     string     // memDir  MemDir
-	name    string     // BaseeName - distinct from os.FileInfo method Name()
-	isDir   bool       // distinct from os.FileInfo method IsDir()
-	modTime time.Time
-	mode    os.FileMode
+	Fs       *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Dir      string
+	BName    string      // BaseName - distinct from os.FileInfo method Name()
+	isDir    bool        // distinct from os.FileInfo method IsDir()
+	MModTime time.Time   `datastore:"ModTime" json:"ModTime"`
+	MMode    os.FileMode `datastore:"-" json:"-"` // SaveProperty must be implemented
 
-	data []byte
+	Data []byte `datastore:"Data" json:"Data"`
 	sync.Mutex
 	at     int64
 	closed bool // default open
 
-	Key  *ds.Key `datastore:"-" json:"-"` // throw out? available anyway.
 	SKey string  // readable form; not from *ds.Key.Encode()
+	Key  *ds.Key `datastore:"-" json:"-"` // throw out? Can be constructed from SKey.
 }
 
 func NewFs(mount string, c appengine.Context, rooted bool) AeFileSys {
 	fs := AeFileSys{}
 	// fs.Opener = fs.Open // implicit
 	fs.c = c
-	fs.rooted = rooted
+	fs.Rooted = rooted
 	if strings.Contains(mount, "/") {
 		panic("mount can't have slash in it")
 	}

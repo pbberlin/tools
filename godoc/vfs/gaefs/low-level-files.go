@@ -3,6 +3,7 @@ package gaefs
 import (
 	"fmt"
 	pth "path"
+	"sort"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -33,6 +34,8 @@ func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 		fs.Ctx().Errorf("Error getching files children of %v => %v", dir.Key, err)
 		return files, err
 	}
+
+	sort.Sort(AeFileByName(files))
 
 	return files, err
 }
@@ -82,13 +85,13 @@ func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 
 	path = cleanseLeadingSlash(path)
 
-	if f.name == "" {
+	if f.BName == "" {
 		return fmt.Errorf("file needs name")
 	}
 
 	f.Fs = fs
-	f.dir = path
-	f.modTime = time.Now()
+	f.Dir = path
+	f.MModTime = time.Now()
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {
@@ -98,7 +101,7 @@ func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 		return err
 	}
 
-	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.name, 0, dir.Key)
+	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, dir.Key)
 	f.Key = suggKey
 	f.SKey = spf("%v", suggKey)
 

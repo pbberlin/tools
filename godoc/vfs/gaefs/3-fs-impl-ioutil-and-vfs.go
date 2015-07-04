@@ -2,6 +2,7 @@ package gaefs
 
 import (
 	"os"
+	"sort"
 
 	"appengine/datastore"
 
@@ -24,7 +25,7 @@ func ReadFile(fs *AeFileSys, path string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	return file.data, err
+	return file.Data, err
 }
 
 // ReadDir satisfies the vfs interface
@@ -59,15 +60,17 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 		fis = append(fis, fi)
 	}
 
+	sort.Sort(FileInfoByName(fis))
+
 	return fis, err
 
 }
 
 func (fs *AeFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
 	f := AeFile{}
-	f.name = pth.Base(filename)
-	f.dir = pth.Dir(filename)
-	f.data = data
+	f.BName = pth.Base(filename)
+	f.Dir = pth.Dir(filename)
+	f.Data = data
 
 	err := fs.SaveFile(&f, filename)
 	return err

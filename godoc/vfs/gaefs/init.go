@@ -21,6 +21,7 @@ const sep = "/" // no, package path does not provide it; yes, we do need it.
 
 var (
 	ErrFileClosed        = errors.New("File is closed")
+	ErrFileInUse         = errors.New("File already in use")
 	ErrOutOfRange        = errors.New("Out of range")
 	ErrTooLarge          = errors.New("Too large")
 	ErrFileNotFound      = os.ErrNotExist

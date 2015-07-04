@@ -38,7 +38,7 @@ func (fs AeFileSys) OpenVFS(path string) (vfs.ReadSeekCloser, error) {
 		return NopCloser(bytes.NewReader(b)), err
 	}
 
-	b = file.data
+	b = file.Data
 	return NopCloser(bytes.NewReader(b)), nil
 }
 

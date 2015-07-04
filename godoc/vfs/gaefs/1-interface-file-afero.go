@@ -15,8 +15,8 @@ type File interface {
 	io.WriterAt
 	//Fd() uintptr
 	Stat() (os.FileInfo, error)
-	// Readdir(count int) ([]os.FileInfo, error)
-	// Readdirnames(n int) ([]string, error)
+	Readdir(count int) ([]os.FileInfo, error)
+	Readdirnames(n int) ([]string, error)
 	WriteString(s string) (ret int, err error)
 	Truncate(size int64) error
 	Name() string

@@ -6,27 +6,43 @@ import (
 	"sync/atomic"
 )
 
+// We take minimal provision
+// to ensure exclusive access;
+// But only for one thread.
+// Another thread may open the file again
 func (f *AeFile) Open() error {
-	atomic.StoreInt64(&f.at, 0)
+
+	if f.closed == false {
+		return ErrFileInUse
+	}
+
 	f.Lock()
+	atomic.StoreInt64(&f.at, 0)
 	f.closed = false
 	f.Unlock()
 	return nil
 }
 
 func (f *AeFile) Close() error {
-	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
+	atomic.StoreInt64(&f.at, 0)
 	f.closed = true
 	f.Unlock()
 	return nil
 }
 
-// func (f *File) Readdir(count int) (res []os.FileInfo, err error) {
-// }
+func (f *AeFile) Readdir(count int) (res []os.FileInfo, err error) {
+	return f.Fs.ReadDir(f.Dir)
+}
 
-// func (f *File) Readdirnames(n int) (names []string, err error) {
-// }
+func (f *AeFile) Readdirnames(n int) (names []string, err error) {
+	fis, err := f.Readdir(n)
+	names = make([]string, len(fis))
+	for i, f := range fis {
+		names[i] = f.Name()
+	}
+	return names, err
+}
 
 func (f *AeFile) Read(b []byte) (n int, err error) {
 	f.Lock()
@@ -34,15 +50,15 @@ func (f *AeFile) Read(b []byte) (n int, err error) {
 	if f.closed == true {
 		return 0, ErrFileClosed
 	}
-	if len(b) > 0 && int(f.at) == len(f.data) {
+	if len(b) > 0 && int(f.at) == len(f.Data) {
 		return 0, io.EOF
 	}
-	if len(f.data)-int(f.at) >= len(b) {
+	if len(f.Data)-int(f.at) >= len(b) {
 		n = len(b)
 	} else {
-		n = len(f.data) - int(f.at)
+		n = len(f.Data) - int(f.at)
 	}
-	copy(b, f.data[f.at:f.at+int64(n)])
+	copy(b, f.Data[f.at:f.at+int64(n)])
 	atomic.AddInt64(&f.at, int64(n))
 	return
 }
@@ -59,13 +75,13 @@ func (f *AeFile) Truncate(size int64) error {
 	if size < 0 {
 		return ErrOutOfRange
 	}
-	if size > int64(len(f.data)) {
-		diff := size - int64(len(f.data))
+	if size > int64(len(f.Data)) {
+		diff := size - int64(len(f.Data))
 		// f.Content = append(f.Content, bytes.Repeat([]byte{00}, int(diff))...)
 		sb := make([]byte, int(diff))
-		f.data = append(f.data, sb...)
+		f.Data = append(f.Data, sb...)
 	} else {
-		f.data = f.data[0:size]
+		f.Data = f.Data[0:size]
 	}
 	return nil
 }
@@ -80,7 +96,7 @@ func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	case 1:
 		atomic.AddInt64(&f.at, int64(offset))
 	case 2:
-		atomic.StoreInt64(&f.at, int64(len(f.data))+offset)
+		atomic.StoreInt64(&f.at, int64(len(f.Data))+offset)
 	}
 	return f.at, nil
 }
@@ -94,22 +110,22 @@ func (f *AeFile) Write(b []byte) (n int, err error) {
 	cur := atomic.LoadInt64(&f.at)
 	f.Lock()
 	defer f.Unlock()
-	diff := cur - int64(len(f.data))
+	diff := cur - int64(len(f.Data))
 	var tail []byte
-	if n+int(cur) < len(f.data) {
-		tail = f.data[n+int(cur):]
+	if n+int(cur) < len(f.Data) {
+		tail = f.Data[n+int(cur):]
 	}
 	if diff > 0 {
 		sb := make([]byte, int(diff))
-		f.data = append(sb, b...)
+		f.Data = append(sb, b...)
 		// f.Content = append(bytes.Repeat([]byte{00}, int(diff)), b...)
-		f.data = append(f.data, tail...)
+		f.Data = append(f.Data, tail...)
 	} else {
-		f.data = append(f.data[:cur], b...)
-		f.data = append(f.data, tail...)
+		f.Data = append(f.Data[:cur], b...)
+		f.Data = append(f.Data, tail...)
 	}
 
-	atomic.StoreInt64(&f.at, int64(len(f.data)))
+	atomic.StoreInt64(&f.at, int64(len(f.Data)))
 	return
 }
 

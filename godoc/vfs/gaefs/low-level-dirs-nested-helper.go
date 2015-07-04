@@ -35,10 +35,10 @@ func (fs *AeFileSys) saveDirUnderParent(name string, parent *datastore.Key) (AeD
 
 	fo := AeDir{}
 	fo.isDir = true
-	fo.name = name
+	fo.BName = name
 
-	fo.dir = dirFromKey(parent)
-	fo.modTime = time.Now()
+	fo.Dir = dirFromKey(parent)
+	fo.MModTime = time.Now()
 	fo.Fs = fs
 
 	suggKey := datastore.NewKey(fs.Ctx(), tdir, name, 0, parent)

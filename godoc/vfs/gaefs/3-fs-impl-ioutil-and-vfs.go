@@ -40,6 +40,8 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	var fis []os.FileInfo
 
 	dir, err := fs.GetDirByPath(path)
+	logif.Pf("%15v => %-12v", path, dir.Dir+dir.BName)
+
 	if err == datastore.ErrNoSuchEntity {
 		return fis, err
 	} else if err != nil {
@@ -51,11 +53,17 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	keys, err := q.GetAll(fs.Ctx(), &dirs)
 	_ = keys
 	if err != nil {
-		fs.Ctx().Errorf("Error getching dir children of %v => %v", dir.Key, err)
+		fs.Ctx().Errorf("Error fetching dir children of %v => %v", dir.Key, err)
 		return fis, err
 	}
 
-	for _, v := range dirs {
+	for i, v := range dirs {
+		pK := keys[i].Parent()
+		if pK != nil && !pK.Equal(dir.Key) {
+			logif.Pf("%15v =>    skp %-14v", "", v.Dir+v.BName)
+			continue
+		}
+		logif.Pf("%15v => %-14v", "", v.Dir+v.BName)
 		fi := os.FileInfo(v)
 		fis = append(fis, fi)
 	}

@@ -6,8 +6,6 @@ import (
 	"os"
 	pth "path"
 	"path/filepath"
-
-	"github.com/pbberlin/tools/logif"
 )
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
@@ -30,7 +28,7 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 	}
 
 	names, err := fs.Readdirnames(path)
-	logif.Pf("%v => %+v", path, names)
+	// logif.Pf("%11v => %+v", path, names)
 	if err != nil {
 		return walkFn(path, info, err)
 	}

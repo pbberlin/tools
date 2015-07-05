@@ -1,8 +1,6 @@
 package distributed_unancestored
 
 import (
-	"net/http"
-
 	"fmt"
 	"math/rand"
 
@@ -39,20 +37,20 @@ type WrapShardData struct {
 }
 
 // memcache key for number of shards
-func mCKNumShards(valName string) string {
+func mcKeyShardsTotal(valName string) string {
 	return dsKindNumShards + "__" + valName
 }
 
 // memcache key for the value of valName
-func mCKValue(valName string) string {
+func mcKey(valName string) string {
 	return dsKindShard + "__" + valName
 }
 
-// datastore key for a single shard
+//  datastore key for a single shard
 //  We want an equal distribuation of the keys.
 //  We want to avoid "clustering" of datastore "tablet servers"
 //  But the mapping still needs to be deterministic
-func dSKSingleShard(valName string, shardKey int) string {
+func keySingleShard(valName string, shardKey int) string {
 	prefix := ""
 	iter := shardKey
 	for {
@@ -69,18 +67,16 @@ func dSKSingleShard(valName string, shardKey int) string {
 
 // Count retrieves the value of the named counter.
 // Either from memcache - or from datastore
-func Count(w http.ResponseWriter, r *http.Request, valName string) (retVal int, err error) {
-
-	c := appengine.NewContext(r)
+func Count(c appengine.Context, valName string) (retVal int, err error) {
 
 	wi := dsu.WrapInt{}
-	errMc := dsu.McacheGet(c, mCKValue(valName), &wi)
+	errMc := dsu.McacheGet(c, mcKey(valName), &wi)
 	if errMc == false {
 		c.Errorf("%v", errMc)
 	}
 	retVal = wi.I
 	if retVal > 0 {
-		c.Infof("found counter %s = %v in memcache; return", mCKValue(valName), wi.I)
+		c.Infof("found counter %s = %v in memcache; return", mcKey(valName), wi.I)
 		retVal = 0
 		//return
 	}
@@ -125,7 +121,7 @@ Loop1:
 
 	}
 
-	dsu.McacheSet(c, mCKValue(valName), retVal)
+	dsu.McacheSet(c, mcKey(valName), retVal)
 	return
 
 }
@@ -134,30 +130,30 @@ Loop1:
 func Increment(c appengine.Context, valName string) error {
 
 	// Get counter config.
-	wNumShards := dsu.WrapInt{}
-	dsu.McacheGet(c, mCKNumShards(valName), &wNumShards)
-	if wNumShards.I < 1 {
-		ckey := datastore.NewKey(c, dsKindNumShards, mCKNumShards(valName), 0, nil)
+	shardsTotal := dsu.WrapInt{}
+	dsu.McacheGet(c, mcKeyShardsTotal(valName), &shardsTotal)
+	if shardsTotal.I < 1 {
+		ckey := datastore.NewKey(c, dsKindNumShards, mcKeyShardsTotal(valName), 0, nil)
 		errTx := datastore.RunInTransaction(c,
 			func(c appengine.Context) error {
-				err := datastore.Get(c, ckey, &wNumShards)
+				err := datastore.Get(c, ckey, &shardsTotal)
 				if err == datastore.ErrNoSuchEntity {
-					wNumShards.I = defaultNumShards
-					_, err = datastore.Put(c, ckey, &wNumShards)
+					shardsTotal.I = defaultNumShards
+					_, err = datastore.Put(c, ckey, &shardsTotal)
 				}
 				return err
 			}, nil)
 		if errTx != nil {
 			return errTx
 		}
-		dsu.McacheSet(c, mCKNumShards(valName), dsu.WrapInt{wNumShards.I})
+		dsu.McacheSet(c, mcKeyShardsTotal(valName), dsu.WrapInt{shardsTotal.I})
 	}
 
 	// pick random counter and increment it
 	errTx := datastore.RunInTransaction(c,
 		func(c appengine.Context) error {
-			shardId := rand.Intn(wNumShards.I)
-			dsKey := datastore.NewKey(c, dsKindShard, dSKSingleShard(valName, shardId), 0, nil)
+			shardId := rand.Intn(shardsTotal.I)
+			dsKey := datastore.NewKey(c, dsKindShard, keySingleShard(valName, shardId), 0, nil)
 			var sd WrapShardData
 			err := datastore.Get(c, dsKey, &sd)
 			// A missing entity and a present entity will both work.
@@ -175,7 +171,7 @@ func Increment(c appengine.Context, valName string) error {
 		return errTx
 	}
 
-	memcache.Increment(c, mCKValue(valName), 1, 0)
+	memcache.Increment(c, mcKey(valName), 1, 0)
 
 	// collect number of updates
 	//    per valName per instance in memory
@@ -193,21 +189,21 @@ func Increment(c appengine.Context, valName string) error {
 func AdjustShards(c appengine.Context, valName string, n int) error {
 	ckey := datastore.NewKey(c, dsKindNumShards, valName, 0, nil)
 	return datastore.RunInTransaction(c, func(c appengine.Context) error {
-		wNumShards := dsu.WrapInt{}
+		shardsTotal := dsu.WrapInt{}
 		mod := false
-		err := datastore.Get(c, ckey, &wNumShards)
+		err := datastore.Get(c, ckey, &shardsTotal)
 		if err == datastore.ErrNoSuchEntity {
-			wNumShards.I = defaultNumShards
+			shardsTotal.I = n
 			mod = true
 		} else if err != nil {
 			return err
 		}
-		if wNumShards.I < n {
-			wNumShards.I = n
+		if shardsTotal.I < n {
+			shardsTotal.I = n
 			mod = true
 		}
 		if mod {
-			_, err = datastore.Put(c, ckey, &wNumShards)
+			_, err = datastore.Put(c, ckey, &shardsTotal)
 		}
 		return err
 	}, nil)

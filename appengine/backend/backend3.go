@@ -175,11 +175,7 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 
 	path := m["dir"].(string) + m["base"].(string)
 
-	err := sc.Increment(c, path)
-	loghttp.E(w, r, err, false)
-
-	cntr, err := sc.Count(w, r, path)
-	loghttp.E(w, r, err, false)
+	cntr, _ := sc.Count(c, path)
 
 	add, tplExec := tplx.FuncTplBuilder(w, r)
 	add("n_html_title", "Backend", nil)

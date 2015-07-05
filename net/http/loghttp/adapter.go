@@ -155,7 +155,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 				given(w, r, mp)
 				distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
-				cntr, _ := distributed_unancestored.Count(w, r, mp["dir"].(string)+mp["base"].(string))
+				cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
 				fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
 			}
 			httpHandler := appstats.NewHandler(given1)

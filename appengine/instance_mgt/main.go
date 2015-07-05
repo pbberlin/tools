@@ -25,8 +25,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/pbberlin/tools/net/http/loghttp"
-
 	"appengine"
 )
 
@@ -79,10 +77,6 @@ func (i *Instance) String() string {
 	return b1.String()
 }
 
-func collectInfo(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	Get(appengine.NewContext(r), m)
-}
-
 func onStart(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	c.Infof("instance started by appengine")
@@ -102,10 +96,6 @@ func onStop(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	// InstanceId := appengine.InstanceID() // does not during init, only after a few seconds
-
-	http.HandleFunc("/instance-info/view", loghttp.Adapter(view))
-	http.HandleFunc("/instance-info/collect", loghttp.Adapter(collectInfo))
-
 	http.HandleFunc("/_ah/start", onStart)
 	http.HandleFunc("/_ah/stop", onStop)
 

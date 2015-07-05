@@ -7,14 +7,13 @@ import (
 	"math/rand"
 
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
+
+	"time"
 
 	"appengine"
 	"appengine/datastore"
 	"appengine/memcache"
-	// _ "os"
-	"time"
 )
 
 var updateSamplingFrequency = map[string]int{}
@@ -76,7 +75,9 @@ func Count(w http.ResponseWriter, r *http.Request, valName string) (retVal int, 
 
 	wi := dsu.WrapInt{}
 	errMc := dsu.McacheGet(c, mCKValue(valName), &wi)
-	loghttp.E(w, r, errMc, false)
+	if errMc == false {
+		c.Errorf("%v", errMc)
+	}
 	retVal = wi.I
 	if retVal > 0 {
 		c.Infof("found counter %s = %v in memcache; return", mCKValue(valName), wi.I)
@@ -98,13 +99,9 @@ Loop1:
 
 		q = q.Order("Name")
 		q = q.Order("-ShardId")
-
 		q = q.Limit(-1)
 		q = q.Limit(batchSize)
-
-		//q = q.Offset(0)
 		q = q.Offset(j * batchSize)
-
 		cntr := 0
 		iter := q.Run(c)
 		for {
@@ -123,15 +120,7 @@ Loop1:
 			cntr++
 			retVal += sd.I
 			c.Infof("        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
-
-			loghttp.E(w, r, err, false)
-			// other err
-			// if err != nil {
-			// 	return retVal, err
-			// }
-
 		}
-
 		c.Infof("   %2v shards found - sum %4v", cntr, retVal)
 
 	}
@@ -225,7 +214,5 @@ func AdjustShards(c appengine.Context, valName string, n int) error {
 }
 
 func init() {
-
 	rand.Seed(time.Now().UnixNano())
-
 }

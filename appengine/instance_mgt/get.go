@@ -1,3 +1,4 @@
+// Package instance_mgt computes instance info; views are in instance_info.
 package instance_mgt
 
 import (
@@ -9,11 +10,14 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/stringspb"
 )
 
 var ii = new(Instance)
+
+func GetStatic() *Instance {
+	return ii
+}
 
 func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
@@ -60,7 +64,9 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
 		if !util_appengine.IsLocalEnviron() {
 			ii.NumInstances, err = module.NumInstances(c, ii.ModuleName, ii.VersionMajor)
-			logif.E(err, "get num instances works only live and without autoscale")
+			if err != nil {
+				c.Errorf("get num instances works only live and without autoscale; %v", err)
+			}
 		}
 
 	}
@@ -75,7 +81,10 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
 	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName,
 		ii.VersionMajor, "")
-	logif.F(err)
+
+	if err != nil {
+		c.Errorf("%v", err)
+	}
 
 	if !util_appengine.IsLocalEnviron() {
 		ii.HostnameInst0, err = appengine.ModuleHostname(c, ii.ModuleName,
@@ -84,7 +93,9 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 			c.Infof("inst 0: " + autoScalingErrMsg)
 			err = nil
 		}
-		logif.E(err)
+		if err != nil {
+			c.Errorf("%v", err)
+		}
 
 		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName,
 			ii.VersionMajor, "1")
@@ -92,10 +103,14 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 			c.Infof("inst 1: " + autoScalingErrMsg)
 			err = nil
 		}
-		logif.E(err)
+		if err != nil {
+			c.Errorf("%v", err)
+		}
 
 		ii.HostnameMod02, err = appengine.ModuleHostname(c, "mod02", "", "")
-		logif.E(err)
+		if err != nil {
+			c.Errorf("%v", err)
+		}
 
 	}
 

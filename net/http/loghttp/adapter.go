@@ -15,6 +15,7 @@ import (
 
 	"github.com/mjibson/appstats"
 	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/dsu/distributed_unancestored"
 
 	"appengine" // mjibson
 )
@@ -153,6 +154,9 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			var given1 AppengineHandler
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 				given(w, r, mp)
+				distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
+				cntr, _ := distributed_unancestored.Count(w, r, mp["dir"].(string)+mp["base"].(string))
+				fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
 			}
 			httpHandler := appstats.NewHandler(given1)
 			httpHandler.ServeHTTP(w, r)

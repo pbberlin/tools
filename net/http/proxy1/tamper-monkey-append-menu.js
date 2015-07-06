@@ -9,15 +9,22 @@
 // @match        http://www.handelsblatt.com/*
 // @match        https://www.handelsblatt.com/*
 // @match        http://www.focus.de/*
-// @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
+//  // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @grant        none
 // ==/UserScript==
 
 
+// fallback http://encosia.com/3-reasons-why-you-should-let-google-host-jquery-for-you/
+if (typeof jQuery === 'undefined') {
+    console.log("CDN blocked by Iran or China?");
+    document.write(unescape('%3Cscript%20src%3D%22/path/to/your/scripts/jquery-2.1.4.min.js%22%3E%3C/script%3E'));
+}
+
 (function ($, undefined) {
     $(function () {
         //isolated jQuery start;
-        console.log("about to add right click handler");
+        console.log("about to add right click handler; " + $.fn.jquery + " Version");
 
         var menuHtml = "<div id='menu01' style='background-color:#ccc;padding:4px;z-index:1000'>";
         menuHtml    += "  <li>item1</li>" ;
@@ -71,8 +78,14 @@
                     textSh += text.substr(text.length-50,text.length-1);
                     text = textSh;
                 }
+                
+                var formHtml = "";
+                formHtml += "<form  action='https://libertarian-islands.appspot.com/fetch-url-x' method='post'>"                
+                formHtml += "<input type='hidden'  name='url' value='"+href+"' >"
+                formHtml += "<input type='submit'             value='subm'     >"
+                formHtml += "</form>"
 
-                $('#menu01-item02').html("<a href="+href+" >" + href +  " <br/>" + text + "</a>");   
+                $('#menu01-item02').html("<a href="+href+" >" + href +  " <br/>" + text + "</a>" + formHtml);   
             }
 
             var fromBottom =  evt.pageY - $('#menu01').height() - 8;

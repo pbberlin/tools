@@ -22,7 +22,7 @@
 // Such an index can be queried for equality.
 //
 // Worst disadvantage: Move operations, esp. in high level directories become expensive.
-//
+// Advantage: The directory "tree" can be sparse; only lowest dir must exist.
 //
 // Integrate into Afero.
 //

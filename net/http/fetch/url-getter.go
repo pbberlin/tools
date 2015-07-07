@@ -29,6 +29,13 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 		c, _ := util_appengine.SafeGaeCheck(gaeReq)
 		if c != nil {
 			client = urlfetch.Client(c)
+
+			// this does not prevent urlfetch: SSL_CERTIFICATE_ERROR
+			// it merely leads to err = "DEADLINE_EXCEEDED"
+			tr := urlfetch.Transport{Context: c, AllowInvalidServerCertificate: true}
+			// thus
+			tr = urlfetch.Transport{Context: c, AllowInvalidServerCertificate: false}
+			client.Transport = &tr
 		}
 	}
 
@@ -50,6 +57,13 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 	}
 
 	resp, err := client.Get(u.String())
+	if err != nil {
+		if strings.Contains(err.Error(), "SSL_CERTIFICATE_ERROR") && u.Scheme == "https" {
+			u.Scheme = "http"
+			resp, err = client.Get(u.String())
+		}
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("get request failed: %v", err)
 	}

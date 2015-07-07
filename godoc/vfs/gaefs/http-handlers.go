@@ -48,11 +48,12 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fmt.Fprint(w, tplx.Head)
 
 	nestedOrRooted = !nestedOrRooted
+	nestedOrRooted = false
 
 	rt := <-util.Counter
-	rts := fmt.Sprintf("mount%03v", rt)
+	rts := fmt.Sprintf("mnt%02v", rt)
 	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)), Rooted(nestedOrRooted))
-	loghttp.Pf(w, r, "created fs %v<br>\n", rts)
+	loghttp.Pf(w, r, "created fs %v<br>", rts)
 
 	fc1 := func(p []string) {
 		path := pth.Join(p...)
@@ -63,7 +64,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		loghttp.Pf(w, r, "child created %v - %v <br>", dir.Name(), dir.Key)
 	}
 
-	loghttp.Pf(w, r, "--------create-dirs---------<br>\n")
+	loghttp.Pf(w, r, "--------create-dirs---------<br>")
 
 	fc1([]string{"ch1"})
 	fc1([]string{"ch1", "ch2"})
@@ -73,17 +74,18 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc1([]string{"ch1A"})
 	fc1([]string{"ch1B"})
 
-	loghttp.Pf(w, r, "--------retrieve-dirs---------<br>\n")
+	loghttp.Pf(w, r, "--------retrieve-dirs---------<br>")
 
 	// retrieval
 	fc2 := func(p []string) {
 		path := pth.Join(p...)
-		loghttp.Pf(w, r, "searching  %v<br>", path)
+		path = fs.RootDir() + path
+		loghttp.Pf(w, r, "%v - searching...<br>", path)
 		f, err := fs.GetDirByPath(path)
 		if err != nil {
 			loghttp.Pf(w, r, "  nothing retrieved - err %v<br>", err)
 		} else {
-			loghttp.Pf(w, r, " - child retrieved %v, %v<br>", f.Name(), f.Dir)
+			loghttp.Pf(w, r, " - %v retrieved under %v <br>", f.Name(), f.Dir)
 		}
 	}
 	fc2([]string{"ch1"})
@@ -93,7 +95,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"fsd,mount000", "fsd,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
 
-	loghttp.Pf(w, r, "-----------------<br>\n")
+	loghttp.Pf(w, r, "--------retrieve by query---------<br>")
 
 	fc3 := func(path string) {
 		loghttp.Pf(w, r, "searching  %v<br>", path)
@@ -107,47 +109,37 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc3(spf(`/fsd,%v/fsd,ch1/fsd,ch2/fsd,ch3`, rts))
 	fc3(spf(`/fsd,%v/fsd,ch1/ch2/ch3`, rts))
 
-	loghttp.Pf(w, r, "-------create and save some files----<br>\n")
+	loghttp.Pf(w, r, "-------create and save some files----<br>")
 
 	fc4 := func(name, content string) {
-		f := AeFile{}
-		dir, base := pth.Split(name)
-		f.BName = base
-		f.Data = []byte(content)
-
-		err := fs.SaveFile(&f, dir)
+		err := fs.WriteFile(name, []byte(content), os.ModePerm)
 		logif.E(err)
 	}
 
 	fc4("ch1/ch2/file1", "content 1")
 	fc4("ch1/ch2/file2", "content 2")
 	fc4("ch1/ch2/ch3/file3", "another content")
-	fc4("file4", "root content")
+	fc4(fs.RootDir()+"file4", "root content")
 
-	loghttp.Pf(w, r, "-------retrieve files again----<br>\n")
+	loghttp.Pf(w, r, "-------retrieve files again----<br>")
 
-	{
-		files, err := fs.GetFiles("ch1/ch2")
+	fc5 := func(path string) {
+		files, err := fs.GetFiles(fs.RootDir() + path)
 		logif.E(err)
+		loghttp.Pf(w, r, " srch %v  <br>", fs.RootDir()+path)
 		for k, v := range files {
 			loghttp.Pf(w, r, "%v  -  %v %s<br>", k, v.Name(), v.Data)
 		}
 	}
 
-	loghttp.Pf(w, r, "  <br>\n")
-
-	{
-		files, err := fs.GetFiles("")
-		logif.E(err)
-		for k, v := range files {
-			loghttp.Pf(w, r, "%v  -  %v %s<br>", k, v.Name(), v.Data)
-		}
-	}
+	fc5("ch1/ch2")
+	fc5("ch1/ch2/ch3")
+	fc5("")
 
 	fmt.Fprint(w, tplx.Foot)
 	//
 
-	loghttp.Pf(w, r, "-------filewalk----<br>\n")
+	loghttp.Pf(w, r, "-------filewalk----<br>")
 
 	bb := bytes.Buffer{}
 
@@ -161,7 +153,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
 		return nil
 	}
-	err := fs.Walk("ch1", walkFunc)
+	err := fs.Walk(fs.RootDir(), walkFunc)
 	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
 
 	w.Write(bb.Bytes())

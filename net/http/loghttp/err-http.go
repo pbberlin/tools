@@ -106,7 +106,7 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	// Write to log/gae-log
 	// Adding src code info
 	line, file := runtimepb.LineFileXUp(1)
-	s = fmt.Sprintf("%v \t\t- %v:%v", s, file, line)
+	s = fmt.Sprintf("%v - %v:%v", s, file, line)
 
 	// Log it
 	c, _ := util_appengine.SafeGaeCheck(r)

@@ -8,6 +8,7 @@ import (
 // File represents a file in the filesystem.
 type File interface {
 	io.Closer
+	// vfs.Opener
 	io.Reader
 	io.ReaderAt
 	io.Seeker

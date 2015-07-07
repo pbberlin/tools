@@ -4,6 +4,8 @@ import (
 	pth "path"
 	"strings"
 
+	"github.com/pbberlin/tools/logif"
+
 	"appengine/datastore"
 )
 
@@ -19,8 +21,13 @@ func (fs AeFileSys) nestedGetDirByPath(path string) (AeDir, error) {
 func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 
 	// always starting with root
-	k = datastore.NewKey(fs.Ctx(), tdir, fs.rootDir.BName, 0, nil)
+	rt := fs.RootDir()
+	rt = rt[:len(rt)-1]
+	if !strings.HasPrefix(path, rt) {
+		logif.Pf("warning: path does not start with root %q ", path)
+	}
 
+	k = nil
 	if path == "" {
 		return
 	}
@@ -28,6 +35,7 @@ func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 	// moving top down
 	for {
 		dirs := strings.Split(path, sep)
+		// logif.Pf("   %v", dirs[0])
 		k = datastore.NewKey(fs.Ctx(), tdir, dirs[0], 0, k)
 		dirs = dirs[1:]
 		path = pth.Join(dirs...)

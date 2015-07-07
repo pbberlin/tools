@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	pth "path"
-	"path/filepath"
 )
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
@@ -53,10 +52,14 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 }
 
 // Walk walks the file tree rooted at root, calling walkFn for each file or
-// directory in the tree, including root. All errors that arise visiting files
-// and directories are filtered by walkFn. The files are walked in lexical
-// order, which makes the output deterministic but means that for very
-// large directories Walk can be inefficient.
+// directory in the tree, including root.
+// But it does not enumerate files.
+// The directories are walked in lexical order.
+//
+// It is similar to filepath.Walk(root string, walkFunc)
+//
+// Errors that arise visiting directories can be filtered by walkFn.
+//
 // Walk does not follow symbolic links.
 func (fs *AeFileSys) Walk(root string, walkFn WalkFunc) error {
 	info, err := fs.Lstat(root)
@@ -67,21 +70,29 @@ func (fs *AeFileSys) Walk(root string, walkFn WalkFunc) error {
 	return fs.walk(root, info, walkFn)
 }
 
-func EXAMPLES() {}
-
-// example walk func
-func exWalkFunc(path string, f os.FileInfo, err error) error {
-	tp := "file"
-	if f.IsDir() {
-		tp = "dir "
-	}
-	fmt.Printf("Visited: %s %s \n", tp, path)
-	return nil
-}
-
 // example walk
-func exWalk() {
-	root := "/"
-	err := filepath.Walk(root, exWalkFunc)
-	fmt.Printf("filepath.Walk() returned %v\n", err)
+func ExampleWalk() {
+
+	// first the per-node func:
+	exWalkFunc := func(path string, f os.FileInfo, err error) error {
+
+		if err == fmt.Errorf("My special error") {
+			err = nil
+		} else if err != nil {
+			return err // calling off the walk
+		}
+
+		tp := "file"
+		if f.IsDir() {
+			tp = "dir "
+		}
+		fmt.Printf("Visited: %s %s \n", tp, path)
+		return nil
+	}
+
+	mnt := "mnt00"
+	fs := NewAeFs(mnt) // add appengine context
+
+	err := fs.Walk(mnt, exWalkFunc)
+	fmt.Printf("Walk() returned %v\n", err)
 }

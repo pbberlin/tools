@@ -16,6 +16,13 @@ func cleanseLeadingSlash(p string) string {
 			break
 		}
 	}
+	for {
+		if strings.HasSuffix(p, sep) {
+			p = p[:len(p)-1]
+		} else {
+			break
+		}
+	}
 	return p
 }
 
@@ -28,7 +35,7 @@ func dirFromKey(key *datastore.Key) string {
 	dirs := strings.Split(dir, sep)
 
 	if len(dirs) > 1 {
-		dirs = dirs[1:]
+		// dirs = dirs[1:] // WITH Root
 		dir = path.Join(dirs...)
 		dir = dir + sep
 		return dir

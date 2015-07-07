@@ -1,6 +1,7 @@
 package gaefs
 
 import (
+	"strings"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -26,6 +27,10 @@ func (fs *AeFileSys) rootedSaveDirByPath(path string) (AeDir, error) {
 	fo.isDir = true
 	dir, base := pth.Split(path)
 	fo.Dir = dir
+	if !strings.HasPrefix(fo.Dir, fs.RootDir()) {
+		fo.Dir = fs.RootDir() + fo.Dir
+	}
+
 	fo.BName = base
 	fo.MModTime = time.Now()
 	fo.Fs = fs

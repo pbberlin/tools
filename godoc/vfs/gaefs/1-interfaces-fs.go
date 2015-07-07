@@ -25,7 +25,7 @@ type FileSystemVFS interface {
 	Opener
 	Lstat(path string) (os.FileInfo, error)
 	Stat(path string) (os.FileInfo, error)
-	ReadDir(path string) ([]os.FileInfo, error)
+	ReadDir(path string) ([]os.FileInfo, error) // uppercase dir :( - different from file interface
 	String() string
 }
 

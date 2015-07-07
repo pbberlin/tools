@@ -7,8 +7,6 @@ import (
 	"appengine/datastore"
 
 	"github.com/pbberlin/tools/logif"
-
-	pth "path"
 )
 
 func OS(mount string) AeFileSys {
@@ -31,7 +29,6 @@ func ReadFile(fs *AeFileSys, path string) ([]byte, error) {
 // ReadDir satisfies the vfs interface
 // and ioutil.ReadDir.
 // It is similar to GetFiles, but returning only dirs
-// Todo: Sort dirs by name
 func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 	path = cleanseLeadingSlash(path)
@@ -40,7 +37,10 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	var fis []os.FileInfo
 
 	dir, err := fs.GetDirByPath(path)
-	logif.Pf("%15v => %-12v", path, dir.Dir+dir.BName)
+	if path != dir.Dir+dir.BName {
+		// panic(spf("path %v must equal dir and base %v %v ", path, dir.Dir, dir.BName))
+	}
+	logif.Pf("%15v => %24v", path, "")
 
 	if err == datastore.ErrNoSuchEntity {
 		return fis, err
@@ -60,10 +60,10 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	for i, v := range dirs {
 		pK := keys[i].Parent()
 		if pK != nil && !pK.Equal(dir.Key) {
-			logif.Pf("%15v =>    skp %-14v", "", v.Dir+v.BName)
+			logif.Pf("%15v =>    skp %-17v", "", v.Dir+v.BName)
 			continue
 		}
-		logif.Pf("%15v => %-14v", "", v.Dir+v.BName)
+		logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
 		fi := os.FileInfo(v)
 		fis = append(fis, fi)
 	}
@@ -81,14 +81,4 @@ func (fs *AeFileSys) Readdirnames(path string) (names []string, err error) {
 		names = append(names, lp.Name())
 	}
 	return names, err
-}
-
-func (fs *AeFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
-	f := AeFile{}
-	f.BName = pth.Base(filename)
-	f.Dir = pth.Dir(filename)
-	f.Data = data
-
-	err := fs.SaveFile(&f, filename)
-	return err
 }

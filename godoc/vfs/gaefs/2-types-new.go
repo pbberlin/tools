@@ -53,3 +53,7 @@ func NewAeFs(mount string, options ...func(*AeFileSys)) *AeFileSys {
 func (fs *AeFileSys) Ctx() appengine.Context {
 	return fs.c
 }
+
+func (fs *AeFileSys) RootDir() string {
+	return fs.mount + sep
+}

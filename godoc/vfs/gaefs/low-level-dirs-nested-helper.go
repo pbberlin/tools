@@ -2,6 +2,7 @@ package gaefs
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -38,6 +39,10 @@ func (fs *AeFileSys) saveDirUnderParent(name string, parent *datastore.Key) (AeD
 	fo.BName = name
 
 	fo.Dir = dirFromKey(parent)
+	if !strings.HasPrefix(fo.Dir, fs.RootDir()) {
+		fo.Dir = fs.RootDir() + fo.Dir
+	}
+
 	fo.MModTime = time.Now()
 	fo.Fs = fs
 

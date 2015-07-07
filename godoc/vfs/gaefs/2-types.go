@@ -18,9 +18,8 @@ type AeFileSys struct {
 
 	rooted bool // default would be nested; <nested, rooted>
 
-	rootDir AeDir
 	mount   string // name of mount point, for remount
-	// Opener         // forcing implementation of Open()
+	rootDir AeDir  // a directory with the same name
 }
 
 // Upper case field names sadly

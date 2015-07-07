@@ -12,20 +12,21 @@ import (
 // Another thread may open the file again
 func (f *AeFile) Open() error {
 
+	atomic.StoreInt64(&f.at, 0) // why is this not covered by f.Lock()
+
 	if f.closed == false {
-		return ErrFileInUse
+		// return ErrFileInUse // instead of waiting for lock?
 	}
 
 	f.Lock()
-	atomic.StoreInt64(&f.at, 0)
 	f.closed = false
 	f.Unlock()
 	return nil
 }
 
 func (f *AeFile) Close() error {
-	f.Lock()
 	atomic.StoreInt64(&f.at, 0)
+	f.Lock()
 	f.closed = true
 	f.Unlock()
 	return nil

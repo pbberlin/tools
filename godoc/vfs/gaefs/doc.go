@@ -2,7 +2,7 @@
 //
 // Todos:
 
-// Add a Walk function, similar to filepath.Walk(root string, walkFunc)
+// Complete the usage of the walker function, similar to filepath.Walk(root string, walkFunc)
 // 	Use this "walker" to implement removals
 
 //

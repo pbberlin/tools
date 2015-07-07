@@ -4,6 +4,7 @@ import (
 	"fmt"
 	pth "path"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
@@ -12,12 +13,12 @@ import (
 )
 
 // similar to ReadDir but returning only files
-// Todo: Sort files by name
 func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 
 	path = cleanseLeadingSlash(path)
 
 	var files []AeFile
+	var filesDirect []AeFile
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {
@@ -29,15 +30,24 @@ func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 
 	q := datastore.NewQuery(tfil).Ancestor(dir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
-	_ = keys
 	if err != nil {
 		fs.Ctx().Errorf("Error getching files children of %v => %v", dir.Key, err)
 		return files, err
 	}
 
-	sort.Sort(AeFileByName(files))
+	for i, v := range files {
+		pK := keys[i].Parent()
+		if pK != nil && !pK.Equal(dir.Key) {
+			// logif.Pf("%15v =>    skp %-17v", "", v.Dir+v.BName)
+			continue
+		}
+		// logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
+		filesDirect = append(filesDirect, v)
+	}
 
-	return files, err
+	sort.Sort(AeFileByName(filesDirect))
+
+	return filesDirect, err
 }
 
 func (fs *AeFileSys) GetFile(path string) (AeFile, error) {
@@ -89,9 +99,25 @@ func (fs *AeFileSys) SaveFile(f *AeFile, path string) error {
 		return fmt.Errorf("file needs name")
 	}
 
-	f.Fs = fs
+	if !strings.HasPrefix(path, fs.RootDir()) {
+		path = fs.RootDir() + path
+	}
+
+	if strings.HasSuffix(path, f.BName) {
+		path = path[:len(path)-len(f.BName)]
+	}
+
 	f.Dir = path
+
+	if !strings.HasSuffix(f.Dir, sep) {
+		f.Dir += sep
+	}
+
 	f.MModTime = time.Now()
+	f.Fs = fs
+
+	//
+	// -------------now the datastore part-------------------------
 
 	dir, err := fs.GetDirByPath(path)
 	if err == datastore.ErrNoSuchEntity {

@@ -11,14 +11,23 @@ import (
 	"path/filepath"
 )
 
+func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
+	panic(spf("Chmod not (yet) implemented for %v", fs))
+	return nil
+}
+
+func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
+	panic(spf("Chtimes not (yet) implemented for %v", fs))
+	return nil
+}
+
 func (fs *AeFileSys) Create(name string) (AeFile, error) {
 
 	name = cleanseLeadingSlash(name)
-
 	f := AeFile{}
-	dir, base := pth.Split(name)
-	f.BName = base
-	err := fs.SaveFile(&f, dir)
+	f.BName = pth.Base(name)
+
+	err := fs.SaveFile(&f, name)
 	if err != nil {
 		return f, err
 	}
@@ -67,19 +76,26 @@ func (fs *AeFileSys) Remove(name string) error {
 	return nil
 }
 
-// func (fs *AeFileSys) walkRemove() appengine.Context {
-func walkRemove(path string, f os.FileInfo, err error) error {
-	tp := "file"
-	if f.IsDir() {
-		tp = "dir "
-	}
-	logif.Pf("Visited: %s %s \n", tp, path)
-	return nil
-}
-
 func (fs *AeFileSys) RemoveAll(path string) error {
+
+	paths := []string{}
+	walkRemove := func(path string, f os.FileInfo, err error) error {
+		if f.IsDir() {
+			paths = append(paths, path)
+		}
+		// logif.Pf("Visited: %s %s \n", tp, path)
+		return nil
+	}
+
 	err := filepath.Walk(path, walkRemove)
+
 	logif.Pf("filepath.Walk() returned %v\n", err)
+
+	for i := 0; i < len(paths); i++ {
+		// todo: remove files
+		// bottom-up remove dirs
+	}
+
 	return nil
 }
 
@@ -101,12 +117,15 @@ func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
 	}
 }
 
-func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
-	panic(spf("Chmod not (yet) implemented for %v", fs))
-	return nil
-}
+func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
 
-func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
-	panic(spf("Chtimes not (yet) implemented for %v", fs))
-	return nil
+	name = cleanseLeadingSlash(name)
+
+	f, err := fs.Create(name)
+	if err != nil {
+		return err
+	}
+	f.Data = data
+	err = fs.SaveFile(&f, name)
+	return err
 }

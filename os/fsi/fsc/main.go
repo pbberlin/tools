@@ -1,11 +1,14 @@
-package gaefs
+// Package fsc contains convenience functions,
+// common to all fsi implementations;
+// since only fsi interfaces are used.
+package fsc
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	pth "path"
-	"strings"
+
+	"github.com/pbberlin/tools/os/fsi"
 )
 
 // SkipDir is an "error", which a walk-function can
@@ -15,7 +18,7 @@ var SkipDir = errors.New("skip this directory")
 type WalkFunc func(path string, info os.FileInfo, err error) error
 
 // walk recursively descends path, calling walkFn.
-func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error {
+func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) error {
 
 	err := walkFn(path, info, nil)
 	if err != nil {
@@ -43,7 +46,7 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 				return err
 			}
 		} else {
-			err = fs.walk(filename, fileInfo, walkFn)
+			err = walk(fs, filename, fileInfo, walkFn)
 			if err != nil {
 				if !fileInfo.IsDir() || err != SkipDir {
 					return err
@@ -57,7 +60,7 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 // Walk walks the file tree rooted at root, calling walkFn for each file or
 // directory in the tree, including root.
 //
-// It requires only the FileSystem interface, and is therefore implementation indepdenent.
+// It requires only the fsi.FileSystem interface, and is therefore implementation indepdenent.
 //
 // It is similar to filepath.Walk(root string, walkFunc)
 // In contrast to filepath.Walk, it does not enumerate files, only dirs.
@@ -68,41 +71,11 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 // Errors that arise visiting directories can be filtered by walkFn.
 //
 // Walk does not follow symbolic links.
-func (fs *AeFileSys) Walk(root string, walkFn WalkFunc) error {
+func Walk(fs fsi.FileSystem, root string, walkFn WalkFunc) error {
 	info, err := fs.Lstat(root)
 	if err != nil {
 		// logif.Pf("walk start error %v", err)
 		return walkFn(root, nil, err)
 	}
-	return fs.walk(root, info, walkFn)
-}
-
-// example walk
-func ExampleWalk() {
-
-	// first the per-node func:
-	exWalkFunc := func(path string, f os.FileInfo, err error) error {
-
-		if strings.HasSuffix(path, "my secret directory") {
-			return SkipDir
-		}
-
-		if err == ErrTooLarge {
-			return err // calling off the walk
-		}
-
-		tp := "file"
-		if f.IsDir() {
-			tp = "dir "
-		}
-		fmt.Printf("Visited: %s %s \n", tp, path)
-		return nil
-	}
-
-	mnt := "mnt00"
-	fs := NewAeFs(mnt) // add appengine context
-	fsi := FileSystem(fs)
-
-	err := fsi.Walk(mnt, exWalkFunc)
-	fmt.Printf("Walk() returned %v\n", err)
+	return walk(fs, root, info, walkFn)
 }

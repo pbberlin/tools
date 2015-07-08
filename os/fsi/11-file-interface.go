@@ -1,20 +1,22 @@
-package gaefs
+package fsi
 
 import (
 	"io"
 	"os"
 )
 
-// Interface File is inspired by os.File, informed by godoc.vfs and package afero
-type FileI interface {
+// Interface File is inspired by os.File,
+// and informed by godoc.vfs and package afero
+type File interface {
 	io.Closer
-	// Notice, we dont have an Opener on file. Opener is attached to filesystem one level higher.
+	// Notice, we dont have an Opener on file.
+	// Opener is attached to filesystem one level higher.
 	io.Reader
 	io.ReaderAt
 	io.Seeker
 	io.Writer
-
 	io.WriterAt
+
 	//Fd() uintptr
 	Stat() (os.FileInfo, error)
 

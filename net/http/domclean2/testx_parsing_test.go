@@ -12,10 +12,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pbberlin/tools/io/ioutilpb"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
+	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
@@ -77,13 +77,13 @@ func main() {
 		textExtraction(doc, 0)
 
 		textsBytes, textsSorted := orderByOutline(textsByOutl)
-		ioutilpb.Bytes2File(fn2, textsBytes)
+		osutilpb.Bytes2File(fn2, textsBytes)
 		textsByArticOutl[fnKey] = textsSorted
 
 		reIndent(doc, 0)
 
-		ioutilpb.Bytes2File(fn1, xPathDump)
-		ioutilpb.Dom2File(fn3, doc)
+		osutilpb.Bytes2File(fn1, xPathDump)
+		osutilpb.Dom2File(fn3, doc)
 
 		numTotal++
 	}
@@ -110,19 +110,19 @@ func main() {
 		weedoutMap = assembleWeedout(frags, weedoutMap)
 
 		bb := stringspb.IndentedDumpBytes(weedoutMap)
-		ioutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
+		osutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
 
 		for i, _ := range iter {
 			fnInn, _ := weedoutFilename(i, weedStage-1)
 			fnOut, fnKey := weedoutFilename(i, weedStage)
 
-			resBytes := ioutilpb.BytesFromFile(fnInn)
+			resBytes := osutilpb.BytesFromFile(fnInn)
 			doc, err := html.Parse(bytes.NewReader(resBytes))
 			if err != nil {
 				log.Fatal(err)
 			}
 			weedoutApply(weedoutMap[fnKey], doc)
-			ioutilpb.Dom2File(fnOut, doc)
+			osutilpb.Dom2File(fnOut, doc)
 		}
 	}
 
@@ -130,13 +130,13 @@ func main() {
 		fnInn, _ := weedoutFilename(i, stageMax)
 		fnOut, _ := weedoutFilename(i, stageMax+1)
 
-		resBytes := ioutilpb.BytesFromFile(fnInn)
+		resBytes := osutilpb.BytesFromFile(fnInn)
 		doc, err := html.Parse(bytes.NewReader(resBytes))
 		if err != nil {
 			log.Fatal(err)
 		}
 		flattenTraverse(doc)
-		ioutilpb.Dom2File(fnOut, doc)
+		osutilpb.Dom2File(fnOut, doc)
 	}
 
 	{

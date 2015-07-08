@@ -1,10 +1,9 @@
-// Package ioutilpb reads and writes files.
-package ioutilpb
+// Package osutilpb reads and writes files.
+package osutilpb
 
 import (
 	"bytes"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -15,9 +14,7 @@ import (
 func Dom2File(fn string, node *html.Node) {
 	var b bytes.Buffer
 	err := html.Render(&b, node)
-	if err != nil {
-		log.Fatal(err)
-	}
+	logif.F(err)
 	Bytes2File(fn, b.Bytes())
 }
 
@@ -37,8 +34,6 @@ func Bytes2File(fn string, b []byte) {
 
 func BytesFromFile(fn string) []byte {
 	b, err := ioutil.ReadFile(fn)
-	if err != nil {
-		log.Println(err)
-	}
+	logif.E(err)
 	return b
 }

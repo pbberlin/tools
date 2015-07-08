@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+
+	"github.com/pbberlin/tools/os/fsi"
 )
 
 // the usual short notations for fmt.Printf and fmt.Sprintf
@@ -36,14 +38,14 @@ func init() {
 	// to comply with our interfaces
 
 	f := AeFile{}
-	ifa := FileI(&f)
+	ifa := fsi.File(&f)
 	_ = ifa
 
 	ifi := os.FileInfo(&f)
 	_ = ifi
 
 	fs := AeFileSys{}
-	ifs := FileSystem(&fs)
+	ifs := fsi.FileSystem(&fs)
 	_ = ifs
 
 }

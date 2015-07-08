@@ -3,7 +3,7 @@ package fetch_rss
 import (
 	"fmt"
 
-	"github.com/pbberlin/tools/io/ioutilpb"
+	"github.com/pbberlin/tools/os/osutilpb"
 )
 
 var testDocs = make([]string, 2)
@@ -64,7 +64,7 @@ func init() {
 	// write out to http doc root
 	for i := 0; i < len(testDocs); i++ {
 		fn := fmt.Sprintf(docRoot+"/%v/art%02v.html", hosts[0], i)
-		ioutilpb.Bytes2File(fn, []byte(testDocs[i]))
+		osutilpb.Bytes2File(fn, []byte(testDocs[i]))
 	}
 
 }

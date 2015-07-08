@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pbberlin/tools/io/ioutilpb"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
+	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -106,7 +106,7 @@ func Fetch(rssUrl string, numberArticles int) {
 	logif.E(err)
 
 	bdmp := stringspb.IndentedDumpBytes(rssDoc)
-	ioutilpb.Bytes2File("outp_rss.xml", bdmp)
+	osutilpb.Bytes2File("outp_rss.xml", bdmp)
 	pf("RSS resp size, outp_rss.xml, : %v\n", len(bdmp))
 
 	for i, lpItem := range rssDoc.Items.ItemList {
@@ -133,8 +133,8 @@ func Fetch(rssUrl string, numberArticles int) {
 	// Saving as files
 	for idx, a := range fullArticles {
 		orig, numbered := fetchFileName(a.Url, idx+len(testDocs))
-		ioutilpb.Bytes2File(orig, a.Body)
-		ioutilpb.Bytes2File(numbered, a.Body)
+		osutilpb.Bytes2File(orig, a.Body)
+		osutilpb.Bytes2File(numbered, a.Body)
 	}
 
 	// Write out directory statistics
@@ -158,20 +158,20 @@ func Fetch(rssUrl string, numberArticles int) {
 		}
 		// sr.Print(3)
 		fnDigest := filepath.Join(docRoot, "digest.txt")
-		ioutilpb.Bytes2File(fnDigest, bts)
+		osutilpb.Bytes2File(fnDigest, bts)
 	}
 
 	{
 		b, err := json.MarshalIndent(sr, "  ", "\t")
 		logif.E(err)
 		fnDigest := filepath.Join(docRoot, "digest1.json")
-		ioutilpb.Bytes2File(fnDigest, b)
+		osutilpb.Bytes2File(fnDigest, b)
 	}
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
 		logif.E(err)
 		fnDigest := filepath.Join(docRoot, "digest2.json")
-		ioutilpb.Bytes2File(fnDigest, b)
+		osutilpb.Bytes2File(fnDigest, b)
 	}
 }

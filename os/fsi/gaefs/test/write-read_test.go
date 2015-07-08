@@ -8,7 +8,7 @@ import (
 
 	"appengine/aetest"
 
-	"github.com/pbberlin/tools/godoc/vfs/gaefs"
+	"github.com/pbberlin/tools/os/fsi/gaefs"
 )
 
 func TestWriteRead(t *testing.T) {
@@ -35,7 +35,7 @@ func TestWriteRead(t *testing.T) {
 	f.WriteString("some text content")
 	f.Close()
 
-	err = fs.SaveFile(f, fs.RootDir()+"xx")
+	err = fs.SaveFile(f.(*gaefs.AeFile), fs.RootDir()+"xx")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,3 +1,5 @@
+// Package blobstore_mgt allows changing, listing and viewing
+// binary files to app engine; app engine allows only mediated access.
 package blobstore_mgt
 
 import (

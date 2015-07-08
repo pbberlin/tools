@@ -3,7 +3,7 @@ package domclean2
 import (
 	"fmt"
 
-	"github.com/pbberlin/tools/io/ioutilpb"
+	"github.com/pbberlin/tools/os/osutilpb"
 )
 
 func similaritiesToFile(frags []fragment, stage int) {
@@ -33,7 +33,7 @@ func similaritiesToFile(frags []fragment, stage int) {
 		}
 		bfrags = append(bfrags, '\n')
 	}
-	ioutilpb.Bytes2File(spf("outp_frags_st%v.txt", stage), bfrags)
+	osutilpb.Bytes2File(spf("outp_frags_st%v.txt", stage), bfrags)
 
 }
 

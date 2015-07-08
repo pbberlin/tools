@@ -7,12 +7,12 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
-	_ "github.com/pbberlin/tools/godoc/vfs/gaefs" // only http handler registration
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/proxy1"
 	"github.com/pbberlin/tools/net/http/tplx"
+	_ "github.com/pbberlin/tools/os/fsi/gaefs" // only http handler registration
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 )

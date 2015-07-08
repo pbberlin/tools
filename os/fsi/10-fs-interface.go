@@ -1,17 +1,19 @@
-package gaefs
+// Package fsi - filesystem interface - contains the minimal
+// requirements for exchangeable filesystems.
+package fsi
 
 import "os"
 
 // Interface FileSystem is inspired by os.File + io.ioutil,
 // informed by godoc.vfs and package afero.
 type FileSystem interface {
-	Create(name string) (*AeFile, error) // read write
+	Create(name string) (File, error) // read write
 	Lstat(path string) (os.FileInfo, error)
 	Mkdir(name string, perm os.FileMode) error
 	MkdirAll(path string, perm os.FileMode) error
 	Name() string
-	Open(name string) (*AeFile, error) // read only
-	OpenFile(name string, flag int, perm os.FileMode) (*AeFile, error)
+	Open(name string) (File, error) // read only
+	OpenFile(name string, flag int, perm os.FileMode) (File, error)
 
 	// Notice the distinct methods on File interface:
 	//          Readdir(count int) ([]os.FileInfo, error)
@@ -29,7 +31,10 @@ type FileSystem interface {
 	WriteFile(filename string, data []byte, perm os.FileMode) error
 
 	// Inspired by filepath.Walk.
-	// Could be implemented generically on interface FileSystem;
-	//   with interface methods only. But golang does not support methods on interfaces.
+	// Also implemented generically, purely on fsi.FileSystem;
+	//   in package fsc. However, only functions are possible,
+	//   since golang does not support methods on interfaces.
 	Walk(root string, walkFn WalkFunc) error
 }
+
+type WalkFunc func(path string, info os.FileInfo, err error) error

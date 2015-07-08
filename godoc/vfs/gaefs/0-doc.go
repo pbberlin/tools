@@ -1,5 +1,12 @@
 // Package gaefs builds a filesystem layer on top of appengine datastore.
 //
+// "name" can mean either the basename or the full path of the file,
+// depending on the actual argument - /tmp/logs/app1.log or simply app1.log
+// In the latter case, it refers to [current dir]/app1.log.
+// Btw: golang os file structures have no internal "current dir",
+// they save full path into "name".
+// Compare // http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
+//
 // Todos:
 //
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf

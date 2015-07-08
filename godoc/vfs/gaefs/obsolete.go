@@ -1,33 +1,53 @@
 package gaefs
 
-import "strings"
-import pth "path"
+import (
+	"os"
 
-// before using constructDirKey
-func (fs AeFileSys) nestedGetDirByPath_OOOOOOLD(path string) (AeDir, error) {
+	"golang.org/x/tools/godoc/vfs"
+)
 
-	if path == "" {
-		return fs.rootDir, nil
-	}
+//
+// from golang.org/x/tools/godoc/vfs
+type T_OS func(string) AeFileSys
+type T_ReadFile func(Opener, string) ([]byte, error)
 
-	// prepare
-	var err error
-	childDir := fs.rootDir
+// I wanted my package types <Directory> and <File>
+// pluggable into
+//    pth.Walk(File,WalkFunc)
+// But it seems impossible :(
 
-	// moving top down
-	for {
-		dirs := strings.Split(path, sep)
-		childDir, err = fs.getDirUnderParent(childDir.Key, dirs[0])
-		if err != nil {
-			return childDir, err
-		}
+type FileSystemVFS interface {
+	Opener
+	Lstat(path string) (os.FileInfo, error)
+	Stat(path string) (os.FileInfo, error)
+	ReadDir(path string) ([]os.FileInfo, error) // uppercase dir :( - different from file interface
+	String() string
+}
 
-		dirs = dirs[1:]
-		path = pth.Join(dirs...)
+// from afero - https://github.com/spf13/afero
+// Stat() and Open(...) overlap with vfs interface
+type FileSystemI2 interface {
+	Create(name string) (AeFile, error)
+	Mkdir(name string, perm os.FileMode) error
+	MkdirAll(path string, perm os.FileMode) error
+	Name() string
+	Open(name string) (AeFile, error)
+	OpenFile(name string, flag int, perm os.FileMode) (AeFile, error)
+	Remove(name string) error
+	RemoveAll(path string) error
+	Rename(oldname, newname string) error
+	Stat(name string) (os.FileInfo, error)
+}
 
-		if len(dirs) < 1 {
-			break
-		}
-	}
-	return childDir, nil
+// method signiture conflicted with Afero Open()
+type Opener interface {
+	OpenVFS(name string) (vfs.ReadSeekCloser, error)
+}
+
+func OS(mount string) AeFileSys {
+	panic(`
+		Sadly, google app engine file system requires a
+	 	http.Request based context object.
+	 	Use NewFs(string, AeContext(c)) instead of OS.
+	`)
 }

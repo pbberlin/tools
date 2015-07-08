@@ -31,7 +31,7 @@ func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 	q := datastore.NewQuery(tfil).Ancestor(dir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
 	if err != nil {
-		fs.Ctx().Errorf("Error getching files children of %v => %v", dir.Key, err)
+		fs.Ctx().Errorf("Error fetching files children of %v => %v", dir.Key, err)
 		return files, err
 	}
 
@@ -43,6 +43,7 @@ func (fs *AeFileSys) GetFiles(path string) ([]AeFile, error) {
 		}
 		// logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
 		filesDirect = append(filesDirect, v)
+		// logif.Pf("%s", v.Data)
 	}
 
 	sort.Sort(AeFileByName(filesDirect))

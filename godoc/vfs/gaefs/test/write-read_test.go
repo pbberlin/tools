@@ -28,25 +28,26 @@ func TestWriteRead(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	f, err := fs.Create("xx/test.txt")
+	f, err := fs.Create(fs.RootDir() + "xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	f.WriteString("some text content")
 	f.Close()
-	err = fs.SaveFile(&f, "xx")
+
+	err = fs.SaveFile(f, fs.RootDir()+"xx")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	f2, err := fs.Open("xx/test.txt")
+	f2, err := fs.Open(fs.RootDir() + "xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f2.Close()
-	io.Copy(os.Stdout, &f2)
+	io.Copy(os.Stdout, f2)
 
-	bts, err := gaefs.ReadFile(fs, "xx/test.txt")
+	bts, err := fs.ReadFile(fs.RootDir() + "xx/test.txt")
 	if err != nil {
 		log.Fatal(err)
 	}

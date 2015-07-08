@@ -136,9 +136,6 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc5("ch1/ch2/ch3")
 	fc5("")
 
-	fmt.Fprint(w, tplx.Foot)
-	//
-
 	loghttp.Pf(w, r, "-------filewalk----<br>")
 
 	bb := bytes.Buffer{}
@@ -157,6 +154,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
 
 	w.Write(bb.Bytes())
+	fmt.Fprint(w, tplx.Foot)
 
 }
 

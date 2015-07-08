@@ -121,8 +121,7 @@ func TestWriteAt(t *testing.T) {
 		t.Fatalf("WriteAt 7: %d, %v", n, err)
 	}
 
-	f.Close()
-	f.Open()
+	f.at = int64(0)
 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(f)

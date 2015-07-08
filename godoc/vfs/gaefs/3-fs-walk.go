@@ -5,11 +5,14 @@ import (
 	"fmt"
 	"os"
 	pth "path"
+	"strings"
 )
 
-type WalkFunc func(path string, info os.FileInfo, err error) error
+// SkipDir is an "error", which a walk-function can
+// return, in order to signal, that walk should not traverse into this dir.
+var SkipDir = errors.New("skip this directory")
 
-var SkipDir = errors.New("skip this directory") // walk func signalling: omit this dir
+type WalkFunc func(path string, info os.FileInfo, err error) error
 
 // walk recursively descends path, calling walkFn.
 func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error {
@@ -26,14 +29,14 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 		return nil
 	}
 
-	names, err := fs.Readdirnames(path)
-	// logif.Pf("%11v => %+v", path, names)
+	fis, err := fs.ReadDir(path)
+	// logif.Pf("%11v => %+v", path, fis)
 	if err != nil {
 		return walkFn(path, info, err)
 	}
 
-	for _, name := range names {
-		filename := pth.Join(path, name)
+	for _, fi := range fis {
+		filename := pth.Join(path, fi.Name())
 		fileInfo, err := fs.Lstat(filename)
 		if err != nil {
 			if err := walkFn(filename, fileInfo, err); err != nil && err != SkipDir {
@@ -53,10 +56,14 @@ func (fs *AeFileSys) walk(path string, info os.FileInfo, walkFn WalkFunc) error 
 
 // Walk walks the file tree rooted at root, calling walkFn for each file or
 // directory in the tree, including root.
-// But it does not enumerate files.
-// The directories are walked in lexical order.
+//
+// It requires only the FileSystem interface, and is therefore implementation indepdenent.
 //
 // It is similar to filepath.Walk(root string, walkFunc)
+// In contrast to filepath.Walk, it does not enumerate files, only dirs.
+// File enumeration can be added in the WalkFunc.
+//
+// Directories are walked in order of Readdirnames()
 //
 // Errors that arise visiting directories can be filtered by walkFn.
 //
@@ -76,9 +83,11 @@ func ExampleWalk() {
 	// first the per-node func:
 	exWalkFunc := func(path string, f os.FileInfo, err error) error {
 
-		if err == fmt.Errorf("My special error") {
-			err = nil
-		} else if err != nil {
+		if strings.HasSuffix(path, "my secret directory") {
+			return SkipDir
+		}
+
+		if err == ErrTooLarge {
 			return err // calling off the walk
 		}
 
@@ -92,7 +101,8 @@ func ExampleWalk() {
 
 	mnt := "mnt00"
 	fs := NewAeFs(mnt) // add appengine context
+	fsi := FileSystem(fs)
 
-	err := fs.Walk(mnt, exWalkFunc)
+	err := fsi.Walk(mnt, exWalkFunc)
 	fmt.Printf("Walk() returned %v\n", err)
 }

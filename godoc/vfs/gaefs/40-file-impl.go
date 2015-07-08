@@ -6,24 +6,6 @@ import (
 	"sync/atomic"
 )
 
-// We take minimal provision
-// to ensure exclusive access;
-// But only for one thread.
-// Another thread may open the file again
-func (f *AeFile) Open() error {
-
-	atomic.StoreInt64(&f.at, 0) // why is this not covered by f.Lock()
-
-	if f.closed == false {
-		// return ErrFileInUse // instead of waiting for lock?
-	}
-
-	f.Lock()
-	f.closed = false
-	f.Unlock()
-	return nil
-}
-
 func (f *AeFile) Close() error {
 	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
@@ -69,24 +51,6 @@ func (f *AeFile) ReadAt(b []byte, off int64) (n int, err error) {
 	return f.Read(b)
 }
 
-func (f *AeFile) Truncate(size int64) error {
-	if f.closed == true {
-		return ErrFileClosed
-	}
-	if size < 0 {
-		return ErrOutOfRange
-	}
-	if size > int64(len(f.Data)) {
-		diff := size - int64(len(f.Data))
-		// f.Content = append(f.Content, bytes.Repeat([]byte{00}, int(diff))...)
-		sb := make([]byte, int(diff))
-		f.Data = append(f.Data, sb...)
-	} else {
-		f.Data = f.Data[0:size]
-	}
-	return nil
-}
-
 func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	if f.closed == true {
 		return 0, ErrFileClosed
@@ -104,6 +68,24 @@ func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 
 func (f *AeFile) Stat() (os.FileInfo, error) {
 	return os.FileInfo(*f), nil
+}
+
+func (f *AeFile) Truncate(size int64) error {
+	if f.closed == true {
+		return ErrFileClosed
+	}
+	if size < 0 {
+		return ErrOutOfRange
+	}
+	if size > int64(len(f.Data)) {
+		diff := size - int64(len(f.Data))
+		// f.Content = append(f.Content, bytes.Repeat([]byte{00}, int(diff))...)
+		sb := make([]byte, int(diff))
+		f.Data = append(f.Data, sb...)
+	} else {
+		f.Data = f.Data[0:size]
+	}
+	return nil
 }
 
 func (f *AeFile) Write(b []byte) (n int, err error) {

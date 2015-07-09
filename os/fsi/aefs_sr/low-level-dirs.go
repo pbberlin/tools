@@ -1,4 +1,4 @@
-package gaefs
+package aefs_sr
 
 func (fs AeFileSys) GetDirByPath(path string) (AeDir, error) {
 	path = cleanseLeadingSlash(path)

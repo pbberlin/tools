@@ -1,4 +1,4 @@
-package gaefs
+package aefs_sr
 
 import (
 	"path"

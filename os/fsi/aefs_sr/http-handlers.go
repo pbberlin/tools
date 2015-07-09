@@ -1,7 +1,6 @@
-package gaefs
+package aefs_sr
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -135,26 +134,6 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc5("ch1/ch2")
 	fc5("ch1/ch2/ch3")
 	fc5("")
-
-	loghttp.Pf(w, r, "-------filewalk----<br>")
-
-	bb := bytes.Buffer{}
-
-	walkFunc := func(path string, f os.FileInfo, err error) error {
-		tp := "file"
-		if f != nil {
-			if f.IsDir() {
-				tp = "dir "
-			}
-		}
-		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
-		return nil
-	}
-	err := fs.Walk(fs.RootDir(), walkFunc)
-	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
-
-	w.Write(bb.Bytes())
-	fmt.Fprint(w, tplx.Foot)
 
 }
 

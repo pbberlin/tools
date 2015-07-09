@@ -1,4 +1,4 @@
-package gaefs
+package aefs_sr
 
 import (
 	"io"
@@ -72,7 +72,7 @@ func (f *AeFile) Stat() (os.FileInfo, error) {
 
 func (f *AeFile) Sync() error {
 
-	err = fs.SaveFile(f, f.Dir)
+	err := f.Fs.SaveFile(f, f.Dir)
 	if err != nil {
 		return err
 	}

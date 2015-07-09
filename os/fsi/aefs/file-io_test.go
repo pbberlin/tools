@@ -124,7 +124,7 @@ func TestWriteAt(t *testing.T) {
 	f.at = int64(0) // ugly, but we have no filesystem
 
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(f2)
+	buf.ReadFrom(f)
 	b := buf.Bytes()
 	if string(b) != "hello, WORLD\n" {
 		t.Fatalf("after write: have %q want %q", string(b), "hello, WORLD\n")

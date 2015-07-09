@@ -102,7 +102,7 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 	//
 	// -------------now the datastore part-------------------------
 
-	logif.Pf("%q %q", f.Dir, f.BName)
+	// logif.Pf("%q %q", f.Dir, f.BName)
 
 	dir, err := fs.dirByPath(f.Dir)
 	if err == datastore.ErrNoSuchEntity {

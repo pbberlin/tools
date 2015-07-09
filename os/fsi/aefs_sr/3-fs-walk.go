@@ -1,14 +1,6 @@
-package gaefs
+package aefs_sr
 
-import (
-	"errors"
-	"fmt"
-	"os"
-	pth "path"
-	"strings"
-
-	"github.com/pbberlin/tools/os/fsi"
-)
+/*
 
 // SkipDir is an "error", which a walk-function can
 // return, in order to signal, that walk should not traverse into this dir.
@@ -108,3 +100,5 @@ func ExampleWalk() {
 	err := fsiX.Walk(mnt, exWalkFunc)
 	fmt.Printf("Walk() returned %v\n", err)
 }
+
+*/

@@ -1,6 +1,7 @@
 package aefs
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
@@ -120,6 +121,40 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc5("")
 
 	wpf(w, "</pre>")
+
+}
+
+func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	fmt.Fprint(w, tplx.Head)
+	defer wpf(w, tplx.Foot)
+
+	rts := fmt.Sprintf("mnt%02v", util.CounterLast())
+	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
+	_ = fs
+	loghttp.Pf(w, r, "-------filewalk----<br>")
+
+	bb := bytes.Buffer{}
+
+	walkFunc := func(path string, f os.FileInfo, err error) error {
+		tp := "file"
+		if f != nil {
+			if f.IsDir() {
+				tp = "dir "
+			}
+		}
+		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
+		return nil
+	}
+
+	var err error
+	_ = walkFunc
+	// err = fs.Walk(fs.RootDir(), walkFunc)
+
+	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
+
+	w.Write(bb.Bytes())
+	fmt.Fprint(w, tplx.Foot)
 
 }
 

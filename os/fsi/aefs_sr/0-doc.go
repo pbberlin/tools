@@ -1,5 +1,5 @@
-// Package gaefs builds a filesystem layer on top of appengine datastore.
-package gaefs
+// package aefs_sr builds a filesystem layer on top of appengine datastore.
+package aefs_sr
 
 //
 // "name" can mean either the basename or the full path of the file,

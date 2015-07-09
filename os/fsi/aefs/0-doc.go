@@ -1,6 +1,9 @@
 // package aefs builds a filesystem layer on top of appengine datastore.
 package aefs
 
+// path always automatically prefixed with RootDir()
+// Subdirs may exist only virtually
+//
 //
 // "name" can mean either the basename or the full path of the file,
 // depending on the actual argument - /tmp/logs/app1.log or simply app1.log

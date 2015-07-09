@@ -79,7 +79,7 @@ const Head = `<!DOCTYPE html>
 	<link rel="icon" href="data:;base64,=">
 	<title>static-title</title>
   </head>
-  <body>`
+  <body><style> pre {line-height:14px;}</style>`
 
 const Foot = `
   </body>

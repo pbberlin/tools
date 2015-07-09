@@ -4,7 +4,7 @@ import "fmt"
 import "net/http"
 
 var Counter chan int = make(chan int)
-var cntr = 0
+var cntr = -1
 
 /*
 	a counter - globally synchronized across all goroutines
@@ -13,22 +13,30 @@ var cntr = 0
 func init() {
 	go func() {
 		for {
-			Counter <- cntr
 			cntr++
+			Counter <- cntr
 		}
 	}()
-	http.HandleFunc("/counter/get", GetCounter)
-	http.HandleFunc("/counter/reset", ResetCounter)
+	http.HandleFunc("/counter/demo", counterDemo)
+	http.HandleFunc("/counter/reset", counterReset)
+	http.HandleFunc("/counter/decr", counterDecrement)
 }
 
-func ResetCounter(w http.ResponseWriter, r *http.Request) {
+func CounterLast() int {
+	return cntr - 1
+}
+
+func counterReset(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "cntr was %v<br>\n", cntr)
 	cntr = 0
 	fmt.Fprintf(w, "cntr resetted to %v<br>\n", cntr)
-
+}
+func counterDecrement(w http.ResponseWriter, r *http.Request) {
+	cntr--
+	fmt.Fprintf(w, "cntr decremented to %v<br>\n", cntr)
 }
 
-func GetCounter(w http.ResponseWriter, r *http.Request) {
+func counterDemo(w http.ResponseWriter, r *http.Request) {
 	x := <-Counter
 	fmt.Fprintf(w, "cntr %v\n", x)
 

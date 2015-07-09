@@ -82,7 +82,7 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 		return fmt.Errorf("file needs name")
 	}
 
-	if !strings.HasPrefix(path, fs.RootDir()) {
+	if !strings.HasPrefix(path, fs.RootName()) {
 		path = fs.RootDir() + path
 	}
 
@@ -102,7 +102,9 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 	//
 	// -------------now the datastore part-------------------------
 
-	dir, err := fs.dirByPath(path)
+	logif.Pf("%q %q", f.Dir, f.BName)
+
+	dir, err := fs.dirByPath(f.Dir)
 	if err == datastore.ErrNoSuchEntity {
 		return err
 	} else if err != nil {
@@ -112,7 +114,6 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 
 	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, dir.Key)
 	f.Key = suggKey
-	f.SKey = spf("%v", suggKey)
 
 	effKey, err := datastore.Put(fs.Ctx(), suggKey, f)
 	if err != nil {

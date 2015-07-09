@@ -17,13 +17,19 @@ import (
 func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 
 	path = cleanseLeadingSlash(path)
+	if !strings.HasPrefix(path, fs.RootName()) {
+		path = fs.RootDir() + path
+	}
+	// logif.Pf("  %v", path)
 
 	fo := AeDir{}
 	fo.Fs = fs
-	preciseK := ds.NewKey(fs.c, tdir, fs.RootDir()+path, 0, nil)
+
+	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
 	fo.Key = preciseK
 	err := ds.Get(fs.c, preciseK, &fo)
 	if err == ds.ErrNoSuchEntity {
+		logif.Pf("Path %v is no directory", path)
 		return fo, err
 	} else if err != nil {
 		logif.E(err)
@@ -34,6 +40,9 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 
 	path = cleanseLeadingSlash(path)
+	if !strings.HasPrefix(path, fs.RootName()) {
+		path = fs.RootDir() + path
+	}
 
 	var fis []os.FileInfo
 
@@ -53,24 +62,27 @@ func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 
 func (fs *AeFileSys) saveDirByPath(path string) (AeDir, error) {
 
-	path = cleanseLeadingSlash(path)
-
 	fo := AeDir{}
 	fo.isDir = true
-	dir, base := pth.Split(path)
-	fo.Dir = dir
-	if !strings.HasPrefix(fo.Dir, fs.RootDir()) {
-		fo.Dir = fs.RootDir() + fo.Dir
-	}
-
-	fo.BName = base
 	fo.MModTime = time.Now()
 	fo.Fs = fs
+
+	if path == fs.RootDir() || path+sep == fs.RootDir() {
+		fo.Dir = fs.RootDir()
+		fo.BName = ""
+	} else {
+		path = cleanseLeadingSlash(path)
+		if !strings.HasPrefix(path, fs.RootName()) {
+			path = fs.RootDir() + path
+		}
+		dir, base := pth.Split(path)
+		fo.Dir = dir
+		fo.BName = base
+	}
 
 	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
 
 	fo.Key = preciseK
-	fo.SKey = spf("%v", preciseK) // not effKey.Encode()
 
 	effKey, err := ds.Put(fs.c, preciseK, &fo)
 

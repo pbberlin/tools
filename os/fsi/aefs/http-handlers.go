@@ -16,17 +16,22 @@ import (
 
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	fs := NewAeFs("anyRoot", AeContext(appengine.NewContext(r)))
-	err, msg := fs.DeleteAll()
+	wpf(w, tplx.Head)
+
+	fs := NewAeFs("rootDelete", AeContext(appengine.NewContext(r)))
+	msg, err := fs.DeleteAll()
 
 	loghttp.E(w, r, err, true)
 
 	wpf(w, "<pre>%v</pre>", msg)
 
+	wpf(w, tplx.Foot)
+
 }
 func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	fmt.Fprint(w, tplx.Head)
+	wpf(w, tplx.Head)
+	defer wpf(w, tplx.Foot)
 
 	rt := <-util.Counter
 	rts := fmt.Sprintf("mnt%02v", rt)
@@ -39,10 +44,12 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 		dir, err := fs.saveDirByPath(path)
 		loghttp.E(w, r, err, true)
-		loghttp.Pf(w, r, "child created %v - %v <br>", dir.Name(), dir.Key)
+		loghttp.Pf(w, r, "child created %3v - %v ", dir.Name(), dir.Key)
 	}
 
-	loghttp.Pf(w, r, "--------create-dirs---------<br>")
+	wpf(w, "<pre>")
+
+	loghttp.Pf(w, r, "--------create-dirs---------")
 
 	fc1([]string{"ch1"})
 	fc1([]string{"ch1", "ch2"})
@@ -51,19 +58,20 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc1([]string{"ch1", "ch2", "ch3", "ch4"})
 	fc1([]string{"ch1A"})
 	fc1([]string{"ch1B"})
+	fc1([]string{"ch1", "d2", "d3", "d4"})
+	fc1([]string{"d1", "d2", "d3", "d4"})
 
-	loghttp.Pf(w, r, "--------retrieve-dirs---------<br>")
+	loghttp.Pf(w, r, "\n--------retrieve-dirs---------")
 
 	// retrieval
 	fc2 := func(p []string) {
 		path := pth.Join(p...)
-		path = fs.RootDir() + path
-		loghttp.Pf(w, r, "%v - searching...<br>", path)
+		loghttp.Pf(w, r, "searching... %v", path)
 		f, err := fs.dirByPath(path)
 		if err != nil {
-			loghttp.Pf(w, r, "  nothing retrieved - err %v<br>", err)
+			loghttp.Pf(w, r, "   nothing retrieved - err %v", err)
 		} else {
-			loghttp.Pf(w, r, " - %v retrieved under %v <br>", f.Name(), f.Dir)
+			loghttp.Pf(w, r, "   fnd %v ", f.Dir+f.Name())
 		}
 	}
 	fc2([]string{"ch1"})
@@ -73,42 +81,37 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"fsd,mount000", "fsd,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
 
-	loghttp.Pf(w, r, "--------retrieve by query---------<br>")
+	loghttp.Pf(w, r, "\n-------create and save some files----")
 
-	fc3 := func(path string) {
-		loghttp.Pf(w, r, "searching  %v<br>", path)
-		children, err := fs.subdirsByPath(path, true)
-		if err != nil {
-			loghttp.Pf(w, r, "  nothing retrieved - err %v<br>", err)
-		} else {
-			for k, v := range children {
-				loghttp.Pf(w, r, "  %v child retrieved %v, %v<br>", k, v.Name(), v.Dir)
-			}
-		}
-	}
-	fc3(spf(`/fsd,%v/fsd,ch1/fsd,ch2/fsd,ch3`, rts))
-	fc3(spf(`/fsd,%v/fsd,ch1/ch2/ch3`, rts))
-
-	loghttp.Pf(w, r, "-------create and save some files----<br>")
-
-	fc4 := func(name, content string) {
+	fc4a := func(name, content string) {
 		err := fs.WriteFile(name, []byte(content), os.ModePerm)
 		logif.E(err)
 	}
+	fc4b := func(name, content string) {
+		f, err := fs.Create(name)
+		logif.E(err)
+		if err != nil {
+			return
+		}
+		_, err = f.WriteString(content)
+		logif.E(err)
+		err = f.Sync()
+		logif.E(err)
+	}
 
-	fc4("ch1/ch2/file1", "content 1")
-	fc4("ch1/ch2/file2", "content 2")
-	fc4("ch1/ch2/ch3/file3", "another content")
-	fc4(fs.RootDir()+"file4", "root content")
+	fc4a("ch1/ch2/file1", "content 1")
+	fc4b("ch1/ch2/file2", "content 2")
+	fc4a("ch1/ch2/ch3/file3", "another content")
+	fc4b(fs.RootDir()+"file4", "chq content 2")
 
-	loghttp.Pf(w, r, "-------retrieve files again----<br>")
+	loghttp.Pf(w, r, "\n-------retrieve files again----")
 
 	fc5 := func(path string) {
 		files, err := fs.filesByPath(fs.RootDir() + path)
 		logif.E(err)
-		loghttp.Pf(w, r, " srch %v  <br>", fs.RootDir()+path)
+		loghttp.Pf(w, r, " srch %v  ", fs.RootDir()+path)
 		for k, v := range files {
-			loghttp.Pf(w, r, "%v  -  %v %s<br>", k, v.Name(), v.Data)
+			loghttp.Pf(w, r, "     %v  -  %v %s", k, v.Name(), v.Data)
 		}
 	}
 
@@ -116,9 +119,44 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc5("ch1/ch2/ch3")
 	fc5("")
 
+	wpf(w, "</pre>")
+
+}
+
+func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	fmt.Fprint(w, tplx.Head)
+	defer wpf(w, tplx.Foot)
+
+	rts := fmt.Sprintf("mnt%02v", util.CounterLast())
+	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
+	loghttp.Pf(w, r, "created fs %v<br>", rts)
+
+	loghttp.Pf(w, r, "--------retrieve by query---------<br>")
+
+	fc3 := func(path string, direct bool) {
+		loghttp.Pf(w, r, "searching ---  %v", path)
+		children, err := fs.subdirsByPath(path, direct)
+		if err != nil {
+			loghttp.Pf(w, r, "   nothing retrieved - err %v", err)
+		} else {
+			for k, v := range children {
+				loghttp.Pf(w, r, "child #%2v %-24v", k, v.Dir+v.Name())
+			}
+		}
+	}
+	wpf(w, "<pre>")
+	fc3(spf(`ch1/ch2/ch3`), false)
+	fc3(spf(`ch1/ch2/ch3`), true)
+	fc3(spf(`ch1`), false)
+	fc3(spf(`ch1`), true)
+	fc3(spf(``), true)
+	wpf(w, "</pre>")
+
 }
 
 func init() {
-	http.HandleFunc("/fs/aefs/vfs-gae-demo", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/aefs/demo", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
 	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
 }

@@ -78,8 +78,9 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
-	htmlfrag.Wb(b1, "Filesystem on gae", "/fs/aefs/vfs-gae-demo")
-	htmlfrag.Wb(b1, "Delete fs on gae", "/fs/aefs/delete-all")
+	htmlfrag.Wb(b1, "ae filesys", "/fs/aefs/demo")
+	htmlfrag.Wb(b1, "query", "/fs/aefs/retrieve-by-query")
+	htmlfrag.Wb(b1, "delete all fs entities", "/fs/aefs/delete-all")
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

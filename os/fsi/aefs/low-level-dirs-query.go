@@ -2,12 +2,15 @@ package aefs
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/pbberlin/tools/stringspb"
 
 	"appengine/datastore"
 )
 
 // subdirsByPath retrieves a subdirectories of a given directory.
-// It is relying on an indexed string property "SKey"
+// It is relying on an indexed string property "Dir"
 // containing a string representation of the full path.
 //
 // It might be fast for deep, uncached directory subtrees,
@@ -19,15 +22,30 @@ import (
 // the func could easily be enhanced chunked scanning.
 func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDir, error) {
 
-	filt := "SKey>="
-	if onlyDirectChildren {
-		filt = "SKey="
+	path = cleanseLeadingSlash(path)
+	if !strings.HasPrefix(path, fs.RootName()) {
+		path = fs.RootDir() + path
 	}
 
-	q := datastore.NewQuery(tdir).
-		Filter(filt, path).
-		Order("SKey")
-	//  Limit(4)
+	var q *datastore.Query
+
+	if onlyDirectChildren {
+		if !strings.HasSuffix(path, sep) {
+			path += sep
+		}
+		q = datastore.NewQuery(tdir).
+			Filter("Dir=", path).
+			Order("Dir")
+		//  Limit(4)
+	} else {
+		pathInc := stringspb.IncrementString(path)
+		q = datastore.NewQuery(tdir).
+			Filter("Dir>=", path).
+			Filter("Dir<", pathInc).
+			Order("Dir")
+	}
+
+	// logif.Pf("%v", q)
 
 	var children []AeDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
@@ -38,7 +56,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 
 	if len(children) < 1 {
 		return children, fmt.Errorf(
-			"Query found no result. The SKey index is only eventual consistent.")
+			"Query found no result. The Dir index is only eventual consistent.")
 	}
 
 	for k, v := range children {

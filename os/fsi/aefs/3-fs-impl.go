@@ -1,6 +1,7 @@
 package aefs
 
 import (
+	"fmt"
 	"os"
 	"sync/atomic"
 	"time"
@@ -28,6 +29,12 @@ func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) erro
 // Create opens for read-write.
 // Open opens for readonly access.
 func (fs *AeFileSys) Create(name string) (fsi.File, error) {
+
+	if name == "" {
+		err := fmt.Errorf("name cant be empty string")
+		logif.E(err)
+		return nil, err
+	}
 
 	name = cleanseLeadingSlash(name)
 	f := AeFile{}
@@ -183,7 +190,6 @@ func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 	name = cleanseLeadingSlash(name)
 
 	f, err := fs.Create(name)
-	_ = f
 	if err != nil {
 		return err
 	}
@@ -193,14 +199,14 @@ func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 		return err
 	}
 
-	ff := f.(*AeFile)
+	// ff := f.(*AeFile)
 
-	err = fs.saveFileByPath(ff, name)
+	err = f.Sync()
 	if err != nil {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 // DeleteAll deletes across all roots

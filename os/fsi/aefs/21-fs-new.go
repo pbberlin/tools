@@ -3,6 +3,8 @@ package aefs
 import (
 	"strings"
 
+	"github.com/pbberlin/tools/logif"
+
 	"appengine"
 )
 
@@ -33,6 +35,9 @@ func NewAeFs(mount string, options ...func(*AeFileSys)) *AeFileSys {
 	if fs.c == nil {
 		panic("this type of filesystem needs appengine context, submitted as option")
 	}
+
+	_, err := fs.saveDirByPath(mount)
+	logif.F(err)
 
 	return &fs
 }

@@ -78,7 +78,6 @@ func Count(c appengine.Context, valName string) (retVal int, err error) {
 	if retVal > 0 {
 		c.Infof("found counter %s = %v in memcache; return", mcKey(valName), wi.I)
 		retVal = 0
-		//return
 	}
 
 Loop1:

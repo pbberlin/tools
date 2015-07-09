@@ -12,8 +12,16 @@ import (
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"github.com/pbberlin/tools/os/fsi/fsc"
 	"github.com/pbberlin/tools/util"
 )
+
+func init() {
+	http.HandleFunc("/fs/aefs/demo", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
+	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
+	http.HandleFunc("/fs/aefs/walk", loghttp.Adapter(walkH))
+}
 
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
@@ -81,6 +89,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"ch1", "ch2", "ch3"})
 	fc2([]string{"fsd,mount000", "fsd,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
+	fc2([]string{fs.RootDir()})
 
 	loghttp.Pf(w, r, "\n-------create and save some files----")
 
@@ -124,40 +133,6 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 
 }
 
-func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	fmt.Fprint(w, tplx.Head)
-	defer wpf(w, tplx.Foot)
-
-	rts := fmt.Sprintf("mnt%02v", util.CounterLast())
-	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
-	_ = fs
-	loghttp.Pf(w, r, "-------filewalk----<br>")
-
-	bb := bytes.Buffer{}
-
-	walkFunc := func(path string, f os.FileInfo, err error) error {
-		tp := "file"
-		if f != nil {
-			if f.IsDir() {
-				tp = "dir "
-			}
-		}
-		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
-		return nil
-	}
-
-	var err error
-	_ = walkFunc
-	// err = fs.Walk(fs.RootDir(), walkFunc)
-
-	bb.WriteString(spf("fs.Walk() returned %v\n<br>", err))
-
-	w.Write(bb.Bytes())
-	fmt.Fprint(w, tplx.Foot)
-
-}
-
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	fmt.Fprint(w, tplx.Head)
@@ -190,8 +165,41 @@ func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interf
 
 }
 
-func init() {
-	http.HandleFunc("/fs/aefs/demo", loghttp.Adapter(demoSaveRetrieve))
-	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
-	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
+func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	fmt.Fprint(w, tplx.Head)
+	defer wpf(w, tplx.Foot)
+
+	rts := fmt.Sprintf("mnt%02v", util.CounterLast())
+	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
+	loghttp.Pf(w, r, "-------filewalk----<br>")
+
+	bb := bytes.Buffer{}
+	walkFunc := func(path string, f os.FileInfo, err error) error {
+		tp := "file"
+		if f != nil {
+			if f.IsDir() {
+				tp = "dir "
+			}
+		}
+		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
+		return nil
+	}
+
+	err := fsc.Walk(fs, fs.RootDir(), walkFunc)
+	bb.WriteString(spf("fs.Walk() returned %v\n<br><br>", err))
+	w.Write(bb.Bytes())
+
+	bb = bytes.Buffer{}
+	err = fsc.Walk(fs, "ch1/ch2", walkFunc)
+	bb.WriteString(spf("fs.Walk() returned %v\n<br><br>", err))
+	w.Write(bb.Bytes())
+
+	bb = bytes.Buffer{}
+	err = fsc.Walk(fs, "ch1/ch2/ch3", walkFunc)
+	bb.WriteString(spf("fs.Walk() returned %v\n<br><br>", err))
+	w.Write(bb.Bytes())
+
+	fmt.Fprint(w, tplx.Foot)
+
 }

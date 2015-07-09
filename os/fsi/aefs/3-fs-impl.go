@@ -112,20 +112,21 @@ func (fs *AeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 	return fs.Open(name)
 }
 
-// ReadDir satisfies the vfs interface
+// ReadDir satisfies the godoc.vfs interface
 // and ioutil.ReadDir.
-// It is similar to filesByPaths, but returning only dirs
 func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
-	return fs.dirsByPath(path)
-}
-
-func (fs *AeFileSys) Readdirnames(path string) (names []string, err error) {
-	fis, err := fs.ReadDir(path)
-	names = make([]string, 0, len(fis))
-	for _, lp := range fis {
-		names = append(names, lp.Name())
+	dirs, err := fs.dirsByPath(path)
+	if err != nil {
+		return nil, err
 	}
-	return names, err
+	files, err := fs.filesByPath(path)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range files {
+		dirs = append(dirs, os.FileInfo(v))
+	}
+	return dirs, nil
 }
 
 func (fs *AeFileSys) Remove(name string) error {

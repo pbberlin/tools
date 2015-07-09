@@ -23,7 +23,11 @@ func init() {
 }
 
 func CounterLast() int {
-	return cntr - 1
+	ret := cntr - 1
+	if ret < 0 {
+		ret = 0
+	}
+	return ret
 }
 
 func counterReset(w http.ResponseWriter, r *http.Request) {

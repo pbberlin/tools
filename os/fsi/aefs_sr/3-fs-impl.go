@@ -110,7 +110,6 @@ func (fs *AeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 
 // ReadDir satisfies the vfs interface
 // and ioutil.ReadDir.
-// It is similar to GetFiles, but returning only dirs
 func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 	path = cleanseLeadingSlash(path)
@@ -152,17 +151,16 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 	sort.Sort(FileInfoByName(fis))
 
+	files, err := fs.filesByPath(path)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range files {
+		fis = append(fis, os.FileInfo(v))
+	}
+
 	return fis, err
 
-}
-
-func (fs *AeFileSys) Readdirnames(path string) (names []string, err error) {
-	fis, err := fs.ReadDir(path)
-	names = make([]string, 0, len(fis))
-	for _, lp := range fis {
-		names = append(names, lp.Name())
-	}
-	return names, err
 }
 
 func (fs *AeFileSys) Remove(name string) error {

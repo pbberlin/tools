@@ -43,6 +43,7 @@ func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 	if !strings.HasPrefix(path, fs.RootName()) {
 		path = fs.RootDir() + path
 	}
+	// logif.Pf("  %v", path)
 
 	var fis []os.FileInfo
 

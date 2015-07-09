@@ -18,8 +18,15 @@ var SkipDir = errors.New("skip this directory")
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
 
+var cntr = 0
+
 // walk recursively descends path, calling walkFn.
 func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) error {
+
+	// cntr++
+	// if cntr > 20 {
+	// 	return fmt.Errorf("too many recursions")
+	// }
 
 	err := walkFn(path, info, nil)
 	if err != nil {

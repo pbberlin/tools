@@ -80,7 +80,7 @@ if (typeof jQuery === 'undefined') {
                 }
                 
                 var formHtml = "";
-                formHtml += "<form  action='https://libertarian-islands.appspot.com/fetch-url-x' method='post'>"                
+                formHtml += "<form  action='https://libertarian-islands.appspot.com/fetch-url-x' method='post'  target='proxy-window' >"                
                 formHtml += "<input type='hidden'  name='url' value='"+href+"' >"
                 formHtml += "<input type='submit'             value='subm'     >"
                 formHtml += "</form>"

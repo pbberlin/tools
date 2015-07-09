@@ -6,6 +6,7 @@ import (
 	"github.com/pbberlin/tools/logif"
 
 	"appengine"
+	"appengine/datastore"
 )
 
 // AeContext is an option func, adding ae context to the filesystem
@@ -36,8 +37,11 @@ func NewAeFs(mount string, options ...func(*AeFileSys)) *AeFileSys {
 		panic("this type of filesystem needs appengine context, submitted as option")
 	}
 
-	_, err := fs.saveDirByPath(mount)
-	logif.F(err)
+	_, err := fs.dirByPath(mount)
+	if err == datastore.ErrNoSuchEntity {
+		_, err := fs.saveDirByPath(mount)
+		logif.F(err)
+	}
 
 	return &fs
 }

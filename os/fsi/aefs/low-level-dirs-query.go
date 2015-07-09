@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/stringspb"
 
 	"appengine/datastore"
@@ -26,13 +27,13 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	if !strings.HasPrefix(path, fs.RootName()) {
 		path = fs.RootDir() + path
 	}
+	if !strings.HasSuffix(path, sep) {
+		path += sep
+	}
 
 	var q *datastore.Query
 
 	if onlyDirectChildren {
-		if !strings.HasSuffix(path, sep) {
-			path += sep
-		}
 		q = datastore.NewQuery(tdir).
 			Filter("Dir=", path).
 			Order("Dir")
@@ -59,9 +60,23 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 			"Query found no result. The Dir index is only eventual consistent.")
 	}
 
+	// Very evil: We filter out root node, since it's
+	// has the same dir as the level-1 directories.
+	keyRoot := datastore.NewKey(fs.Ctx(), tdir, fs.mount, 0, nil)
+	// keySelf := datastore.NewKey(fs.Ctx(), tdir, path, 0, nil)
+	idxRoot := -1
 	for k, v := range children {
 		v.fSys = fs
 		v.Key = keys[k]
+		// if keys[k].Equal(keyRoot) || keys[k].Equal(keySelf) {
+		if keys[k].Equal(keyRoot) {
+			idxRoot = k
+		}
+	}
+
+	if idxRoot > -1 {
+		logif.Pf("self excluded")
+		children = append(children[:idxRoot], children[idxRoot+1:]...)
 	}
 
 	return children, nil

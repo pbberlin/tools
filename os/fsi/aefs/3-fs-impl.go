@@ -4,33 +4,20 @@ import (
 	"fmt"
 	"os"
 	"sync/atomic"
-	"time"
 
 	"appengine/datastore"
 
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/fsc"
 )
-import (
-	pth "path"
-	"path/filepath"
-)
+import pth "path"
 
 func (fs AeFileSys) Name() string { return "aefs" }
 
 func (fs AeFileSys) String() string { return fs.mount }
 
 //---------------------------------------
-
-func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
-	panic(spf("Chmod not (yet) implemented for %v", fs))
-	return nil
-}
-
-func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
-	panic(spf("Chtimes not (yet) implemented for %v", fs))
-	return nil
-}
 
 // Create opens for read-write.
 // Open opens for readonly access.
@@ -130,28 +117,50 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 }
 
 func (fs *AeFileSys) Remove(name string) error {
-	panic(spf("Remove not (yet) implemented for %v", fs))
+
+	logif.Pf("trying to remove %-20v", name)
+
+	f, err := fs.fileByPath(name)
+	if err != nil {
+		logif.Pf("   fkey %v", f.Key)
+		err = datastore.Delete(fs.Ctx(), f.Key)
+		if err != nil {
+			return fmt.Errorf("error removing file %v", err)
+		}
+	} else {
+		d, err := fs.dirByPath(name)
+		if err != nil {
+			logif.Pf("   dkey %v", d.Key)
+			err = datastore.Delete(fs.Ctx(), d.Key)
+			if err != nil {
+				return fmt.Errorf("error removing dir %v", err)
+			}
+		}
+	}
 	return nil
+
 }
 
 func (fs *AeFileSys) RemoveAll(path string) error {
 
 	paths := []string{}
 	walkRemove := func(path string, f os.FileInfo, err error) error {
-		if f.IsDir() {
+		if f.IsDir() || true {
 			paths = append(paths, path)
 		}
 		// logif.Pf("Visited: %s %s \n", tp, path)
 		return nil
 	}
 
-	err := filepath.Walk(path, walkRemove)
-
-	logif.Pf("filepath.Walk() returned %v\n", err)
+	err := fsc.Walk(fs, path, walkRemove)
+	logif.E(err)
 
 	for i := 0; i < len(paths); i++ {
-		// todo: remove files
-		// bottom-up remove dirs
+		iRev := len(paths) - 1 - i
+		err := fs.Remove(paths[iRev])
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

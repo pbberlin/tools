@@ -4,7 +4,6 @@ import (
 	"os"
 	"sort"
 	"sync/atomic"
-	"time"
 
 	"appengine/datastore"
 
@@ -16,15 +15,11 @@ import (
 	"path/filepath"
 )
 
-func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
-	panic(spf("Chmod not (yet) implemented for %v", fs))
-	return nil
-}
+func (fs AeFileSys) String() string { return "aefs_sr" }
 
-func (fs *AeFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
-	panic(spf("Chtimes not (yet) implemented for %v", fs))
-	return nil
-}
+func (fs AeFileSys) Name() string { return fs.mount }
+
+//---------------------------------------
 
 // Create opens for read-write.
 // Open opens for readonly access.
@@ -63,14 +58,6 @@ func (fs *AeFileSys) Mkdir(name string, perm os.FileMode) error {
 func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 	_, err := fs.SaveDirByPath(path)
 	return err
-}
-
-func (fs AeFileSys) String() string {
-	return "gaefs"
-}
-
-func (fs AeFileSys) Name() string {
-	return fs.String()
 }
 
 // Open opens for readonly access.

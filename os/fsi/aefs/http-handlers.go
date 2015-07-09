@@ -204,6 +204,10 @@ func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	bb.WriteString(spf("fs.Walk() returned %v\n<br><br>", err))
 	w.Write(bb.Bytes())
 
+	//
+	err = fs.RemoveAll("ch1/ch2/ch3")
+	wpf(w, "fs.RemoveAll() returned %v\n<br><br>", err)
+
 	fmt.Fprint(w, tplx.Foot)
 
 }

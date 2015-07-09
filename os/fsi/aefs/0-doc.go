@@ -5,6 +5,8 @@ package aefs
 // Subdirs may exist only virtually
 //
 // CreateFile and WriteFile: Only one save operation
+// Use the generalized walker function to implement removals
+//
 //
 // "name" can mean either the basename or the full path of the file,
 // depending on the actual argument - /tmp/logs/app1.log or simply app1.log
@@ -45,8 +47,6 @@ package aefs
 // Mem Caching for directories
 // Mem Caching for files - beware of cost
 // Instance Caching with broadcasting instances via http request to instances.
-//
-// Use the generalized walker function to implement removals
 //
 //
 // Nice to have: FileLinks

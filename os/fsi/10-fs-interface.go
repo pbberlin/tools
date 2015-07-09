@@ -2,10 +2,7 @@
 // requirements for exchangeable filesystems.
 package fsi
 
-import (
-	"os"
-	"time"
-)
+import "os"
 
 // Interface FileSystem is inspired by os.File + io.ioutil,
 // informed by godoc.vfs and package afero.
@@ -13,8 +10,8 @@ type FileSystem interface {
 	Name() string   // the type
 	String() string // a mountpoint or a drive letter
 
-	Chmod(name string, mode os.FileMode) error
-	Chtimes(name string, atime time.Time, mtime time.Time) error
+	// Chmod(name string, mode os.FileMode) error
+	// Chtimes(name string, atime time.Time, mtime time.Time) error
 
 	Create(name string) (File, error) // read write
 	Lstat(path string) (os.FileInfo, error)

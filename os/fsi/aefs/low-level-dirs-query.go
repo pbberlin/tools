@@ -3,7 +3,6 @@ package aefs
 import (
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/os/fsi/fsc"
 	"github.com/pbberlin/tools/stringspb"
 
@@ -74,7 +73,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	}
 
 	if idxRoot > -1 {
-		logif.Pf("self excluded")
+		// logif.Pf("self excluded")
 		children = append(children[:idxRoot], children[idxRoot+1:]...)
 	}
 

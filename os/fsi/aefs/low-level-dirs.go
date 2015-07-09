@@ -23,7 +23,7 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 	// logif.Pf("  %v", path)
 
 	fo := AeDir{}
-	fo.Fs = fs
+	fo.fSys = fs
 
 	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
 	fo.Key = preciseK
@@ -65,7 +65,7 @@ func (fs *AeFileSys) saveDirByPath(path string) (AeDir, error) {
 	fo := AeDir{}
 	fo.isDir = true
 	fo.MModTime = time.Now()
-	fo.Fs = fs
+	fo.fSys = fs
 
 	if path == fs.RootDir() || path+sep == fs.RootDir() {
 		fo.Dir = fs.RootDir()

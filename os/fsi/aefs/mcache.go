@@ -14,9 +14,9 @@ func (d *AeDir) MemCacheSet() {
 		Object:     &d,
 		Expiration: 3600 * time.Second,
 	}
-	err := memcache.JSON.Set(d.Fs.c, miPut)
+	err := memcache.JSON.Set(d.fSys.c, miPut)
 	if err != nil {
-		d.Fs.Ctx().Errorf("fso memcachd %v - key %v", err, d.Dir+d.BName)
+		d.fSys.Ctx().Errorf("fso memcachd %v - key %v", err, d.Dir+d.BName)
 	} else {
 		// d.Fs.Ctx().Infof("fso memcachd - key %v", d.Dir+d.BName)
 	}
@@ -30,9 +30,9 @@ func (f *AeFile) MemCacheSet() {
 		Object:     &f,
 		Expiration: 3600 * time.Second,
 	}
-	err := memcache.JSON.Set(f.Fs.c, miPut)
+	err := memcache.JSON.Set(f.fSys.c, miPut)
 	if err != nil {
-		f.Fs.Ctx().Errorf("fso memcachd %v - key %v", err, f.Dir+f.BName)
+		f.fSys.Ctx().Errorf("fso memcachd %v - key %v", err, f.Dir+f.BName)
 	} else {
 		// f.Fs.Ctx().Infof("fso memcachd - key %v", f.Dir + f.BName)
 	}

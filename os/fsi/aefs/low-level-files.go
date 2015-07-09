@@ -17,7 +17,7 @@ func (fs *AeFileSys) fileByPath(path string) (AeFile, error) {
 	path = cleanseLeadingSlash(path)
 
 	fo := AeFile{}
-	fo.Fs = fs
+	fo.fSys = fs
 
 	sdir, base := pth.Split(path)
 
@@ -97,7 +97,7 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 	}
 
 	f.MModTime = time.Now()
-	f.Fs = fs
+	f.fSys = fs
 
 	//
 	// -------------now the datastore part-------------------------

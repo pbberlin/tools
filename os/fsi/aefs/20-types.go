@@ -22,8 +22,8 @@ type AeFileSys struct {
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeDir struct {
-	Fs  *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	Key *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName
+	fSys *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName
 
 	Dir      string
 	BName    string      // BaseName - distinct from os.FileInfo method Name()
@@ -35,8 +35,8 @@ type AeDir struct {
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeFile struct {
-	Fs  *AeFileSys `datastore:"-" json:"-"` // Reference to root
-	Key *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName.
+	fSys *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName.
 
 	Dir      string
 	BName    string      // BaseName - distinct from os.FileInfo method Name()

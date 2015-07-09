@@ -60,7 +60,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	}
 
 	for k, v := range children {
-		v.Fs = fs
+		v.fSys = fs
 		v.Key = keys[k]
 	}
 

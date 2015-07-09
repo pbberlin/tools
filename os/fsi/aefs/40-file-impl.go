@@ -15,7 +15,7 @@ func (f *AeFile) Close() error {
 }
 
 func (f *AeFile) Readdir(count int) (res []os.FileInfo, err error) {
-	return f.Fs.ReadDir(f.Dir)
+	return f.fSys.ReadDir(f.Dir)
 }
 
 func (f *AeFile) Readdirnames(n int) (names []string, err error) {
@@ -72,7 +72,7 @@ func (f *AeFile) Stat() (os.FileInfo, error) {
 
 func (f *AeFile) Sync() error {
 
-	err := f.Fs.saveFileByPath(f, f.Dir)
+	err := f.fSys.saveFileByPath(f, f.Dir)
 	if err != nil {
 		return err
 	}

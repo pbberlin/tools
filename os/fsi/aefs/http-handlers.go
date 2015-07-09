@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	http.HandleFunc("/fs/aefs/demo", loghttp.Adapter(demoSaveRetrieve))
+	http.HandleFunc("/fs/aefs/create-objects", loghttp.Adapter(demoSaveRetrieve))
 	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
 	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
 	http.HandleFunc("/fs/aefs/walk", loghttp.Adapter(walkH))
@@ -27,7 +27,8 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	wpf(w, tplx.Head)
 
-	fs := NewAeFs("rootDelete", AeContext(appengine.NewContext(r)))
+	rts := fmt.Sprintf("mnt%02v", util.CounterLast())
+	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
 	msg, err := fs.DeleteAll()
 
 	loghttp.E(w, r, err, true)
@@ -174,7 +175,7 @@ func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	fs := NewAeFs(rts, AeContext(appengine.NewContext(r)))
 	loghttp.Pf(w, r, "-------filewalk----<br>")
 
-	bb := bytes.Buffer{}
+	var bb bytes.Buffer
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		tp := "file"
 		if f != nil {
@@ -186,7 +187,10 @@ func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 		return nil
 	}
 
-	err := fsc.Walk(fs, fs.RootDir(), walkFunc)
+	var err error
+
+	bb = bytes.Buffer{}
+	err = fsc.Walk(fs, fs.RootName(), walkFunc)
 	bb.WriteString(spf("fs.Walk() returned %v\n<br><br>", err))
 	w.Write(bb.Bytes())
 

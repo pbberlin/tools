@@ -17,7 +17,7 @@ import (
 func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 
 	path = cleanseLeadingSlash(path)
-	if !strings.HasPrefix(path, fs.RootName()) {
+	if path != fs.RootName() && !strings.HasPrefix(path, fs.RootName()) {
 		path = fs.RootDir() + path
 	}
 	// logif.Pf("  %v", path)
@@ -29,7 +29,7 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 	fo.Key = preciseK
 	err := ds.Get(fs.c, preciseK, &fo)
 	if err == ds.ErrNoSuchEntity {
-		logif.Pf("Path %v is no directory", path)
+		logif.Pf("no directory: %-20v ", path)
 		return fo, err
 	} else if err != nil {
 		logif.E(err)

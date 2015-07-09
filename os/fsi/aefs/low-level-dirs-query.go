@@ -1,10 +1,10 @@
 package aefs
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/os/fsi/fsc"
 	"github.com/pbberlin/tools/stringspb"
 
 	"appengine/datastore"
@@ -56,8 +56,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	}
 
 	if len(children) < 1 {
-		return children, fmt.Errorf(
-			"Query found no result. The Dir index is only eventual consistent.")
+		return children, fsc.EmptyIndexQueryResult
 	}
 
 	// Very evil: We filter out root node, since it's

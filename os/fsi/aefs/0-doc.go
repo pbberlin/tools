@@ -4,6 +4,7 @@ package aefs
 // path always automatically prefixed with RootDir()
 // Subdirs may exist only virtually
 //
+// CreateFile and WriteFile: Only one save operation
 //
 // "name" can mean either the basename or the full path of the file,
 // depending on the actual argument - /tmp/logs/app1.log or simply app1.log
@@ -17,7 +18,7 @@ package aefs
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf
 // we must chose the granularity of our entity groups.
 //
-// We use decided on using fictitious directory paths.
+// We decided on using fictitious directory paths.
 // The directory structure must stomach massive updates and inserts.
 // Only *one* directory can be an entity group.
 // Applications are forced to partition directories,
@@ -26,7 +27,10 @@ package aefs
 //
 // How to traverse? How to implement ReadDir()?
 // Answer: Use one global index of the Dir property.
-// Such an index can be queried for equality.
+//
+// If we create all directories of all paths,
+// such an index could be queried for equality (direct children).
+// Otherwise we only can retrieve entire subtree.
 //
 // Worst disadvantage: Move operations, esp. in high level directories become expensive.
 // Advantage: The directory "tree" can be sparse; only lowest dir must exist.

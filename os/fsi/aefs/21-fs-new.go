@@ -41,6 +41,8 @@ func NewAeFs(mount string, options ...func(*AeFileSys)) *AeFileSys {
 	if err == datastore.ErrNoSuchEntity {
 		_, err := fs.saveDirByPath(mount)
 		logif.F(err)
+	} else if err != nil {
+		logif.F(err)
 	}
 
 	return &fs

@@ -1,4 +1,4 @@
-// package aefs_sr builds a filesystem layer on top of appengine datastore.
+// Package aefs_sr builds a coherent filesystem layer on top of appengine datastore.
 package aefs_sr
 
 //

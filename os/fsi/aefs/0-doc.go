@@ -1,4 +1,4 @@
-// package aefs builds a filesystem layer on top of appengine datastore.
+// Package aefs builds a fully distributed filesystem layer on top of appengine datastore.
 package aefs
 
 // path always automatically prefixed with RootDir()

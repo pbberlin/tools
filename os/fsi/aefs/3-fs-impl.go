@@ -16,6 +16,12 @@ import (
 	"path/filepath"
 )
 
+func (fs AeFileSys) Name() string { return "aefs" }
+
+func (fs AeFileSys) String() string { return fs.mount }
+
+//---------------------------------------
+
 func (fs *AeFileSys) Chmod(name string, mode os.FileMode) error {
 	panic(spf("Chmod not (yet) implemented for %v", fs))
 	return nil
@@ -69,14 +75,6 @@ func (fs *AeFileSys) Mkdir(name string, perm os.FileMode) error {
 func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 	_, err := fs.saveDirByPath(path)
 	return err
-}
-
-func (fs AeFileSys) String() string {
-	return "gaefs"
-}
-
-func (fs AeFileSys) Name() string {
-	return fs.String()
 }
 
 // Open opens for readonly access.

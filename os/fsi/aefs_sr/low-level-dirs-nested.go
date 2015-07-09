@@ -25,6 +25,7 @@ func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 	rt = rt[:len(rt)-1]
 	if !strings.HasPrefix(path, rt) {
 		logif.Pf("warning: path does not start with root %q ", path)
+		path = fs.RootDir() + path
 	}
 
 	k = nil

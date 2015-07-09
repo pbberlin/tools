@@ -1,6 +1,7 @@
-// Package fsc contains convenience functions,
+// Package fsc - filesystem common - contains convenience functions,
 // common to all fsi implementations;
-// since only fsi interfaces are used.
+// since only methods from the fsi interface are used;
+// sadly we cannot attach methods to interfaces.
 package fsc
 
 import (

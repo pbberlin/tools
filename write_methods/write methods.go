@@ -20,7 +20,7 @@ import (
 	"appengine/urlfetch"
 )
 
-var opf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
+var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 var spf func(format string, a ...interface{}) string = fmt.Sprintf
 var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 
@@ -92,31 +92,31 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 	//
 	//
 	//
-	opf(w, "operations with a bytes buffer\n")
+	wpf(w, "operations with a bytes buffer\n")
 	var buf1 *bytes.Buffer
 	buf1 = new(bytes.Buffer) // not optional on buffer pointer
 	buf1.ReadFrom(resp2.Body)
 
 	buf1 = new(bytes.Buffer)
-	opf(buf1, "\t\tbuf1 content %v (filled via Fprintf)\n", 222)
+	wpf(buf1, "\t\tbuf1 content %v (filled via Fprintf)\n", 222)
 
-	opf(w, "FOUR methods of dumping buf1 into resp.w:\n")
-	opf(w, "\tw.Write\n")
+	wpf(w, "FOUR methods of dumping buf1 into resp.w:\n")
+	wpf(w, "\tw.Write\n")
 	w.Write(buf1.Bytes())
-	opf(w, "\tFprint\n")
-	opf(w, buf1.String())
-	opf(w, "\tio.WriteString\n")
+	wpf(w, "\tFprint\n")
+	wpf(w, buf1.String())
+	wpf(w, "\tio.WriteString\n")
 	io.WriteString(w, buf1.String())
-	opf(w, "\tio.Copy \n")
+	wpf(w, "\tio.Copy \n")
 	io.Copy(w, buf1) // copy the bytes.Buffer into w
-	opf(w, " \t\t\tio.copy exhausts buf1 - Fprinting again yields %q ", buf1.String())
-	opf(w, buf1.String())
-	opf(w, "\n\n\n")
+	wpf(w, " \t\t\tio.copy exhausts buf1 - Fprinting again yields %q ", buf1.String())
+	wpf(w, buf1.String())
+	wpf(w, "\n\n\n")
 
 	//
 	//
 	//
-	opf(w, "ioutil.ReadAll\n")
+	wpf(w, "ioutil.ReadAll\n")
 	var content []byte
 	resp3, err := client.Get(spf(`http://%s/write-methods-read`, ii.Hostname))
 	loghttp.E(w, r, err, false)
@@ -131,7 +131,7 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 // simple helper for reading http.response.Body
 func writeMethodsResponder(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	opf(w, "some http response body string")
+	wpf(w, "some http response body string")
 }
 
 func init() {

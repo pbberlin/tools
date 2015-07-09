@@ -19,6 +19,7 @@ type File interface {
 
 	//Fd() uintptr
 	Stat() (os.FileInfo, error)
+	Sync() error
 
 	Readdir(count int) ([]os.FileInfo, error) // notice distinctive signature FileSys.ReadDir(...)
 	Readdirnames(n int) ([]string, error)

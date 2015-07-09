@@ -1,4 +1,4 @@
-// Package logif wrapps logging errors, saving the err != nil condition.
+// Package logif wraps logging errors, saving some err != nil boilerplate.
 package logif
 
 import (

@@ -34,7 +34,7 @@ type FileSystem interface {
 	// Also implemented generically, purely on fsi.FileSystem;
 	//   in package fsc. However, only functions are possible,
 	//   since golang does not support methods on interfaces.
-	Walk(root string, walkFn WalkFunc) error
+	// Walk(root string, walkFn WalkFunc) error
 }
 
 type WalkFunc func(path string, info os.FileInfo, err error) error

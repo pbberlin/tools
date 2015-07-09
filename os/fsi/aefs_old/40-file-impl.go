@@ -70,6 +70,15 @@ func (f *AeFile) Stat() (os.FileInfo, error) {
 	return os.FileInfo(*f), nil
 }
 
+func (f *AeFile) Sync() error {
+
+	err = fs.SaveFile(f, f.Dir)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (f *AeFile) Truncate(size int64) error {
 	if f.closed == true {
 		return ErrFileClosed

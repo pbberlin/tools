@@ -23,7 +23,7 @@ import (
 )
 
 var spf func(format string, a ...interface{}) string = fmt.Sprintf
-var opf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
+var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 var serveraddress string = `header of ["SERVER_ADDR"]`
 var pos_01 int = strings.Index(serveraddress, "192.")
@@ -94,7 +94,7 @@ func makeRequest(w http.ResponseWriter, r *http.Request, path string) CGI_Result
 
 	url_exe := spf(`http://%s%s%s&ts=%s`, dns_cam, path, credentials, urlParamTS())
 	url_dis := spf(`http://%s%s&ts=%s`, dns_cam, path, urlParamTS())
-	opf(w, "<div style='font-size:10px; line-height:11px;'>requesting %v<br></div>\n", url_dis)
+	wpf(w, "<div style='font-size:10px; line-height:11px;'>requesting %v<br></div>\n", url_dis)
 	resp1, err := client.Get(url_exe)
 	loghttp.E(w, r, err, false)
 
@@ -107,15 +107,15 @@ func makeRequest(w http.ResponseWriter, r *http.Request, path string) CGI_Result
 	loghttp.E(w, r, xmlerr, false)
 
 	if cgiRes.Result != "0" {
-		opf(w, "<b>RESPONSE shows bad mood:</b><br>\n")
+		wpf(w, "<b>RESPONSE shows bad mood:</b><br>\n")
 		psXml := stringspb.IndentedDump(cgiRes)
 		dis := strings.Trim(*psXml, "{}")
-		opf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
+		wpf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
 	}
 
 	if debug {
 		scont := string(bcont)
-		opf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", scont)
+		wpf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", scont)
 	}
 
 	return cgiRes
@@ -125,7 +125,7 @@ func makeRequest(w http.ResponseWriter, r *http.Request, path string) CGI_Result
 func imageRetrieve(w http.ResponseWriter, r *http.Request) {
 
 	makeRequest(w, r, path_snap_config)
-	opf(w, "<img src='http://%s%s' width='60%' /><br>", dns_cam, path_snap_retrieval)
+	wpf(w, "<img src='http://%s%s' width='60%' /><br>", dns_cam, path_snap_retrieval)
 
 }
 
@@ -169,7 +169,7 @@ func logRetrieve(w http.ResponseWriter, r *http.Request) {
 		iMinutes := util.Round(since.Minutes()) - iHours*60
 
 		if eventId == "1" {
-			opf(w, "Last Alarm <b>%3vhrs %2vmin</b> ago (%v)<br>\n", iHours, iMinutes, tsf)
+			wpf(w, "Last Alarm <b>%3vhrs %2vmin</b> ago (%v)<br>\n", iHours, iMinutes, tsf)
 			break
 		}
 	}
@@ -193,12 +193,12 @@ func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface
 	dis = strings.Replace(dis, "Area0", "\nArea0", -1)
 	dis = strings.Replace(dis, "Schedule0", "\nSchedule0", -1)
 	dis = strings.Replace(dis, "Log0", "\nLog0", -1)
-	opf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
+	wpf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
 
 	if cgiRes.IsEnable == "0" {
-		opf(w, "Status <b>DISabled</b><br><br>\n")
+		wpf(w, "Status <b>DISabled</b><br><br>\n")
 	} else {
-		opf(w, "Status <b>ENabled</b><br><br>\n")
+		wpf(w, "Status <b>ENabled</b><br><br>\n")
 	}
 
 	imageRetrieve(w, r)
@@ -212,13 +212,13 @@ func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface
 	ssecs := r.FormValue("sleep")
 	if ssecs != "" {
 		secs := util.Stoi(ssecs)
-		opf(w, "sleeping %v secs ... <br><br>\n", secs)
+		wpf(w, "sleeping %v secs ... <br><br>\n", secs)
 		time.Sleep(time.Duration(secs) * time.Second)
 	}
 
 	prevStat := makeRequest(w, r, path_get_alarm)
 
-	opf(w, "||%s||<br>\n", prevStat.IsEnable)
+	wpf(w, "||%s||<br>\n", prevStat.IsEnable)
 	if strings.TrimSpace(prevStat.IsEnable) == "0" {
 		prevStat.IsEnable = "1"
 	} else {
@@ -253,25 +253,25 @@ func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface
 		}
 	}
 
-	opf(w, "<pre>")
+	wpf(w, "<pre>")
 	// disS2 := stringspb.Breaker(s2, 50)
 	// for _, v := range disS2 {
-	// 	opf(w, "%v\n", v)
+	// 	wpf(w, "%v\n", v)
 	// }
 	disRecombined := stringspb.Breaker(recombined, 50)
 	for _, v := range disRecombined {
-		opf(w, "%v\n", v)
+		wpf(w, "%v\n", v)
 	}
-	opf(w, "</pre>")
-	// opf(w, "<pre>%v</pre>\n", recombined)
+	wpf(w, "</pre>")
+	// wpf(w, "<pre>%v</pre>\n", recombined)
 
 	toggleRes := makeRequest(w, r, path_set_alarm+"&"+recombined)
 	if toggleRes.Result == "0" {
-		opf(w, "<br>end foscam toggle - success<br>\n")
+		wpf(w, "<br>end foscam toggle - success<br>\n")
 		if prevStat.IsEnable == "0" {
-			opf(w, "<b>DISabled</b><br>\n")
+			wpf(w, "<b>DISabled</b><br>\n")
 		} else {
-			opf(w, "<b>ENabled</b><br>\n")
+			wpf(w, "<b>ENabled</b><br>\n")
 		}
 	}
 

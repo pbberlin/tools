@@ -1,4 +1,6 @@
 // Package gaefs builds a filesystem layer on top of appengine datastore.
+package gaefs
+
 //
 // "name" can mean either the basename or the full path of the file,
 // depending on the actual argument - /tmp/logs/app1.log or simply app1.log
@@ -18,25 +20,8 @@
 // Direct children need to be filtered out at extra cost.
 // Writes are limited to single datastore "tablet" performance.
 //
-// We have to rewrite everything using fictitious directory paths
-// The directory structure must stomach massive updates and inserts.
-// Only *one* directory can be an entity group.
-// Applications need to partition directories, if needed.
-// Thus, the entire filesystem is extremely parallel.
-//
-// Major problem: How to traverse? How to implement ReadDir()?
-// Answer: Use one global index of the Dir property.
-// Such an index can be queried for equality.
-//
-// Worst disadvantage: Move operations, esp. in high level directories become expensive.
-// Advantage: The directory "tree" can be sparse; only lowest dir must exist.
-//
-// Integrate into Afero.
-//
-// Unify/Extend the interface stuff. ReadDir or Readdir() ???
-//
-// Split into core package with interfaces only; plus several implementations?
-//
+// Todo/to consider:
+// Integrate this into Afero.
 //
 // Add a "block"-layer under file,
 // so that more than 1MB byte files can be writtens?
@@ -52,5 +37,3 @@
 //   or return at least path.Error
 //
 // Nice to have: FileLinks
-
-package gaefs

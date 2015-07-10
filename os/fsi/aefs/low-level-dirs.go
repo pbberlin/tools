@@ -98,5 +98,14 @@ func (fs *AeFileSys) saveDirByPath(path string) (AeDir, error) {
 
 	fo.MemCacheSet()
 
+	// recurse upwards
+	_, err = fs.dirByPath(fo.Dir)
+	if err == ds.ErrNoSuchEntity {
+		_, err = fs.saveDirByPath(fo.Dir)
+		if err != nil {
+			return fo, err
+		}
+	}
+
 	return fo, nil
 }

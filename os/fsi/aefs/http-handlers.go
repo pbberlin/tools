@@ -53,6 +53,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		path = cleanseLeadingSlash(path)
 
 		dir, err := fs.saveDirByPath(path)
+		//  err := fs.MkdirAll(path, os.ModePerm)
 		loghttp.E(w, r, err, true)
 		loghttp.Pf(w, r, "child created %3v - %v ", dir.Name(), dir.Key)
 	}
@@ -162,6 +163,7 @@ func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interf
 	fc3(spf(`ch1`), false)
 	fc3(spf(`ch1`), true)
 	fc3(spf(``), true)
+	fc3(spf(``), false)
 	wpf(w, "</pre>")
 
 }

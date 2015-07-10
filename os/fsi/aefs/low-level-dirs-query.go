@@ -61,19 +61,15 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	// Very evil: We filter out root node, since it's
 	// has the same dir as the level-1 directories.
 	keyRoot := datastore.NewKey(fs.Ctx(), tdir, fs.mount, 0, nil)
-	// keySelf := datastore.NewKey(fs.Ctx(), tdir, path, 0, nil)
 	idxRoot := -1
 	for k, v := range children {
 		v.fSys = fs
 		v.Key = keys[k]
-		// if keys[k].Equal(keyRoot) || keys[k].Equal(keySelf) {
 		if keys[k].Equal(keyRoot) {
 			idxRoot = k
 		}
 	}
-
 	if idxRoot > -1 {
-		// logif.Pf("self excluded")
 		children = append(children[:idxRoot], children[idxRoot+1:]...)
 	}
 

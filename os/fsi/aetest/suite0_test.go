@@ -1,61 +1,23 @@
-// Package aetest runs test, which require an appengine context;
-// and which must be run by goapp test
+// +build suite0
+// go test -tags=suite0
+
 package aetest
 
 import (
 	"io/ioutil"
 	"os"
 	"testing"
-
-	"appengine/aetest"
-
-	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/aefs"
-	"github.com/pbberlin/tools/os/fsi/aefs_sr"
-	"github.com/pbberlin/tools/os/fsi/memfs"
-	"github.com/pbberlin/tools/os/fsi/osfs"
 )
 
 func TestWriteRead(t *testing.T) {
 
-	c, err := aetest.NewContext(nil)
-	if err != nil {
-		c.Criticalf("%v\n", err)
-		t.Fatalf("%v\n", err)
-	}
-	defer c.Close()
-
-	// We can have variadic option funcs.
-	// But seems we can not make those generic,
-	// since we need the concrete filesystem type
-	// one way or another.
-
-	fs1 := aefs.NewAeFs("rootX", aefs.AeContext(c))
-	fs1i := fsi.FileSystem(fs1)
-	_ = fs1i
-
-	fs2 := aefs_sr.NewAeFs("rootY", aefs_sr.AeContext(c))
-	fs2i := fsi.FileSystem(fs2)
-	_ = fs2i
-
-	fs3 := &osfs.OsFileSys{}
-	fs3i := fsi.FileSystem(fs3)
-	_ = fs3i
-
-	fs4 := &memfs.MemMapFs{}
-	fs4i := fsi.FileSystem(fs4)
-	_ = fs4i
-
-	fss := []fsi.FileSystem{fs1i, fs2i, fs3i, fs4i}
-	// fss := []fsi.FileSystem{fs4i}
-
-	for _, fs := range fss {
+	for _, fs := range Fss {
 
 		c.Infof(" ")
 		c.Infof("%v %v\n", fs.Name(), fs.String())
 		c.Infof("================================")
 
-		err = fs.Mkdir("/temp/testdir", os.ModePerm)
+		err := fs.Mkdir("/temp/testdir", os.ModePerm)
 		if err != nil {
 			if !os.IsExist(err) {
 				c.Criticalf("%v\n", err)
@@ -99,7 +61,7 @@ func TestWriteRead(t *testing.T) {
 			c.Criticalf("%v\n", err)
 			t.Fatalf("%v\n", err)
 		}
-		c.Infof("1st: %v\n", string(bts1))
+		// c.Infof("1st: %v\n", string(bts1))
 
 		bts2, err := fs.ReadFile("/temp/testdir/test.txt")
 		if err != nil {
@@ -107,7 +69,7 @@ func TestWriteRead(t *testing.T) {
 			t.Fatalf("%v\n", err)
 		}
 
-		c.Infof("2nd: %v\n", string(bts2))
+		// c.Infof("2nd: %v\n", string(bts2))
 
 		bts4 := []byte("other stuff")
 		err = fs.WriteFile("/temp/testdir/test1.txt", bts4, os.ModePerm)

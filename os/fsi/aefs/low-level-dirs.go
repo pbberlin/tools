@@ -28,7 +28,13 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 
 	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
 	fo.Key = preciseK
-	err := ds.Get(fs.c, preciseK, &fo)
+
+	err := fo.MemCacheGet(path)
+	if err == nil {
+		return fo, nil
+	}
+
+	err = ds.Get(fs.c, preciseK, &fo)
 	if err == ds.ErrNoSuchEntity {
 		// uncomment to see where directories do not exist:
 		// logif.Pf("no directory: %-20v ", path)
@@ -37,6 +43,8 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 	} else if err != nil {
 		logif.E(err)
 	}
+
+	fo.MemCacheSet()
 	return fo, err
 }
 

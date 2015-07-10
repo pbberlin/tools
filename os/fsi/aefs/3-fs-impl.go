@@ -119,24 +119,25 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 func (fs *AeFileSys) Remove(name string) error {
 
 	logif.Pf("trying to remove %-20v", name)
-
 	f, err := fs.fileByPath(name)
-	if err != nil {
-		logif.Pf("   fkey %v", f.Key)
+	if err == nil {
+		// logif.Pf("   found file %v", f.Dir+f.BName)
+		// logif.Pf("   fkey %-26v", f.Key)
 		err = datastore.Delete(fs.Ctx(), f.Key)
 		if err != nil {
 			return fmt.Errorf("error removing file %v", err)
 		}
-	} else {
-		d, err := fs.dirByPath(name)
+	}
+
+	d, err := fs.dirByPath(name)
+	if err == nil {
+		logif.Pf("   dkey %v", d.Key)
+		err = datastore.Delete(fs.Ctx(), d.Key)
 		if err != nil {
-			logif.Pf("   dkey %v", d.Key)
-			err = datastore.Delete(fs.Ctx(), d.Key)
-			if err != nil {
-				return fmt.Errorf("error removing dir %v", err)
-			}
+			return fmt.Errorf("error removing dir %v", err)
 		}
 	}
+
 	return nil
 
 }
@@ -145,16 +146,17 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 
 	paths := []string{}
 	walkRemove := func(path string, f os.FileInfo, err error) error {
-		if f.IsDir() || true {
+		if f != nil { // && f.IsDir() to constrain
 			paths = append(paths, path)
 		}
-		// logif.Pf("Visited: %s %s \n", tp, path)
 		return nil
 	}
 
 	err := fsc.Walk(fs, path, walkRemove)
 	logif.E(err)
 
+	// Walk crawls directories first, files second.
+	// Intuitively removal in reverse order should always work. Or does it not?
 	for i := 0; i < len(paths); i++ {
 		iRev := len(paths) - 1 - i
 		err := fs.Remove(paths[iRev])
@@ -167,7 +169,8 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 }
 
 func (fs *AeFileSys) Rename(oldname, newname string) error {
-	panic(spf("Rename not (yet) implemented for %v", fs))
+	panic(spf("Rename not (yet) implemented for %v", fs.Name()+fs.String()))
+	// we could use a walk similar to remove all
 	return nil
 }
 

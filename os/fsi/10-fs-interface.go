@@ -7,9 +7,11 @@ import "os"
 // Interface FileSystem is inspired by os.File + io.ioutil,
 // informed by godoc.vfs and package afero.
 type FileSystem interface {
-	Name() string   // the type
+	Name() string   // the type of filesystem, i.e. "osfs"
 	String() string // a mountpoint or a drive letter
 
+	// Nobody restricts you from implementing those.
+	// But they are not mandatory for our interface.
 	// Chmod(name string, mode os.FileMode) error
 	// Chtimes(name string, atime time.Time, mtime time.Time) error
 
@@ -20,17 +22,24 @@ type FileSystem interface {
 	Open(name string) (File, error) // read only
 	OpenFile(name string, flag int, perm os.FileMode) (File, error)
 
+	// ReadDir is taken from io.ioutil.
+	// It should return directories first, then files second.
 	// Notice the distinct methods on File interface:
 	//          Readdir(count int) ([]os.FileInfo, error)
 	//          Readdirnames(n int) ([]string, error)
-	ReadDir(dirname string) ([]os.FileInfo, error) // from io.ioutil
+	// Those coming from os.File.
+	// We would base all those methods on a single internal implementation.
+	// Readdir may return fsc.EmptyQueryResult error as a warning.
+	ReadDir(dirname string) ([]os.FileInfo, error)
 
 	Remove(name string) error
 	RemoveAll(path string) error
 	Rename(oldname, newname string) error
 	Stat(path string) (os.FileInfo, error)
 
-	// Two convenience methods taken from io.ioutil, that we want to rely on
+	// Two convenience methods taken from io.ioutil.
+	// They are mandatory, because you will need them sooner or later anyway.
+	// Thus we require them right from the start with *standard* signatures.
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filename string, data []byte, perm os.FileMode) error
 

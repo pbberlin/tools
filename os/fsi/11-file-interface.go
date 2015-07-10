@@ -21,7 +21,9 @@ type File interface {
 	Stat() (os.FileInfo, error)
 	Sync() error
 
-	Readdir(count int) ([]os.FileInfo, error) // notice distinctive signature FileSys.ReadDir(...)
+	// Readdir and Readdirnames come from os.File.
+	// 		Notice the distinctive signature FileSys.ReadDir(...)
+	Readdir(count int) ([]os.FileInfo, error)
 	Readdirnames(n int) ([]string, error)
 
 	WriteString(s string) (ret int, err error)

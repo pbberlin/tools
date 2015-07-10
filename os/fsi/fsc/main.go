@@ -16,7 +16,11 @@ import (
 // SkipDir is an "error", which a walk-function can
 // return, in order to signal, that walk should not traverse into this dir.
 var SkipDir = errors.New("skip this directory")
-var EmptyIndexQueryResult = fmt.Errorf("Query found no result. The Dir index is only eventual consistent.")
+
+// EmptyQueryResult is a warning, that implementations of ReadDir may return,
+// if their results are based on weakly consistent indexes.
+// It is defined here, since Walk() wants to ignore it.
+var EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
 
@@ -43,9 +47,7 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 	}
 
 	fis, err := fs.ReadDir(path)
-	// logif.Pf("%11v => %+v", path, fis)
-	if err != nil && err != EmptyIndexQueryResult {
-		// logif.Pf("%v %v", path, err)
+	if err != nil && err != EmptyQueryResult {
 		return walkFn(path, info, err)
 	}
 	//
@@ -72,13 +74,12 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 // Walk walks the file tree rooted at root, calling walkFn for each file or
 // directory in the tree, including root.
 //
-// It requires only the fsi.FileSystem interface, and is therefore implementation indepdenent.
+// It requires only the fsi.FileSystem interface, and is therefore implementation independent.
 //
 // It is similar to filepath.Walk(root string, walkFunc)
-// In contrast to filepath.Walk, it does not enumerate files, only dirs.
-// File enumeration can be added in the WalkFunc.
 //
-// Directories are walked in order of Readdirnames()
+// Directories are crawled in order of fs.ReadDir()
+// Walk crawls directories first, files second.
 //
 // Errors that arise visiting directories can be filtered by walkFn.
 //

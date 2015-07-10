@@ -55,7 +55,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	}
 
 	if len(children) < 1 {
-		return children, fsc.EmptyIndexQueryResult
+		return children, fsc.EmptyQueryResult
 	}
 
 	// Very evil: We filter out root node, since it's

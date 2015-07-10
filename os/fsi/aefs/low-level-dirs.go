@@ -14,6 +14,7 @@ import (
 )
 
 // Retrieves a directory in one go.
+// Also used to check existence; returning ds.ErrNoSuchEntity
 func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 
 	path = cleanseLeadingSlash(path)
@@ -29,7 +30,9 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 	fo.Key = preciseK
 	err := ds.Get(fs.c, preciseK, &fo)
 	if err == ds.ErrNoSuchEntity {
-		logif.Pf("no directory: %-20v ", path)
+		// uncomment to see where directories do not exist:
+		// logif.Pf("no directory: %-20v ", path)
+		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
 		logif.E(err)
@@ -37,6 +40,9 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 	return fo, err
 }
 
+// dirsByPath might not find recently added directories.
+// Upon finding nothing, it therefore returns the
+// "warning" fsi.EmptyQueryResult
 func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 
 	path = cleanseLeadingSlash(path)

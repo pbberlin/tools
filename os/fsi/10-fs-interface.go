@@ -2,7 +2,18 @@
 // requirements for exchangeable filesystems.
 package fsi
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
+
+// EmptyQueryResult is a warning, that implementations of ReadDir may return,
+// if their results are based on weakly consistent indexes.
+// It is defined here, since Walk() wants to ignore it.
+var EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
+
+// If an implementation cannot support a method, it should at least return this testable error.
+var NotImplemented = fmt.Errorf("Filesystem does not support this method.")
 
 // Interface FileSystem is inspired by os.File + io.ioutil,
 // informed by godoc.vfs and package afero.
@@ -29,7 +40,7 @@ type FileSystem interface {
 	//          Readdirnames(n int) ([]string, error)
 	// Those coming from os.File.
 	// We would base all those methods on a single internal implementation.
-	// Readdir may return fsc.EmptyQueryResult error as a warning.
+	// Readdir may return EmptyQueryResult error as a warning.
 	ReadDir(dirname string) ([]os.FileInfo, error)
 
 	Remove(name string) error

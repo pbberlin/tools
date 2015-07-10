@@ -14,10 +14,12 @@ func (f *AeFile) Close() error {
 	return nil
 }
 
+// See fsi.File interface.
 func (f *AeFile) Readdir(count int) (res []os.FileInfo, err error) {
 	return f.fSys.ReadDir(f.Dir)
 }
 
+// See fsi.File interface.
 func (f *AeFile) Readdirnames(n int) (names []string, err error) {
 	fis, err := f.Readdir(n)
 	names = make([]string, 0, len(fis))

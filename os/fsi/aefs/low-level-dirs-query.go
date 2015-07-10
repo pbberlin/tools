@@ -3,7 +3,7 @@ package aefs
 import (
 	"strings"
 
-	"github.com/pbberlin/tools/os/fsi/fsc"
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/stringspb"
 
 	"appengine/datastore"
@@ -17,9 +17,10 @@ import (
 // that have been saved in nested manner.
 //
 // However, it might not find recently added directories.
+// Upon finding nothing, it therefore returns the
+// "warning" fsi.EmptyQueryResult
 //
-// If a range scan over a huge directory tree is neccessary,
-// the func could easily be enhanced chunked scanning.
+// The func could easily be enhanced chunked scanning.
 func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDir, error) {
 
 	path = cleanseLeadingSlash(path)
@@ -55,7 +56,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	}
 
 	if len(children) < 1 {
-		return children, fsc.EmptyQueryResult
+		return children, fsi.EmptyQueryResult
 	}
 
 	// Very evil: We filter out root node, since it's

@@ -55,7 +55,7 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 		dir, err := fs.saveDirByPath(path)
 		//  err := fs.MkdirAll(path, os.ModePerm)
 		loghttp.E(w, r, err, true)
-		loghttp.Pf(w, r, "child created %3v - %v ", dir.Name(), dir.Key)
+		loghttp.Pf(w, r, "child created %-5v - %v ", dir.Name(), dir.Key)
 	}
 
 	wpf(w, "<pre>")
@@ -89,7 +89,6 @@ func demoSaveRetrieve(w http.ResponseWriter, r *http.Request, m map[string]inter
 	fc2([]string{"ch1", "ch2"})
 	fc2([]string{"ch1", "cha2"})
 	fc2([]string{"ch1", "ch2", "ch3"})
-	fc2([]string{"fsd,mount000", "fsd,ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
 	fc2([]string{fs.RootDir()})
 
@@ -179,13 +178,17 @@ func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	var bb bytes.Buffer
 	walkFunc := func(path string, f os.FileInfo, err error) error {
-		tp := "file"
-		if f != nil {
-			if f.IsDir() {
-				tp = "dir "
+		if err != nil {
+			bb.WriteString(spf("Visited: %s %v \n<br>", path, err))
+		} else {
+			tp := "file"
+			if f != nil {
+				if f.IsDir() {
+					tp = "dir "
+				}
 			}
+			bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
 		}
-		bb.WriteString(spf("Visited: %s %s \n<br>", tp, path))
 		return nil
 	}
 

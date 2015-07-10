@@ -138,7 +138,7 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 	sort.Sort(FileInfoByName(fis))
 
-	files, err := fs.filesByPath(path)
+	files, err := fs.GetFiles(path)
 	if err != nil {
 		return nil, err
 	}

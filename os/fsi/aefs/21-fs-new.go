@@ -4,15 +4,17 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine"
 	"appengine/datastore"
 )
 
 // AeContext is an option func, adding ae context to the filesystem
-func AeContext(c appengine.Context) func(*AeFileSys) {
-	return func(fs *AeFileSys) {
-		fs.c = c
+func AeContext(c appengine.Context) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*AeFileSys)
+		fst.c = c
 	}
 }
 
@@ -20,7 +22,7 @@ func AeContext(c appengine.Context) func(*AeFileSys) {
 // Notice that variadic options are submitted as functions,
 // as is explained and justified here:
 // http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
-func NewAeFs(mount string, options ...func(*AeFileSys)) *AeFileSys {
+func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 
 	fs := AeFileSys{}
 

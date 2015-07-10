@@ -1,3 +1,5 @@
+// Package move_package scripts refactorings of package locations and names;
+// sadly refactor/rename still has some limitations.
 package main
 
 import (

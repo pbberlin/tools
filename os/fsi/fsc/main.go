@@ -6,7 +6,6 @@ package fsc
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	pth "path"
 
@@ -16,11 +15,6 @@ import (
 // SkipDir is an "error", which a walk-function can
 // return, in order to signal, that walk should not traverse into this dir.
 var SkipDir = errors.New("skip this directory")
-
-// EmptyQueryResult is a warning, that implementations of ReadDir may return,
-// if their results are based on weakly consistent indexes.
-// It is defined here, since Walk() wants to ignore it.
-var EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
 
 type WalkFunc func(path string, info os.FileInfo, err error) error
 
@@ -47,9 +41,10 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 	}
 
 	fis, err := fs.ReadDir(path)
-	if err != nil && err != EmptyQueryResult {
+	if err != nil && err != fsi.EmptyQueryResult {
 		return walkFn(path, info, err)
 	}
+
 	//
 	for _, fi := range fis {
 		filename := pth.Join(path, fi.Name())
@@ -87,7 +82,7 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 func Walk(fs fsi.FileSystem, root string, walkFn WalkFunc) error {
 	info, err := fs.Lstat(root)
 	if err != nil {
-		// logif.Pf("walk start error %v", err)
+		// logif.Pf("walk start error %10v %v", root, err)
 		return walkFn(root, nil, err)
 	}
 	return walk(fs, root, info, walkFn)

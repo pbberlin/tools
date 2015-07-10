@@ -4,8 +4,6 @@ import (
 	pth "path"
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
-
 	"appengine/datastore"
 )
 
@@ -24,7 +22,7 @@ func (fs AeFileSys) constructDirKey(path string) (k *datastore.Key) {
 	rt := fs.RootDir()
 	rt = rt[:len(rt)-1]
 	if !strings.HasPrefix(path, rt) {
-		logif.Pf("warning: path does not start with root %q ", path)
+		// logif.Pf("warning: path does not start with root %q ", path)
 		path = fs.RootDir() + path
 	}
 

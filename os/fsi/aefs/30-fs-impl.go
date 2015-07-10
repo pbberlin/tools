@@ -23,24 +23,25 @@ func (fs AeFileSys) String() string { return fs.mount }
 // Open opens for readonly access.
 func (fs *AeFileSys) Create(name string) (fsi.File, error) {
 
+	// WriteFile & Create
 	if name == "" {
-		err := fmt.Errorf("name cant be empty string")
-		logif.E(err)
-		return nil, err
+		return nil, fmt.Errorf("name cant be empty string")
 	}
-
 	name = cleanseLeadingSlash(name)
 	f := AeFile{}
+	f.fSys = fs
 	f.BName = pth.Base(name)
+	f.Dir = pth.Dir(name)
 
-	err := fs.saveFileByPath(&f, name)
+	// let all the properties by set by fs.saveFileByPath
+	err := f.Sync()
 	if err != nil {
 		return nil, err
 	}
 
 	// return &f, nil
 	ff := fsi.File(&f)
-	return ff, nil
+	return ff, err
 
 }
 
@@ -64,8 +65,8 @@ func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 	return err
 }
 
-// Open opens for readonly access.
-// Create opens for read-write.
+// Open() open existing file for readonly access.
+// Create() should be used   for read-write.
 
 // We could make provisions to ensure exclusive access;
 
@@ -99,11 +100,10 @@ func (fs *AeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 	return fs.Open(name)
 }
 
-// ReadDir satisfies the godoc.vfs interface
-// and ioutil.ReadDir.
+// See fsi.FileSystem interface.
 func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	dirs, err := fs.dirsByPath(path)
-	if err != nil {
+	if err != nil && err != fsi.EmptyQueryResult {
 		return nil, err
 	}
 	files, err := fs.filesByPath(path)
@@ -118,7 +118,7 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 func (fs *AeFileSys) Remove(name string) error {
 
-	logif.Pf("trying to remove %-20v", name)
+	// logif.Pf("trying to remove %-20v", name)
 	f, err := fs.fileByPath(name)
 	if err == nil {
 		// logif.Pf("   found file %v", f.Dir+f.BName)
@@ -131,7 +131,7 @@ func (fs *AeFileSys) Remove(name string) error {
 
 	d, err := fs.dirByPath(name)
 	if err == nil {
-		logif.Pf("   dkey %v", d.Key)
+		// logif.Pf("   dkey %v", d.Key)
 		err = datastore.Delete(fs.Ctx(), d.Key)
 		if err != nil {
 			return fmt.Errorf("error removing dir %v", err)
@@ -146,8 +146,12 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 
 	paths := []string{}
 	walkRemove := func(path string, f os.FileInfo, err error) error {
-		if f != nil { // && f.IsDir() to constrain
-			paths = append(paths, path)
+		if err != nil {
+			// do nothing
+		} else {
+			if f != nil { // && f.IsDir() to constrain
+				paths = append(paths, path)
+			}
 		}
 		return nil
 	}
@@ -169,15 +173,15 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 }
 
 func (fs *AeFileSys) Rename(oldname, newname string) error {
-	panic(spf("Rename not (yet) implemented for %v", fs.Name()+fs.String()))
 	// we could use a walk similar to remove all
-	return nil
+	return fsi.NotImplemented
 }
 
 func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
 	f, err := fs.fileByPath(path)
 	if err != nil {
 		dir, err := fs.dirByPath(path)
+		// logif.Pf("Stat for dir %q => %v, %v", path, err, dir.Dir+dir.BName)
 		if err != nil {
 			return nil, err
 		}
@@ -196,21 +200,24 @@ func (fs *AeFileSys) ReadFile(path string) ([]byte, error) {
 	return file.Data, err
 }
 
+// Only one save operation required
 func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
 
-	name = cleanseLeadingSlash(name)
-
-	f, err := fs.Create(name)
-	if err != nil {
-		return err
+	// WriteFile & Create
+	if name == "" {
+		return fmt.Errorf("name cant be empty string")
 	}
+	name = cleanseLeadingSlash(name)
+	f := AeFile{}
+	f.fSys = fs
+	f.BName = pth.Base(name)
+	f.Dir = pth.Dir(name)
 
+	var err error
 	_, err = f.Write(data)
 	if err != nil {
 		return err
 	}
-
-	// ff := f.(*AeFile)
 
 	err = f.Sync()
 	if err != nil {

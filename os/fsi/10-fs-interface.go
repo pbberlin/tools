@@ -3,17 +3,29 @@
 package fsi
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
 
-// EmptyQueryResult is a warning, that implementations of ReadDir may return,
-// if their results are based on weakly consistent indexes.
-// It is defined here, since Walk() wants to ignore it.
-var EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
+var (
+	// EmptyQueryResult is a warning, that implementations of ReadDir may return,
+	// if their results are based on weakly consistent indexes.
+	// It is defined here, since Walk() wants to ignore it.
+	EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
 
-// If an implementation cannot support a method, it should at least return this testable error.
-var NotImplemented = fmt.Errorf("Filesystem does not support this method.")
+	// If an implementation cannot support a method, it should at least return this testable error.
+	NotImplemented = fmt.Errorf("Filesystem does not support this method.")
+
+	ErrFileClosed = errors.New("File is closed")
+	ErrFileInUse  = errors.New("File already in use")
+	ErrOutOfRange = errors.New("Out of range")
+	ErrTooLarge   = errors.New("Too large")
+
+	ErrFileNotFound      = os.ErrNotExist
+	ErrFileExists        = os.ErrExist
+	ErrDestinationExists = os.ErrExist
+)
 
 // Interface FileSystem is inspired by os.File + io.ioutil,
 // informed by godoc.vfs and package afero.

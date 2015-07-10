@@ -6,7 +6,6 @@ package aefs
 //
 // Mem Caching for directories
 //
-// Integrate memfs from Afero
 //
 // Standardize the root stuff - make "/" synonymous with the RootDir.
 //

@@ -1,4 +1,7 @@
-package fsc
+// +build walk
+// go test -tags=walk
+
+package aetest
 
 import (
 	"fmt"
@@ -7,7 +10,8 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/gaefs"
+	"github.com/pbberlin/tools/os/fsi/fsc"
+	"github.com/pbberlin/tools/os/fsi/memfs"
 )
 
 func TestWalk(t *testing.T) {
@@ -16,7 +20,7 @@ func TestWalk(t *testing.T) {
 	exWalkFunc := func(path string, f os.FileInfo, err error) error {
 
 		if strings.HasSuffix(path, "my secret directory") {
-			return SkipDir
+			return fsc.SkipDir
 		}
 
 		if err == os.ErrInvalid {
@@ -31,10 +35,11 @@ func TestWalk(t *testing.T) {
 		return nil
 	}
 
-	mnt := "mnt00"
-	fs := gaefs.NewAeFs(mnt) // add appengine context
-	fsiX := fsi.FileSystem(fs)
+	fs := &memfs.MemMapFs{}
+	fsi := fsi.FileSystem(fs)
+	fsi.Mkdir("/", os.ModePerm)
+	fsi.Mkdir("/temp", os.ModePerm)
 
-	err := fsiX.Walk(mnt, exWalkFunc)
+	err := fsc.Walk(fsi, "/", exWalkFunc)
 	fmt.Printf("Walk() returned %v\n", err)
 }

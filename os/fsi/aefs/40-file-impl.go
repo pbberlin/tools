@@ -4,6 +4,8 @@ import (
 	"io"
 	"os"
 	"sync/atomic"
+
+	"github.com/pbberlin/tools/os/fsi"
 )
 
 func (f *AeFile) Close() error {
@@ -33,7 +35,7 @@ func (f *AeFile) Read(b []byte) (n int, err error) {
 	f.Lock()
 	defer f.Unlock()
 	if f.closed == true {
-		return 0, ErrFileClosed
+		return 0, fsi.ErrFileClosed
 	}
 	if len(b) > 0 && int(f.at) == len(f.Data) {
 		return 0, io.EOF
@@ -55,7 +57,7 @@ func (f *AeFile) ReadAt(b []byte, off int64) (n int, err error) {
 
 func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	if f.closed == true {
-		return 0, ErrFileClosed
+		return 0, fsi.ErrFileClosed
 	}
 	switch whence {
 	case 0:
@@ -83,10 +85,10 @@ func (f *AeFile) Sync() error {
 
 func (f *AeFile) Truncate(size int64) error {
 	if f.closed == true {
-		return ErrFileClosed
+		return fsi.ErrFileClosed
 	}
 	if size < 0 {
-		return ErrOutOfRange
+		return fsi.ErrOutOfRange
 	}
 	if size > int64(len(f.Data)) {
 		diff := size - int64(len(f.Data))

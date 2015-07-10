@@ -1,7 +1,6 @@
 package aefs
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -20,18 +19,6 @@ const (
 	tdirsep = tdir + "," // nested datastore keys each have this prefix
 	tfil    = "fsf"      // datastory entity type for filesystem file
 	sep     = "/"        // no, package path does not provide it; yes, we do need it.
-)
-
-var (
-	ErrFileClosed = errors.New("File is closed")
-	ErrFileInUse  = errors.New("File already in use")
-	ErrOutOfRange = errors.New("Out of range")
-	ErrTooLarge   = errors.New("Too large")
-
-	// can't those be replaced by the original?
-	ErrFileNotFound      = os.ErrNotExist
-	ErrFileExists        = os.ErrExist
-	ErrDestinationExists = os.ErrExist
 )
 
 func init() {

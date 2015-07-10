@@ -12,6 +12,7 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
 	"github.com/pbberlin/tools/os/fsi/aefs_sr"
+	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 )
 
@@ -37,11 +38,16 @@ func TestWriteRead(t *testing.T) {
 	fs2i := fsi.FileSystem(fs2)
 	_ = fs2i
 
-	fs3 := osfs.OsFileSys{}
+	fs3 := &osfs.OsFileSys{}
 	fs3i := fsi.FileSystem(fs3)
 	_ = fs3i
 
-	fss := []fsi.FileSystem{fs1i, fs2i, fs3i}
+	fs4 := &memfs.MemMapFs{}
+	fs4i := fsi.FileSystem(fs4)
+	_ = fs4i
+
+	fss := []fsi.FileSystem{fs1i, fs2i, fs3i, fs4i}
+	// fss := []fsi.FileSystem{fs4i}
 
 	for _, fs := range fss {
 

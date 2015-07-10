@@ -45,13 +45,13 @@ package aefs
 //
 // Again: Traversal - meaning ReadDir is done
 // using one global index of the Dir property.
-// This index can be queried for equality (direct children).
-// Otherwise we retrieve entire subtree.
+// This index can be queried for equality (direct children),
+// or for retrieval of entire subtrees.
 //
 //
-// Todo/To consider:
+// Todo/Consider:
 // Add a "block"-layer under file,
-// so that more than 1MB byte files can be writtens?
+// so that more than 1MB byte files can be written?
 // At least throw an error before the file is saved?
 //
 // Mem Caching for files; not just directories - but beware of cost.

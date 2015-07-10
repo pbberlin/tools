@@ -11,7 +11,7 @@ import (
 var (
 	// EmptyQueryResult is a warning, that implementations of ReadDir may return,
 	// if their results are based on weakly consistent indexes.
-	// It is defined here, since Walk() wants to ignore it.
+	// It is defined here, since fsc.Walk() wants to ignore it.
 	EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
 
 	// If an implementation cannot support a method, it should at least return this testable error.
@@ -33,13 +33,13 @@ type FileSystem interface {
 	Name() string   // the type of filesystem, i.e. "osfs"
 	String() string // a mountpoint or a drive letter
 
-	// Nobody restricts you from implementing those.
-	// But they are not mandatory for our interface.
+	// Nobody restricts you from implementing following methods.
+	// But they are not mandatory for our interface:
 	// Chmod(name string, mode os.FileMode) error
 	// Chtimes(name string, atime time.Time, mtime time.Time) error
 
-	Create(name string) (File, error) // read write
-	Lstat(path string) (os.FileInfo, error)
+	Create(name string) (File, error)       // read write
+	Lstat(path string) (os.FileInfo, error) // for fsc.Walk
 	Mkdir(name string, perm os.FileMode) error
 	MkdirAll(path string, perm os.FileMode) error
 	Open(name string) (File, error) // read only
@@ -62,16 +62,13 @@ type FileSystem interface {
 
 	// Two convenience methods taken from io.ioutil.
 	// They are mandatory, because you will need them sooner or later anyway.
-	// Thus we require them right from the start with *standard* signatures.
+	// Thus we require them right from the start and with *standard* signatures.
 	ReadFile(filename string) ([]byte, error)
 	WriteFile(filename string, data []byte, perm os.FileMode) error
 
-	// Inspired by filepath.Walk.
-	// Also implemented generically, purely on fsi.FileSystem;
-	//   in package fsc. However, only functions are possible,
-	//   since golang does not support methods on interfaces.
+	// Walk() is inspired by filepath.Walk()
+	// Walk is implemented generically, purely on fsi.FileSystem,
+	// in package fsc. Implementing it here is discouraged:
 	// Walk(root string, walkFn WalkFunc) error
 
 }
-
-type WalkFunc func(path string, info os.FileInfo, err error) error

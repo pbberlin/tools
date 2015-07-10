@@ -31,11 +31,12 @@ type File interface {
 
 	Name() string
 
-	// Notice indirect need to support os.FileInfo by the means of Stat()
-	//	Size() int64 {
-	//	Mode() os.FileMode {
-	//	ModTime() time.Time {
-	//	IsDir() bool {
-	//	Sys() interface{} {
+	// Notice the indirect need to implement os.FileInfo
+	// because it is returned by Stat()
+	//	  Size() int64 {
+	//	  Mode() os.FileMode {
+	//	  ModTime() time.Time {
+	//	  IsDir() bool {
+	//	  Sys() interface{} {
 
 }

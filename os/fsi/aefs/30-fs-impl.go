@@ -7,7 +7,6 @@ import (
 
 	"appengine/datastore"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/fsc"
 )
@@ -158,7 +157,9 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 	}
 
 	err := fsc.Walk(fs, path, walkRemove)
-	logif.E(err)
+	if err != nil {
+		fs.Ctx().Errorf("Error removing %v => %v", path, err)
+	}
 
 	// Walk crawls directories first, files second.
 	// Intuitively removal in reverse order should always work. Or does it not?

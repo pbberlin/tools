@@ -17,7 +17,11 @@ package aetest
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/pbberlin/tools/os/fsi"
+)
 
 func TestRename(t *testing.T) {
 	for _, fs := range Fss {
@@ -32,6 +36,9 @@ func TestRename(t *testing.T) {
 			t.Errorf("close %q failed: %v", to, err)
 		}
 		err = fs.Rename(from, to)
+		if err == fsi.NotImplemented {
+			continue
+		}
 		if err != nil {
 			t.Fatalf("rename %q, %q failed: %v", to, from, err)
 		}

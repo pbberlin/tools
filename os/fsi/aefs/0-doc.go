@@ -17,23 +17,10 @@ import (
 //    	mntX/dir1			mntX/	     dir1
 //    	mntX/dir1/			mntX/	     dir1
 //    	mntX/dir1/file2		mntX/dir1/	 file2
+//  We always want *split*.
 //
-//  We always want split.
-//
-// Solve Remaining Test failures
-//
-// Remove imports from aefs
-//   // logif
-
-// http-handlers:
-// 	"github.com/pbberlin/tools/logif"
-// "github.com/pbberlin/tools/net/http/loghttp"
-// "github.com/pbberlin/tools/net/http/tplx"
-// "github.com/pbberlin/tools/os/fsi/fsc"
-// "github.com/pbberlin/tools/util"
-//
-// low-level-dirs-query.go
-// 	"github.com/pbberlin/tools/stringspb"
+//  integrate http filesys
+//  try to do the extra testcases with memfs and osfs
 //
 //
 // Common Remarks:
@@ -53,10 +40,10 @@ import (
 // Architecture
 // ==============================
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf
-// we must chose the granularity of our entity groups.
+// we must choose the granularity of our entity groups.
 //
 // We decided on using weakly consistent directory paths.
-// The directory structure can stomach massive updates and inserts.
+// Thus, the directory structure can stomach massive updates and inserts.
 // But its indexing on property 'dir' may be delayed.
 //
 // Direct directory reads are not affected
@@ -64,25 +51,26 @@ import (
 //
 // Only each *one* directory is an entity group.
 // Applications are forced to partition directories,
-// if files are changed too frequently.
+// if files *per directory* are changed too frequently.
 //
-// In summary: The entire filesystem is extremely parallel.
+// In summary: The entire filesystem is extremely parallel,
 // and heavily writeable. But it's structural changes
 // are not instantly visible to everyone.
 //
-// Again: Traversal - meaning ReadDir is done
+// Again: Traversal - meaning ReadDir() - is done
 // using one global index of the Dir property.
 // This index can be queried for equality (direct children),
 // or for retrieval of entire subtrees.
 //
 //
 // Todo/Consider:
-// Add a "block"-layer under file,
-// so that more than 1MB byte files can be written?
+// Add a "block"-layer under file layer,
+// so that more than 1MB files can be written?
 // At least throw an error before the file is saved?
 //
 // Mem Caching for files; not just directories - but beware of cost.
-// Instance Caching with broadcasting instances via http request to instances.
+//
+// Usage of instance caching with broadcasting instances via http request to instances.
 //
 // Locking the filesys upon RemoveAll and Rename?
 //

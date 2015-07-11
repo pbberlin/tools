@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/stringspb"
 
 	"appengine/datastore"
 )
@@ -39,7 +38,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 			Order("Dir")
 		//  Limit(4)
 	} else {
-		pathInc := stringspb.IncrementString(path)
+		pathInc := IncrementString(path)
 		q = datastore.NewQuery(tdir).
 			Filter("Dir>=", path).
 			Filter("Dir<", pathInc).

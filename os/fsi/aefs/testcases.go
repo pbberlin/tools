@@ -4,19 +4,60 @@ import (
 	"bytes"
 	"os"
 
-	pth "path"
+	"github.com/pbberlin/tools/os/fsi/fsc"
 
-	"github.com/pbberlin/tools/logif"
+	pth "path"
 
 	"appengine"
 )
 
-func RetrieveDirs(c appengine.Context, rts string) *bytes.Buffer {
+func WalkDirs(c appengine.Context) *bytes.Buffer {
+
+	bb := new(bytes.Buffer)
+	fs := NewAeFs(MountPointLast(), AeContext(c))
+	wpf(bb, "created fs %v\n", fs.RootDir())
+
+	wpf(bb, "-------filewalk----\n")
+
+	walkFunc := func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			wpf(bb, "error on visiting %s => %v \n", path, err)
+			return err
+		} else {
+			tp := "file"
+			if f != nil {
+				if f.IsDir() {
+					tp = "dir "
+				}
+			}
+			wpf(bb, "Visited: %s %s \n", tp, path)
+		}
+		return nil
+	}
+
+	var err error
+
+	err = fsc.Walk(fs, fs.RootName(), walkFunc)
+	wpf(bb, "fs.Walk() returned %v\n\n", err)
+
+	err = fsc.Walk(fs, "ch1/ch2", walkFunc)
+	wpf(bb, "fs.Walk() returned %v\n\n", err)
+
+	err = fsc.Walk(fs, "ch1/ch2/ch3", walkFunc)
+	wpf(bb, "fs.Walk() returned %v\n\n", err)
+
+	//
+	err = fs.RemoveAll("ch1/ch2/ch3")
+	wpf(bb, "fs.RemoveAll() returned %v\n\n", err)
+
+	return bb
+}
+func RetrieveDirs(c appengine.Context) *bytes.Buffer {
 
 	bb := new(bytes.Buffer)
 
-	fs := NewAeFs(rts, AeContext(c))
-	wpf(bb, "created fs %v\n", rts)
+	fs := NewAeFs(MountPointLast(), AeContext(c))
+	wpf(bb, "created fs %v\n", fs.RootDir())
 
 	wpf(bb, "--------retrieve by query---------\n")
 
@@ -43,17 +84,19 @@ func RetrieveDirs(c appengine.Context, rts string) *bytes.Buffer {
 
 }
 
-func CreateSys(c appengine.Context, rts string) *bytes.Buffer {
+func CreateSys(c appengine.Context) *bytes.Buffer {
 
 	bb := new(bytes.Buffer)
 
-	fs := NewAeFs(rts, AeContext(c))
-	wpf(bb, "created fs %v\n", rts)
+	fs := NewAeFs(MountPointNext(), AeContext(c))
+	wpf(bb, "created fs %v\n", fs.RootDir())
 
 	fc1 := func(p []string) {
 		path := pth.Join(p...)
 		err := fs.MkdirAll(path, os.ModePerm)
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "MkdirAll failed %v\n", err)
+		}
 	}
 
 	wpf(bb, "--------create-dirs---------\n")
@@ -92,18 +135,26 @@ func CreateSys(c appengine.Context, rts string) *bytes.Buffer {
 
 	fc4a := func(name, content string) {
 		err := fs.WriteFile(name, []byte(content), os.ModePerm)
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "WriteFile %v failed %v\n", name, err)
+		}
 	}
 	fc4b := func(name, content string) {
 		f, err := fs.Create(name)
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "Create %v failed %v\n", name, err)
+		}
 		if err != nil {
 			return
 		}
 		_, err = f.WriteString(content)
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "WriteString %v failed %v\n", f.Name(), err)
+		}
 		err = f.Sync()
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "Sync %v failed %v\n", f.Name(), err)
+		}
 	}
 
 	fc4a("ch1/ch2/file1", "content 1")
@@ -115,7 +166,10 @@ func CreateSys(c appengine.Context, rts string) *bytes.Buffer {
 
 	fc5 := func(path string) {
 		files, err := fs.filesByPath(fs.RootDir() + path)
-		logif.E(err)
+		if err != nil {
+			wpf(bb, "filesByPath %v failed %v\n", path, err)
+		}
+
 		wpf(bb, " srch %v  \n", fs.RootDir()+path)
 		for k, v := range files {
 			wpf(bb, "     %v  -  %v %s\n", k, v.Name(), v.Data)

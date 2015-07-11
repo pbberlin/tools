@@ -4,8 +4,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/pbberlin/tools/runtimepb"
 )
 
 // golang.org/pkg/os
@@ -22,9 +20,6 @@ type FileInfo interface {
 
 func (d AeDir) Name() string {
 	n := d.Dir + d.BName
-	if d.fSys == nil {
-		runtimepb.StackTrace(9)
-	}
 	if strings.HasPrefix(n, d.fSys.RootDir()) {
 		n = n[len(d.fSys.RootDir()):]
 	}
@@ -32,9 +27,6 @@ func (d AeDir) Name() string {
 }
 func (f AeFile) Name() string {
 	n := f.Dir + f.BName
-	if f.fSys == nil {
-		runtimepb.StackTrace(9)
-	}
 	if strings.HasPrefix(n, f.fSys.RootDir()) {
 		n = n[len(f.fSys.RootDir()):]
 	}

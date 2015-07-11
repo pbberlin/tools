@@ -7,8 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pbberlin/tools/logif"
-
 	"appengine/datastore"
 )
 
@@ -25,7 +23,7 @@ func (fs *AeFileSys) fileByPath(path string) (AeFile, error) {
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error reading dir for file %v => %v", path, err)
 		return fo, err
 	}
 
@@ -36,7 +34,7 @@ func (fs *AeFileSys) fileByPath(path string) (AeFile, error) {
 		return fo, err
 	} else if err != nil {
 		s := fmt.Sprintf("%v", fileKey)
-		logif.E(err, s)
+		fs.Ctx().Errorf("Error reading file %v (%v) => %v", path, s, err)
 	}
 
 	return fo, err
@@ -54,7 +52,7 @@ func (fs *AeFileSys) filesByPath(path string) ([]AeFile, error) {
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error reading dir for files %v => %v", path, err)
 		return files, err
 	}
 
@@ -112,7 +110,7 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 	if err == datastore.ErrNoSuchEntity {
 		return err
 	} else if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error reading dir for file %v => %v", path, err)
 		return err
 	}
 
@@ -121,7 +119,7 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 
 	effKey, err := datastore.Put(fs.Ctx(), suggKey, f)
 	if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error saving file %v => %v", path, err)
 		return err
 	}
 	if !suggKey.Equal(effKey) {

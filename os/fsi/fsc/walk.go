@@ -8,7 +8,6 @@ package fsc
 
 import (
 	"errors"
-	"log"
 	"os"
 	pth "path"
 
@@ -44,7 +43,7 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 	}
 
 	fis, err := fs.ReadDir(path)
-	log.Printf("readdir of %-22v  => %v", path, len(fis))
+	// log.Printf("readdir of %-22v  => %v", path, len(fis))
 	if err != nil && err != fsi.EmptyQueryResult {
 		return walkFn(path, info, err)
 	}

@@ -6,8 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pbberlin/tools/logif"
-
 	pth "path"
 
 	ds "appengine/datastore"
@@ -41,7 +39,7 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error getting dir %v => %v", path, err)
 	}
 
 	fo.MemCacheSet()
@@ -99,9 +97,8 @@ func (fs *AeFileSys) saveDirByPath(path string) (AeDir, error) {
 	fo.Key = preciseK
 
 	effKey, err := ds.Put(fs.c, preciseK, &fo)
-
 	if err != nil {
-		logif.E(err)
+		fs.Ctx().Errorf("Error saving dir %v => %v", path, err)
 		return fo, err
 	}
 

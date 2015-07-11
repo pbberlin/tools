@@ -3,7 +3,6 @@ package aefs
 import (
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine"
@@ -41,10 +40,9 @@ func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 
 	_, err := fs.dirByPath(mount)
 	if err == datastore.ErrNoSuchEntity {
-		_, err := fs.saveDirByPath(mount)
-		logif.F(err)
+		_, err := fs.saveDirByPath(mount) // fine
 	} else if err != nil {
-		logif.F(err)
+		fs.c.Errorf("could not create mount %v => %v", mount, err)
 	}
 
 	return &fs

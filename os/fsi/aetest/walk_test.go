@@ -5,13 +5,14 @@ package aetest
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
 	"github.com/pbberlin/tools/os/fsi/fsc"
-	"github.com/pbberlin/tools/util"
 )
 
 func TestWalk(t *testing.T) {
@@ -41,14 +42,20 @@ func TestWalk(t *testing.T) {
 	}
 	_ = exWalkFunc
 
-	rt := <-util.Counter
-	rts := fmt.Sprintf("mnt%02v", rt)
-	bb := aefs.CreateSys(c, rts)
+	bb := aefs.CreateSys(c)
 	wpf(os.Stdout, bb.String())
 
-	bb = aefs.RetrieveDirs(c, rts)
+	bb = aefs.RetrieveDirs(c)
 	wpf(os.Stdout, bb.String())
 
-	// err = fsc.Walk(fsi, "temp", exWalkFunc)
-	// fmt.Printf("Walk() returned: %v\n", err)
+	bb = aefs.WalkDirs(c)
+	wpf(os.Stdout, bb.String())
+
+	bb = aefs.WalkDirs(c)
+	wpf(os.Stdout, bb.String())
+
+	fs := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(c))
+	fsIn := fsi.FileSystem(fs)
+	err := fsc.Walk(fsIn, fs.RootDir(), exWalkFunc)
+	log.Printf("Walk() returned: %v\n", err)
 }

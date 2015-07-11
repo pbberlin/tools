@@ -17,9 +17,16 @@ func WalkDirs(c appengine.Context) *bytes.Buffer {
 	fs := NewAeFs(MountPointLast(), AeContext(c))
 	wpf(bb, "created fs %v\n", fs.RootDir())
 
-	wpf(bb, "-------filewalk----\n")
+	wpf(bb, "-------filewalk----\n\n")
 
+	cntr := 0
 	walkFunc := func(path string, f os.FileInfo, err error) error {
+
+		cntr++
+		if cntr > 100 {
+			panic("counter")
+		}
+
 		if err != nil {
 			wpf(bb, "error on visiting %s => %v \n", path, err)
 			return err
@@ -47,8 +54,8 @@ func WalkDirs(c appengine.Context) *bytes.Buffer {
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
 
 	//
-	err = fs.RemoveAll("ch1/ch2/ch3")
-	wpf(bb, "fs.RemoveAll() returned %v\n\n", err)
+	// err = fs.RemoveAll("ch1/ch2/ch3")
+	// wpf(bb, "fs.RemoveAll() returned %v\n\n", err)
 
 	return bb
 }
@@ -59,18 +66,23 @@ func RetrieveDirs(c appengine.Context) *bytes.Buffer {
 	fs := NewAeFs(MountPointLast(), AeContext(c))
 	wpf(bb, "created fs %v\n", fs.RootDir())
 
-	wpf(bb, "--------retrieve by query---------\n")
+	wpf(bb, "--------retrieve by query---------\n\n")
 
 	fc3 := func(path string, direct bool) {
-		wpf(bb, "searching ---  %v\n", path)
+		mode := "direct"
+		if !direct {
+			mode = "all"
+		}
+		wpf(bb, "searching %-6v  %q\n", mode, path)
 		children, err := fs.subdirsByPath(path, direct)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
 			for k, v := range children {
-				wpf(bb, "child #%2v %-24v\n", k, v.Name())
+				wpf(bb, "  child #%-2v        %-24v\n", k, v.Name())
 			}
 		}
+		wpf(bb, "\n")
 	}
 
 	fc3(spf(`ch1/ch2/ch3`), false)

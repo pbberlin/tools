@@ -1,6 +1,8 @@
 package aefs
 
 import (
+	"strings"
+
 	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine/datastore"
@@ -21,18 +23,22 @@ import (
 func (fs *AeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
 
 	dir, bname := fs.pathInternalize(name)
+	name = dir + bname
+	if !strings.HasSuffix(name, sep) {
+		name += sep
+	}
 
 	var q *datastore.Query
 
 	if onlyDirectChildren {
 		q = datastore.NewQuery(tdir).
-			Filter("Dir=", dir+bname).
+			Filter("Dir=", name).
 			Order("Dir")
 		//  Limit(4)
 	} else {
-		pathInc := IncrementString(dir + bname)
+		pathInc := IncrementString(name)
 		q = datastore.NewQuery(tdir).
-			Filter("Dir>=", dir+bname).
+			Filter("Dir>=", name).
 			Filter("Dir<", pathInc).
 			Order("Dir")
 	}
@@ -52,13 +58,14 @@ func (fs *AeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDi
 
 	// Very evil: We filter out root node, since it's
 	// has the same dir as the level-1 directories.
-	keyRoot := datastore.NewKey(fs.Ctx(), tdir, fs.mount, 0, nil)
+	keyRoot := datastore.NewKey(fs.Ctx(), tdir, fs.RootDir(), 0, nil)
 	idxRoot := -1
 
 	for i := 0; i < len(children); i++ {
 		children[i].fSys = fs
 		children[i].Key = keys[i]
 		if keys[i].Equal(keyRoot) {
+			// log.Printf("root idx %v", i)
 			idxRoot = i
 		}
 	}

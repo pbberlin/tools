@@ -38,8 +38,10 @@ func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 		panic("this type of filesystem needs appengine context, submitted as option")
 	}
 
-	_, err := fs.dirByPath(mount)
+	rt, err := fs.dirByPath(mount)
+	_ = rt
 	if err == datastore.ErrNoSuchEntity {
+		// log.Printf("need to creat root %v", mount)
 		_, err := fs.saveDirByPath(mount) // fine
 		if err != nil {
 			fs.c.Errorf("could not create mount %v => %v", mount, err)

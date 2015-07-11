@@ -1,6 +1,9 @@
 package aefs
 
-import "appengine/datastore"
+import (
+	"appengine/datastore"
+	"appengine/memcache"
+)
 
 // DeleteAll deletes across all roots
 // DeleteAll deletes by kind alone.
@@ -42,6 +45,12 @@ func (fs *AeFileSys) DeleteAll() (string, error) {
 		}
 
 		msg += spf("%v directories deleted\n", len(keys))
+	}
+
+	err := memcache.Flush(fs.Ctx())
+	if err != nil {
+		msg += "error flushing memcache\n"
+		return msg, err
 	}
 
 	return msg, nil

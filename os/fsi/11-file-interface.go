@@ -19,6 +19,9 @@ type File interface {
 
 	//Fd() uintptr
 	Stat() (os.FileInfo, error)
+
+	// It seems I made a mistake.
+	// Close writes to disk; Sync is not neccessary
 	Sync() error
 
 	// Readdir and Readdirnames come from os.File.

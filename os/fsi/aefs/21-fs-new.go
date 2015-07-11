@@ -41,8 +41,11 @@ func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 	_, err := fs.dirByPath(mount)
 	if err == datastore.ErrNoSuchEntity {
 		_, err := fs.saveDirByPath(mount) // fine
+		if err != nil {
+			fs.c.Errorf("could not create mount %v => %v", mount, err)
+		}
 	} else if err != nil {
-		fs.c.Errorf("could not create mount %v => %v", mount, err)
+		fs.c.Errorf("could read mount dir %v => %v", mount, err)
 	}
 
 	return &fs

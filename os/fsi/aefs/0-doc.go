@@ -8,7 +8,11 @@ import (
 
 //
 // Todos:
-
+//
+//
+// Throw out sync()
+//
+//
 // Standardize path - everywhere
 //    cases
 // 		"/"					mntX/	     ""

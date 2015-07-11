@@ -50,7 +50,7 @@ func cleanseLeadingSlash(p string) string {
 }
 
 // name is the *external* path or filename.
-func (fs *AeFileSys) pathInternalize(name string) (dir, bname, fullpath string) {
+func (fs *AeFileSys) pathInternalize(name string) (dir, bname string) {
 
 	name = cleanseLeadingSlash(name)
 
@@ -73,8 +73,6 @@ func (fs *AeFileSys) pathInternalize(name string) (dir, bname, fullpath string) 
 	if !strings.HasSuffix(dir, sep) {
 		dir += sep
 	}
-
-	fullpath = dir + bname
 
 	return
 

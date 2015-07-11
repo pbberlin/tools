@@ -3,31 +3,24 @@ package aefs
 import (
 	"os"
 	"sort"
-	"strings"
 	"time"
-
-	pth "path"
 
 	ds "appengine/datastore"
 )
 
 // Retrieves a directory in one go.
 // Also used to check existence; returning ds.ErrNoSuchEntity
-func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
+func (fs *AeFileSys) dirByPath(name string) (AeDir, error) {
 
-	path = cleanseLeadingSlash(path)
-	if path != fs.RootName() && !strings.HasPrefix(path, fs.RootName()) {
-		path = fs.RootDir() + path
-	}
-	// logif.Pf("  %v", path)
+	dir, bname := fs.pathInternalize(name)
 
 	fo := AeDir{}
 	fo.fSys = fs
 
-	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
+	preciseK := ds.NewKey(fs.c, tdir, dir+bname, 0, nil)
 	fo.Key = preciseK
 
-	err := fo.MemCacheGet(path)
+	err := fo.MemCacheGet(dir + bname)
 	if err == nil {
 		return fo, nil
 	}
@@ -39,7 +32,7 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error getting dir %v => %v", path, err)
+		fs.Ctx().Errorf("Error getting dir %v => %v", dir+bname, err)
 	}
 
 	fo.MemCacheSet()
@@ -49,17 +42,13 @@ func (fs *AeFileSys) dirByPath(path string) (AeDir, error) {
 // dirsByPath might not find recently added directories.
 // Upon finding nothing, it therefore returns the
 // "warning" fsi.EmptyQueryResult
-func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
+func (fs *AeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
-	path = cleanseLeadingSlash(path)
-	if !strings.HasPrefix(path, fs.RootName()) {
-		path = fs.RootDir() + path
-	}
-	// logif.Pf("  %v", path)
+	dir, bname := fs.pathInternalize(name)
 
 	var fis []os.FileInfo
 
-	dirs, err := fs.subdirsByPath(path, true)
+	dirs, err := fs.subdirsByPath(dir+bname, true)
 	for _, v := range dirs {
 		// logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
 		fi := os.FileInfo(v)
@@ -72,33 +61,23 @@ func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 
 }
 
-func (fs *AeFileSys) saveDirByPath(path string) (AeDir, error) {
+func (fs *AeFileSys) saveDirByPath(name string) (AeDir, error) {
 
 	fo := AeDir{}
 	fo.isDir = true
 	fo.MModTime = time.Now()
 	fo.fSys = fs
 
-	if path == fs.RootDir() || path+sep == fs.RootDir() {
-		fo.Dir = fs.RootDir()
-		fo.BName = ""
-	} else {
-		path = cleanseLeadingSlash(path)
-		if !strings.HasPrefix(path, fs.RootName()) {
-			path = fs.RootDir() + path
-		}
-		dir, base := pth.Split(path)
-		fo.Dir = dir
-		fo.BName = base
-	}
+	dir, bname := fs.pathInternalize(name)
+	fo.Dir = dir
+	fo.BName = bname
 
-	preciseK := ds.NewKey(fs.c, tdir, path, 0, nil)
-
+	preciseK := ds.NewKey(fs.c, tdir, dir+bname, 0, nil)
 	fo.Key = preciseK
 
 	effKey, err := ds.Put(fs.c, preciseK, &fo)
 	if err != nil {
-		fs.Ctx().Errorf("Error saving dir %v => %v", path, err)
+		fs.Ctx().Errorf("Error saving dir %v => %v", dir+bname, err)
 		return fo, err
 	}
 

@@ -1,8 +1,6 @@
 package aefs
 
 import (
-	"strings"
-
 	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine/datastore"
@@ -20,27 +18,21 @@ import (
 // "warning" fsi.EmptyQueryResult
 //
 // The func could easily be enhanced chunked scanning.
-func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDir, error) {
+func (fs *AeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
 
-	path = cleanseLeadingSlash(path)
-	if !strings.HasPrefix(path, fs.RootName()) {
-		path = fs.RootDir() + path
-	}
-	if !strings.HasSuffix(path, sep) {
-		path += sep
-	}
+	dir, bname := fs.pathInternalize(name)
 
 	var q *datastore.Query
 
 	if onlyDirectChildren {
 		q = datastore.NewQuery(tdir).
-			Filter("Dir=", path).
+			Filter("Dir=", dir+bname).
 			Order("Dir")
 		//  Limit(4)
 	} else {
-		pathInc := IncrementString(path)
+		pathInc := IncrementString(dir + bname)
 		q = datastore.NewQuery(tdir).
-			Filter("Dir>=", path).
+			Filter("Dir>=", dir+bname).
 			Filter("Dir<", pathInc).
 			Order("Dir")
 	}
@@ -50,7 +42,7 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	var children []AeDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
-		fs.Ctx().Errorf("Error getting all children of %v => %v", fs.RootDir(), err)
+		fs.Ctx().Errorf("Error getting all children of %v => %v", dir+bname, err)
 		return children, err
 	}
 

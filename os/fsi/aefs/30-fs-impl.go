@@ -10,7 +10,6 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/fsc"
 )
-import pth "path"
 
 func (fs AeFileSys) Name() string { return "aefs" }
 
@@ -23,14 +22,12 @@ func (fs AeFileSys) String() string { return fs.mount }
 func (fs *AeFileSys) Create(name string) (fsi.File, error) {
 
 	// WriteFile & Create
-	if name == "" {
-		return nil, fmt.Errorf("name cant be empty string")
-	}
-	name = cleanseLeadingSlash(name)
+	dir, bname := fs.pathInternalize(name)
+
 	f := AeFile{}
 	f.fSys = fs
-	f.BName = pth.Base(name)
-	f.Dir = pth.Dir(name)
+	f.BName = bname
+	f.Dir = dir
 
 	// let all the properties by set by fs.saveFileByPath
 	err := f.Sync()
@@ -74,8 +71,9 @@ func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 // conflicts with file.Open() interface of Afero
 func (fs *AeFileSys) Open(name string) (fsi.File, error) {
 
-	name = cleanseLeadingSlash(name)
-	f, err := fs.fileByPath(name)
+	dir, bname := fs.pathInternalize(name)
+
+	f, err := fs.fileByPath(dir + bname)
 	if err != nil {
 		return nil, err
 	}
@@ -206,14 +204,11 @@ func (fs *AeFileSys) ReadFile(path string) ([]byte, error) {
 func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
 
 	// WriteFile & Create
-	if name == "" {
-		return fmt.Errorf("name cant be empty string")
-	}
-	name = cleanseLeadingSlash(name)
+	dir, bname := fs.pathInternalize(name)
 	f := AeFile{}
+	f.Dir = dir
+	f.BName = bname
 	f.fSys = fs
-	f.BName = pth.Base(name)
-	f.Dir = pth.Dir(name)
 
 	var err error
 	_, err = f.Write(data)

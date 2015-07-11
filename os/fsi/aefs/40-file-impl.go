@@ -77,7 +77,7 @@ func (f *AeFile) Stat() (os.FileInfo, error) {
 
 func (f *AeFile) Sync() error {
 
-	err := f.fSys.saveFileByPath(f, f.Dir)
+	err := f.fSys.saveFileByPath(f, f.Dir+f.BName)
 	if err != nil {
 		return err
 	}

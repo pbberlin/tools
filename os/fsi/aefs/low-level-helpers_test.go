@@ -45,18 +45,19 @@ func TestPathCleanage(t *testing.T) {
 		_ = inpt
 		wnt1 := v[1]
 		wnt2 := v[2]
-		got1, got2, got3 := fs.pathInternalize(v[0])
+		dir, bname := fs.pathInternalize(v[0])
+		fullpath := dir + bname
 
-		log.Printf("%-28v %-24v => %-16q %-12q ", inpt, got1, got2, got3)
+		log.Printf("%-28v %-24v => %-16q %-12q ", inpt, dir, bname, fullpath)
 
-		if wnt1 != got1 {
-			t.Logf("got %-13v - wnt %v\n", got1, wnt1)
+		if wnt1 != dir {
+			t.Logf("got %-13v - wnt %v\n", dir, wnt1)
 		}
-		if wnt2 != got2 {
-			t.Logf("got %-13v - wnt %v\n", got2, wnt2)
+		if wnt2 != bname {
+			t.Logf("got %-13v - wnt %v\n", bname, wnt2)
 		}
-		if wnt1+wnt2 != got3 {
-			t.Logf("got %-13v - wnt %v\n", got3, wnt1+wnt2)
+		if wnt1+wnt2 != fullpath {
+			t.Logf("got %-13v - wnt %v\n", fullpath, wnt1+wnt2)
 		}
 	}
 }

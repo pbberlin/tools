@@ -2,7 +2,6 @@ package aefs
 
 import (
 	"fmt"
-	pth "path"
 	"sort"
 	"strings"
 	"time"
@@ -10,31 +9,29 @@ import (
 	"appengine/datastore"
 )
 
-func (fs *AeFileSys) fileByPath(path string) (AeFile, error) {
+func (fs *AeFileSys) fileByPath(name string) (AeFile, error) {
 
-	path = cleanseLeadingSlash(path)
+	dir, bname := fs.pathInternalize(name)
 
 	fo := AeFile{}
 	fo.fSys = fs
 
-	sdir, base := pth.Split(path)
-
-	dir, err := fs.dirByPath(sdir)
+	foDir, err := fs.dirByPath(dir)
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for file %v => %v", path, err)
+		fs.Ctx().Errorf("Error reading dir for file %v => %v", dir+bname, err)
 		return fo, err
 	}
 
-	fileKey := datastore.NewKey(fs.Ctx(), tfil, base, 0, dir.Key)
+	fileKey := datastore.NewKey(fs.Ctx(), tfil, dir+bname, 0, foDir.Key)
 	fo.Key = fileKey
 	err = datastore.Get(fs.c, fileKey, &fo)
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {
 		s := fmt.Sprintf("%v", fileKey)
-		fs.Ctx().Errorf("Error reading file %v (%v) => %v", path, s, err)
+		fs.Ctx().Errorf("Error reading file %v (%v) => %v", dir+bname, s, err)
 	}
 
 	return fo, err
@@ -42,24 +39,24 @@ func (fs *AeFileSys) fileByPath(path string) (AeFile, error) {
 }
 
 // similar to ReadDir but returning only files
-func (fs *AeFileSys) filesByPath(path string) ([]AeFile, error) {
+func (fs *AeFileSys) filesByPath(name string) ([]AeFile, error) {
 
-	path = cleanseLeadingSlash(path)
+	dir, bname := fs.pathInternalize(name)
 
 	var files []AeFile
 
-	dir, err := fs.dirByPath(path)
+	foDir, err := fs.dirByPath(dir)
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for files %v => %v", path, err)
+		fs.Ctx().Errorf("Error reading dir for files %v => %v", dir+bname, err)
 		return files, err
 	}
 
-	q := datastore.NewQuery(tfil).Ancestor(dir.Key)
+	q := datastore.NewQuery(tfil).Ancestor(foDir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
 	if err != nil {
-		fs.Ctx().Errorf("Error fetching files children of %v => %v", dir.Key, err)
+		fs.Ctx().Errorf("Error fetching files children of %v => %v", foDir.Key, err)
 		return files, err
 	}
 
@@ -76,27 +73,21 @@ func (fs *AeFileSys) filesByPath(path string) ([]AeFile, error) {
 //
 //
 // Path is the directory, BName contains the base name.
-func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
+func (fs *AeFileSys) saveFileByPath(f *AeFile, name string) error {
 
-	path = cleanseLeadingSlash(path)
-
-	if f.BName == "" {
-		return fmt.Errorf("file needs name")
+	dir, bname := fs.pathInternalize(name)
+	f.Dir = dir
+	// bname was only submitted in the fileobject only
+	// correct previous
+	if f.BName != "" && f.BName != bname {
+		dir = dir + bname // re-append
+		if !strings.HasSuffix(dir, sep) {
+			dir += sep
+		}
+		bname = f.BName
+		f.Dir = dir
 	}
-
-	if !strings.HasPrefix(path, fs.RootName()) {
-		path = fs.RootDir() + path
-	}
-
-	if strings.HasSuffix(path, f.BName) {
-		path = path[:len(path)-len(f.BName)]
-	}
-
-	f.Dir = path
-
-	if !strings.HasSuffix(f.Dir, sep) {
-		f.Dir += sep
-	}
+	f.BName = bname
 
 	f.MModTime = time.Now()
 	f.fSys = fs
@@ -104,22 +95,20 @@ func (fs *AeFileSys) saveFileByPath(f *AeFile, path string) error {
 	//
 	// -------------now the datastore part-------------------------
 
-	// logif.Pf("%q %q", f.Dir, f.BName)
-
-	dir, err := fs.dirByPath(f.Dir)
+	foDir, err := fs.dirByPath(dir)
 	if err == datastore.ErrNoSuchEntity {
 		return err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for file %v => %v", path, err)
+		fs.Ctx().Errorf("Error reading dir for file %v => %v", dir+bname, err)
 		return err
 	}
 
-	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, dir.Key)
+	suggKey := datastore.NewKey(fs.Ctx(), tfil, f.BName, 0, foDir.Key)
 	f.Key = suggKey
 
 	effKey, err := datastore.Put(fs.Ctx(), suggKey, f)
 	if err != nil {
-		fs.Ctx().Errorf("Error saving file %v => %v", path, err)
+		fs.Ctx().Errorf("Error saving file %v => %v", dir+bname, err)
 		return err
 	}
 	if !suggKey.Equal(effKey) {

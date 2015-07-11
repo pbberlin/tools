@@ -9,21 +9,23 @@ import (
 )
 
 func StackTrace(max int) {
-	// we could construct a logger without info:
-	// 	lg := log.New(os.Stdout, "str", 0)
-	// but it would not be  written under appengine, because of os.Stdout
-
 	for i := 1; i <= max; i++ {
-		_, file, line, _ := runtime.Caller(i)
+		// _, file, line, _ := runtime.Caller(i)
+		line, file := LineFileXUp(i)
 		log.Printf("        %s:%d ", file, line)
 	}
 }
 
 func LineFileXUp(levelsUp int) (int, string) {
 	_, file, line, _ := runtime.Caller(levelsUp + 1) // plus one for myself-func
-	dir := filepath.Dir(file)
-	dirLast := filepath.Base(dir)
-	file = filepath.Join(dirLast, filepath.Base(file))
+
+	path1 := filepath.Dir(file)
+	dir1 := filepath.Base(path1)
+
+	path2 := filepath.Dir(path1)
+	dir2 := filepath.Base(path2)
+
+	file = filepath.Join(dir2, dir1, filepath.Base(file))
 	return line, file
 }
 

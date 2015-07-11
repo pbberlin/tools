@@ -34,7 +34,9 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 		stMold != "*filesys.fs" &&
 		stMold != "*filesys.fso" {
 		// struct - save it with JSON encoder
-		c.Infof("%v", stMold)
+		if ll > 2 {
+			c.Infof("%v", stMold)
+		}
 		n := tMold.NumField()
 		_ = n
 		miPut := &memcache.Item{
@@ -44,7 +46,9 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 			Expiration: 3600 * time.Second,
 		}
 		memcache.JSON.Set(c, miPut)
-		c.Infof("mcache set obj key %v[%s]  - err %v", skey, stMold, err)
+		if ll > 2 {
+			c.Infof("mcache set obj key %v[%s]  - err %v", skey, stMold, err)
+		}
 
 	} else {
 		// scalar value - save it
@@ -114,7 +118,9 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 					Value: []byte(val),
 				}
 				eset := memcache.Set(c, miCas)
-				c.Infof("%v", eset)
+				if ll > 2 {
+					c.Infof("%v", eset)
+				}
 				time.Sleep(10 * time.Millisecond)
 				continue
 			}
@@ -123,9 +129,10 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 				time.Sleep(10 * time.Millisecond)
 				continue
 			}
-
-			c.Infof("mcache set scalar %v[%T]=%v - mode %v - eget/eput: %v/%v",
-				skey, str_int_struct, val, putMode, eget, eput)
+			if ll > 2 {
+				c.Infof("mcache set scalar %v[%T]=%v - mode %v - eget/eput: %v/%v",
+					skey, str_int_struct, val, putMode, eget, eput)
+			}
 			break
 		}
 
@@ -160,7 +167,9 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 		stMold == "int" ||
 		stMold == "*dsu.WrapInt" ||
 		stMold == "*dsu.WrapString" {
-		c.Infof("%s %s", "scalar", msg1)
+		if ll > 2 {
+			c.Infof("%s %s", "scalar", msg1)
+		}
 		miGet, err := memcache.Get(c, skey)
 		if err != nil && err != memcache.ErrCacheMiss {
 			panic(err)
@@ -190,12 +199,16 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 			tmp := moldForReturn.(*WrapString)
 			tmp.S = string(miGet.Value)
 		}
-		c.Infof(" mcache got scalar - key %v %v", skey, moldForReturn)
+		if ll > 2 {
+			c.Infof(" mcache got scalar - key %v %v", skey, moldForReturn)
+		}
 
 		return true //xx
 
 	} else {
-		c.Infof("%s %s", "objct", msg1)
+		if ll > 2 {
+			c.Infof("%s %s", "objct", msg1)
+		}
 
 		unparsedjson, err := memcache.JSON.Get(c, skey, &moldForReturn)
 		_ = unparsedjson
@@ -205,7 +218,9 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 		if err == memcache.ErrCacheMiss {
 			return false //xx
 		}
-		c.Infof(" mcache got obj - key %v", skey)
+		if ll > 2 {
+			c.Infof(" mcache got obj - key %v", skey)
+		}
 		return true //xx
 
 	}

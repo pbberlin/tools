@@ -60,10 +60,14 @@ func (fs *AeFileSys) filesByPath(path string) ([]AeFile, error) {
 
 	q := datastore.NewQuery(tfil).Ancestor(dir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
-	_ = keys
 	if err != nil {
 		fs.Ctx().Errorf("Error fetching files children of %v => %v", dir.Key, err)
 		return files, err
+	}
+
+	for i := 0; i < len(files); i++ {
+		files[i].Key = keys[i]
+		files[i].fSys = fs
 	}
 
 	sort.Sort(AeFileByName(files))

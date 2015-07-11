@@ -62,7 +62,6 @@ func (fs *AeFileSys) dirsByPath(path string) ([]os.FileInfo, error) {
 	var fis []os.FileInfo
 
 	dirs, err := fs.subdirsByPath(path, true)
-
 	for _, v := range dirs {
 		// logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
 		fi := os.FileInfo(v)

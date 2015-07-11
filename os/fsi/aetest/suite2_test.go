@@ -26,6 +26,7 @@ import (
 )
 
 func TestTruncate(t *testing.T) {
+
 	for _, fs := range Fss {
 		f := newFile("TestTruncate", fs, t)
 		defer fs.Remove(f.Name())
@@ -48,6 +49,7 @@ func TestTruncate(t *testing.T) {
 }
 
 func TestSeek(t *testing.T) {
+
 	for _, fs := range Fss {
 		f := newFile("TestSeek", fs, t)
 		defer fs.Remove(f.Name())
@@ -86,6 +88,7 @@ func TestSeek(t *testing.T) {
 }
 
 func TestReadAt(t *testing.T) {
+
 	for _, fs := range Fss {
 		f := newFile("TestReadAt", fs, t)
 		defer fs.Remove(f.Name())
@@ -106,7 +109,15 @@ func TestReadAt(t *testing.T) {
 }
 
 func TestWriteAt(t *testing.T) {
+
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		fmt.Println("Recovered in TestWriteAt", r)
+	// 	}
+	// }()
+
 	for _, fs := range Fss {
+
 		f := newFile("TestWriteAt", fs, t)
 		defer fs.Remove(f.Name())
 		defer f.Close()
@@ -119,11 +130,24 @@ func TestWriteAt(t *testing.T) {
 			t.Fatalf("WriteAt 7: %d, %v", n, err)
 		}
 
+		err = f.Sync()
+		if err != nil {
+			t.Fatalf("Saving file %v: %v", f.Name(), err)
+		}
+		// log.Printf(" Saved file %v", f.Name())
+
 		f2, err := fs.Open(f.Name())
+		if err != nil {
+			t.Fatalf("Reopening file %v: %v", f.Name(), err)
+		}
 		defer f2.Close()
+
+		// log.Printf("so far 4 %v", fs.Name())
+
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(f2)
 		b := buf.Bytes()
+
 		if err != nil {
 			t.Fatalf("%v: ReadFile %s: %v", fs.Name(), f.Name(), err)
 		}

@@ -8,6 +8,7 @@ package fsc
 
 import (
 	"errors"
+	"log"
 	"os"
 	pth "path"
 
@@ -43,13 +44,14 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 	}
 
 	fis, err := fs.ReadDir(path)
+	log.Printf("readdir of %-22v  => %v", path, len(fis))
 	if err != nil && err != fsi.EmptyQueryResult {
 		return walkFn(path, info, err)
 	}
 
 	//
 	for _, fi := range fis {
-		filename := pth.Join(path, fi.Name())
+		filename := pth.Join(path, pth.Base(fi.Name()))
 
 		fileInfo, err := fs.Lstat(filename)
 		if err != nil {
@@ -87,5 +89,6 @@ func Walk(fs fsi.FileSystem, root string, walkFn WalkFunc) error {
 		// logif.Pf("walk start error %10v %v", root, err)
 		return walkFn(root, nil, err)
 	}
+	// logif.Pf("walk start fnd %v", info.Name())
 	return walk(fs, root, info, walkFn)
 }

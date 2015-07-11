@@ -133,6 +133,7 @@ func (fs *AeFileSys) Remove(name string) error {
 	if err == nil {
 		// logif.Pf("   dkey %v", d.Key)
 		err = datastore.Delete(fs.Ctx(), d.Key)
+		d.MemCacheDelete()
 		if err != nil {
 			return fmt.Errorf("error removing dir %v", err)
 		}

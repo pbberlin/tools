@@ -15,6 +15,7 @@ import (
 )
 
 var updateSamplingFrequency = map[string]int{}
+var ll = 0
 
 const (
 	defaultNumShards = 4
@@ -76,7 +77,9 @@ func Count(c appengine.Context, valName string) (retVal int, err error) {
 	}
 	retVal = wi.I
 	if retVal > 0 {
-		c.Infof("found counter %s = %v in memcache; return", mcKey(valName), wi.I)
+		if ll > 2 {
+			c.Infof("found counter %s = %v in memcache; return", mcKey(valName), wi.I)
+		}
 		retVal = 0
 	}
 
@@ -104,19 +107,27 @@ Loop1:
 			_, err = iter.Next(&sd)
 
 			if err == datastore.Done {
-				c.Infof("       No Results (any more)  %v", err)
+				if ll > 2 {
+					c.Infof("       No Results (any more)  %v", err)
+				}
 				err = nil
 				if cntr == 0 {
-					c.Infof("  Leaving Loop1")
+					if ll > 2 {
+						c.Infof("  Leaving Loop1")
+					}
 					break Loop1
 				}
 				break
 			}
 			cntr++
 			retVal += sd.I
-			c.Infof("        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
+			if ll > 2 {
+				c.Infof("        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
+			}
 		}
-		c.Infof("   %2v shards found - sum %4v", cntr, retVal)
+		if ll > 2 {
+			c.Infof("   %2v shards found - sum %4v", cntr, retVal)
+		}
 
 	}
 
@@ -163,7 +174,9 @@ func Increment(c appengine.Context, valName string) error {
 			sd.ShardId = shardId
 			sd.I++
 			_, err = datastore.Put(c, dsKey, &sd)
-			c.Infof("ds put %v %v", dsKey, sd)
+			if ll > 2 {
+				c.Infof("ds put %v %v", dsKey, sd)
+			}
 			return err
 		}, nil)
 	if errTx != nil {

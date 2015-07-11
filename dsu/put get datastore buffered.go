@@ -17,6 +17,8 @@ import (
 	"github.com/alexcesaro/mail/quotedprintable"
 )
 
+var ll = 0
+
 // BufPut - buffered put - saves its contents to memory, to memcache and the datastore
 //   Todo: Don't buffer in local memory.
 func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosure error) {
@@ -31,7 +33,9 @@ func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosu
 			McacheSet(c, mkk, wb)
 			memoryInstanceStore[mkk] = &wb
 			multiCastInstanceCacheChange(c, mkk)
-			c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
+			if ll > 2 {
+				c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
+			}
 			return err
 		}, nil)
 	c.Errorf("%v", errClosure)
@@ -48,7 +52,9 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	// first check instance memory
 	wb1, ok := memoryInstanceStore[mkk]
 	if ok {
-		c.Infof("received %q from static instance memory", mkk)
+		if ll > 2 {
+			c.Infof("received %q from static instance memory", mkk)
+		}
 		//util_err.StackTrace(6)
 		return *wb1, nil
 	}
@@ -57,7 +63,9 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	ok = McacheGet(c, mkk, wb1)
 	if ok && wb1 != nil && wb1.Name != "" {
 		// we could replenish memcache TTL here - instead we do that below
-		c.Infof("retrieved from memcache - combi_key %v", mkk)
+		if ll > 2 {
+			c.Infof("retrieved from memcache - combi_key %v", mkk)
+		}
 		memoryInstanceStore[mkk] = wb1
 		return *wb1, nil
 	}
@@ -81,7 +89,9 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	McacheSet(c, mkk, wb2)
 	memoryInstanceStore[mkk] = &wb2
 
-	c.Infof("retrieved from ds - re-inserted into memcache + instance RAM - combi_key %v", mkk)
+	if ll > 2 {
+		c.Infof("retrieved from ds - re-inserted into memcache + instance RAM - combi_key %v", mkk)
+	}
 
 	return wb2, nil
 }
@@ -104,7 +114,9 @@ func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 			ii.Hostname,
 			mkk, ii.InstanceID)
 		_ = url
-		c.Infof(" url\n%v", url)
+		if ll > 2 {
+			c.Infof(" url\n%v", url)
+		}
 
 		//response, err := http.Get(url)  // not available in gae
 		// instead:
@@ -121,14 +133,16 @@ func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 		//    /_ah/xmpp/message/chat/
 
 		if err != nil {
-			c.Infof("  could not launch get request; %v", err)
+			c.Errorf("  could not launch get request; %v", err)
 		} else {
 			defer response.Body.Close()
 			contents, err := ioutil.ReadAll(response.Body)
 			if err != nil {
-				c.Infof("  could not read response; %v", err)
+				c.Errorf("  could not read response; %v", err)
 			}
-			c.Infof("%s\n", string(contents))
+			if ll > 2 {
+				c.Infof("%s\n", string(contents))
+			}
 		}
 
 	}
@@ -144,7 +158,9 @@ func invalidate(w http.ResponseWriter, r *http.Request) {
 	mkk := r.FormValue("mkk")
 	sii := r.FormValue("senderInstanceId")
 
-	c.Infof(" %s  ---------  %s\n", sii, mkk)
+	if ll > 2 {
+		c.Infof(" %s  ---------  %s\n", sii, mkk)
+	}
 
 	w.WriteHeader(http.StatusOK)
 

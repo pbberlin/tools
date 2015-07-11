@@ -114,7 +114,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			panicSignal := recover()
 			if panicSignal != nil {
 				miniStacktrace := ""
-				for i := 1; i < 6; i++ {
+				for i := 1; i < 8; i++ {
 					_, file, line, _ := runtime.Caller(i)
 					if strings.Index(file, `/src/pkg/runtime/`) > -1 {
 						miniStacktrace += fmt.Sprintf("<br>\n\t\t %s:%d ", file[len(file)-20:], line)

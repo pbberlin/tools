@@ -3,16 +3,19 @@
 package aetest
 
 import (
+	"fmt"
+	"io"
 	"log"
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
-	"github.com/pbberlin/tools/os/fsi/aefs_sr"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 
 	"appengine/aetest"
 )
+
+var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 var dot = []string{
 	"fs.go",
@@ -48,10 +51,6 @@ func init() {
 	fs1i := fsi.FileSystem(fs1)
 	_ = fs1i
 
-	fs2 := aefs_sr.NewAeFs("rootY", aefs_sr.AeContext(c))
-	fs2i := fsi.FileSystem(fs2)
-	_ = fs2i
-
 	fs3 := &osfs.OsFileSys{}
 	fs3i := fsi.FileSystem(fs3)
 	_ = fs3i
@@ -60,7 +59,7 @@ func init() {
 	fs4i := fsi.FileSystem(fs4)
 	_ = fs4i
 
-	Fss = []fsi.FileSystem{fs1i, fs2i, fs3i, fs4i}
+	Fss = []fsi.FileSystem{fs1i, fs3i, fs4i}
 	// fss := []fsi.FileSystem{fs4i}
 
 }

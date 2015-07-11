@@ -1,8 +1,24 @@
 // Package aefs builds a fully distributed filesystem layer on top of appengine datastore.
 package aefs
 
+import (
+	"fmt"
+	"path"
+)
+
 //
 // Todos:
+
+// Standardize path - everywhere
+//    cases
+// 		"/"					mntX/	     ""
+//    	mntX				mntX/	     ""
+//    	mntX/				mntX/	     ""
+//    	mntX/dir1			mntX/	     dir1
+//    	mntX/dir1/			mntX/	     dir1
+//    	mntX/dir1/file2		mntX/dir1/	 file2
+//
+//  We always want split.
 //
 // Solve Remaining Test failures
 //
@@ -19,7 +35,6 @@ package aefs
 // low-level-dirs-query.go
 // 	"github.com/pbberlin/tools/stringspb"
 //
-// Standardize the root stuff - make "/" synonymous with the RootDir.
 //
 // Common Remarks:
 // ==============================
@@ -72,3 +87,17 @@ package aefs
 // Locking the filesys upon RemoveAll and Rename?
 //
 // Nice to have: Links
+
+func splitIsWhatWeWant() {
+
+	s := "rt/"
+
+	dir1, f1 := path.Split(s)
+
+	dir2 := path.Dir(s)
+	f2 := path.Base(s)
+
+	fmt.Printf("%q %q \n", dir1, f1) //  "rt/"   ""
+	fmt.Printf("%q %q \n", dir2, f2) //  "rt"    "rt"
+
+}

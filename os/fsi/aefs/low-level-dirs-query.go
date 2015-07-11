@@ -63,13 +63,15 @@ func (fs *AeFileSys) subdirsByPath(path string, onlyDirectChildren bool) ([]AeDi
 	// has the same dir as the level-1 directories.
 	keyRoot := datastore.NewKey(fs.Ctx(), tdir, fs.mount, 0, nil)
 	idxRoot := -1
-	for k, v := range children {
-		v.fSys = fs
-		v.Key = keys[k]
-		if keys[k].Equal(keyRoot) {
-			idxRoot = k
+
+	for i := 0; i < len(children); i++ {
+		children[i].fSys = fs
+		children[i].Key = keys[i]
+		if keys[i].Equal(keyRoot) {
+			idxRoot = i
 		}
 	}
+
 	if idxRoot > -1 {
 		children = append(children[:idxRoot], children[idxRoot+1:]...)
 	}

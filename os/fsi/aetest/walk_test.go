@@ -9,15 +9,20 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/aefs"
 	"github.com/pbberlin/tools/os/fsi/fsc"
-	"github.com/pbberlin/tools/os/fsi/memfs"
+	"github.com/pbberlin/tools/util"
 )
 
 func TestWalk(t *testing.T) {
 
 	// first the per-node func:
 	exWalkFunc := func(path string, f os.FileInfo, err error) error {
+
+		if err != nil {
+			fmt.Printf("Visiting path %s => error: %s \n", path, err)
+			return err
+		}
 
 		if strings.HasSuffix(path, "my secret directory") {
 			return fsc.SkipDir
@@ -34,12 +39,16 @@ func TestWalk(t *testing.T) {
 		fmt.Printf("Visited: %s %s \n", tp, path)
 		return nil
 	}
+	_ = exWalkFunc
 
-	fs := &memfs.MemMapFs{}
-	fsi := fsi.FileSystem(fs)
-	fsi.Mkdir("/", os.ModePerm)
-	fsi.Mkdir("/temp", os.ModePerm)
+	rt := <-util.Counter
+	rts := fmt.Sprintf("mnt%02v", rt)
+	bb := aefs.CreateSys(c, rts)
+	wpf(os.Stdout, bb.String())
 
-	err := fsc.Walk(fsi, "/", exWalkFunc)
-	fmt.Printf("Walk() returned %v\n", err)
+	bb = aefs.RetrieveDirs(c, rts)
+	wpf(os.Stdout, bb.String())
+
+	// err = fsc.Walk(fsi, "temp", exWalkFunc)
+	// fmt.Printf("Walk() returned: %v\n", err)
 }

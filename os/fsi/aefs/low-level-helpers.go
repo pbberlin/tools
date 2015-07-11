@@ -7,26 +7,7 @@ import (
 	"appengine/datastore"
 )
 
-func cleanseLeadingSlash(p string) string {
-	p = path.Join(p)
-	for {
-		if strings.HasPrefix(p, sep) {
-			p = p[1:]
-		} else {
-			break
-		}
-	}
-	for {
-		if strings.HasSuffix(p, sep) {
-			p = p[:len(p)-1]
-		} else {
-			break
-		}
-	}
-	return p
-}
-
-func dirFromKey(key *datastore.Key) string {
+func OBSOLETE_dirFromKey(key *datastore.Key) string {
 
 	dir := key.String()
 	dir = cleanseLeadingSlash(dir)
@@ -42,5 +23,65 @@ func dirFromKey(key *datastore.Key) string {
 	} else {
 		return ""
 	}
+
+}
+
+// "" 	=> ""
+// "/" 	=> ""
+// "/aa/bb/" 	=> "aa/bb"
+// "aa/bb/" 	=> "aa/bb"
+func cleanseLeadingSlash(p string) string {
+
+	// path.Join does not clean spaces
+	p = strings.TrimSpace(p)
+
+	// Make any // single /  -  make leading // single /
+	// Remove trailing /
+	// i.e.: 		"//a\n a//a//"
+	// 				"/a\n a/a"
+	p = path.Join(p)
+
+	// now remove the remaining possible leading sep
+	if strings.HasPrefix(p, sep) {
+		p = p[1:]
+	}
+
+	return p
+}
+
+// name is the *external* path or filename.
+func (fs *AeFileSys) pathInternalize(name string) (dir, bname, fullpath string) {
+
+	name = cleanseLeadingSlash(name)
+
+	// prepend rootdir, if neccessary
+	if !strings.HasPrefix(name, fs.RootName()) {
+		name = fs.RootDir() + name
+	}
+
+	// append slash to rootdir, if alone
+	if name == fs.RootName() {
+		name += sep
+	}
+
+	dir, bname = path.Split(name)
+
+	if dir != fs.RootDir() && bname == "" {
+		panic("file needs name")
+	}
+
+	if !strings.HasSuffix(dir, sep) {
+		dir += sep
+	}
+
+	fullpath = dir + bname
+
+	return
+
+	// remove filename
+	if strings.HasSuffix(name, bname) {
+		name = name[:len(name)-len(bname)]
+	}
+	return
 
 }

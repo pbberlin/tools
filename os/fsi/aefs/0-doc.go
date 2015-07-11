@@ -1,30 +1,15 @@
 // Package aefs builds a fully distributed filesystem layer on top of appengine datastore.
 package aefs
 
-import (
-	"fmt"
-	"path"
-)
-
 //
 // Todos:
 //
 //
 // Throw out sync()
 //
-//
-// Standardize path - everywhere
-//    cases
-// 		"/"					mntX/	     ""
-//    	mntX				mntX/	     ""
-//    	mntX/				mntX/	     ""
-//    	mntX/dir1			mntX/	     dir1
-//    	mntX/dir1/			mntX/	     dir1
-//    	mntX/dir1/file2		mntX/dir1/	 file2
-//  We always want *split*.
-//
 //  integrate http filesys
-//  try to do the extra testcases with memfs and osfs
+//
+// 		try the extra testcases with memfs and osfs
 //
 //
 // Common Remarks:
@@ -79,17 +64,3 @@ import (
 // Locking the filesys upon RemoveAll and Rename?
 //
 // Nice to have: Links
-
-func splitIsWhatWeWant() {
-
-	s := "rt/"
-
-	dir1, f1 := path.Split(s)
-
-	dir2 := path.Dir(s)
-	f2 := path.Base(s)
-
-	fmt.Printf("%q %q \n", dir1, f1) //  "rt/"   ""
-	fmt.Printf("%q %q \n", dir2, f2) //  "rt"    "rt"
-
-}

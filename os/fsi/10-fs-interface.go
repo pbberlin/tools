@@ -3,11 +3,12 @@
 //
 // Todos:
 //
+// Move the extra testcases to fsi
+// Try  the extra testcases with memfs and osfs
+//
 // Throw out sync(); Employ Close instead.
 //
 // Integrate http filesys
-//
-// Try the extra testcases with memfs and osfs
 //
 package fsi
 

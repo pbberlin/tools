@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/fsc"
 
 	pth "path"
@@ -47,7 +48,7 @@ func CreateSys(c appengine.Context) *bytes.Buffer {
 	fc2 := func(p []string) {
 		path := pth.Join(p...)
 		wpf(bb, "searching... %v\n", path)
-		f, err := fs.dirByPath(path)
+		f, err := fs.Lstat(path)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
@@ -103,16 +104,23 @@ func CreateSys(c appengine.Context) *bytes.Buffer {
 	wntSizeFiles := 9 + 9 + 15 + 13
 
 	fc5 := func(path string) {
-		files, err := fs.filesByPath(fs.RootDir() + path)
+		wpf(bb, " srch %v  \n", path)
+		files, err := fs.ReadDir(path)
 		if err != nil {
 			wpf(bb, "filesByPath %v failed %v\n", path, err)
 		}
 
-		wpf(bb, " srch %v  \n", fs.RootDir()+path)
 		for k, v := range files {
-			wpf(bb, "     %v  -  %v %s\n", k, v.Name(), v.Data)
+			if v.IsDir() {
+				continue
+			}
+			data, err := fs.ReadFile(v.Name())
+			if err != nil {
+				wpf(bb, "could not get content of %v =>  %v\n", v.Name(), err)
+			}
+			wpf(bb, "     %v  -  %v %s\n", k, v.Name(), data)
 			gotNumFiles++
-			gotSizeFiles += len(v.Data)
+			gotSizeFiles += len(data)
 		}
 	}
 
@@ -201,8 +209,10 @@ func RetrieveByReadDir(c appengine.Context) *bytes.Buffer {
 func WalkDirs(c appengine.Context) *bytes.Buffer {
 
 	bb := new(bytes.Buffer)
-	fs := NewAeFs(MountPointLast(), AeContext(c))
-	wpf(bb, "created fs %v\n", fs.RootDir())
+	fsConcrete := NewAeFs(MountPointLast(), AeContext(c))
+	fs := fsi.FileSystem(fsConcrete)
+
+	wpf(bb, "created fs %v\n", MountPointLast())
 
 	wpf(bb, "-------filewalk----\n\n")
 
@@ -229,7 +239,7 @@ func WalkDirs(c appengine.Context) *bytes.Buffer {
 
 	var err error
 
-	err = fsc.Walk(fs, fs.RootName(), walkFunc)
+	err = fsc.Walk(fs, "/", walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
 
 	err = fsc.Walk(fs, "ch1/ch2", walkFunc)
@@ -243,8 +253,10 @@ func WalkDirs(c appengine.Context) *bytes.Buffer {
 
 func RemoveSubtree(c appengine.Context) *bytes.Buffer {
 	bb := new(bytes.Buffer)
-	fs := NewAeFs(MountPointLast(), AeContext(c))
-	wpf(bb, "created fs %v\n", fs.RootDir())
+	fsConcrete := NewAeFs(MountPointLast(), AeContext(c))
+	fs := fsi.FileSystem(fsConcrete)
+
+	wpf(bb, "created fs %v\n", MountPointLast())
 
 	wpf(bb, "-------removedir----\n\n")
 	err := fs.RemoveAll("ch1/ch2/ch3")

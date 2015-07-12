@@ -10,6 +10,7 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/httpfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 
@@ -59,6 +60,9 @@ func init() {
 	fs4 := &memfs.MemMapFs{}
 	fs4i := fsi.FileSystem(fs4)
 	_ = fs4i
+
+	fs5 := httpfs.HttpFs{fs3}
+	_ = fs5
 
 	Fss = []fsi.FileSystem{fs1i, fs3i, fs4i}
 	// fss := []fsi.FileSystem{fs4i}

@@ -88,7 +88,7 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 	fc4a("ch1/ch2/file_1", "content 1")
 	fc4b("ch1/ch2/file_2", "content 2")
 	fc4a("ch1/ch2/ch3/file3", "another content")
-	fc4b("/file4", "chq content 2")
+	fc4b("file4", "chq content 2")
 
 	wpf(bb, "\n-------retrieve files again----\n\n")
 

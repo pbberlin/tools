@@ -17,38 +17,14 @@ package httpfs
 // limitations under the License.
 
 import (
-	"errors"
 	"net/http"
 	"os"
-	"path"
-	"path/filepath"
-	"strings"
+
+	"github.com/pbberlin/tools/os/fsi"
 )
 
-type httpDir struct {
-	basePath string
-	fs       HttpFs
-}
-
-func (d httpDir) Open(name string) (http.File, error) {
-	if filepath.Separator != '/' && strings.IndexRune(name, filepath.Separator) >= 0 ||
-		strings.Contains(name, "\x00") {
-		return nil, errors.New("http: invalid character in file path")
-	}
-	dir := string(d.basePath)
-	if dir == "" {
-		dir = "."
-	}
-
-	f, err := d.fs.Open(filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))))
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
-}
-
 type HttpFs struct {
-	SourceFs Fs
+	SourceFs fsi.FileSystem
 }
 
 func (h HttpFs) Dir(s string) *httpDir {
@@ -57,7 +33,7 @@ func (h HttpFs) Dir(s string) *httpDir {
 
 func (h HttpFs) Name() string { return "h HttpFs" }
 
-func (h HttpFs) Create(name string) (File, error) {
+func (h HttpFs) Create(name string) (fsi.File, error) {
 	return h.SourceFs.Create(name)
 }
 
@@ -79,7 +55,7 @@ func (h HttpFs) Open(name string) (http.File, error) {
 	return nil, err
 }
 
-func (h HttpFs) OpenFile(name string, flag int, perm os.FileMode) (File, error) {
+func (h HttpFs) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
 	return h.SourceFs.OpenFile(name, flag, perm)
 }
 

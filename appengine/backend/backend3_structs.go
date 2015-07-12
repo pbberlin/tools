@@ -1,4 +1,4 @@
-package shared_structs
+package backend
 
 // block level root
 type B0 struct {

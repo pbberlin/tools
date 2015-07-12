@@ -1,3 +1,5 @@
+// Package osfs provides access to the file system
+// of the OS; merely wrapping os and ioutil
 package osfs
 
 import (

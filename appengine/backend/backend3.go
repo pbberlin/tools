@@ -5,7 +5,6 @@ import (
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
-	ss "github.com/pbberlin/tools/shared_structs"
 
 	"appengine"
 
@@ -73,7 +72,7 @@ import (
 */
 
 //var myB0 = b0{NumYSectors: 2}
-var myB0 ss.B0 = ss.B0{NumYSectors: 2}
+var myB0 B0 = B0{NumYSectors: 2}
 
 func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
@@ -88,7 +87,7 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 		nColsViewport = util.Stoi(r.FormValue("nColsViewport"))
 	}
 
-	myB0.VB1 = ss.X
+	myB0.VB1 = X
 	myB0.NumB1 = len(myB0.VB1)
 	myB0.NumB2 = 0
 	myB0.NColsViewport = nColsViewport
@@ -146,10 +145,10 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 
 	// create slices with the data to be sorted
 	for i1, _ := range myB0.VB1 {
-		sh1 := make([]ss.Order, len(myB0.VB1[i1].VB2))
-		myB0.VB1[i1].BySize = ss.ByInt(sh1)
-		sh2 := make([]ss.Order, len(myB0.VB1[i1].VB2))
-		myB0.VB1[i1].ByHeading = ss.ByStr(sh2)
+		sh1 := make([]Order, len(myB0.VB1[i1].VB2))
+		myB0.VB1[i1].BySize = ByInt(sh1)
+		sh2 := make([]Order, len(myB0.VB1[i1].VB2))
+		myB0.VB1[i1].ByHeading = ByStr(sh2)
 		// fill in the data - to be sorted later
 		for i2, _ := range myB0.VB1[i1].VB2 {
 			ro := myB0.VB1[i1].VB2[i2] // read only
@@ -193,7 +192,7 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 
 }
 
-func prepareLayout(l ss.B0) {
+func prepareLayout(l B0) {
 
 }
 

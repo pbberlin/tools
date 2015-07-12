@@ -1,5 +1,14 @@
 // Package fsi - filesystem interface - contains the minimal
 // requirements for exchangeable filesystems.
+//
+// Todos:
+//
+// Throw out sync(); Employ Close instead.
+//
+// Integrate http filesys
+//
+// Try the extra testcases with memfs and osfs
+//
 package fsi
 
 import (

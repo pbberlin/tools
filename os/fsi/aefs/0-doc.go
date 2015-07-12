@@ -2,15 +2,6 @@
 package aefs
 
 //
-// Todos:
-//
-//
-// Throw out sync(); Employ Close instead.
-//
-// Integrate http filesys
-//
-// Try the extra testcases with memfs and osfs
-//
 //
 // Common Remarks:
 // ==============================

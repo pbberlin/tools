@@ -3,7 +3,6 @@
 package dsu
 
 /*
-
 	Package dsu - datastore utiltiies for google's appengine datastore
 	with memcache buffering.
 

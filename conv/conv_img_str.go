@@ -1,3 +1,4 @@
+// Package converts image objects to base64 strings to byte slices.
 package conv
 
 import (

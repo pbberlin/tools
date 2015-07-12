@@ -1,3 +1,8 @@
+// Package persistent_cursor shows
+// how a query iterator has a cursor object;
+// that can be serialized into memcache
+// and reused to continue the query in
+// a different request
 package persistent_cursor
 
 import (
@@ -20,7 +25,7 @@ func guestViewCursor(w http.ResponseWriter, r *http.Request, m map[string]interf
 
 	c := appengine.NewContext(r)
 
-	q := ds.NewQuery(gbp.DSKindGBEntry)
+	q := ds.NewQuery(gbp.GbEntryKind)
 	q.Order("-Date")
 
 	b1 := new(bytes.Buffer)

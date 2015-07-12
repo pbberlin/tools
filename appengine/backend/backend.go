@@ -1,3 +1,4 @@
+// Package backend provides visual controls to all the tools and util.
 package backend
 
 import (

@@ -1,3 +1,5 @@
+// Package ancestored_gb_entries demonstrates putting all entries
+// under one ancestor, making them a strongly consistent 'entity group'
 package ancestored_gb_entries
 
 import (
@@ -28,10 +30,8 @@ import (
 */
 
 const (
-	kind_guestbk string = "class_parent_gb"    // "classname" of the parent
-	key_guestbk  string = "instance_parent_gb" // string Key
-
-	DSKindGBEntry string = "gbEntry" // "classname" of a guestbookk entry
+	kind_guestbk string = "class_parent_gb" // "classname" of the parent
+	GbEntryKind  string = "gbEntry"         // "classname" of a guestbookk entry
 
 )
 
@@ -60,12 +60,13 @@ type GbEntryRetr struct {
 //   to store and retrieve all guestbook entries.
 //   the content of this parent is nil
 //   it only servers as umbrella for the entries
-func key_entity_group_key_parent(c appengine.Context) (r *ds.Key) {
-	// key_guestbk could be varied for multiple guestbooks.
-	// Either key_guestbk XOR key_int_guestbk must be zero
-	var key_int_guestbk int64 = 0
-	var key_parent *ds.Key = nil
-	r = ds.NewKey(c, kind_guestbk, key_guestbk, key_int_guestbk, key_parent)
+func keyParent(c appengine.Context) (r *ds.Key) {
+
+	// strPart could be varied for multiple guestbooks.
+	// Either strPart XOR intPart must be zero
+	const strPart = "instance_parent_gb"
+	const intPart = int64(0)
+	r = ds.NewKey(c, kind_guestbk, strPart, intPart, nil)
 	return
 }
 
@@ -112,10 +113,10 @@ func SaveEntry(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		Upon usage the datastore generates an integer key
 	*/
 
-	incomplete := ds.NewIncompleteKey(c, DSKindGBEntry, key_entity_group_key_parent(c))
+	incomplete := ds.NewIncompleteKey(c, GbEntryKind, keyParent(c))
 	concreteNewKey, err := ds.Put(c, incomplete, &g)
 	loghttp.E(w, r, err, false)
-	_ = concreteNewKey // we query entries via key_entity_group_key_parent - via parent
+	_ = concreteNewKey // we query entries via keyParent - via parent
 
 }
 
@@ -129,7 +130,7 @@ func ListEntries(w http.ResponseWriter,
 	If .Ancestor was omitted from this query, there would be slight chance
 	that recent GB entry would not show up in a query.
 	*/
-	q := ds.NewQuery(DSKindGBEntry).Ancestor(key_entity_group_key_parent(c)).Order("-Date").Limit(10)
+	q := ds.NewQuery(GbEntryKind).Ancestor(keyParent(c)).Order("-Date").Limit(10)
 	gbEntries = make([]GbEntryRetr, 0, 10)
 	keys, err := q.GetAll(c, &gbEntries)
 

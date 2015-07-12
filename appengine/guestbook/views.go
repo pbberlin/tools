@@ -1,3 +1,4 @@
+// Package contains view to dsu.ancestored_gb_entries.
 package guestbook
 
 import (

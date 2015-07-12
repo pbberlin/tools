@@ -16,29 +16,6 @@ type link struct {
 	Target   string
 }
 
-var links1 = []interface{}{
-	link{Linktext: "Login", Url: "/login"},
-	link{Linktext: "Schreib-Methoden", Url: "/write-methods"},
-	link{Linktext: "Letzte Email", Url: "/email-view"},
-	link{Linktext: "Blob List", Url: "/blob/list"},
-	link{Linktext: "Template Demo 1", Url: "/tpl/demo1"},
-	link{Linktext: "Template Demo 2", Url: "/tpl/demo2"},
-	link{Linktext: "Http fetch", Url: "/fetch-url"},
-	link{Linktext: "Instance Info", Url: "/instance-info/view"},
-	link{Linktext: "Gob encode decode", Url: "/big-query/test-gob-codec"},
-
-	link{Linktext: "JSON encode", Url: "/json-encode"},
-	link{Linktext: "JSON decode", Url: "/json-decode"},
-
-	link{Linktext: "Fulltext put", Url: "/fulltext-search/put"},
-	link{Linktext: "Fulltext get", Url: "/fulltext-search/get"},
-}
-var links2 = []interface{}{
-	link{Linktext: "Eintrag hinzufügen", Url: "/guest-entry"},
-	link{Linktext: "Einträge auflisten", Url: "/guest-view"},
-	link{Linktext: "Einträge auflisten - paged - serialized cursor", Url: "/guest-view-cursor"},
-}
-
 var blocks2 = map[string]interface{}{
 	"01 Diverse": []interface{}{
 		link{Linktext: "Login", Url: "/login"},

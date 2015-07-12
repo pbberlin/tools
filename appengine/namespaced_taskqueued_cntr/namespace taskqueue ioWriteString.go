@@ -1,4 +1,4 @@
-package namespaces_taskqueues
+package namespaced_taskqueued_cntr
 
 import (
 	"io"

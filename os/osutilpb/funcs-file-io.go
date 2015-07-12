@@ -1,4 +1,4 @@
-// Package osutilpb reads and writes files.
+// Package osutilpb reads and writes files with maximum convenience.
 package osutilpb
 
 import (
@@ -11,6 +11,7 @@ import (
 	"golang.org/x/net/html"
 )
 
+// Dom2File writes DOM to file
 func Dom2File(fn string, node *html.Node) {
 	var b bytes.Buffer
 	err := html.Render(&b, node)
@@ -18,6 +19,8 @@ func Dom2File(fn string, node *html.Node) {
 	Bytes2File(fn, b.Bytes())
 }
 
+// Bytes2File writes bytes; creates path if neccessary
+// and logs any errors even to appengine log
 func Bytes2File(fn string, b []byte) {
 	var err error
 	err = ioutil.WriteFile(fn, b, 0)
@@ -32,6 +35,8 @@ func Bytes2File(fn string, b []byte) {
 	}
 }
 
+// BytesFromFile reads bytes and logs any
+// errors even to appengine log.
 func BytesFromFile(fn string) []byte {
 	b, err := ioutil.ReadFile(fn)
 	logif.E(err)

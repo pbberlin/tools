@@ -131,16 +131,15 @@ var t_base *tt.Template = nil
 //  it will live as long as the application runs
 func cloneFromBase(w http.ResponseWriter, r *http.Request) *tt.Template {
 
+	// use INDEX to access certain elements
 	funcMap := tt.FuncMap{
-		"unescape":         html.UnescapeString,
-		"escape":           html.EscapeString,
-		"fMult":            fMult,
-		"fAdd":             fAdd,
-		"fChop":            fChop,
-		"fAccessElement":   fAccessElement,
-		"fAccessElementB2": fAccessElementB2,
-		"fMakeRange":       fMakeRange,
-		"fNumCols":         fNumCols,
+		"unescape":   html.UnescapeString,
+		"escape":     html.EscapeString,
+		"fMult":      fMult,
+		"fAdd":       fAdd,
+		"fChop":      fChop,
+		"fMakeRange": fMakeRange,
+		"fNumCols":   fNumCols,
 		"df": func(g time.Time) string {
 			return g.Format("2006-01-02 (Jan 02)")
 		},

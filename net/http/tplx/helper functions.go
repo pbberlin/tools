@@ -1,9 +1,5 @@
 package tplx
 
-import (
-	"github.com/pbberlin/tools/shared_structs"
-)
-
 func fMult(x, y int) int {
 	return x * y
 }
@@ -20,12 +16,8 @@ func fMakeRange(num int) []int {
 }
 
 // use "index entity idx" instead - see
-//	http://stackoverflow.com/questions/12701452/golang-html-template-how-to-index-a-slice-element
-func fAccessElement(v []interface{}, i int) interface{} {
-	return v[i]
-}
-
-func fAccessElementB2(v []shared_structs.B2, i int) shared_structs.B2 {
+//	www.stackoverflow.com/questions/12701452/golang-html-template-how-to-index-a-slice-element
+func Unused_fAccessElement(v []interface{}, i int) interface{} {
 	return v[i]
 }
 

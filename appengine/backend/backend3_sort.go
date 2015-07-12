@@ -1,27 +1,5 @@
-package shared_structs
+package backend
 
-/*
-	Order is filled with data from other structs.
-	The slice index of the origin data records.
-	And either an int or a string to sort
-
-	Usage
-	var sortedByX = make( []Order , len(sliceSrc))
-	for i,v  := range sliceSrc {
-		sortedByX[i].IdxSrc = i
-		sortedByX[i].byI = v.Size  // or Salary ...
-		sortedByX[i].byS = v.Lastname
-	}
-	bySize := ByInt(sortedByX)
-	byLastname := ByStr(sortedByX)
-
-	sort.Sort(byLastname)
-	sort.Sort(bySize)		// last one wins
-
-	The copying is necessary, since sort.Sort
-	otherwise reorders the sliceSrc
-
-*/
 type Order struct {
 	IdxSrc int    // index to the base slice
 	ByI    int    // the base for sorting by int

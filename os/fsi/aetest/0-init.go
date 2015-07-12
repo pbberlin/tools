@@ -1,5 +1,6 @@
-// Package aetest runs test, which require an appengine context;
-// and which must be run by goapp test
+// Package aetest runs tests on all fsi subpackages;
+// some of which require an appengine context;
+// and which must be run by goapp test.
 package aetest
 
 import (

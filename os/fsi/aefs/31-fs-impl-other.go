@@ -51,6 +51,8 @@ func (fs *AeFileSys) DeleteAll() (string, error) {
 	if err != nil {
 		msg += "error flushing memcache\n"
 		return msg, err
+	} else {
+		msg += "memcache flushed \n"
 	}
 
 	return msg, nil

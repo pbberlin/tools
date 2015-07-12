@@ -5,12 +5,15 @@ import (
 	"net/http"
 
 	"appengine"
+	"appengine/memcache"
 
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/memfs"
+	"github.com/pbberlin/tools/os/fsi/osfs"
 )
 
 var backendFragFsiAefs = new(bytes.Buffer)
@@ -46,85 +49,65 @@ func init() {
 
 }
 
-func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+var memMapFileSys = &memfs.MemMapFs{}
+var osFileSys = &osfs.OsFileSys{}
+
+func callTestX(w http.ResponseWriter, r *http.Request,
+	f1 func() string,
+	f2 func(fsi.FileSystem) *bytes.Buffer) {
+
+	if f1 == nil {
+		f1 = aefs.MountPointLast
+	}
 
 	wpf(w, tplx.Head)
 	wpf(w, "<pre>\n")
 	defer wpf(w, tplx.Foot)
-	defer wpf(w, "\n</pre>") // strange order
+	defer wpf(w, "\n</pre>")
 
-	fsConcrete := aefs.NewAeFs(aefs.MountPointNext(), aefs.AeContext(appengine.NewContext(r)))
-	fs := fsi.FileSystem(fsConcrete)
+	var fs fsi.FileSystem
+
+	fsConcrete := aefs.NewAeFs(f1(), aefs.AeContext(appengine.NewContext(r)))
+	fs = fsi.FileSystem(fsConcrete)
+
+	if false {
+		fsc := aefs.NewAeFs(f1(), aefs.AeContext(appengine.NewContext(r)))
+		fs = fsi.FileSystem(fsc)
+	} else if false {
+		fs = fsi.FileSystem(osFileSys)
+	} else {
+		fs = fsi.FileSystem(memMapFileSys)
+	}
+
 	bb := new(bytes.Buffer)
 	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = aefs.CreateSys(fs)
+	bb = f2(fs)
 	w.Write(bb.Bytes())
 
+}
+
+func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+	callTestX(w, r, aefs.MountPointNext, aefs.CreateSys)
 }
 
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
-	defer wpf(w, tplx.Foot)
-	defer wpf(w, "\n</pre>")
-
-	fsConcrete := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(appengine.NewContext(r)))
-	fs := fsi.FileSystem(fsConcrete)
-	bb := new(bytes.Buffer)
-	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = aefs.RetrieveByQuery(fs)
-	w.Write(bb.Bytes())
-
+	callTestX(w, r, nil, aefs.RetrieveByQuery)
 }
 
 func retrieveByReadDir(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
-	defer wpf(w, tplx.Foot)
-	defer wpf(w, "\n</pre>")
-
-	fsConcrete := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(appengine.NewContext(r)))
-	fs := fsi.FileSystem(fsConcrete)
-	bb := new(bytes.Buffer)
-	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = aefs.RetrieveByReadDir(fs)
-	w.Write(bb.Bytes())
-
+	callTestX(w, r, nil, aefs.RetrieveByReadDir)
 }
 
 func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
-	defer wpf(w, tplx.Foot)
-	defer wpf(w, "\n</pre>")
-
-	fsConcrete := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(appengine.NewContext(r)))
-	fs := fsi.FileSystem(fsConcrete)
-	bb := new(bytes.Buffer)
-	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = aefs.WalkDirs(fs)
-	w.Write(bb.Bytes())
-
+	callTestX(w, r, nil, aefs.WalkDirs)
 }
 
 func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
-	defer wpf(w, tplx.Foot)
-	defer wpf(w, "\n</pre>")
-
-	fsConcrete := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(appengine.NewContext(r)))
-	fs := fsi.FileSystem(fsConcrete)
-	bb := new(bytes.Buffer)
-	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = aefs.RemoveSubtree(fs)
-	w.Write(bb.Bytes())
-
+	callTestX(w, r, nil, aefs.RemoveSubtree)
 }
+
+//
+// aefs specific
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	wpf(w, tplx.Head)
@@ -138,6 +121,15 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		wpf(w, "err during delete %v\n", err)
 	}
 	wpf(w, msg)
+
+	err = memcache.Flush(fs.Ctx())
+	if err != nil {
+		msg = "error flushing memcache\n"
+	}
+	wpf(w, msg)
+
+	memMapFileSys = &memfs.MemMapFs{}
+	osFileSys = &osfs.OsFileSys{}
 
 }
 

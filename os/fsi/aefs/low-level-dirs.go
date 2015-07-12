@@ -24,7 +24,7 @@ func (fs *AeFileSys) dirByPath(name string) (AeDir, error) {
 	if err == nil {
 		fo.fSys = fs
 		fo.Key = preciseK
-		// log.Printf("  mcg %-16v %v", fo.Name(), fo.Key)
+		// log.Printf("  mcg %-16v %v", dir+bname, fo.Key)
 		return fo, nil
 	}
 

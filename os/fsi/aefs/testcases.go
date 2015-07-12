@@ -2,6 +2,7 @@ package aefs
 
 import (
 	"bytes"
+	"log"
 	"os"
 	"strings"
 
@@ -46,7 +47,7 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
-			wpf(bb, "   fnd %v \n", f.Name())
+			wpf(bb, "   fnd %v \n", pth.Join(path, f.Name()))
 			gotByPath++
 		}
 	}
@@ -77,11 +78,11 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 		}
 		_, err = f.WriteString(content)
 		if err != nil {
-			wpf(bb, "WriteString %v failed %v\n", f.Name(), err)
+			wpf(bb, "WriteString %v failed %v\n", name, err)
 		}
 		err = f.Sync()
 		if err != nil {
-			wpf(bb, "Sync %v failed %v\n", f.Name(), err)
+			wpf(bb, "Sync %v failed %v\n", name, err)
 		}
 	}
 
@@ -108,11 +109,11 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 			if v.IsDir() {
 				continue
 			}
-			data, err := fs.ReadFile(v.Name())
+			data, err := fs.ReadFile(pth.Join(path, v.Name()))
 			if err != nil {
-				wpf(bb, "could not get content of %v =>  %v\n", v.Name(), err)
+				wpf(bb, "could not get content of %v =>  %v\n", pth.Join(path, v.Name()), err)
 			}
-			wpf(bb, "     %v  -  %v %s\n", k, v.Name(), data)
+			wpf(bb, "     %v  -  %v %s\n", k, pth.Join(path, v.Name()), data)
 			gotNumFiles++
 			gotSizeFiles += len(data)
 		}
@@ -123,9 +124,17 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 	fc5("")
 
 	wpf(bb, "\n")
+
 	wpf(bb, "fnd %2v of %2v fils \n", gotNumFiles, wntNumFiles)
 	wpf(bb, "fnd %2v of %2v fsize \n", gotSizeFiles, wntSizeFiles)
 	wpf(bb, "\n")
+
+	if gotNumFiles != wntNumFiles {
+		log.Printf("wnt %2v - got %v", wntNumFiles, gotNumFiles)
+	}
+	if gotSizeFiles != wntSizeFiles {
+		log.Printf("wnt %2v - got %v", wntSizeFiles, gotSizeFiles)
+	}
 
 	return bb
 }
@@ -135,6 +144,10 @@ func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
 	bb := new(bytes.Buffer)
 	wpf(bb, "--------retrieve by readDir---------\n\n")
 
+	wnt1 := []int{2, 3, 2, 5}
+	wnt2 := []int{2, 2, 5}
+	got := []int{}
+
 	fc3 := func(path string) {
 		wpf(bb, "searching %q\n", path)
 		children, err := fs.ReadDir(path)
@@ -142,8 +155,9 @@ func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
 			for k, v := range children {
-				wpf(bb, "  child #%-2v        %-24v\n", k, v.Name())
+				wpf(bb, "  child #%-2v        %-24v\n", k, pth.Join(path, v.Name()))
 			}
+			got = append(got, len(children))
 		}
 		wpf(bb, "\n")
 	}
@@ -153,6 +167,11 @@ func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
 	fc3(`ch1`)
 	fc3(``)
 
+	if spf("%+v", wnt1) != spf("%+v", got) &&
+		spf("%+v", wnt2) != spf("%+v", got) {
+		log.Printf("wnt %v or %v - got %v", wnt1, wnt2, got)
+	}
+
 	return bb
 
 }
@@ -160,6 +179,10 @@ func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
 func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
 
 	bb := new(bytes.Buffer)
+
+	wnt1 := []int{1, 1, 2, 1, 4, 2, 4, 13}
+	wnt2 := []int{2, 2, 4, 11}
+	got := []int{}
 
 	fsConcrete, ok := fs.(*AeFileSys)
 	if !ok {
@@ -180,8 +203,9 @@ func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
 			for k, v := range children {
-				wpf(bb, "  child #%-2v        %-24v\n", k, v.Name())
+				wpf(bb, "  child #%-2v        %-24v\n", k, pth.Join(path, v.Name()))
 			}
+			got = append(got, len(children))
 		}
 		wpf(bb, "\n")
 	}
@@ -195,6 +219,11 @@ func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
 	fc3(``, true)
 	fc3(``, false)
 
+	if spf("%+v", wnt1) != spf("%+v", got) &&
+		spf("%+v", wnt2) != spf("%+v", got) {
+		log.Printf("wnt %v or %v - got %v", wnt1, wnt2, got)
+	}
+
 	return bb
 
 }
@@ -204,6 +233,11 @@ func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
 	bb := new(bytes.Buffer)
 	wpf(bb, "-------filewalk----\n\n")
 
+	wnt := []int{16, 6, 3}
+	wnt2 := []int{13, 3, 0}
+	got := []int{}
+
+	cntr := 0
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			wpf(bb, "error on visiting %s => %v \n", path, err)
@@ -222,19 +256,31 @@ func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
 			}
 		}
 		wpf(bb, "Visited: %s %s \n", tp, path)
+		cntr++
 		return nil
 	}
 
 	var err error
 
+	cntr = 0
 	err = fsc.Walk(fs, "/", walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
+	got = append(got, cntr)
 
+	cntr = 0
 	err = fsc.Walk(fs, "ch1/ch2", walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
+	got = append(got, cntr)
 
+	cntr = 0
 	err = fsc.Walk(fs, "ch1/ch2/ch3", walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
+	got = append(got, cntr)
+
+	if spf("%+v", wnt) != spf("%+v", got) &&
+		spf("%+v", wnt2) != spf("%+v", got) {
+		log.Printf("wnt %v or %v - got %v", wnt, wnt2, got)
+	}
 
 	return bb
 }

@@ -3,7 +3,6 @@ package aefs
 import (
 	"io"
 	"os"
-	"path"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -27,7 +26,7 @@ func (f *AeFile) Readdirnames(n int) (names []string, err error) {
 	fis, err := f.Readdir(n)
 	names = make([]string, 0, len(fis))
 	for _, lp := range fis {
-		names = append(names, path.Base(lp.Name()))
+		names = append(names, lp.Name())
 	}
 	return names, err
 }

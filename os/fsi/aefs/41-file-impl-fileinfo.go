@@ -19,6 +19,8 @@ type FileInfo interface {
 // All of them: NO pointer receiver
 
 func (d AeDir) Name() string {
+	return d.BName
+
 	n := d.Dir + d.BName
 	if strings.HasPrefix(n, d.fSys.RootDir()) {
 		n = n[len(d.fSys.RootDir()):]
@@ -26,6 +28,8 @@ func (d AeDir) Name() string {
 	return n
 }
 func (f AeFile) Name() string {
+	return f.BName
+
 	n := f.Dir + f.BName
 	if strings.HasPrefix(n, f.fSys.RootDir()) {
 		n = n[len(f.fSys.RootDir()):]

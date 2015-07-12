@@ -17,6 +17,8 @@ package aefs
 // they save full path into "name".
 // Compare http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
 //
+// Exception: os.FileInfo.Name() - that's the base name.
+//
 // Architecture
 // ==============================
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf

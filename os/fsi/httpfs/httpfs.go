@@ -1,5 +1,6 @@
-// Package httpfs wraps any other filesystem
-// and provides basePath functionality.
+// Package httpfs wraps any other fsi filesystem
+// so that it works with http.FileServer;
+// it adds as basePath to inner filesystem.
 package httpfs
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.

@@ -43,7 +43,11 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 	}
 
 	fis, err := fs.ReadDir(path)
-	// log.Printf("readdir of %-22v  => %v", path, len(fis))
+	// fnd := ""
+	// for i := 0; i < len(fis); i++ {
+	// 	fnd += fis[i].Name() + ", "
+	// }
+	// log.Printf("readdir of %-26v  => %v, %v", path, len(fis), fnd)
 	if err != nil && err != fsi.EmptyQueryResult {
 		return walkFn(path, info, err)
 	}
@@ -85,9 +89,9 @@ func walk(fs fsi.FileSystem, path string, info os.FileInfo, walkFn WalkFunc) err
 func Walk(fs fsi.FileSystem, root string, walkFn WalkFunc) error {
 	info, err := fs.Lstat(root)
 	if err != nil {
-		// logif.Pf("walk start error %10v %v", root, err)
+		// log.Printf("walk start error %10v %v", root, err)
 		return walkFn(root, nil, err)
 	}
-	// logif.Pf("walk start fnd %v", info.Name())
+	// log.Printf("walk start fnd %v", info.Name())
 	return walk(fs, root, info, walkFn)
 }

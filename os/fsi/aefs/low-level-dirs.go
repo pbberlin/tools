@@ -22,13 +22,16 @@ func (fs *AeFileSys) dirByPath(name string) (AeDir, error) {
 
 	err := fo.MemCacheGet(dir + bname)
 	if err == nil {
+		fo.fSys = fs
+		fo.Key = preciseK
+		// log.Printf("  mcg %-16v %v", fo.Name(), fo.Key)
 		return fo, nil
 	}
 
 	err = ds.Get(fs.c, preciseK, &fo)
 	if err == ds.ErrNoSuchEntity {
 		// uncomment to see where directories do not exist:
-		// logif.Pf("no directory: %-20v ", path)
+		// log.Printf("no directory: %-20v ", path)
 		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
@@ -50,7 +53,7 @@ func (fs *AeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
 	dirs, err := fs.subdirsByPath(dir+bname, true)
 	for _, v := range dirs {
-		// logif.Pf("%15v => %-24v", "", v.Dir+v.BName)
+		// log.Printf("%15v => %-24v", "", v.Dir+v.BName)
 		fi := os.FileInfo(v)
 		fis = append(fis, fi)
 	}

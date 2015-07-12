@@ -15,19 +15,24 @@ import (
 var backendFragFsiAefs = new(bytes.Buffer)
 
 func init() {
-	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
 
 	http.HandleFunc("/fs/aefs/create-objects", loghttp.Adapter(demoSaveRetrieve))
 	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
+	http.HandleFunc("/fs/aefs/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
 	http.HandleFunc("/fs/aefs/walk", loghttp.Adapter(walkH))
+	http.HandleFunc("/fs/aefs/remove", loghttp.Adapter(removeSubtree))
+
+	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
 
 	http.HandleFunc("/fs/aefs/reset", loghttp.Adapter(resetMountPoint))
 	http.HandleFunc("/fs/aefs/decr", loghttp.Adapter(decrMountPoint))
 
-	htmlfrag.Wb(backendFragFsiAefs, "aefs create", "/fs/aefs/create-objects")
+	htmlfrag.Wb(backendFragFsiAefs, "create", "/fs/aefs/create-objects")
 
 	htmlfrag.Wb(backendFragFsiAefs, "query", "/fs/aefs/retrieve-by-query")
+	htmlfrag.Wb(backendFragFsiAefs, "readdir", "/fs/aefs/retrieve-by-read-dir")
 	htmlfrag.Wb(backendFragFsiAefs, "walk", "/fs/aefs/walk")
+	htmlfrag.Wb(backendFragFsiAefs, "remove", "/fs/aefs/remove")
 	htmlfrag.Wb(backendFragFsiAefs, "delete all fs entities", "/fs/aefs/delete-all")
 
 	htmlfrag.Wb(backendFragFsiAefs, "reset", "/fs/aefs/reset")
@@ -92,7 +97,19 @@ func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interf
 	defer wpf(w, tplx.Foot)
 	defer wpf(w, "\n</pre>")
 
-	bb := aefs.RetrieveDirs(appengine.NewContext(r))
+	bb := aefs.RetrieveByQuery(appengine.NewContext(r))
+	w.Write(bb.Bytes())
+
+}
+
+func retrieveByReadDir(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	wpf(w, tplx.Head)
+	wpf(w, "<pre>\n")
+	defer wpf(w, tplx.Foot)
+	defer wpf(w, "\n</pre>")
+
+	bb := aefs.RetrieveByReadDir(appengine.NewContext(r))
 	w.Write(bb.Bytes())
 
 }
@@ -105,6 +122,18 @@ func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	defer wpf(w, "\n</pre>")
 
 	bb := aefs.WalkDirs(appengine.NewContext(r))
+	w.Write(bb.Bytes())
+
+}
+
+func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	wpf(w, tplx.Head)
+	wpf(w, "<pre>\n")
+	defer wpf(w, tplx.Foot)
+	defer wpf(w, "\n</pre>")
+
+	bb := aefs.RemoveSubtree(appengine.NewContext(r))
 	w.Write(bb.Bytes())
 
 }

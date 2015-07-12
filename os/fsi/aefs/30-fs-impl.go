@@ -45,7 +45,8 @@ func (fs *AeFileSys) Create(name string) (fsi.File, error) {
 // and LStat (links go unresolved)
 // We don't support links yet, anyway
 func (fs *AeFileSys) Lstat(path string) (os.FileInfo, error) {
-	return fs.Stat(path)
+	fi, err := fs.Stat(path)
+	return fi, err
 }
 
 // Strangely, neither MkdirAll nor Mkdir seem to have
@@ -115,11 +116,11 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 
 func (fs *AeFileSys) Remove(name string) error {
 
-	// logif.Pf("trying to remove %-20v", name)
+	// log.Printf("trying to remove %-20v", name)
 	f, err := fs.fileByPath(name)
 	if err == nil {
-		// logif.Pf("   found file %v", f.Dir+f.BName)
-		// logif.Pf("   fkey %-26v", f.Key)
+		// log.Printf("   found file %v", f.Dir+f.BName)
+		// log.Printf("   fkey %-26v", f.Key)
 		err = datastore.Delete(fs.Ctx(), f.Key)
 		if err != nil {
 			return fmt.Errorf("error removing file %v", err)
@@ -128,7 +129,7 @@ func (fs *AeFileSys) Remove(name string) error {
 
 	d, err := fs.dirByPath(name)
 	if err == nil {
-		// logif.Pf("   dkey %v", d.Key)
+		// log.Printf("   dkey %v", d.Key)
 		err = datastore.Delete(fs.Ctx(), d.Key)
 		d.MemCacheDelete()
 		if err != nil {
@@ -180,14 +181,18 @@ func (fs *AeFileSys) Rename(oldname, newname string) error {
 func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
 	f, err := fs.fileByPath(path)
 	if err != nil {
+		// log.Printf("isno file err %-24q =>  %v", path, err)
 		dir, err := fs.dirByPath(path)
-		// logif.Pf("Stat for dir %q => %v, %v", path, err, dir.Dir+dir.BName)
 		if err != nil {
 			return nil, err
 		}
-		return os.FileInfo(dir), nil
+		fiDir := os.FileInfo(dir)
+		// log.Printf("Stat for dire %-24q => %-24v, %v", path, fiDir.Name(), err)
+		return fiDir, nil
 	} else {
-		return os.FileInfo(f), nil
+		fiFi := os.FileInfo(f)
+		// log.Printf("Stat for file %-24q => %-24v, %v", path, fiFi.Name(), err)
+		return fiFi, nil
 	}
 }
 

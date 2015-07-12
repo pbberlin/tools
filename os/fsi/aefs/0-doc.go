@@ -5,11 +5,11 @@ package aefs
 // Todos:
 //
 //
-// Throw out sync()
+// Throw out sync(); Employ Close instead.
 //
-//  integrate http filesys
+// Integrate http filesys
 //
-// 		try the extra testcases with memfs and osfs
+// Try the extra testcases with memfs and osfs
 //
 //
 // Common Remarks:

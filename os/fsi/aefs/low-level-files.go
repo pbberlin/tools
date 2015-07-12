@@ -16,6 +16,11 @@ func (fs *AeFileSys) fileByPath(name string) (AeFile, error) {
 	fo := AeFile{}
 	fo.fSys = fs
 
+	//
+	if dir == fs.RootDir() && bname == "" {
+		return fo, fmt.Errorf("rootdir; no file")
+	}
+
 	foDir, err := fs.dirByPath(dir)
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
@@ -24,7 +29,7 @@ func (fs *AeFileSys) fileByPath(name string) (AeFile, error) {
 		return fo, err
 	}
 
-	fileKey := datastore.NewKey(fs.Ctx(), tfil, dir+bname, 0, foDir.Key)
+	fileKey := datastore.NewKey(fs.Ctx(), tfil, bname, 0, foDir.Key)
 	fo.Key = fileKey
 	err = datastore.Get(fs.c, fileKey, &fo)
 	if err == datastore.ErrNoSuchEntity {
@@ -45,7 +50,7 @@ func (fs *AeFileSys) filesByPath(name string) ([]AeFile, error) {
 
 	var files []AeFile
 
-	foDir, err := fs.dirByPath(dir)
+	foDir, err := fs.dirByPath(dir + bname)
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {

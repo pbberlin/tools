@@ -43,7 +43,7 @@ func (fs *AeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDi
 			Order("Dir")
 	}
 
-	// logif.Pf("%v", q)
+	// log.Printf("%v", q)
 
 	var children []AeDir
 	keys, err := q.GetAll(fs.Ctx(), &children)

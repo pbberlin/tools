@@ -210,6 +210,11 @@ func (m *memMapFs) Rename(name, newname string) error {
 	dir, bname := m.pathInternalize(name)
 	name = path.Join(dir, bname)
 
+	{
+		dir, bname := m.pathInternalize(newname)
+		newname = path.Join(dir, bname)
+	}
+
 	m.rlock()
 	defer m.runlock()
 	if _, ok := m.fos[name]; ok {

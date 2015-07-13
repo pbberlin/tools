@@ -54,7 +54,7 @@ var osFileSys = &osfs.OsFileSys{}
 
 func callTestX(w http.ResponseWriter, r *http.Request,
 	f1 func() string,
-	f2 func(fsi.FileSystem) *bytes.Buffer) {
+	f2 func(fsi.FileSystem) (*bytes.Buffer, string)) {
 
 	if f1 == nil {
 		f1 = aefs.MountPointLast
@@ -80,8 +80,11 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 	}
 
 	bb := new(bytes.Buffer)
+	msg := ""
 	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
-	bb = f2(fs)
+	bb, msg = f2(fs)
+	w.Write([]byte(msg))
+	w.Write([]byte("\n\n"))
 	w.Write(bb.Bytes())
 
 }

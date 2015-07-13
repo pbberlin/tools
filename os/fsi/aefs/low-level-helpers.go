@@ -54,6 +54,11 @@ func (fs *AeFileSys) pathInternalize(name string) (dir, bname string) {
 
 	name = cleanseLeadingSlash(name)
 
+	// exchange current dir "." for root
+	if strings.HasPrefix(name, ".") {
+		name = fs.RootDir() + name[1:]
+	}
+
 	// prepend rootdir, if neccessary
 	if !strings.HasPrefix(name, fs.RootName()) {
 		name = fs.RootDir() + name

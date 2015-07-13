@@ -1,23 +1,25 @@
-// Package aefs builds a fully distributed filesystem layer on top of appengine datastore.
+// Package aefs builds a fully distributed
+// filesystem layer on top of appengine datastore.
 package aefs
 
 //
 //
 // Common Remarks:
 // ==============================
-// "path" is prefixed with RootDir(),
-// This is done by all internal methods.
-// We don't allow intermittent "virtual" directories.
-// All directories are explicitly created. Otherwise traversal is impossible.
+// To remain compatible with osfs,
+// we support "." for current working dir.
+// We could introduce ChDir(), but so far
+// current working dir is always RootDir().
 //
+//
+// Terminology:
+// ==============================
 // "name" or "filename" can mean either the basename or the full path of the file,
 // depending on the actual argument - '/tmp/logs/app1.log' or simply 'app1.log'
-// In the latter case, it refers to [current dir]/app1.log.
-// Btw: golang os file structures have no internal "current dir",
-// they save full path into "name".
+// In the latter case, it refers to [current dir]/app1.log => [root dir]/app1.log
+// Exception: os.FileInfo.Name() contains only the base name.
 // Compare http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
 //
-// Exception: os.FileInfo.Name() - that's the base name.
 //
 // Architecture
 // ==============================
@@ -28,12 +30,18 @@ package aefs
 // Thus, the directory structure can stomach massive updates and inserts.
 // But its indexing on property 'dir' may be delayed.
 //
-// Direct directory reads are not affected
-// Only traversals might miss newest directories.
-//
 // Only each *one* directory is an entity group.
 // Applications are forced to partition directories,
 // if files *per directory* are changed too frequently.
+//
+// We cannot allow intermittent "virtual" directories.
+// All directories must be explicitly created. Otherwise traversal is impossible.
+//
+// Direct directory reads are not always consistent.
+// Only subdirectory queries are affected.
+// Such traversals might miss newest directories.
+// Such traversals might report directories already deleted.
+//
 //
 // In summary: The entire filesystem is extremely parallel,
 // and heavily writeable. But it's structural changes
@@ -52,8 +60,11 @@ package aefs
 //
 // Mem Caching for files; not just directories - but beware of cost.
 //
-// Usage of instance caching with broadcasting instances via http request to instances.
+// Combine with memfs?
+// Usage of instance caching with broadcasting instances
+// via http request to instances?
 //
-// Locking the filesys upon RemoveAll and Rename?
+// Implement rename?
+// Locking the filesys during RemoveAll and Rename?
 //
 // Nice to have: Links

@@ -29,6 +29,7 @@ func TestPathCleanage(t *testing.T) {
 	cases := [][]string{
 		[]string{"", "mntX/", ""},
 		[]string{"/", "mntX/", ""},
+		[]string{".", "mntX/", ""},
 		[]string{"mntX", "mntX/", ""},
 		[]string{"mntX/", "mntX/", ""},
 		[]string{"mntX/dir1", "mntX/", "dir1"},
@@ -37,6 +38,7 @@ func TestPathCleanage(t *testing.T) {
 		[]string{"mntX/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
 		[]string{"/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
 		[]string{"dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
+		[]string{"./dir1/", "mntX/", "dir1"},
 	}
 
 	fs := AeFileSys{mount: "mntX"}

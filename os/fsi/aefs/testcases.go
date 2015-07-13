@@ -2,7 +2,6 @@ package aefs
 
 import (
 	"bytes"
-	"log"
 	"os"
 	"strings"
 
@@ -12,7 +11,7 @@ import (
 	pth "path"
 )
 
-func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
+func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	bb := new(bytes.Buffer)
 	wpf(bb, "--------create-dirs---------\n")
@@ -56,7 +55,7 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 	fc2([]string{"ch1", "non-exist-dir"})
 	fc2([]string{"ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
-	fc2([]string{""})
+	fc2([]string{"."})
 
 	wpf(bb, "\nfnd %v of %v dirs \n", gotByPath, wntByPath)
 
@@ -89,7 +88,7 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 	fc4a("ch1/ch2/file_1", "content 1")
 	fc4b("ch1/ch2/file_2", "content 2")
 	fc4a("ch1/ch2/ch3/file3", "another content")
-	fc4b("file4", "chq content 2")
+	fc4b("./file4", "chq content 2")
 
 	wpf(bb, "\n-------retrieve files again----\n\n")
 
@@ -121,7 +120,7 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 
 	fc5("ch1/ch2")
 	fc5("ch1/ch2/ch3")
-	fc5("")
+	fc5(".")
 
 	wpf(bb, "\n")
 
@@ -129,17 +128,17 @@ func CreateSys(fs fsi.FileSystem) *bytes.Buffer {
 	wpf(bb, "fnd %2v of %2v fsize \n", gotSizeFiles, wntSizeFiles)
 	wpf(bb, "\n")
 
+	testRes := ""
 	if gotNumFiles != wntNumFiles {
-		log.Printf("wnt %2v - got %v", wntNumFiles, gotNumFiles)
+		testRes += spf("Create:   wnt %2v - got %v\n", wntNumFiles, gotNumFiles)
 	}
 	if gotSizeFiles != wntSizeFiles {
-		log.Printf("wnt %2v - got %v", wntSizeFiles, gotSizeFiles)
+		testRes += spf("Create:   wnt %2v - got %v\n", wntSizeFiles, gotSizeFiles)
 	}
-
-	return bb
+	return bb, testRes
 }
 
-func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
+func RetrieveByReadDir(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	bb := new(bytes.Buffer)
 	wpf(bb, "--------retrieve by readDir---------\n\n")
@@ -165,18 +164,18 @@ func RetrieveByReadDir(fs fsi.FileSystem) *bytes.Buffer {
 	fc3(`ch1/ch2/ch3`)
 	fc3(`ch1/ch2`)
 	fc3(`ch1`)
-	fc3(``)
+	fc3(`.`)
 
+	testRes := ""
 	if spf("%+v", wnt1) != spf("%+v", got) &&
 		spf("%+v", wnt2) != spf("%+v", got) {
-		log.Printf("wnt %v or %v - got %v", wnt1, wnt2, got)
+		testRes = spf("ReadDir:  wnt %v or %v - got %v", wnt1, wnt2, got)
 	}
-
-	return bb
+	return bb, testRes
 
 }
 
-func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
+func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	bb := new(bytes.Buffer)
 
@@ -187,7 +186,7 @@ func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
 	fsConcrete, ok := fs.(*AeFileSys)
 	if !ok {
 		wpf(bb, "--------retrieve by query UNSUPPORTED---------\n\n")
-		return bb
+		return bb, ""
 	}
 
 	wpf(bb, "--------retrieve by query---------\n\n")
@@ -219,16 +218,16 @@ func RetrieveByQuery(fs fsi.FileSystem) *bytes.Buffer {
 	fc3(``, true)
 	fc3(``, false)
 
+	testRes := ""
 	if spf("%+v", wnt1) != spf("%+v", got) &&
 		spf("%+v", wnt2) != spf("%+v", got) {
-		log.Printf("wnt %v or %v - got %v", wnt1, wnt2, got)
+		testRes = spf("IdxQuery: wnt %v or %v - got %v", wnt1, wnt2, got)
 	}
-
-	return bb
+	return bb, testRes
 
 }
 
-func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
+func WalkDirs(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	bb := new(bytes.Buffer)
 	wpf(bb, "-------filewalk----\n\n")
@@ -241,7 +240,8 @@ func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			wpf(bb, "error on visiting %s => %v \n", path, err)
-			return err
+			return nil
+			return err // this would break the walk on any error; notably dir-index entries, that have been deleted since.
 		}
 		if strings.HasSuffix(path, "_secretdir") {
 			return fsc.SkipDir // do not delve deeper
@@ -263,7 +263,7 @@ func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
 	var err error
 
 	cntr = 0
-	err = fsc.Walk(fs, "/", walkFunc)
+	err = fsc.Walk(fs, ".", walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
 	got = append(got, cntr)
 
@@ -277,15 +277,16 @@ func WalkDirs(fs fsi.FileSystem) *bytes.Buffer {
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
 	got = append(got, cntr)
 
+	testRes := ""
 	if spf("%+v", wnt) != spf("%+v", got) &&
 		spf("%+v", wnt2) != spf("%+v", got) {
-		log.Printf("wnt %v or %v - got %v", wnt, wnt2, got)
+		testRes = spf("WalkDir:  wnt %v or %v - got %v", wnt, wnt2, got)
 	}
 
-	return bb
+	return bb, testRes
 }
 
-func RemoveSubtree(fs fsi.FileSystem) *bytes.Buffer {
+func RemoveSubtree(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	bb := new(bytes.Buffer)
 
@@ -293,5 +294,9 @@ func RemoveSubtree(fs fsi.FileSystem) *bytes.Buffer {
 	err := fs.RemoveAll("ch1/ch2/ch3")
 	wpf(bb, "fs.RemoveAll() returned %v\n\n", err)
 
-	return bb
+	testRes := ""
+	if err != nil {
+		testRes = spf("RemoveTree: %v", err)
+	}
+	return bb, testRes
 }

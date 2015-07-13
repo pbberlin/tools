@@ -1,8 +1,8 @@
 package osfs
 
-type OsFileSys struct{}
+type osFileSys struct{}
 
-func New() *OsFileSys {
-	o := &OsFileSys{}
+func New() *osFileSys {
+	o := &osFileSys{}
 	return o
 }

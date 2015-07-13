@@ -13,14 +13,10 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-func (memMapFs) Name() string { return "MemMapFS" } // type
+func (memMapFs) Name() string { return "memfs" } // type
 // instance
-func (memMapFs) String() string {
-	hn, err := os.Hostname()
-	if err != nil {
-		return err.Error()
-	}
-	return hn
+func (m *memMapFs) String() string {
+	return m.mount
 }
 
 func (m *memMapFs) createHelper(name string) *InMemoryFile {
@@ -181,6 +177,7 @@ func (m *memMapFs) Remove(name string) error {
 		m.lock()
 		delete(m.fos, name)
 		m.unlock()
+		m.unRegisterWithParent(name)
 	}
 	return nil
 }
@@ -190,15 +187,19 @@ func (m *memMapFs) RemoveAll(name string) error {
 	dir, bname := m.pathInternalize(name)
 	name = path.Join(dir, bname)
 
+	// log.Printf("starting removeall %v", name)
+
 	m.rlock()
 	defer m.runlock()
 	for p, _ := range m.fos {
+		// log.Printf("    removeall check %v", p)
 		if strings.HasPrefix(p, name) {
 			m.runlock()
 			m.lock()
 			delete(m.fos, p)
 			m.unlock()
 			m.rlock()
+			m.unRegisterWithParent(name)
 		}
 	}
 	return nil
@@ -270,8 +271,15 @@ func (m *memMapFs) List() {
 }
 
 func (m *memMapFs) Dump() {
-	for _, f := range m.fos {
 
+	keys := make([]string, 0, len(m.fos))
+	for key, _ := range m.fos {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		f := m.fos[k]
 		ff, ok := f.(*InMemoryFile)
 		y, _ := f.Stat()
 		if ok {

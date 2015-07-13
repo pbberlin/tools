@@ -44,8 +44,6 @@ func TestWalk(t *testing.T) {
 		wpf(os.Stdout, bb.String())
 	}
 
-	return
-
 	bb, msg = aefs.RetrieveByReadDir(fs)
 	if msg != "" {
 		wpf(os.Stdout, msg+"\n")
@@ -70,7 +68,11 @@ func TestWalk(t *testing.T) {
 		wpf(os.Stdout, bb.String())
 	}
 
-	time.Sleep(5 * time.Millisecond) // time to have index removals finished
+	// After removal, give time,
+	// to remove directories from index too.
+	// Alternatively, the walkFunc should not return
+	// err == datastore.ErrNoSuchEntity
+	time.Sleep(5 * time.Millisecond)
 
 	bb, msg = aefs.WalkDirs(fs)
 	if msg != "" {

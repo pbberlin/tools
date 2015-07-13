@@ -5,9 +5,10 @@ import (
 	"os"
 	"strings"
 
+	"appengine/datastore"
+
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/fsc"
-	"github.com/pbberlin/tools/os/fsi/memfs"
 
 	pth "path"
 )
@@ -99,11 +100,11 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	fc4a("ch1/ch2/ch3/file3", "another content")
 	fc4b(relPsep+"file4", "chq content 2")
 
-	fsc, ok := memfs.Unwrap(fs)
-	if ok {
-		fsc.Dump()
-	}
-	return bb, ""
+	// fsc, ok := memfs.Unwrap(fs)
+	// if ok {
+	// 	fsc.Dump()
+	// }
+	// return bb, ""
 
 	wpf(bb, "\n-------retrieve files again----\n\n")
 
@@ -198,7 +199,7 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wnt2 := []int{2, 2, 4, 11}
 	got := []int{}
 
-	fsConcrete, ok := fs.(*AeFileSys)
+	fsConcrete, ok := fs.(*aeFileSys)
 	if !ok {
 		wpf(bb, "--------retrieve by query UNSUPPORTED---------\n\n")
 		return bb, ""
@@ -255,7 +256,9 @@ func WalkDirs(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			wpf(bb, "error on visiting %s => %v \n", path, err)
-			return nil
+			if err == datastore.ErrNoSuchEntity || err == os.ErrNotExist {
+				return nil // dont break the walk on this, it's just a stale directory
+			}
 			return err // this would break the walk on any error; notably dir-index entries, that have been deleted since.
 		}
 		if strings.HasSuffix(path, "_secretdir") {
@@ -272,6 +275,9 @@ func WalkDirs(fs fsi.FileSystem) (*bytes.Buffer, string) {
 		}
 		wpf(bb, "Visited: %s %s \n", tp, path)
 		cntr++
+		// if cntr > 100 {
+		// 	return fmt.Errorf("too many walk recursions%v", cntr)
+		// }
 		return nil
 	}
 

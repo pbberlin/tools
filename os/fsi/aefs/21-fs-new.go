@@ -12,12 +12,12 @@ import (
 // AeContext is an option func, adding ae context to the filesystem
 func AeContext(c appengine.Context) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
-		fst := fs.(*AeFileSys)
+		fst := fs.(*aeFileSys)
 		fst.c = c
 	}
 }
 
-func New(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
+func New(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
 	return NewAeFs(mount, options...)
 }
 
@@ -25,9 +25,9 @@ func New(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 // Notice that variadic options are submitted as functions,
 // as is explained and justified here:
 // http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
-func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
+func NewAeFs(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
 
-	fs := AeFileSys{}
+	fs := aeFileSys{}
 
 	if strings.Contains(mount, "/") {
 		panic("mount can't have slash in it")
@@ -57,14 +57,14 @@ func NewAeFs(mount string, options ...func(fsi.FileSystem)) *AeFileSys {
 	return &fs
 }
 
-func (fs *AeFileSys) Ctx() appengine.Context {
+func (fs *aeFileSys) Ctx() appengine.Context {
 	return fs.c
 }
 
-func (fs *AeFileSys) RootDir() string {
+func (fs *aeFileSys) RootDir() string {
 	return fs.mount + sep
 }
 
-func (fs *AeFileSys) RootName() string {
+func (fs *aeFileSys) RootName() string {
 	return fs.mount
 }

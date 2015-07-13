@@ -10,7 +10,7 @@ import (
 
 // Retrieves a directory in one go.
 // Also used to check existence; returning ds.ErrNoSuchEntity
-func (fs *AeFileSys) dirByPath(name string) (AeDir, error) {
+func (fs *aeFileSys) dirByPath(name string) (AeDir, error) {
 
 	dir, bname := fs.pathInternalize(name)
 
@@ -45,7 +45,7 @@ func (fs *AeFileSys) dirByPath(name string) (AeDir, error) {
 // dirsByPath might not find recently added directories.
 // Upon finding nothing, it therefore returns the
 // "warning" fsi.EmptyQueryResult
-func (fs *AeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
+func (fs *aeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
 	dir, bname := fs.pathInternalize(name)
 
@@ -64,7 +64,7 @@ func (fs *AeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
 }
 
-func (fs *AeFileSys) saveDirByPath(name string) (AeDir, error) {
+func (fs *aeFileSys) saveDirByPath(name string) (AeDir, error) {
 
 	fo := AeDir{}
 	fo.isDir = true

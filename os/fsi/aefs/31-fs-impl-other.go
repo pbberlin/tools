@@ -7,7 +7,7 @@ import (
 
 // DeleteAll deletes across all roots
 // DeleteAll deletes by kind alone.
-func (fs *AeFileSys) DeleteAll() (string, error) {
+func (fs *aeFileSys) DeleteAll() (string, error) {
 
 	msg := ""
 	{

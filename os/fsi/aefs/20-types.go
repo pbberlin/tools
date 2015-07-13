@@ -11,7 +11,7 @@ import (
 )
 
 // Filesystem
-type AeFileSys struct {
+type aeFileSys struct {
 	// w http.ResponseWriter `datastore:"-" json:"-"`
 	// r *http.Request       `datastore:"-" json:"-"`
 	c appengine.Context `datastore:"-" json:"-"`
@@ -22,7 +22,7 @@ type AeFileSys struct {
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeDir struct {
-	fSys *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	fSys *aeFileSys `datastore:"-" json:"-"` // Reference to root
 	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName
 
 	Dir      string
@@ -35,7 +35,7 @@ type AeDir struct {
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeFile struct {
-	fSys *AeFileSys `datastore:"-" json:"-"` // Reference to root
+	fSys *aeFileSys `datastore:"-" json:"-"` // Reference to root
 	Key  *ds.Key    `datastore:"-" json:"-"` // throw out? Can be constructed from Dir+BName.
 
 	Dir      string

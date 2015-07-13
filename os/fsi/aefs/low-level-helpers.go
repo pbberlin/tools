@@ -29,7 +29,7 @@ func cleanseLeadingSlash(p string) string {
 }
 
 // name is the *external* path or filename.
-func (fs *AeFileSys) pathInternalize(name string) (dir, bname string) {
+func (fs *aeFileSys) pathInternalize(name string) (dir, bname string) {
 
 	name = cleanseLeadingSlash(name)
 

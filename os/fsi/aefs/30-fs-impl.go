@@ -11,15 +11,15 @@ import (
 	"github.com/pbberlin/tools/os/fsi/fsc"
 )
 
-func (fs AeFileSys) Name() string { return "aefs" }
+func (fs aeFileSys) Name() string { return "aefs" }
 
-func (fs AeFileSys) String() string { return fs.mount }
+func (fs aeFileSys) String() string { return fs.mount }
 
 //---------------------------------------
 
 // Create opens for read-write.
 // Open opens for readonly access.
-func (fs *AeFileSys) Create(name string) (fsi.File, error) {
+func (fs *aeFileSys) Create(name string) (fsi.File, error) {
 
 	// WriteFile & Create
 	dir, bname := fs.pathInternalize(name)
@@ -44,7 +44,7 @@ func (fs *AeFileSys) Create(name string) (fsi.File, error) {
 // No distinction between Stat (links are followed)
 // and LStat (links go unresolved)
 // We don't support links yet, anyway
-func (fs *AeFileSys) Lstat(path string) (os.FileInfo, error) {
+func (fs *aeFileSys) Lstat(path string) (os.FileInfo, error) {
 	fi, err := fs.Stat(path)
 	return fi, err
 }
@@ -52,12 +52,12 @@ func (fs *AeFileSys) Lstat(path string) (os.FileInfo, error) {
 // Strangely, neither MkdirAll nor Mkdir seem to have
 // any concept of current working directory.
 // They seem to operate relative to root.
-func (fs *AeFileSys) Mkdir(name string, perm os.FileMode) error {
+func (fs *aeFileSys) Mkdir(name string, perm os.FileMode) error {
 	_, err := fs.saveDirByPath(name)
 	return err
 }
 
-func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
+func (fs *aeFileSys) MkdirAll(path string, perm os.FileMode) error {
 	_, err := fs.saveDirByPath(path)
 	return err
 }
@@ -70,7 +70,7 @@ func (fs *AeFileSys) MkdirAll(path string, perm os.FileMode) error {
 // complies  with   os.Open()
 // conflicts with  vfs.Open() signature
 // conflicts with file.Open() interface of Afero
-func (fs *AeFileSys) Open(name string) (fsi.File, error) {
+func (fs *aeFileSys) Open(name string) (fsi.File, error) {
 
 	dir, bname := fs.pathInternalize(name)
 
@@ -94,12 +94,12 @@ func (fs *AeFileSys) Open(name string) (fsi.File, error) {
 	return ff, nil
 }
 
-func (fs *AeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
+func (fs *aeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
 	return fs.Open(name)
 }
 
 // See fsi.FileSystem interface.
-func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
+func (fs *aeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	dirs, err := fs.dirsByPath(path)
 	if err != nil && err != fsi.EmptyQueryResult {
 		return nil, err
@@ -114,7 +114,7 @@ func (fs *AeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
 	return dirs, nil
 }
 
-func (fs *AeFileSys) Remove(name string) error {
+func (fs *aeFileSys) Remove(name string) error {
 
 	// log.Printf("trying to remove %-20v", name)
 	f, err := fs.fileByPath(name)
@@ -141,12 +141,12 @@ func (fs *AeFileSys) Remove(name string) error {
 
 }
 
-func (fs *AeFileSys) RemoveAll(path string) error {
+func (fs *aeFileSys) RemoveAll(path string) error {
 
 	paths := []string{}
 	walkRemove := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
-			// do nothing
+			// do nothing; don't break the walk
 		} else {
 			if f != nil { // && f.IsDir() to constrain
 				paths = append(paths, path)
@@ -173,12 +173,12 @@ func (fs *AeFileSys) RemoveAll(path string) error {
 	return nil
 }
 
-func (fs *AeFileSys) Rename(oldname, newname string) error {
+func (fs *aeFileSys) Rename(oldname, newname string) error {
 	// we could use a walk similar to remove all
 	return fsi.NotImplemented
 }
 
-func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
+func (fs *aeFileSys) Stat(path string) (os.FileInfo, error) {
 	f, err := fs.fileByPath(path)
 	if err != nil {
 		// log.Printf("isno file err %-24q =>  %v", path, err)
@@ -196,7 +196,7 @@ func (fs *AeFileSys) Stat(path string) (os.FileInfo, error) {
 	}
 }
 
-func (fs *AeFileSys) ReadFile(path string) ([]byte, error) {
+func (fs *aeFileSys) ReadFile(path string) ([]byte, error) {
 
 	file, err := fs.fileByPath(path)
 	if err != nil {
@@ -206,7 +206,7 @@ func (fs *AeFileSys) ReadFile(path string) ([]byte, error) {
 }
 
 // Only one save operation required
-func (fs *AeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
+func (fs *aeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
 
 	// WriteFile & Create
 	dir, bname := fs.pathInternalize(name)

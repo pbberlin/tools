@@ -45,7 +45,7 @@ func TestRename(t *testing.T) {
 		defer fs.Remove(to)
 		_, err = fs.Stat(to)
 		if err != nil {
-			t.Errorf("stat %q failed: %v", to, err)
+			t.Errorf("stat %q failed: %v, %v", to, err, fs.Name())
 		}
 	}
 }

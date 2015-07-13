@@ -34,7 +34,7 @@ func init() {
 	ifi := os.FileInfo(&f)
 	_ = ifi
 
-	fs := AeFileSys{}
+	fs := aeFileSys{}
 	ifs := fsi.FileSystem(&fs)
 	_ = ifs
 

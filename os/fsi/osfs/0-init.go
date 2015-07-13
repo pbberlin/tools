@@ -21,7 +21,7 @@ func init() {
 	ifi := os.FileInfo(fi) // of course idiotic, but we keep the pattern
 	_ = ifi
 
-	fs := OsFileSys{}
+	fs := osFileSys{}
 	ifs := fsi.FileSystem(&fs)
 	_ = ifs
 

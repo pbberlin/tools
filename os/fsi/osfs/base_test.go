@@ -7,7 +7,7 @@ import (
 
 func TestOsFileSys(t *testing.T) {
 
-	fs := OsFileSys{}
+	fs := osFileSys{}
 	_ = fs
 	// Run code and tests requiring the appengine.Context using c.
 

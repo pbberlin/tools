@@ -20,7 +20,7 @@ import (
 // "warning" fsi.EmptyQueryResult
 //
 // The func could easily be enhanced chunked scanning.
-func (fs *AeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
+func (fs *aeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
 
 	dir, bname := fs.pathInternalize(name)
 	name = dir + bname

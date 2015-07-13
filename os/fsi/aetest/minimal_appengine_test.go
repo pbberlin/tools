@@ -7,7 +7,7 @@ import (
 	"appengine/aetest"
 )
 
-func UncommentThis_TestMyFunction(t *testing.T) {
+func UncommentThis_TestFunction(t *testing.T) {
 	c, err := aetest.NewContext(nil)
 	if err != nil {
 		log.Printf("%v\n", err)
@@ -15,5 +15,6 @@ func UncommentThis_TestMyFunction(t *testing.T) {
 	}
 	defer c.Close()
 
-	// Run code and tests requiring the appengine.Context using c.
+	// Now you can run the code and tests requiring
+	// the appengine.Context
 }

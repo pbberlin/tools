@@ -10,6 +10,12 @@ import (
 
 // try to find parent in main map-of-files
 func (m *memMapFs) findParent(name string) (fsi.File, error) {
+
+	if name == m.RootName() || name == m.RootDir() {
+		// dont find root for root
+		return nil, nil
+	}
+
 	parent, _ := m.pathInternalize(name)
 	if len(parent) > 0 {
 		pfile, err := m.Open(parent)
@@ -36,7 +42,7 @@ func (m *memMapFs) registerWithParent(name string) string {
 	if pDir == nil {
 		newPar, _ := m.pathInternalize(name)
 		if len(newPar) > 0 {
-			log.Printf("  create parent %-24q for %v\n", newPar, name)
+			// log.Printf("  create parent %-32q for %v\n", newPar, name)
 			err := m.MkdirAll(newPar, 0777)
 			if err != nil && err != fsi.ErrFileExists {
 				log.Printf("Mkdir for %v failed %v", newPar, err)
@@ -78,13 +84,13 @@ func (m *memMapFs) registerDirs(name string) {
 	for {
 
 		cntr++
-		if cntr > 4 {
-			break
+		if cntr > 10 {
+			break //
 		}
 
 		par := m.registerWithParent(name)
-		log.Printf("register loop %v %-22q %-22q \n", cntr, name, par)
-		if par == "" {
+		// log.Printf("register loop %v %-22q %-22q \n", cntr, name, par)
+		if par == "" || par == m.RootDir() || par == m.RootName() {
 			break
 		}
 		name = par
@@ -105,5 +111,7 @@ func (m *memMapFs) unRegisterWithParent(name string) error {
 
 	pDirC := pDir.(*InMemoryFile)
 	delete(pDirC.memDir, name)
+	// log.Printf("unregistered %-22q in %q \n", name, pDirC.name)
+
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 	"appengine/datastore"
 )
 
-func (fs *AeFileSys) fileByPath(name string) (AeFile, error) {
+func (fs *aeFileSys) fileByPath(name string) (AeFile, error) {
 
 	dir, bname := fs.pathInternalize(name)
 
@@ -44,7 +44,7 @@ func (fs *AeFileSys) fileByPath(name string) (AeFile, error) {
 }
 
 // similar to ReadDir but returning only files
-func (fs *AeFileSys) filesByPath(name string) ([]AeFile, error) {
+func (fs *aeFileSys) filesByPath(name string) ([]AeFile, error) {
 
 	dir, bname := fs.pathInternalize(name)
 
@@ -78,7 +78,7 @@ func (fs *AeFileSys) filesByPath(name string) ([]AeFile, error) {
 //
 //
 // Path is the directory, BName contains the base name.
-func (fs *AeFileSys) saveFileByPath(f *AeFile, name string) error {
+func (fs *aeFileSys) saveFileByPath(f *AeFile, name string) error {
 
 	dir, bname := fs.pathInternalize(name)
 	f.Dir = dir

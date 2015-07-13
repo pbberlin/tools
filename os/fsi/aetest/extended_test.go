@@ -22,10 +22,11 @@ func TestWalk(t *testing.T) {
 	_ = bb
 	os.Chdir("c:\\temp")
 	pwd, _ := os.Getwd()
+	_ = pwd
 
 	//
 	var fs fsi.FileSystem
-	if false {
+	if true {
 		fsc := aefs.New(aefs.MountPointNext(), aefs.AeContext(c))
 		fs = fsi.FileSystem(fsc)
 	} else if false {
@@ -36,7 +37,7 @@ func TestWalk(t *testing.T) {
 		fs = fsi.FileSystem(fsc)
 	}
 
-	wpf(os.Stdout, "-----created fs %v %v-----\n", aefs.MountPointLast(), pwd)
+	wpf(os.Stdout, "-----created fs %v %v-----\n", fs.Name(), fs.String())
 
 	bb, msg = aefs.CreateSys(fs)
 	if msg != "" {

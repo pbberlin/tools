@@ -13,13 +13,40 @@ import (
 	pth "path"
 )
 
-const rel = ""
-const relPsep = rel + sep
-const relOpt = rel
+// osfs1
+// const rel = "."
+// const relPsep = rel + sep
+// const relOpt = ""
 
+// osfs1
+// const rel = "."
+// const relPsep = ""
+// const relOpt = ""
+
+// memfs1
+// const rel = ""
+// const relPsep = rel + sep
+// const relOpt = rel
+
+// memfs2
+// const rel = ""
+// const relPsep = rel
+// const relOpt = rel
+
+// aefs1
 // const rel = "/"
 // const relPsep = "/"
 // const relOpt = "/"
+
+// aefs2
+// const rel = ""
+// const relPsep = ""
+// const relOpt = ""
+
+const relPsep = ""
+const relOpt = ""
+
+var rel = "."
 
 func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
@@ -51,7 +78,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wntByPath := 5
 	fc2 := func(p []string) {
 		path := pth.Join(p...)
-		wpf(bb, "searching... %v\n", path)
+		wpf(bb, "searching... %q\n", path)
 		f, err := fs.Lstat(relOpt + path)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
@@ -114,7 +141,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wntSizeFiles := 9 + 9 + 15 + 13
 
 	fc5 := func(path string) {
-		wpf(bb, " srch %v  \n", relOpt+path)
+		wpf(bb, " srch %q  \n", relOpt+path)
 		files, err := fs.ReadDir(relOpt + path)
 		if err != nil {
 			wpf(bb, "filesByPath %v failed %v\n", path, err)
@@ -255,7 +282,7 @@ func WalkDirs(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	cntr := 0
 	walkFunc := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
-			wpf(bb, "error on visiting %s => %v \n", path, err)
+			wpf(bb, "error on visiting %q => %v \n", path, err)
 			if err == datastore.ErrNoSuchEntity || err == os.ErrNotExist {
 				return nil // dont break the walk on this, it's just a stale directory
 			}

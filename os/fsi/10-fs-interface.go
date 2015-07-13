@@ -3,8 +3,6 @@
 //
 // Todos:
 //
-// Apply extra testcases with memfs and osfs
-//
 // Throw out sync(); Employ Close instead.
 //
 // Integrate http filesys

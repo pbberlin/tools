@@ -91,6 +91,11 @@ func TestWriteRead(t *testing.T) {
 			t.Fatalf("there are differences \nwnt %s \ngt1 %s", bts4, bts5)
 		}
 
+		// fsc, ok := fs.(*memfs.MemMapFs)
+		// if ok {
+		// 	fsc.Dump()
+		// }
+
 	}
 
 }

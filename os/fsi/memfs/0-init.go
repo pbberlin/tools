@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package memfs
 
 import (
@@ -21,6 +22,8 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi"
 )
+
+const sep = "/"
 
 var mux = &sync.Mutex{}
 
@@ -37,7 +40,7 @@ func init() {
 	ifi := os.FileInfo(&fi)
 	_ = ifi
 
-	fs := MemMapFs{}
+	fs := memMapFs{}
 	ifs := fsi.FileSystem(&fs)
 	_ = ifs
 

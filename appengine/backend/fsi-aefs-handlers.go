@@ -18,6 +18,9 @@ import (
 
 var backendFragFsiAefs = new(bytes.Buffer)
 
+var memMapFileSys = memfs.New()
+var osFileSys = osfs.New()
+
 func init() {
 
 	//
@@ -49,9 +52,6 @@ func init() {
 
 }
 
-var memMapFileSys = &memfs.MemMapFs{}
-var osFileSys = &osfs.OsFileSys{}
-
 func callTestX(w http.ResponseWriter, r *http.Request,
 	f1 func() string,
 	f2 func(fsi.FileSystem) (*bytes.Buffer, string)) {
@@ -71,7 +71,7 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 	fs = fsi.FileSystem(fsConcrete)
 
 	if false {
-		fsc := aefs.NewAeFs(f1(), aefs.AeContext(appengine.NewContext(r)))
+		fsc := aefs.New(f1(), aefs.AeContext(appengine.NewContext(r)))
 		fs = fsi.FileSystem(fsc)
 	} else if false {
 		fs = fsi.FileSystem(osFileSys)
@@ -131,8 +131,8 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	}
 	wpf(w, msg)
 
-	memMapFileSys = &memfs.MemMapFs{}
-	osFileSys = &osfs.OsFileSys{}
+	memMapFileSys = memfs.New()
+	osFileSys = osfs.New()
 
 }
 

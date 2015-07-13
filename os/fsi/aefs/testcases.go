@@ -7,9 +7,18 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/fsc"
+	"github.com/pbberlin/tools/os/fsi/memfs"
 
 	pth "path"
 )
+
+const rel = ""
+const relPsep = rel + sep
+const relOpt = rel
+
+// const rel = "/"
+// const relPsep = "/"
+// const relOpt = "/"
 
 func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
@@ -18,7 +27,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	fc1 := func(p []string) {
 		path := pth.Join(p...)
-		err := fs.MkdirAll(path, os.ModePerm)
+		err := fs.MkdirAll(relOpt+path, os.ModePerm)
 		if err != nil {
 			wpf(bb, "MkdirAll failed %v\n", err)
 		}
@@ -42,7 +51,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	fc2 := func(p []string) {
 		path := pth.Join(p...)
 		wpf(bb, "searching... %v\n", path)
-		f, err := fs.Lstat(path)
+		f, err := fs.Lstat(relOpt + path)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
@@ -55,20 +64,20 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	fc2([]string{"ch1", "non-exist-dir"})
 	fc2([]string{"ch1", "ch2", "ch3"})
 	fc2([]string{"ch1A"})
-	fc2([]string{"."})
+	fc2([]string{rel})
 
 	wpf(bb, "\nfnd %v of %v dirs \n", gotByPath, wntByPath)
 
 	wpf(bb, "\n-------create and save some files----\n")
 
 	fc4a := func(name, content string) {
-		err := fs.WriteFile(name, []byte(content), os.ModePerm)
+		err := fs.WriteFile(relOpt+name, []byte(content), os.ModePerm)
 		if err != nil {
 			wpf(bb, "WriteFile %v failed %v\n", name, err)
 		}
 	}
 	fc4b := func(name, content string) {
-		f, err := fs.Create(name)
+		f, err := fs.Create(relOpt + name)
 		if err != nil {
 			wpf(bb, "Create %v failed %v\n", name, err)
 		}
@@ -88,7 +97,13 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	fc4a("ch1/ch2/file_1", "content 1")
 	fc4b("ch1/ch2/file_2", "content 2")
 	fc4a("ch1/ch2/ch3/file3", "another content")
-	fc4b("./file4", "chq content 2")
+	fc4b(relPsep+"file4", "chq content 2")
+
+	fsc, ok := memfs.Unwrap(fs)
+	if ok {
+		fsc.Dump()
+	}
+	return bb, ""
 
 	wpf(bb, "\n-------retrieve files again----\n\n")
 
@@ -98,8 +113,8 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wntSizeFiles := 9 + 9 + 15 + 13
 
 	fc5 := func(path string) {
-		wpf(bb, " srch %v  \n", path)
-		files, err := fs.ReadDir(path)
+		wpf(bb, " srch %v  \n", relOpt+path)
+		files, err := fs.ReadDir(relOpt + path)
 		if err != nil {
 			wpf(bb, "filesByPath %v failed %v\n", path, err)
 		}
@@ -120,7 +135,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	fc5("ch1/ch2")
 	fc5("ch1/ch2/ch3")
-	fc5(".")
+	fc5(rel)
 
 	wpf(bb, "\n")
 
@@ -164,7 +179,7 @@ func RetrieveByReadDir(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	fc3(`ch1/ch2/ch3`)
 	fc3(`ch1/ch2`)
 	fc3(`ch1`)
-	fc3(`.`)
+	fc3(rel)
 
 	testRes := ""
 	if spf("%+v", wnt1) != spf("%+v", got) &&
@@ -263,7 +278,7 @@ func WalkDirs(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	var err error
 
 	cntr = 0
-	err = fsc.Walk(fs, ".", walkFunc)
+	err = fsc.Walk(fs, rel, walkFunc)
 	wpf(bb, "fs.Walk() returned %v\n\n", err)
 	got = append(got, cntr)
 

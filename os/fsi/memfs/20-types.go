@@ -8,9 +8,23 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-type MemMapFs struct {
-	data  map[string]fsi.File
+// It's unexported; only New() is possible.
+// If access to underlying methods neccessary from outside, use Unwrap()
+type memMapFs struct {
+	fos   map[string]fsi.File // file objects - a vector of all files and directories
 	mutex *sync.RWMutex
+}
+
+func New() *memMapFs {
+	m := &memMapFs{
+		fos: map[string]fsi.File{}, //
+	}
+	return m
+}
+
+func Unwrap(fs fsi.FileSystem) (*memMapFs, bool) {
+	fsc, ok := fs.(*memMapFs)
+	return fsc, ok
 }
 
 type InMemoryFile struct {
@@ -18,7 +32,7 @@ type InMemoryFile struct {
 	at      int64
 	name    string
 	data    []byte
-	memDir  MemDir
+	memDir  MemDir // directory contents
 	dir     bool
 	closed  bool
 	mode    os.FileMode
@@ -29,12 +43,13 @@ type InMemoryFileInfo struct {
 	file *InMemoryFile
 }
 
-type MemDirMap map[string]fsi.File
-
+// Implemented by MemDirMap
 type MemDir interface {
-	Len() int
-	Names() []string
-	Files() []fsi.File
 	Add(fsi.File)
+	Len() int
+	Files() []fsi.File
+	Names() []string
 	Remove(fsi.File)
 }
+
+type MemDirMap map[string]fsi.File // implements MemDir

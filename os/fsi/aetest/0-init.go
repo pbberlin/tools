@@ -49,15 +49,15 @@ func init() {
 	// since we need the concrete filesystem type
 	// one way or another.
 
-	fs1 := aefs.NewAeFs("rootX", aefs.AeContext(c))
+	fs1 := aefs.New("rootX", aefs.AeContext(c))
 	fs1i := fsi.FileSystem(fs1)
 	_ = fs1i
 
-	fs3 := &osfs.OsFileSys{}
+	fs3 := osfs.New()
 	fs3i := fsi.FileSystem(fs3)
 	_ = fs3i
 
-	fs4 := &memfs.MemMapFs{}
+	fs4 := memfs.New()
 	fs4i := fsi.FileSystem(fs4)
 	_ = fs4i
 

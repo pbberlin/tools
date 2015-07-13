@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"path"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -26,7 +27,8 @@ func (f *InMemoryFile) Close() error {
 }
 
 func (f *InMemoryFile) Name() string {
-	return f.name
+	_, bname := path.Split(f.name)
+	return bname
 }
 
 func (f *InMemoryFile) Stat() (os.FileInfo, error) {

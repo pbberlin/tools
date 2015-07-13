@@ -26,13 +26,13 @@ func TestWalk(t *testing.T) {
 	//
 	var fs fsi.FileSystem
 	if false {
-		fsc := aefs.NewAeFs(aefs.MountPointNext(), aefs.AeContext(c))
+		fsc := aefs.New(aefs.MountPointNext(), aefs.AeContext(c))
 		fs = fsi.FileSystem(fsc)
-	} else if true {
-		fsc := &osfs.OsFileSys{}
+	} else if false {
+		fsc := osfs.New()
 		fs = fsi.FileSystem(fsc)
 	} else {
-		fsc := &memfs.MemMapFs{}
+		fsc := memfs.New()
 		fs = fsi.FileSystem(fsc)
 	}
 
@@ -43,6 +43,8 @@ func TestWalk(t *testing.T) {
 		wpf(os.Stdout, msg+"\n")
 		wpf(os.Stdout, bb.String())
 	}
+
+	return
 
 	bb, msg = aefs.RetrieveByReadDir(fs)
 	if msg != "" {

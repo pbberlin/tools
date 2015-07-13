@@ -13,7 +13,8 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-func (memMapFs) Name() string { return "MemMapFS" }
+func (memMapFs) Name() string { return "MemMapFS" } // type
+// instance
 func (memMapFs) String() string {
 	hn, err := os.Hostname()
 	if err != nil {
@@ -22,15 +23,67 @@ func (memMapFs) String() string {
 	return hn
 }
 
-func MemFileCreate(name string) *InMemoryFile {
-	return &InMemoryFile{name: name, mode: os.ModeTemporary, modtime: time.Now()}
+func (m *memMapFs) createHelper(name string) *InMemoryFile {
+	return &InMemoryFile{
+		name:    name,
+		mode:    os.ModeTemporary,
+		modtime: time.Now(),
+		memDir:  map[string]fsi.File{},
+		fs:      m,
+	}
+}
+
+func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
+	f, ok := m.fos[name]
+	if !ok {
+		return &os.PathError{"chmod", name, fsi.ErrFileNotFound}
+	}
+
+	ff, ok := f.(*InMemoryFile)
+	if ok {
+		m.lock()
+		ff.mode = mode
+		m.unlock()
+	} else {
+		return errors.New("Unable to Chmod Memory File")
+	}
+	return nil
+}
+
+func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
+	f, ok := m.fos[name]
+	if !ok {
+		return &os.PathError{"chtimes", name, fsi.ErrFileNotFound}
+	}
+
+	ff, ok := f.(*InMemoryFile)
+	if ok {
+		m.lock()
+		ff.modtime = mtime
+		m.unlock()
+	} else {
+		return errors.New("Unable to Chtime Memory File")
+	}
+	return nil
 }
 
 func (m *memMapFs) Create(name string) (fsi.File, error) {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.lock()
-	m.fos[name] = MemFileCreate(name)
+	m.fos[name] = m.createHelper(name)
 	m.unlock()
-	m.registerDirs(m.fos[name])
+	m.registerDirs(name)
 	return m.fos[name], nil
 }
 
@@ -39,6 +92,10 @@ func (fs *memMapFs) Lstat(path string) (os.FileInfo, error) {
 }
 
 func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.rlock()
 	_, ok := m.fos[name]
 	m.runlock()
@@ -46,9 +103,11 @@ func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 		return fsi.ErrFileExists
 	} else {
 		m.lock()
-		m.fos[name] = &InMemoryFile{name: name, memDir: &MemDirMap{}, dir: true}
+		fo := m.createHelper(name)
+		fo.dir = true
+		m.fos[name] = fo
 		m.unlock()
-		m.registerDirs(m.fos[name])
+		m.registerDirs(name)
 	}
 	return nil
 }
@@ -57,20 +116,24 @@ func (m *memMapFs) MkdirAll(name string, perm os.FileMode) error {
 
 	return m.Mkdir(name, 0777)
 
-	name = strings.TrimSpace(name)
-	dirs := strings.Split(path.Clean(name), sep)
-	// log.Printf("  MkdirAll %-22v => %v", name, dirs)
-	for _, v := range dirs {
-		err := m.Mkdir(v, 0777)
-		// log.Printf("    MkdirAll %q %v", v, err)
-		if err != nil && err != fsi.ErrFileExists {
-			return err
-		}
-	}
-	return nil
+	// name = strings.TrimSpace(name)
+	// dirs := strings.Split(path.Clean(name), sep)
+	// // log.Printf("  MkdirAll %-22v => %v", name, dirs)
+	// for _, v := range dirs {
+	// 	err := m.Mkdir(v, 0777)
+	// 	// log.Printf("    MkdirAll %q %v", v, err)
+	// 	if err != nil && err != fsi.ErrFileExists {
+	// 		return err
+	// 	}
+	// }
+	// return nil
 }
 
 func (m *memMapFs) Open(name string) (fsi.File, error) {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.rlock()
 	f, ok := m.fos[name]
 	ff, ok := f.(*InMemoryFile)
@@ -90,9 +153,9 @@ func (m *memMapFs) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, 
 	return m.Open(name)
 }
 
-func (fs *memMapFs) ReadDir(path string) ([]os.FileInfo, error) {
+func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
 
-	f, err := fs.Open(path)
+	f, err := fs.Open(name)
 	if err != nil {
 		return nil, err
 	}
@@ -104,22 +167,13 @@ func (fs *memMapFs) ReadDir(path string) ([]os.FileInfo, error) {
 	sort.Sort(byName(list))
 	return list, nil
 
-	// ===================================
-	// var files1 map[string]File
-	// files1 = fs.getData()
-	// _ = files1
-
-	// // or
-	// var m MemDirMap
-	// files2 := m.Files()
-	// names2 := m.Names()
-	// _, _ = files2, names2
-
-	// return []os.FileInfo{}, nil
-
 }
 
 func (m *memMapFs) Remove(name string) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.rlock()
 	defer m.runlock()
 
@@ -131,11 +185,15 @@ func (m *memMapFs) Remove(name string) error {
 	return nil
 }
 
-func (m *memMapFs) RemoveAll(path string) error {
+func (m *memMapFs) RemoveAll(name string) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.rlock()
 	defer m.runlock()
 	for p, _ := range m.fos {
-		if strings.HasPrefix(p, path) {
+		if strings.HasPrefix(p, name) {
 			m.runlock()
 			m.lock()
 			delete(m.fos, p)
@@ -146,15 +204,19 @@ func (m *memMapFs) RemoveAll(path string) error {
 	return nil
 }
 
-func (m *memMapFs) Rename(oldname, newname string) error {
+func (m *memMapFs) Rename(name, newname string) error {
+
+	dir, bname := m.pathInternalize(name)
+	name = path.Join(dir, bname)
+
 	m.rlock()
 	defer m.runlock()
-	if _, ok := m.fos[oldname]; ok {
+	if _, ok := m.fos[name]; ok {
 		if _, ok := m.fos[newname]; !ok {
 			m.runlock()
 			m.lock()
-			m.fos[newname] = m.fos[oldname]
-			delete(m.fos, oldname)
+			m.fos[newname] = m.fos[name]
+			delete(m.fos, name)
 			m.unlock()
 			m.rlock()
 		} else {
@@ -174,43 +236,9 @@ func (m *memMapFs) Stat(name string) (os.FileInfo, error) {
 	return &InMemoryFileInfo{file: f.(*InMemoryFile)}, nil
 }
 
-func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
-	f, ok := m.fos[name]
-	if !ok {
-		return &os.PathError{"chmod", name, fsi.ErrFileNotFound}
-	}
+func (fs *memMapFs) ReadFile(name string) ([]byte, error) {
 
-	ff, ok := f.(*InMemoryFile)
-	if ok {
-		m.lock()
-		ff.mode = mode
-		m.unlock()
-	} else {
-		return errors.New("Unable to Chmod Memory File")
-	}
-	return nil
-}
-
-func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
-	f, ok := m.fos[name]
-	if !ok {
-		return &os.PathError{"chtimes", name, fsi.ErrFileNotFound}
-	}
-
-	ff, ok := f.(*InMemoryFile)
-	if ok {
-		m.lock()
-		ff.modtime = mtime
-		m.unlock()
-	} else {
-		return errors.New("Unable to Chtime Memory File")
-	}
-	return nil
-}
-
-func (fs *memMapFs) ReadFile(path string) ([]byte, error) {
-
-	f, err := fs.Open(path)
+	f, err := fs.Open(name)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -246,10 +274,13 @@ func (m *memMapFs) Dump() {
 
 		ff, ok := f.(*InMemoryFile)
 		y, _ := f.Stat()
-		if ok && ff.memDir != nil {
-			log.Printf("%-36q %4v   %-20v\n", f.Name(), y.Size(), ff.memDir.Names())
-		} else {
-			log.Printf("%-36q %4v\n", f.Name(), y.Size())
+		if ok {
+			names := ""
+			for _, v := range ff.memDir {
+				vf, _ := v.(*InMemoryFile)
+				names += vf.name + "  "
+			}
+			log.Printf("%-38q %4v   %-20v\n", ff.name, y.Size(), names)
 		}
 	}
 }

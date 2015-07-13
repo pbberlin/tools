@@ -15,10 +15,11 @@ var spf func(format string, a ...interface{}) string = fmt.Sprintf
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 const (
-	tdir    = "fsd"      // datastory entity type for filesystem directory
-	tdirsep = tdir + "," // nested datastore keys each have this prefix
-	tfil    = "fsf"      // datastory entity type for filesystem file
-	sep     = "/"        // no, package path does not provide it; yes, we do need it.
+	tdir      = "fsd"      // datastory entity type for filesystem directory
+	tdirsep   = tdir + "," // nested datastore keys each have this prefix
+	tfil      = "fsf"      // datastory entity type for filesystem file
+	sep       = "/"        // no, package path does not provide it; yes, we do need it.
+	doublesep = "//"
 )
 
 func init() {

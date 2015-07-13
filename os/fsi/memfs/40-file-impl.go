@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"path"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -26,8 +25,9 @@ func (f *InMemoryFile) Close() error {
 	return nil
 }
 
+// To remain consistent with osfs, we can only return base name.
 func (f *InMemoryFile) Name() string {
-	_, bname := path.Split(f.name)
+	_, bname := f.fs.pathInternalize(f.name)
 	return bname
 }
 
@@ -36,10 +36,10 @@ func (f *InMemoryFile) Stat() (os.FileInfo, error) {
 }
 
 func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
-	files := f.memDir.Files()
-	limit := len(files)
 
-	if len(files) == 0 {
+	limit := len(f.memDir)
+
+	if len(f.memDir) == 0 {
 		return
 	}
 
@@ -47,14 +47,14 @@ func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
 		limit = count
 	}
 
-	if len(files) < limit {
+	if len(f.memDir) < limit {
 		err = io.EOF
 	}
 
-	res = make([]os.FileInfo, f.memDir.Len())
+	res = make([]os.FileInfo, len(f.memDir))
 
 	i := 0
-	for _, file := range f.memDir.Files() {
+	for _, file := range f.memDir {
 		res[i], _ = file.Stat()
 		i++
 	}

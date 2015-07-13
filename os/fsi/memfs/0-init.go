@@ -23,7 +23,10 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-const sep = "/"
+const (
+	sep       = "/" // No support for windows
+	doublesep = "//"
+)
 
 var mux = &sync.Mutex{}
 

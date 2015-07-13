@@ -8,18 +8,34 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-// It's unexported; only New() is possible.
-// If access to underlying methods neccessary from outside, use Unwrap()
+// The main type is unexported.
+// Use New().
+// For conversion from fsi.FileSystem from outside, use Unwrap()
 type memMapFs struct {
-	fos   map[string]fsi.File // file objects - a vector of all files and directories
+	// fos - file objects - a map containing all files and directories.
+	// It must be keyed by the full path, otherwise uniqueness suffers
+	fos   map[string]fsi.File
 	mutex *sync.RWMutex
+
+	// mount is a directory prefix, similar to a base directory.
+	// Useful to as a kind of current dir; to keep memfs exchangeable with osfs
+	mount string
 }
 
 func New() *memMapFs {
 	m := &memMapFs{
-		fos: map[string]fsi.File{}, //
+		fos:   map[string]fsi.File{}, // secure init
+		mount: "mnt0",
 	}
 	return m
+}
+
+func (m *memMapFs) RootDir() string {
+	return m.mount + sep
+}
+
+func (m *memMapFs) RootName() string {
+	return m.mount
 }
 
 func Unwrap(fs fsi.FileSystem) (*memMapFs, bool) {
@@ -27,29 +43,25 @@ func Unwrap(fs fsi.FileSystem) (*memMapFs, bool) {
 	return fsc, ok
 }
 
+// Implements fsi.File
 type InMemoryFile struct {
 	sync.Mutex
 	at      int64
-	name    string
-	data    []byte
-	memDir  MemDir // directory contents
-	dir     bool
 	closed  bool
+	data    []byte
+	dir     bool
 	mode    os.FileMode
 	modtime time.Time
+	name    string
+
+	// memDir -  in-memory directory
+	// For directories it contains the children;
+	// For for files:  it contains siblings.
+	memDir map[string]fsi.File
+	fs     *memMapFs // reference to fs
 }
 
+// Implements os.FileInfo
 type InMemoryFileInfo struct {
 	file *InMemoryFile
 }
-
-// Implemented by MemDirMap
-type MemDir interface {
-	Add(fsi.File)
-	Len() int
-	Files() []fsi.File
-	Names() []string
-	Remove(fsi.File)
-}
-
-type MemDirMap map[string]fsi.File // implements MemDir

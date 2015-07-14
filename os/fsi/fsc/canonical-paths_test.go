@@ -1,13 +1,16 @@
 // +build cleaning
 // go test -tags=cleaning
 
-package aefs
+package fsc
 
 import (
 	"fmt"
 	"log"
 	"path"
 	"testing"
+
+	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/fsc"
 )
 
 func splitIsWhatWeWant() {
@@ -41,13 +44,13 @@ func TestPathCleanage(t *testing.T) {
 		[]string{"./dir1/", "mntX/", "dir1"},
 	}
 
-	fs := AeFileSys{mount: "mntX"}
+	fs := aefs.New()
 	for _, v := range cases {
 		inpt := v[0]
 		_ = inpt
 		wnt1 := v[1]
 		wnt2 := v[2]
-		dir, bname := fs.pathInternalize(v[0])
+		dir, bname := fsc.PathInternalize(v[0], fs.RootDir(), fs.RootName())
 		fullpath := dir + bname
 
 		log.Printf("%-28v %-24v => %-16q %-12q ", inpt, dir, bname, fullpath)

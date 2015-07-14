@@ -17,15 +17,16 @@ func AeContext(c appengine.Context) func(fsi.FileSystem) {
 	}
 }
 
-func New(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
-	return NewAeFs(mount, options...)
+// old
+func NewAeFs(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
+	return New(mount, options...)
 }
 
-// NewAeFs creates a new appengine datastore filesystem.
+// New creates a new appengine datastore filesystem.
 // Notice that variadic options are submitted as functions,
 // as is explained and justified here:
 // http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
-func NewAeFs(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
+func New(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
 
 	fs := aeFileSys{}
 

@@ -29,7 +29,12 @@ func TestOsFileSys(t *testing.T) {
 		t.Fatalf("%v\n", err)
 	}
 
-	err = f.Sync()
+	err = f.Close()
+	if err != nil {
+		t.Fatalf("%v\n", err)
+	}
+
+	err = os.Remove("/temp/test.txt")
 	if err != nil {
 		t.Fatalf("%v\n", err)
 	}

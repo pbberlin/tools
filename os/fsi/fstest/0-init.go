@@ -41,15 +41,16 @@ func init() {
 		log.Fatal(err)
 	}
 
-	// Do not
+	// Do not here
 	// defer c.Close()
+	//  but instead at the start of the test-funcs
 
 	// We can have variadic option funcs.
 	// But seems we can not make those generic,
 	// since we need the concrete filesystem type
 	// one way or another.
 
-	fs1 := aefs.New("rootX", aefs.AeContext(c))
+	fs1 := aefs.New(aefs.MountPointNext(), aefs.AeContext(c))
 	fs1i := fsi.FileSystem(fs1)
 	_ = fs1i
 
@@ -57,7 +58,7 @@ func init() {
 	fs3i := fsi.FileSystem(fs3)
 	_ = fs3i
 
-	fs4 := memfs.New()
+	fs4 := memfs.New(memfs.MountName("m"))
 	fs4i := fsi.FileSystem(fs4)
 	_ = fs4i
 

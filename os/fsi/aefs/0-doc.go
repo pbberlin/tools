@@ -3,24 +3,6 @@
 package aefs
 
 //
-//
-// Common Remarks:
-// ==============================
-// To remain compatible with osfs,
-// we support "." for current working dir.
-// We could introduce ChDir(), but so far
-// current working dir is always RootDir().
-//
-//
-// Terminology:
-// ==============================
-// "name" or "filename" can mean either the basename or the full path of the file,
-// depending on the actual argument - '/tmp/logs/app1.log' or simply 'app1.log'
-// In the latter case, it refers to [current dir]/app1.log => [root dir]/app1.log
-// Exception: os.FileInfo.Name() contains only the base name.
-// Compare http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
-//
-//
 // Architecture
 // ==============================
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf
@@ -64,7 +46,11 @@ package aefs
 // Usage of instance caching with broadcasting instances
 // via http request to instances?
 //
-// Implement rename?
-// Locking the filesys during RemoveAll and Rename?
+// Rename is not implemented.
+// Rename can be a expensive operation.
+//
+// RemoveAll and Rename might have to lock
+// parts of the filesystem.
+// See memfs, for how this could be done.
 //
 // Nice to have: Links

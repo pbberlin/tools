@@ -116,7 +116,7 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 		if err != nil {
 			wpf(bb, "WriteString %v failed %v\n", name, err)
 		}
-		err = f.Sync()
+		err = f.Close()
 		if err != nil {
 			wpf(bb, "Sync %v failed %v\n", name, err)
 		}

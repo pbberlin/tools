@@ -9,10 +9,18 @@ import (
 )
 
 func (f *AeFile) Close() error {
+
 	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
 	f.closed = true
+
+	err := f.Sync()
+	if err != nil {
+		return err
+	}
+
 	f.Unlock()
+
 	return nil
 }
 

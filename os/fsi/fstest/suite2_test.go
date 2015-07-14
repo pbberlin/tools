@@ -130,9 +130,9 @@ func TestWriteAt(t *testing.T) {
 			t.Fatalf("WriteAt 7: %d, %v", n, err)
 		}
 
-		err = f.Sync()
+		err = f.Close()
 		if err != nil {
-			t.Fatalf("Saving file %v: %v", f.Name(), err)
+			t.Fatalf("Closing file %v: %v", f.Name(), err)
 		}
 		// log.Printf(" Saved file %v", f.Name())
 

@@ -22,10 +22,25 @@ type memMapFs struct {
 	mount string
 }
 
-func New() *memMapFs {
+// MountName is an option func, adding a specific mount name to the filesystem
+func MountName(mnt string) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*memMapFs)
+		fst.mount = mnt
+	}
+}
+
+// New creates a in-memory filesystem.
+// Notice that variadic options are submitted as functions,
+// as is explained and justified here:
+// http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
+func New(options ...func(fsi.FileSystem)) *memMapFs {
 	m := &memMapFs{
 		fos:   map[string]fsi.File{}, // secure init
 		mount: "mnt0",
+	}
+	for _, option := range options {
+		option(m)
 	}
 	return m
 }

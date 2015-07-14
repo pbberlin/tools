@@ -125,10 +125,6 @@ func (f *InMemoryFile) Seek(offset int64, whence int) (int64, error) {
 	return f.at, nil
 }
 
-func (f *InMemoryFile) Sync() error {
-	return nil
-}
-
 func (f *InMemoryFile) Write(b []byte) (n int, err error) {
 	n = len(b)
 	cur := atomic.LoadInt64(&f.at)

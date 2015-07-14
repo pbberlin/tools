@@ -38,11 +38,6 @@ func TestWriteRead(t *testing.T) {
 			t.Fatalf("writestr: %v\n", err)
 		}
 
-		err = f.Sync()
-		if err != nil {
-			c.Criticalf("sync: %v\n", err)
-			t.Fatalf("sync: %v\n", err)
-		}
 
 		err = f.Close()
 		if err != nil {

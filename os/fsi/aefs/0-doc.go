@@ -19,10 +19,10 @@ package aefs
 // We cannot allow intermittent "virtual" directories.
 // All directories must be explicitly created. Otherwise traversal is impossible.
 //
-// Direct directory reads are not always consistent.
-// Only subdirectory queries are affected.
-// Such traversals might miss newest directories.
-// Such traversals might report directories already deleted.
+// Direct directory reads are always consistent.
+// Only subdirectory queries might be slightly stale.
+// Traversals might miss newest directories.
+// Traversals might report directories already deleted.
 //
 //
 // In summary: The entire filesystem is extremely parallel,
@@ -47,7 +47,7 @@ package aefs
 // via http request to instances?
 //
 // Rename is not implemented.
-// Rename can be a expensive operation.
+// Rename can be an expensive operation.
 //
 // RemoveAll and Rename might have to lock
 // parts of the filesystem.

@@ -6,6 +6,9 @@ I had three cases in mind:
 * Classic content management systems.
 * Any http server applications, that need static html resources.
 
+Test-Deployments can be made to local machines.
+Files should be editable like local file system files.
+
 The required interface is intentionally ultra slim.
 Contact me, if you think, the interface needs 
 additional *mandatory* methods.

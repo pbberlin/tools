@@ -10,8 +10,10 @@ import (
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
+
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/fstest"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 )
@@ -67,9 +69,6 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 
 	var fs fsi.FileSystem
 
-	fsConcrete := aefs.NewAeFs(f1(), aefs.AeContext(appengine.NewContext(r)))
-	fs = fsi.FileSystem(fsConcrete)
-
 	if false {
 		fsc := aefs.New(f1(), aefs.AeContext(appengine.NewContext(r)))
 		fs = fsi.FileSystem(fsc)
@@ -90,23 +89,23 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 }
 
 func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, aefs.MountPointNext, aefs.CreateSys)
+	callTestX(w, r, aefs.MountPointNext, fstest.CreateSys)
 }
 
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, aefs.RetrieveByQuery)
+	callTestX(w, r, nil, fstest.RetrieveByQuery)
 }
 
 func retrieveByReadDir(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, aefs.RetrieveByReadDir)
+	callTestX(w, r, nil, fstest.RetrieveByReadDir)
 }
 
 func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, aefs.WalkDirs)
+	callTestX(w, r, nil, fstest.WalkDirs)
 }
 
 func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, aefs.RemoveSubtree)
+	callTestX(w, r, nil, fstest.RemoveSubtree)
 }
 
 //

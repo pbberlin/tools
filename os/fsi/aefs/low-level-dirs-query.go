@@ -8,7 +8,7 @@ import (
 	"appengine/datastore"
 )
 
-// subdirsByPath retrieves a subdirectories of a given directory.
+// SubdirsByPath retrieves a subdirectories of a given directory.
 // It is relying on an indexed string property "Dir"
 // containing a string representation of the full path.
 //
@@ -20,7 +20,7 @@ import (
 // "warning" fsi.EmptyQueryResult
 //
 // The func could easily be enhanced chunked scanning.
-func (fs *aeFileSys) subdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
+func (fs *aeFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
 
 	dir, bname := fs.pathInternalize(name)
 	name = dir + bname

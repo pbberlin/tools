@@ -1,7 +1,7 @@
-// Package aetest runs tests on all fsi subpackages;
+// package fstest runs tests on all fsi subpackages;
 // some of which require an appengine context;
 // and which must be run by goapp test.
-package aetest
+package fstest
 
 import (
 	"fmt"
@@ -10,13 +10,13 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
-	"github.com/pbberlin/tools/os/fsi/httpfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 
 	"appengine/aetest"
 )
 
+var spf func(format string, a ...interface{}) string = fmt.Sprintf
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 var dot = []string{
@@ -30,10 +30,7 @@ var dot = []string{
 var testDir = "/temp/fun"
 var testName = "testF.txt"
 
-var Fss = []fsi.FileSystem{}
-var c aetest.Context
-
-func init() {
+func initFileSystems() (fss []fsi.FileSystem, c aetest.Context) {
 
 	var err error
 	c, err = aetest.NewContext(nil)
@@ -41,31 +38,19 @@ func init() {
 		log.Fatal(err)
 	}
 
-	// Do not here
 	// defer c.Close()
-	//  but instead at the start of the test-funcs
+	// Do not here
+	// but instead at the start of the test-funcs
 
-	// We can have variadic option funcs.
-	// But seems we can not make those generic,
-	// since we need the concrete filesystem type
-	// one way or another.
-
+	// We cant make variadic options generic,
+	// since they need the concrete filesystem type.
 	fs1 := aefs.New(aefs.MountPointNext(), aefs.AeContext(c))
-	fs1i := fsi.FileSystem(fs1)
-	_ = fs1i
 
 	fs3 := osfs.New()
-	fs3i := fsi.FileSystem(fs3)
-	_ = fs3i
 
 	fs4 := memfs.New(memfs.MountName("m"))
-	fs4i := fsi.FileSystem(fs4)
-	_ = fs4i
 
-	fs5 := httpfs.HttpFs{fs3}
-	_ = fs5
+	fss = []fsi.FileSystem{fs1, fs3, fs4}
 
-	Fss = []fsi.FileSystem{fs1i, fs3i, fs4i}
-	// fss := []fsi.FileSystem{fs4i}
-
+	return fss, c
 }

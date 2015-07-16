@@ -1,7 +1,7 @@
 // +build extended
 // go test -tags=extended
 
-package aetest
+package fstest
 
 import (
 	"bytes"
@@ -9,13 +9,9 @@ import (
 	"runtime"
 	"testing"
 	"time"
-
-	"github.com/pbberlin/tools/os/fsi/aefs"
 )
 
 func TestWalk(t *testing.T) {
-
-	defer c.Close()
 
 	testRoot := "c:\\temp"
 	if runtime.GOOS != "windows" {
@@ -32,38 +28,46 @@ func TestWalk(t *testing.T) {
 		os.RemoveAll(pwd)
 	}
 
+	Fss, c := initFileSystems()
+	defer c.Close()
+
 	for _, fs := range Fss {
 
 		wpf(os.Stdout, "-----created fs %v %v-----\n", fs.Name(), fs.String())
 
-		bb, msg = aefs.CreateSys(fs)
+		bb, msg = CreateSys(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.RetrieveByReadDir(fs)
+		bb, msg = RetrieveByReadDir(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.RetrieveByQuery(fs)
+		bb, msg = RetrieveByQuery(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.WalkDirs(fs)
+		bb, msg = WalkDirs(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.RemoveSubtree(fs)
+		bb, msg = RemoveSubtree(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
 		// After removal, give time,
@@ -72,28 +76,32 @@ func TestWalk(t *testing.T) {
 		// err == datastore.ErrNoSuchEntity
 		time.Sleep(5 * time.Millisecond)
 
-		bb, msg = aefs.WalkDirs(fs)
+		bb, msg = WalkDirs(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.RetrieveByQuery(fs)
+		bb, msg = RetrieveByQuery(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.RetrieveByReadDir(fs)
+		bb, msg = RetrieveByReadDir(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 
-		bb, msg = aefs.WalkDirs(fs)
+		bb, msg = WalkDirs(fs)
 		if msg != "" {
 			wpf(os.Stdout, msg+"\n")
 			wpf(os.Stdout, bb.String())
+			t.Errorf("%v", msg)
 		}
 	}
 }

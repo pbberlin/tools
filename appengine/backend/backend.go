@@ -11,7 +11,7 @@ import (
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/proxy1"
+	"github.com/pbberlin/tools/net/http/paths"
 	"github.com/pbberlin/tools/net/http/tplx"
 	_ "github.com/pbberlin/tools/os/fsi/aefs" // only http handler registration
 	"github.com/pbberlin/tools/stringspb"
@@ -38,7 +38,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Blob List", "/blob2")
 	htmlfrag.Wb(b1, "Template Demo 1", "/tpl/demo1")
 	htmlfrag.Wb(b1, "Template Demo 2", "/tpl/demo2")
-	htmlfrag.Wb(b1, "fetch via proxy", "/"+proxy1.FetchURL)
+	htmlfrag.Wb(b1, "fetch via proxy", paths.FetchUrl)
 	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
 	htmlfrag.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 

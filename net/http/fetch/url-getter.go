@@ -20,7 +20,7 @@ var LogLevel = 0
 
 // UrlGetter universal http getter for app engine and standalone go programs.
 // Previously response was returned. Forgot why. Dropped it.
-func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error) {
+func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, *url.URL, error) {
 
 	client := &http.Client{}
 	if gaeReq == nil {
@@ -45,7 +45,7 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 
 	u, err := url.Parse(sUrl)
 	if err != nil {
-		return nil, fmt.Errorf("url unparseable: %v", err)
+		return nil, nil, fmt.Errorf("url unparseable: %v", err)
 	}
 
 	if httpsOnly {
@@ -65,21 +65,21 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, error
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("get request failed: %v", err)
+		return nil, u, fmt.Errorf("get request failed: %v", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
+		return nil, u, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
 	}
 
 	defer resp.Body.Close()
 	bts, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read resp body: %v", err)
+		return nil, u, fmt.Errorf("cannot read resp body: %v", err)
 	}
 
 	// log.Printf("len %v bytes\n", len(bts))
 
-	return bts, nil
+	return bts, u, nil
 
 }

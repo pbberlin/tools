@@ -1,7 +1,7 @@
 // +build suite0
 // go test -tags=suite0
 
-package aetest
+package fstest
 
 import (
 	"io/ioutil"
@@ -10,6 +10,9 @@ import (
 )
 
 func TestWriteRead(t *testing.T) {
+
+	Fss, c := initFileSystems()
+	defer c.Close()
 
 	for _, fs := range Fss {
 
@@ -37,7 +40,6 @@ func TestWriteRead(t *testing.T) {
 			c.Criticalf("writestr: %v\n", err)
 			t.Fatalf("writestr: %v\n", err)
 		}
-
 
 		err = f.Close()
 		if err != nil {

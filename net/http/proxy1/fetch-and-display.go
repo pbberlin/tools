@@ -13,6 +13,7 @@ import (
 	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/paths"
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
@@ -29,39 +30,32 @@ var insertNewlines = strings.NewReplacer(
 var replTabsNewline = strings.NewReplacer("\n", " ", "\t", " ")
 var undouble = strings.NewReplacer("\n\n\n", "\n", "\n\n", "\n")
 
-var host, port string
-
-const c_formFetchURL = `
+const c_formFetchUrl = `
 
 	<style> .ib { display:inline-block; }</style>
-    <form action="{{.protocol}}://{{.host}}/{{.path}}" method="post" >
+    <form action="{{.protocol}}://{{.host}}{{.path}}" method="post" >
       <div style='margin:8px;'>
       	<span class='ib' style='width:140px'>URL </span>
       	  <input name="url"           size="80"  value="{{.val}}"><br/>
       	<span class='ib' style='width:140px'>Put into pre tags </span>
       	  <input name="renderInPre"    size="4"    value='' ><br/>
-      	<span class='ib' style='width:140px'>Elipse Output</span>
+      	<span class='ib' style='width:140px'> </span>
       
       	<input type="submit" value="Fetch" accesskey='f'></div>
     </form>
 
 `
 
-const FetchURL = "fetch-url-x"
+// var host, port string
 
 func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	c, _ := util_appengine.SafeGaeCheck(r)
-	_ = c
-
+	// on live server => always use https
 	if r.URL.Scheme != "https" && !util_appengine.IsLocalEnviron() {
 		r.URL.Scheme = "https"
 		r.URL.Host = r.Host
 		http.Redirect(w, r, r.URL.String(), http.StatusFound)
 	}
-
-	urlAsPost := ""
-	rURL := ""
 
 	/*
 		To distinguish between posted and getted value,
@@ -69,18 +63,22 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		If nothing's there, but FormValue *has* a value,
 		then it was "getted", otherwise "posted"
 	*/
+	rURL := ""
+	urlAs := ""
+	err := r.ParseForm()
+	logif.E(err)
 	if r.PostFormValue("url") != "" {
-		urlAsPost = "url posted"
+		urlAs += "url posted "
 		rURL = r.PostFormValue("url")
 	}
 
 	if r.FormValue("url") != "" {
 		if rURL == "" {
-			urlAsPost = "url getted"
+			urlAs += "url getted "
 			rURL = r.FormValue("url")
 		}
 	}
-	_ = urlAsPost
+	logif.Pf("%q %q", urlAs, rURL)
 
 	renderInPre := false
 	if len(r.FormValue("renderInPre")) > 0 {
@@ -92,11 +90,16 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		tplAdder, tplExec := tplx.FuncTplBuilder(w, r)
 		tplAdder("n_html_title", "Fetch some http data", nil)
 
-		m := map[string]string{"protocol": "https", "host": r.Host, "path": FetchURL, "val": "google.com"}
+		m := map[string]string{
+			"protocol": "https",
+			"host":     r.Host, // not  fetch.HostFromReq(r)
+			"path":     paths.FetchUrl,
+			"val":      "google.com",
+		}
 		if util_appengine.IsLocalEnviron() {
 			m["protocol"] = "http"
 		}
-		tplAdder("n_cont_0", c_formFetchURL, m)
+		tplAdder("n_cont_0", c_formFetchUrl, m)
 		tplExec(w, r)
 
 	} else {
@@ -104,8 +107,10 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		w.Header().Set("Content-type", "text/html; charset=utf-8")
 		// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
-		bts, err := fetch.UrlGetter(rURL, r, false)
-		logif.E(err)
+		bts, u, err := fetch.UrlGetter(rURL, r, false)
+		if err != nil {
+			loghttp.Pf(w, r, "%v %v", err, rURL)
+		}
 
 		cntnt := string(bts)
 		cntnt = insertNewlines.Replace(cntnt)
@@ -114,7 +119,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		if renderInPre {
 			fmt.Fprintf(w, "content is: <pre>"+cntnt+"</pre>")
 		} else {
-			cntnt = domclean1.ModifyHTML(r, cntnt)
+			cntnt = domclean1.ModifyHTML(r, u, cntnt)
 			fmt.Fprintf(w, cntnt)
 		}
 
@@ -123,5 +128,5 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.HandleFunc("/"+FetchURL, loghttp.Adapter(handleFetchURL))
+	http.HandleFunc(paths.FetchUrl, loghttp.Adapter(handleFetchURL))
 }

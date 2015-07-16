@@ -69,3 +69,8 @@ func (fs *aeFileSys) RootDir() string {
 func (fs *aeFileSys) RootName() string {
 	return fs.mount
 }
+
+func Unwrap(fs fsi.FileSystem) (*aeFileSys, bool) {
+	fsc, ok := fs.(*aeFileSys)
+	return fsc, ok
+}

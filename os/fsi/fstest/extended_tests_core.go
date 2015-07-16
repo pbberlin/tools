@@ -1,4 +1,4 @@
-package aefs
+package fstest
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"appengine/datastore"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/aefs"
 	"github.com/pbberlin/tools/os/fsi/fsc"
 
 	pth "path"
@@ -226,7 +227,7 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wnt2 := []int{2, 2, 4, 11}
 	got := []int{}
 
-	fsConcrete, ok := fs.(*aeFileSys)
+	fsConcrete, ok := aefs.Unwrap(fs)
 	if !ok {
 		wpf(bb, "--------retrieve by query UNSUPPORTED---------\n\n")
 		return bb, ""
@@ -240,7 +241,7 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 			mode = "all"
 		}
 		wpf(bb, "searching %-6v  %q\n", mode, path)
-		children, err := fsConcrete.subdirsByPath(path, direct)
+		children, err := fsConcrete.SubdirsByPath(path, direct)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {

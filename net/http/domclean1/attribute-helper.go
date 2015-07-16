@@ -2,8 +2,9 @@ package domclean1
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
+
+	"github.com/pbberlin/tools/net/http/paths"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"golang.org/x/net/html"
@@ -12,7 +13,7 @@ import (
 // type Attribute struct {
 //     Namespace, Key, Val string
 // }
-func rewriteAttributes(attributes []html.Attribute, r *http.Request, host, fetchUrl string) []html.Attribute {
+func rewriteAttributes(attributes []html.Attribute, proxyHostPort, remoteHost string) []html.Attribute {
 
 	rew := make([]html.Attribute, 0, len(attributes))
 
@@ -24,25 +25,25 @@ func rewriteAttributes(attributes []html.Attribute, r *http.Request, host, fetch
 		}
 
 		if attr.Key == "href" || attr.Key == "src" || attr.Key == "action" { //  make absolute
-			attr.Val = absolutize(attr.Val, host)
+			attr.Val = absolutize(attr.Val, remoteHost)
 		}
 
-		if attr.Key == "href" || attr.Key == "src" {
-			if attr.Key == "href" {
-				attr.Val = fmt.Sprintf("/%v?url=%v", fetchUrl, attr.Val)
-			}
+		if attr.Key == "href" {
+			attr.Val = fmt.Sprintf("%v?url=%v", paths.FetchUrl, attr.Val)
+		}
+
+		if attr.Key == "src" {
+			attr.Key = "href"
 		}
 
 		if attr.Key == "action" {
-			if attr.Key == "href" || attr.Key == "action" {
-				// attr.Val = fmt.Sprintf("/blob2/form-redirector?redirect-to=%v", attr.Val) // appended as form field, thus not needed here
-				if util_appengine.IsLocalEnviron() {
-					attr.Val = fmt.Sprintf("http://%v/blob2/form-redirector", r.Host)
-				} else {
-					attr.Val = fmt.Sprintf("https://%v/blob2/form-redirector", r.Host)
-				}
-
+			// attr.Val = fmt.Sprintf("/blob2/form-redirector?redirect-to=%v", attr.Val) // appended as form field, thus not needed here
+			if util_appengine.IsLocalEnviron() {
+				attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, paths.FormRedirector)
+			} else {
+				attr.Val = fmt.Sprintf("https://%v%v", proxyHostPort, paths.FormRedirector)
 			}
+
 		}
 
 		if attr.Key == "method" {
@@ -69,7 +70,8 @@ func getAttrVal(attributes []html.Attribute, key string) string {
 }
 
 func absolutize(val, host string) string {
-	if strings.HasPrefix(val, "/") && !strings.HasPrefix(val, "//ssl.") {
+	if strings.HasPrefix(val, "/") &&
+		!strings.HasPrefix(val, "//ssl.") {
 		val = fmt.Sprintf("https://%v%v", host, val)
 	}
 	return val

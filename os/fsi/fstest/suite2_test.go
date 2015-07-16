@@ -1,7 +1,7 @@
 // +build suite2
 // go test -tags=suite2
 
-package aetest
+package fstest
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.
 // Copyright 2009 The Go Authors. All rights reserved.
@@ -27,6 +27,8 @@ import (
 
 func TestTruncate(t *testing.T) {
 
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 		f := newFile("TestTruncate", fs, t)
 		defer fs.Remove(f.Name())
@@ -50,6 +52,8 @@ func TestTruncate(t *testing.T) {
 
 func TestSeek(t *testing.T) {
 
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 		f := newFile("TestSeek", fs, t)
 		defer fs.Remove(f.Name())
@@ -89,6 +93,8 @@ func TestSeek(t *testing.T) {
 
 func TestReadAt(t *testing.T) {
 
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 		f := newFile("TestReadAt", fs, t)
 		defer fs.Remove(f.Name())
@@ -110,12 +116,8 @@ func TestReadAt(t *testing.T) {
 
 func TestWriteAt(t *testing.T) {
 
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		fmt.Println("Recovered in TestWriteAt", r)
-	// 	}
-	// }()
-
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 
 		f := newFile("TestWriteAt", fs, t)

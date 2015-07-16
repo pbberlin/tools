@@ -5,54 +5,29 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/pbberlin/tools/net/http/dom"
-	// "github.com/pbberlin/tools/util"
+	"github.com/pbberlin/tools/net/http/fetch"
 	"golang.org/x/net/html"
 )
 
 var fCondenseNode func(*html.Node, int) string
 var fRecurse func(*html.Node)
 
-var nums int
-
 const emptySrc = "//:0"
 
-// needed to get the current request into the
-// "static" recursive functions
-// attn: unsynchronized
-var UnsyncedGlobalReq *http.Request
+// r is the request to the proxy
+// u is the url, that the proxy has called
+func ModifyHTML(r *http.Request, u *url.URL, s string) string {
 
-var host string
-var fetchUrl string
+	var nums int // counter
 
-func ModifyHTML(r *http.Request, s string) string {
-
-	UnsyncedGlobalReq = r
-
-	var docRoot *html.Node
-	var err error
-	r1 := strings.NewReader(s)
-	// log.Printf("len is %v\n", len(s))
-
-	docRoot, err = html.Parse(r1)
-	if err != nil {
-		panic(fmt.Sprintf("3 %v \n", err))
-	}
-	fRecurse(docRoot)
-
-	var b bytes.Buffer
-	err = html.Render(&b, docRoot)
-	if err != nil {
-		panic(fmt.Sprintf("4 %v \n", err))
-	}
-	// log.Printf("len is %v\n", b.Len())
-
-	return b.String()
-}
-
-func init() {
+	// needed to get the current request into the
+	// "static" recursive functions
+	var PackageProxyHost = r.Host // port included!
+	var PackageRemoteHost = fetch.HostFromUrl(u)
 
 	fCondenseNode = func(n *html.Node, depth int) (ret string) {
 
@@ -95,17 +70,32 @@ func init() {
 		return
 	}
 
+	// --------------------------
+	// ----------------------
+
 	fRecurse = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "form" {
 
 			hidFld := new(html.Node)
 			hidFld.Type = html.ElementNode
 			hidFld.Data = "input"
-			hidFld.Attr = []html.Attribute{html.Attribute{Key: "name", Val: "redirect-to"},
-				html.Attribute{Key: "value", Val: absolutize(getAttrVal(n.Attr, "action"), host)}}
+			hidFld.Attr = []html.Attribute{
+				html.Attribute{Key: "name", Val: "redirect-to"},
+				html.Attribute{Key: "value", Val: absolutize(getAttrVal(n.Attr, "action"), PackageRemoteHost)},
+			}
 			n.AppendChild(hidFld)
 
-			n.Attr = rewriteAttributes(n.Attr, UnsyncedGlobalReq, host, fetchUrl)
+			submt := new(html.Node)
+			submt.Type = html.ElementNode
+			submt.Data = "input"
+			submt.Attr = []html.Attribute{
+				html.Attribute{Key: "type", Val: "submit"},
+				html.Attribute{Key: "value", Val: "subm"},
+				html.Attribute{Key: "accesskey", Val: "f"},
+			}
+			n.AppendChild(submt)
+
+			n.Attr = rewriteAttributes(n.Attr, PackageProxyHost, PackageRemoteHost)
 
 		}
 		if n.Type == html.ElementNode && n.Data == "script" {
@@ -124,8 +114,15 @@ func init() {
 			textReplacement.Type = html.TextNode
 			textReplacement.Data = s
 
+			attrStore := []html.Attribute{}
 			if n.Data == "a" || n.Data == "img" {
-				n.Attr = rewriteAttributes(n.Attr, UnsyncedGlobalReq, host, fetchUrl)
+				attrStore = rewriteAttributes(n.Attr, PackageProxyHost, PackageRemoteHost)
+			}
+			if n.Data == "img" {
+				n.Data = "a"
+			}
+			if n.Data == "a" {
+				n.Attr = attrStore
 			}
 
 			// We want to remove all existing children.
@@ -177,5 +174,29 @@ func init() {
 			fRecurse(c)
 		}
 	}
+
+	// --------------------------
+	// ----------------------
+	var docRoot *html.Node
+	var err error
+	rdr := strings.NewReader(s)
+	docRoot, err = html.Parse(rdr)
+	if err != nil {
+		panic(fmt.Sprintf("3 %v \n", err))
+	}
+
+	fRecurse(docRoot)
+
+	var b bytes.Buffer
+	err = html.Render(&b, docRoot)
+	if err != nil {
+		panic(fmt.Sprintf("4 %v \n", err))
+	}
+	// log.Printf("len is %v\n", b.Len())
+
+	return b.String()
+}
+
+func init() {
 
 }

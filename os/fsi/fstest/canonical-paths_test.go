@@ -1,7 +1,7 @@
 // +build pathing
 // go test -tags=pathing
 
-package aetest
+package fstest
 
 import (
 	"fmt"

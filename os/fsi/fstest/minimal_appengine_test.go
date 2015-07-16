@@ -1,4 +1,4 @@
-package aetest
+package fstest
 
 import (
 	"log"

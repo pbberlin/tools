@@ -1,7 +1,7 @@
 // +build suite3
 // go test -tags=suite3
 
-package aetest
+package fstest
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.
 // Copyright 2009 The Go Authors. All rights reserved.
@@ -24,6 +24,9 @@ import (
 )
 
 func TestRename(t *testing.T) {
+
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 		from, to := testDir+"/renamefrom", testDir+"/renameto"
 		fs.Remove(to)              // Just in case.

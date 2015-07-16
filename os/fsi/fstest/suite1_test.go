@@ -1,7 +1,7 @@
 // +build suite1
 // go test -tags=suite1
 
-package aetest
+package fstest
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.
 // Copyright 2009 The Go Authors. All rights reserved.
@@ -26,6 +26,9 @@ import (
 
 //Read with length 0 should not return EOF.
 func TestRead0(t *testing.T) {
+
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 		path := testDir + "/" + testName
 		if err := fs.MkdirAll(testDir, 0777); err != nil {
@@ -54,6 +57,9 @@ func TestRead0(t *testing.T) {
 }
 
 func TestMemFileRead(t *testing.T) {
+
+	Fss, c := initFileSystems()
+	defer c.Close()
 	for _, fs := range Fss {
 
 		fsc, ok := memfs.Unwrap(fs)

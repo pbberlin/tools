@@ -2,22 +2,18 @@ package proxy1
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net"
 	"net/http"
-	"net/url"
 	"strings"
 
-	"appengine/urlfetch"
-
 	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/domclean1"
+	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/paths"
 )
 
 func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
-	c, _ := util_appengine.SafeGaeCheck(r)
 
 	var msg, cntnt, rURL string
 
@@ -25,20 +21,6 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
 	rURL = r.FormValue("redirect-to")
-	//loghttp.Pf(w, r, "url: %q <br>\n", rURL)
-
-	u, err := url.Parse(rURL)
-	loghttp.E(w, r, err, false)
-
-	host, port, err = net.SplitHostPort(u.Host)
-	loghttp.E(w, r, err, true)
-	if err != nil {
-		host = u.Host
-	}
-	//loghttp.Pf(w, r, "host and port: %q : %q of %q<br>\n", host, port, rURL)
-	//loghttp.Pf(w, r, " &nbsp;  &nbsp;  &nbsp; standalone %q <br>\n", u.Host)
-
-	client := urlfetch.Client(c)
 
 	if len(r.PostForm) > 0 {
 		// loghttp.Pf(w, r, "post unimplemented:<br> %#v <br>\n", r.PostForm)
@@ -58,28 +40,15 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		rURL = fmt.Sprintf("%v&%v=%v", rURL, key, val)
 	}
 
-	resp, err := client.Get(rURL)
-	loghttp.E(w, r, err, false)
+	bts, u, err := fetch.UrlGetter(rURL, r, false)
+	logif.E(err)
 
-	if resp.StatusCode != http.StatusOK {
-		fmt.Fprintf(w, "HTTP GET returned status %v<br>\n\n%v<br>\n\n", resp.Status, rURL)
-		return
-	}
-
-	defer resp.Body.Close()
-	byteContent, err := ioutil.ReadAll(resp.Body)
-	loghttp.E(w, r, err, false)
-	if err != nil {
-		return
-	} else {
-		msg += fmt.Sprintf("%v bytes read<br>", len(byteContent))
-		cntnt = string(byteContent)
-	}
+	cntnt = string(bts)
 
 	cntnt = insertNewlines.Replace(cntnt)
 	cntnt = undouble.Replace(cntnt)
 
-	cntnt = domclean1.ModifyHTML(r, cntnt)
+	cntnt = domclean1.ModifyHTML(r, u, cntnt)
 
 	fmt.Fprintf(w, "%s \n\n", cntnt)
 	fmt.Fprintf(w, "%s \n\n", msg)
@@ -87,5 +56,5 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.Handle("/blob2/form-redirector", loghttp.Adapter(formRedirector))
+	http.Handle(paths.FormRedirector, loghttp.Adapter(formRedirector))
 }

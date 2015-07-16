@@ -1,13 +1,18 @@
-This package might serve as universal abstraction
+This package should serve as universal abstraction
 layer for all go programs that require a file system.
 
-I had three cases in mind:
-* Large image repositories.
-* Classic content management systems.
-* Any http server applications, that need static html resources.
+The interface and the memfs were taken and adapted
+from Steve Francia's afero:
+Afero can be found here: https://github.com/spf13/afero.
+
+Files are made editable like local files.
 
 Test-Deployments can be made to local machines.
-Files should be editable like local file system files.
+
+I had three cases in mind:
+* http services on app engine, who manage static resources.
+* image repositories on app engine.
+* content management systems.
 
 The required interface is intentionally ultra slim.
 Contact me, if you think, the interface needs 

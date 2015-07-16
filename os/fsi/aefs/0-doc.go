@@ -2,6 +2,8 @@
 // filesystem layer on top of appengine datastore.
 package aefs
 
+// Todo: Open() does only return files; httpfs returns page-not-found
+// Todo: f.Readdir... must throw an error if count files < limit; io.EOF
 //
 // Architecture
 // ==============================

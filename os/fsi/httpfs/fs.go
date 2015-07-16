@@ -21,8 +21,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/stringspb"
 )
 
 type HttpFs struct {
@@ -51,14 +53,37 @@ func (h HttpFs) MkdirAll(path string, perm os.FileMode) error {
 }
 
 func (h HttpFs) Open(name string) (http.File, error) {
+
+	if strings.HasSuffix(name, "favicon.ico") {
+		return nil, os.ErrNotExist
+	}
+
 	f, err := h.SourceFs.Open(name)
 	if err == nil {
-		log.Printf("httpfs open      %-22v fnd %-22v %v", name, f.Name(), h.Name())
+		stat, err := f.Stat()
+		if err != nil {
+			return nil, err
+		}
+		tp := "F"
+		if stat.IsDir() {
+			tp = "D"
+		}
+		fn := fmt.Sprintf("%v %v", f.Name(), tp)
+		log.Printf("httpfs open      %-22v fnd %-22v %v", name, fn, h.Name())
+
+		// dirs, err := f.Readdir(100)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// log.Printf("httpfs open      %-22v     %-22v ", len(dirs))
+
 		if httpfile, ok := f.(http.File); ok {
 			return httpfile, nil
 		}
 	}
-	log.Printf("httpfs open      %-22v err %-22v %v", name, err, h.Name())
+	log.Printf("httpfs open      %-22v     %-22v %v", name, "", h.Name())
+	log.Printf("             err %-22v", stringspb.Ellipsoider(err.Error(), 24))
+
 	return nil, err
 }
 

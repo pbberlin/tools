@@ -2,7 +2,6 @@ package httpfs
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"path"
 	filepath "path" //"path/filepath"
@@ -27,9 +26,9 @@ func (d httpDir) Open(name string) (http.File, error) {
 	jpath := filepath.Join(dir, path.Clean("/"+name))
 	f, err := d.fs.Open(jpath)
 	if err != nil {
-		log.Printf("    httpdir open %-22v Err %v", jpath, err)
+		// log.Printf("    httpdir open %-22v Err %v", jpath, err)
 		return nil, err
 	}
-	log.Printf("    httpdir open %-22v Success", jpath)
+	// log.Printf("    httpdir open %-22v Success", jpath)
 	return f, nil
 }

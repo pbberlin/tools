@@ -75,15 +75,15 @@ func (fs *aeFileSys) Open(name string) (fsi.File, error) {
 
 	f, err := fs.fileByPath(name)
 
-	if err != nil && err != datastore.ErrNoSuchEntity {
+	if err != nil && err != datastore.ErrNoSuchEntity && err != fsi.ErrRootDirNoFile {
 		return nil, err
 	}
-	if err == datastore.ErrNoSuchEntity {
-		// these is criminal; we return a fake file
-		// containing directory information; in order to
-		// serve httpfs(aefs) functionality
-		dir, err := fs.dirByPath(name)
-		if err != nil {
+	if err == datastore.ErrNoSuchEntity || err == fsi.ErrRootDirNoFile {
+		// For serving httpfs(aefs) we should return a directory here;
+		// a criminal idea: a fake directory.
+		// But it has ugly side effects
+		dir, err2 := fs.dirByPath(name)
+		if err2 != nil {
 			return nil, err
 		}
 		dirFake := AeFile{
@@ -95,6 +95,8 @@ func (fs *aeFileSys) Open(name string) (fsi.File, error) {
 			Data:  []byte("is_a_directory"),
 		}
 		ff := fsi.File(&dirFake)
+		// NOT returning it:
+		return nil, err
 		return ff, nil
 	}
 
@@ -200,8 +202,7 @@ func (fs *aeFileSys) Rename(oldname, newname string) error {
 func (fs *aeFileSys) Stat(path string) (os.FileInfo, error) {
 
 	f, err := fs.fileByPath(path)
-	if err != nil && err != datastore.ErrNoSuchEntity &&
-		err != fsi.ErrRootDirNoFile {
+	if err != nil && err != datastore.ErrNoSuchEntity && err != fsi.ErrRootDirNoFile {
 		log.Fatalf("OTHER ERROR %v", err)
 
 		return nil, err

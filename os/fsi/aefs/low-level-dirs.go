@@ -85,7 +85,7 @@ func (fs *aeFileSys) saveDirByPath(name string) (AeDir, error) {
 	}
 
 	if !preciseK.Equal(effKey) {
-		fs.Ctx().Errorf("keys unequal %v - %v", preciseK, effKey)
+		fs.Ctx().Errorf("dir keys unequal %v - %v", preciseK, effKey)
 	}
 
 	fo.MemCacheSet()

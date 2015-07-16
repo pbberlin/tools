@@ -3,10 +3,7 @@ package memfs
 import (
 	"bytes"
 	"io"
-	"log"
 	"os"
-	"runtime"
-	"strings"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -36,17 +33,22 @@ func (f *InMemoryFile) Name() string {
 
 func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
 
-	// criminal - we prevent http.server from reading
-	_, file, _, _ := runtime.Caller(1)
-	if strings.HasSuffix(file, `net\http\fs.go`) || strings.HasSuffix(file, `net/http/fs.go`) {
-		// fsi\memfs\40-file-impl.go:43
-		// net\http\fs.go:74
-		// net\http\fs.go:406
-		// net\http\fs.go:452
-		// net\http\server.go:1549
-		log.Printf("    f.Readdir memfs BREAK %v", f.Name())
-		return
-	}
+	// criminal - we prevent http.server from reading recursively
+	// but actually, last line need to be
+	// 			return return res, err
+	// instead of
+	// 			return return res, nil
+
+	// _, file, _, _ := runtime.Caller(1)
+	// if strings.HasSuffix(file, `net\http\fs.go`) || strings.HasSuffix(file, `net/http/fs.go`) {
+	// 	// fsi\memfs\40-file-impl.go:43
+	// 	// net\http\fs.go:74
+	// 	// net\http\fs.go:406
+	// 	// net\http\fs.go:452
+	// 	// net\http\server.go:1549
+	// 	log.Printf("    f.Readdir memfs BREAK %v", f.Name())
+	// 	// return
+	// }
 
 	limit := len(f.memDir)
 
@@ -57,19 +59,16 @@ func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
 	if count > 0 {
 		limit = count
 	}
-
 	if len(f.memDir) < limit {
 		err = io.EOF
 	}
 
-	res = make([]os.FileInfo, len(f.memDir))
-
-	i := 0
-	for _, file := range f.memDir {
-		res[i], _ = file.Stat()
-		i++
+	res = make([]os.FileInfo, 0, len(f.memDir))
+	for _, f1 := range f.memDir {
+		ff := f1.(*InMemoryFile)
+		res = append(res, os.FileInfo(&InMemoryFileInfo{file: ff}))
 	}
-	return res, nil
+	return res, err
 }
 
 func (f *InMemoryFile) Readdirnames(n int) (names []string, err error) {

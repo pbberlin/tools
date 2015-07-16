@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/runtimepb"
 
 	"appengine/datastore"
 )
@@ -119,7 +120,8 @@ func (fs *aeFileSys) saveFileByPath(f *AeFile, name string) error {
 		return err
 	}
 	if !suggKey.Equal(effKey) {
-		fs.Ctx().Errorf("keys unequal %v - %v", suggKey, effKey)
+		fs.Ctx().Errorf("file keys unequal %v - %v; %v %s", suggKey, effKey, f.Dir+f.BName, f.Data)
+		runtimepb.StackTrace(6)
 	}
 
 	// f.MemCacheSet()

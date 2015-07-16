@@ -280,7 +280,7 @@ func (m *memMapFs) Dump() {
 				vf, _ := v.(*InMemoryFile)
 				names += vf.name + "  "
 			}
-			log.Printf("%-38q %4v   %-20v\n", ff.name, y.Size(), names)
+			log.Printf("%-38q %5v %4v %-20v\n", ff.name, y.IsDir(), y.Size(), names)
 		}
 	}
 }

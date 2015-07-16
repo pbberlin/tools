@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"appengine"
-	"appengine/memcache"
 
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -58,10 +57,6 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 	f1 func() string,
 	f2 func(fsi.FileSystem) (*bytes.Buffer, string)) {
 
-	if f1 == nil {
-		f1 = aefs.MountPointLast
-	}
-
 	wpf(w, tplx.Head)
 	wpf(w, "<pre>\n")
 	defer wpf(w, tplx.Foot)
@@ -70,7 +65,7 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 	var fs fsi.FileSystem
 
 	if false {
-		fsc := aefs.New(f1(), aefs.AeContext(appengine.NewContext(r)))
+		fsc := aefs.New(aefs.MountName(f1()), aefs.AeContext(appengine.NewContext(r)))
 		fs = fsi.FileSystem(fsc)
 	} else if false {
 		fs = fsi.FileSystem(osFileSys)
@@ -117,20 +112,18 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	defer wpf(w, "\n</pre>")
 	defer wpf(w, tplx.Foot)
 
-	fs := aefs.NewAeFs(aefs.MountPointLast(), aefs.AeContext(appengine.NewContext(r)))
+	fs := aefs.New(aefs.AeContext(appengine.NewContext(r)))
+	wpf(w, "aefs:\n")
 	msg, err := fs.DeleteAll()
 	if err != nil {
 		wpf(w, "err during delete %v\n", err)
 	}
 	wpf(w, msg)
 
-	err = memcache.Flush(fs.Ctx())
-	if err != nil {
-		msg = "error flushing memcache\n"
-	}
-	wpf(w, msg)
-
 	memMapFileSys = memfs.New()
+	wpf(w, "\n")
+	wpf(w, "memMapFs new")
+
 	osFileSys = osfs.New()
 
 }

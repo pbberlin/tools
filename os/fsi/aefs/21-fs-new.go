@@ -1,8 +1,6 @@
 package aefs
 
 import (
-	"strings"
-
 	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine"
@@ -17,42 +15,44 @@ func AeContext(c appengine.Context) func(fsi.FileSystem) {
 	}
 }
 
-// old
-func NewAeFs(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
-	return New(mount, options...)
+// MountName is an option func, adding a specific mount name to the filesystem
+func MountName(mnt string) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*aeFileSys)
+		fst.mount = mnt
+	}
 }
 
 // New creates a new appengine datastore filesystem.
 // Notice that variadic options are submitted as functions,
 // as is explained and justified here:
 // http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
-func New(mount string, options ...func(fsi.FileSystem)) *aeFileSys {
+func New(options ...func(fsi.FileSystem)) *aeFileSys {
 
 	fs := aeFileSys{}
 
-	if strings.Contains(mount, "/") {
-		panic("mount can't have slash in it")
-	}
-	fs.mount = mount
-
 	for _, option := range options {
 		option(&fs)
+	}
+
+	if fs.mount == "" {
+		fs.mount = MountPointLast()
 	}
 
 	if fs.c == nil {
 		panic("this type of filesystem needs appengine context, submitted as option")
 	}
 
-	rt, err := fs.dirByPath(mount)
+	rt, err := fs.dirByPath(fs.mount)
 	_ = rt
 	if err == datastore.ErrNoSuchEntity {
-		// log.Printf("need to creat root %v", mount)
-		_, err := fs.saveDirByPath(mount) // fine
+		// log.Printf("need to creat root %v", fs.mount)
+		_, err := fs.saveDirByPath(fs.mount) // fine
 		if err != nil {
-			fs.c.Errorf("could not create mount %v => %v", mount, err)
+			fs.c.Errorf("could not create mount %v => %v", fs.mount, err)
 		}
 	} else if err != nil {
-		fs.c.Errorf("could read mount dir %v => %v", mount, err)
+		fs.c.Errorf("could read mount dir %v => %v", fs.mount, err)
 	}
 
 	return &fs

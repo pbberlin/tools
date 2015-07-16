@@ -39,16 +39,20 @@ func initFileSystems() (fss []fsi.FileSystem, c aetest.Context) {
 	}
 
 	// defer c.Close()
-	// Do not here
-	// but instead at the start of the test-funcs
+	// Not here, but instead at the start of the test-funcs
 
 	// We cant make variadic options generic,
 	// since they need the concrete filesystem type.
-	fs1 := aefs.New(aefs.MountPointNext(), aefs.AeContext(c))
+	fs1 := aefs.New(
+		aefs.MountName(aefs.MountPointNext()),
+		aefs.AeContext(c),
+	)
 
 	fs3 := osfs.New()
 
-	fs4 := memfs.New(memfs.MountName("m"))
+	fs4 := memfs.New(
+		memfs.MountName("m"),
+	)
 
 	fss = []fsi.FileSystem{fs1, fs3, fs4}
 

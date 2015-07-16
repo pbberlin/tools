@@ -36,7 +36,7 @@ func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
 
 	f, ok := m.fos[name]
 	if !ok {
-		return &os.PathError{"chmod", name, fsi.ErrFileNotFound}
+		return &os.PathError{Op: "chmod", Path: name, Err: fsi.ErrFileNotFound}
 	}
 
 	ff, ok := f.(*InMemoryFile)
@@ -57,7 +57,7 @@ func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error 
 
 	f, ok := m.fos[name]
 	if !ok {
-		return &os.PathError{"chtimes", name, fsi.ErrFileNotFound}
+		return &os.PathError{Op: "chtimes", Path: name, Err: fsi.ErrFileNotFound}
 	}
 
 	ff, ok := f.(*InMemoryFile)

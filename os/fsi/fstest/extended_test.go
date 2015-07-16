@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestWalk(t *testing.T) {
+func TestExtendedDirectoryAndFiles(t *testing.T) {
 
 	testRoot := "c:\\temp"
 	if runtime.GOOS != "windows" {

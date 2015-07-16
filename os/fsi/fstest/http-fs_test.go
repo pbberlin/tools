@@ -36,7 +36,9 @@ func TestHttp(t *testing.T) {
 	Fss, c := initFileSystems()
 	defer c.Close()
 
+	// Fss = Fss[0:1]
 	// Fss = Fss[1:2]
+	// Fss = Fss[2:3]
 
 	portInc := 2
 	for _, fs := range Fss {

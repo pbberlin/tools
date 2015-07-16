@@ -109,20 +109,7 @@ func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 }
 
 func (m *memMapFs) MkdirAll(name string, perm os.FileMode) error {
-
 	return m.Mkdir(name, 0777)
-
-	// name = strings.TrimSpace(name)
-	// dirs := strings.Split(path.Clean(name), sep)
-	// // log.Printf("  MkdirAll %-22v => %v", name, dirs)
-	// for _, v := range dirs {
-	// 	err := m.Mkdir(v, 0777)
-	// 	// log.Printf("    MkdirAll %q %v", v, err)
-	// 	if err != nil && err != fsi.ErrFileExists {
-	// 		return err
-	// 	}
-	// }
-	// return nil
 }
 
 func (m *memMapFs) Open(name string) (fsi.File, error) {

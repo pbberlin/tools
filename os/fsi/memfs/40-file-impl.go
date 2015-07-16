@@ -3,7 +3,10 @@ package memfs
 import (
 	"bytes"
 	"io"
+	"log"
 	"os"
+	"runtime"
+	"strings"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -31,11 +34,18 @@ func (f *InMemoryFile) Name() string {
 	return bname
 }
 
-func (f *InMemoryFile) Stat() (os.FileInfo, error) {
-	return &InMemoryFileInfo{f}, nil
-}
-
 func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
+
+	_, file, _, _ := runtime.Caller(1)
+	if strings.HasSuffix(file, `net\http\fs.go`) || strings.HasSuffix(file, `net/http/fs.go`) {
+		// fsi\memfs\40-file-impl.go:43
+		// net\http\fs.go:74
+		// net\http\fs.go:406
+		// net\http\fs.go:452
+		// net\http\server.go:1549
+		log.Printf("f.Readdir memfs BREAK %v", f.Name())
+		return
+	}
 
 	limit := len(f.memDir)
 
@@ -92,6 +102,10 @@ func (f *InMemoryFile) Read(b []byte) (n int, err error) {
 func (f *InMemoryFile) ReadAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Read(b)
+}
+
+func (f *InMemoryFile) Stat() (os.FileInfo, error) {
+	return &InMemoryFileInfo{f}, nil
 }
 
 func (f *InMemoryFile) Truncate(size int64) error {
@@ -156,6 +170,6 @@ func (f *InMemoryFile) WriteString(s string) (ret int, err error) {
 	return f.Write([]byte(s))
 }
 
-func (f *InMemoryFile) Info() *InMemoryFileInfo {
-	return &InMemoryFileInfo{file: f}
-}
+// func (f *InMemoryFile) Info() *InMemoryFileInfo {
+// 	return &InMemoryFileInfo{file: f}
+// }

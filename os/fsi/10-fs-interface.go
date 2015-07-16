@@ -43,9 +43,6 @@
 //
 // Compare http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
 
-// Todos:
-// Test http filesys
-//
 package fsi
 
 import (

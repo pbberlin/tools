@@ -1,8 +1,8 @@
 This package should serve as universal abstraction
 layer for all go programs that require a file system.
 
-The interface and the memfs were taken and adapted
-from Steve Francia's afero:
+The interface, http-fs and the memory-fs were taken 
+and adapted from Steve Francia's afero:
 Afero can be found here: https://github.com/spf13/afero.
 
 Files are made editable like local files.

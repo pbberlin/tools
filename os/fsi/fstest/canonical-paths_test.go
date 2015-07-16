@@ -29,6 +29,7 @@ func splitIsWhatWeWant() {
 
 func TestPathCleanage(t *testing.T) {
 
+	_, c := initFileSystems()
 	defer c.Close()
 
 	cases := [][]string{

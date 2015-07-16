@@ -17,6 +17,7 @@ package httpfs
 // limitations under the License.
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +34,9 @@ func (h HttpFs) Dir(s string) *httpDir {
 	return &httpDir{basePath: s, fs: h}
 }
 
-func (h HttpFs) Name() string { return "h HttpFs" }
+func (h HttpFs) Name() string {
+	return fmt.Sprintf("httpfs over %v %v", h.SourceFs.Name(), h.SourceFs.String())
+}
 
 func (h HttpFs) Create(name string) (fsi.File, error) {
 	return h.SourceFs.Create(name)
@@ -50,10 +53,12 @@ func (h HttpFs) MkdirAll(path string, perm os.FileMode) error {
 func (h HttpFs) Open(name string) (http.File, error) {
 	f, err := h.SourceFs.Open(name)
 	if err == nil {
+		log.Printf("httpfs open      %-22v fnd %-22v %v", name, f.Name(), h.Name())
 		if httpfile, ok := f.(http.File); ok {
 			return httpfile, nil
 		}
 	}
+	log.Printf("httpfs open      %-22v err %-22v %v", name, err, h.Name())
 	return nil, err
 }
 

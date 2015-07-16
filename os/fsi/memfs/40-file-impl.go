@@ -36,6 +36,7 @@ func (f *InMemoryFile) Name() string {
 
 func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
 
+	// criminal - we prevent http.server from reading
 	_, file, _, _ := runtime.Caller(1)
 	if strings.HasSuffix(file, `net\http\fs.go`) || strings.HasSuffix(file, `net/http/fs.go`) {
 		// fsi\memfs\40-file-impl.go:43
@@ -43,7 +44,7 @@ func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
 		// net\http\fs.go:406
 		// net\http\fs.go:452
 		// net\http\server.go:1549
-		log.Printf("f.Readdir memfs BREAK %v", f.Name())
+		log.Printf("    f.Readdir memfs BREAK %v", f.Name())
 		return
 	}
 

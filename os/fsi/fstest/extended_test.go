@@ -31,6 +31,8 @@ func TestExtendedDirectoryAndFiles(t *testing.T) {
 	Fss, c := initFileSystems()
 	defer c.Close()
 
+	// Fss = Fss[0:1]
+
 	for _, fs := range Fss {
 
 		wpf(os.Stdout, "-----created fs %v %v-----\n", fs.Name(), fs.String())

@@ -2,6 +2,7 @@ package aefs
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sync/atomic"
 
@@ -72,11 +73,29 @@ func (fs *aeFileSys) MkdirAll(path string, perm os.FileMode) error {
 // conflicts with file.Open() interface of Afero
 func (fs *aeFileSys) Open(name string) (fsi.File, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	f, err := fs.fileByPath(name)
 
-	f, err := fs.fileByPath(dir + bname)
-	if err != nil {
+	if err != nil && err != datastore.ErrNoSuchEntity {
 		return nil, err
+	}
+	if err == datastore.ErrNoSuchEntity {
+		// these is criminal; we return a fake file
+		// containing directory information; in order to
+		// serve httpfs(aefs) functionality
+		dir, err := fs.dirByPath(name)
+		if err != nil {
+			return nil, err
+		}
+		dirFake := AeFile{
+			fSys:  dir.fSys,
+			Key:   dir.Key,
+			Dir:   dir.Dir,
+			BName: dir.BName,
+			isDir: true,
+			Data:  []byte("is_a_directory"),
+		}
+		ff := fsi.File(&dirFake)
+		return ff, nil
 	}
 
 	atomic.StoreInt64(&f.at, 0) // why is this not nested into f.Lock()-f.Unlock()?
@@ -179,8 +198,15 @@ func (fs *aeFileSys) Rename(oldname, newname string) error {
 }
 
 func (fs *aeFileSys) Stat(path string) (os.FileInfo, error) {
+
 	f, err := fs.fileByPath(path)
-	if err != nil {
+	if err != nil && err != datastore.ErrNoSuchEntity &&
+		err != fsi.ErrRootDirNoFile {
+		log.Fatalf("OTHER ERROR %v", err)
+
+		return nil, err
+	}
+	if err == datastore.ErrNoSuchEntity || err == fsi.ErrRootDirNoFile {
 		// log.Printf("isno file err %-24q =>  %v", path, err)
 		dir, err := fs.dirByPath(path)
 		if err != nil {
@@ -189,11 +215,11 @@ func (fs *aeFileSys) Stat(path string) (os.FileInfo, error) {
 		fiDir := os.FileInfo(dir)
 		// log.Printf("Stat for dire %-24q => %-24v, %v", path, fiDir.Name(), err)
 		return fiDir, nil
-	} else {
-		fiFi := os.FileInfo(f)
-		// log.Printf("Stat for file %-24q => %-24v, %v", path, fiFi.Name(), err)
-		return fiFi, nil
 	}
+
+	fiFi := os.FileInfo(f)
+	// log.Printf("Stat for file %-24q => %-24v, %v", path, fiFi.Name(), err)
+	return fiFi, nil
 }
 
 func (fs *aeFileSys) ReadFile(path string) ([]byte, error) {

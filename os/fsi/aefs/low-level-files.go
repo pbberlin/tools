@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pbberlin/tools/os/fsi"
+
 	"appengine/datastore"
 )
 
@@ -18,7 +20,7 @@ func (fs *aeFileSys) fileByPath(name string) (AeFile, error) {
 
 	//
 	if dir == fs.RootDir() && bname == "" {
-		return fo, fmt.Errorf("rootdir; no file")
+		return fo, fsi.ErrRootDirNoFile
 	}
 
 	foDir, err := fs.dirByPath(dir)

@@ -60,6 +60,8 @@ var (
 	// If an implementation cannot support a method, it should at least return this testable error.
 	NotImplemented = fmt.Errorf("Filesystem does not support this method.")
 
+	ErrRootDirNoFile = fmt.Errorf("rootdir; no file")
+
 	ErrFileClosed = errors.New("File is closed")
 	ErrFileInUse  = errors.New("File already in use")
 	ErrOutOfRange = errors.New("Out of range")

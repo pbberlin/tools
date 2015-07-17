@@ -137,7 +137,6 @@ func (m *memMapFs) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, 
 }
 
 func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
-
 	f, err := fs.Open(name)
 	if err != nil {
 		return nil, err
@@ -147,9 +146,8 @@ func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	sort.Sort(byName(list))
+	// sort.Sort(byName(list)) // sorted in f.Readdir
 	return list, nil
-
 }
 
 func (m *memMapFs) Remove(name string) error {

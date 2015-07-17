@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"sync/atomic"
 
 	"appengine/datastore"
@@ -79,24 +80,15 @@ func (fs *aeFileSys) Open(name string) (fsi.File, error) {
 		return nil, err
 	}
 	if err == datastore.ErrNoSuchEntity || err == fsi.ErrRootDirNoFile {
-		// For serving httpfs(aefs) we should return a directory here;
-		// a criminal idea: a fake directory.
-		// But it has ugly side effects
+		// http.FileServer requires, that
+		// we return a directory here.
+		// It's also compliant to os.Open(),
+		// where "os.File" means directories too.
 		dir, err2 := fs.dirByPath(name)
 		if err2 != nil {
 			return nil, err
 		}
-		dirFake := AeFile{
-			fSys:  dir.fSys,
-			Key:   dir.Key,
-			Dir:   dir.Dir,
-			BName: dir.BName,
-			isDir: true,
-			Data:  []byte("is_a_directory"),
-		}
-		ff := fsi.File(&dirFake)
-		// NOT returning it:
-		return nil, err
+		ff := fsi.File(&dir)
 		return ff, nil
 	}
 
@@ -120,15 +112,19 @@ func (fs *aeFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 }
 
 // See fsi.FileSystem interface.
-func (fs *aeFileSys) ReadDir(path string) ([]os.FileInfo, error) {
-	dirs, err := fs.dirsByPath(path)
+func (fs *aeFileSys) ReadDir(name string) ([]os.FileInfo, error) {
+	dirs, err := fs.dirsByPath(name)
 	if err != nil && err != fsi.EmptyQueryResult {
 		return nil, err
 	}
-	files, err := fs.filesByPath(path)
+	sort.Sort(FileInfoByName(dirs))
+
+	files, err := fs.filesByPath(name)
 	if err != nil {
 		return nil, err
 	}
+	sort.Sort(AeFileByName(files))
+
 	for _, v := range files {
 		dirs = append(dirs, os.FileInfo(v))
 	}

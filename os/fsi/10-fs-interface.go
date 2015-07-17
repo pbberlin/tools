@@ -96,8 +96,10 @@ type FileSystem interface {
 	//          Readdir(count int) ([]os.FileInfo, error)
 	//          Readdirnames(n int) ([]string, error)
 	// Those coming from os.File.
-	// We would base all those methods on a single internal implementation.
+	// We base all those methods on a single internal implementation.
 	// Readdir may return EmptyQueryResult error as a warning.
+	//
+	// Compare File.Readdir remarks.
 	ReadDir(dirname string) ([]os.FileInfo, error)
 
 	Remove(name string) error

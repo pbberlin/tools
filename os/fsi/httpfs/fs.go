@@ -60,6 +60,15 @@ func (h HttpFs) Open(name string) (http.File, error) {
 
 	f, err := h.SourceFs.Open(name)
 	if err == nil {
+
+		// f1, ok := f.(*aefs.AeDir)
+		// if ok {
+		// 	t := time.Now()
+		// 	t = t.Add(time.Hour * -80)
+
+		// 	f1.MModTime = t
+		// }
+
 		stat, err := f.Stat()
 		if err != nil {
 			return nil, err
@@ -71,13 +80,9 @@ func (h HttpFs) Open(name string) (http.File, error) {
 		fn := fmt.Sprintf("%v %v", f.Name(), tp)
 		log.Printf("httpfs open      %-22v fnd %-22v %v", name, fn, h.Name())
 
-		// dirs, err := f.Readdir(100)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// log.Printf("httpfs open      %-22v     %-22v ", len(dirs))
-
 		if httpfile, ok := f.(http.File); ok {
+			fix, _ := httpfile.Stat()
+			// log.Printf("time is %v", fix.ModTime())
 			return httpfile, nil
 		}
 	}

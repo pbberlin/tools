@@ -24,8 +24,14 @@ type File interface {
 	// Sync() error
 
 	// Readdir and Readdirnames come from os.File.
-	// 		Notice the distinctive signature FileSys.ReadDir(...)
-	Readdir(count int) ([]os.FileInfo, error)
+	// Notice the distinctive signature and the remarks on FileSys.ReadDir(...)
+	//
+	// Notice the contract https://golang.org/src/os/doc.go
+	// For n > 0, returning io.EOF is important,
+	// otherwise http.FileServer will repeat queries forever.
+	//
+	// Example at https://golang.org/src/os/file_windows.go
+	Readdir(n int) ([]os.FileInfo, error)
 	Readdirnames(n int) ([]string, error)
 
 	WriteString(s string) (ret int, err error)

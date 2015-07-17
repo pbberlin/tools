@@ -19,6 +19,13 @@ type aeFileSys struct {
 	mount string // name of mount point, for remount
 }
 
+// The distinction between AeDir and AeFile
+// brings clarity into the low-level implementation.
+// And into the google datastore overlay architecture.
+//
+// However, AeDir needs many futile methods,
+// since it must be convertable into fsi.File in Open()
+
 // Upper case field names sadly
 // inevitable, for ae datastore :(
 type AeDir struct {

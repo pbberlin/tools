@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"sort"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -31,44 +32,29 @@ func (f *InMemoryFile) Name() string {
 	return bname
 }
 
-func (f *InMemoryFile) Readdir(count int) (res []os.FileInfo, err error) {
+func (f *InMemoryFile) Readdir(n int) (fis []os.FileInfo, err error) {
 
-	// criminal - we prevent http.server from reading recursively
-	// but actually, last line need to be
-	// 			return return res, err
-	// instead of
-	// 			return return res, nil
+	wantAll := n <= 0
 
-	// _, file, _, _ := runtime.Caller(1)
-	// if strings.HasSuffix(file, `net\http\fs.go`) || strings.HasSuffix(file, `net/http/fs.go`) {
-	// 	// fsi\memfs\40-file-impl.go:43
-	// 	// net\http\fs.go:74
-	// 	// net\http\fs.go:406
-	// 	// net\http\fs.go:452
-	// 	// net\http\server.go:1549
-	// 	log.Printf("    f.Readdir memfs BREAK %v", f.Name())
-	// 	// return
-	// }
+	// Actually we would need a fetchPosition on file
+	// holding the latest retrieved file in
+	// a forwardly-linked-list of files.
+	// Compare https://golang.org/src/os/file_windows.go
 
-	limit := len(f.memDir)
-
-	if len(f.memDir) == 0 {
-		return
-	}
-
-	if count > 0 {
-		limit = count
-	}
-	if len(f.memDir) < limit {
-		err = io.EOF
-	}
-
-	res = make([]os.FileInfo, 0, len(f.memDir))
+	// We stow that.
+	// We return all available files instead
+	fis = make([]os.FileInfo, 0, len(f.memDir))
 	for _, f1 := range f.memDir {
 		ff := f1.(*InMemoryFile)
-		res = append(res, os.FileInfo(&InMemoryFileInfo{file: ff}))
+		fis = append(fis, os.FileInfo(&InMemoryFileInfo{file: ff}))
 	}
-	return res, err
+	sort.Sort(byName(fis))
+
+	if wantAll {
+		return fis, nil
+	}
+	return fis, io.EOF // returning even more then requested, finalizing with io.EOF
+
 }
 
 func (f *InMemoryFile) Readdirnames(n int) (names []string, err error) {

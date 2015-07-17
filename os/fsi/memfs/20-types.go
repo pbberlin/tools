@@ -72,8 +72,9 @@ type InMemoryFile struct {
 	// memDir -  in-memory directory
 	// For directories it contains the children;
 	// For for files:  it contains siblings.
-	memDir map[string]fsi.File
-	fs     *memMapFs // reference to fs
+	memDir         map[string]fsi.File
+	memDirFetchPos int       // read position for f.Readdir
+	fs             *memMapFs // reference to fs
 }
 
 // Implements os.FileInfo

@@ -61,14 +61,7 @@ func (h HttpFs) Open(name string) (http.File, error) {
 	f, err := h.SourceFs.Open(name)
 	if err == nil {
 
-		// f1, ok := f.(*aefs.AeDir)
-		// if ok {
-		// 	t := time.Now()
-		// 	t = t.Add(time.Hour * -80)
-
-		// 	f1.MModTime = t
-		// }
-
+		// Gather som info
 		stat, err := f.Stat()
 		if err != nil {
 			return nil, err
@@ -78,14 +71,17 @@ func (h HttpFs) Open(name string) (http.File, error) {
 			tp = "D"
 		}
 		fn := fmt.Sprintf("%v %v", f.Name(), tp)
+
+		// report info
 		log.Printf("httpfs open      %-22v fnd %-22v %v", name, fn, h.Name())
 
+		// return fo as http.File
 		if httpfile, ok := f.(http.File); ok {
-			fix, _ := httpfile.Stat()
-			// log.Printf("time is %v", fix.ModTime())
 			return httpfile, nil
 		}
 	}
+
+	// otherwise: error logging
 	log.Printf("httpfs open      %-22v     %-22v %v", name, "", h.Name())
 	log.Printf("             err %-22v", stringspb.Ellipsoider(err.Error(), 24))
 

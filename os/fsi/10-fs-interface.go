@@ -1,47 +1,5 @@
-// Package fsi - filesystem interface - contains the minimal
-// requirements for exchangeable filesystems.
-//
-// Subpackage fsc holds common extensions to all filesystems.
-// Subpackage fstests contains tests for all filesystems.
-//
-// osfs is the operating filesystem.
-// 		Replace os.FuncX and ioutil.FuncX by osfs.FuncX in your code.
-// 		Then you can switch to a memory filesystem later on.
-// 		Or, if you can switch go appengine filesystem.
-// Not yet implemented: An s3fs - a filesystem layer for amazon and ceph
-//
-// Common Remarks:
-// ==============================
-// All filesystems need to maintain compatibility
-// to relative paths of osfs; that is to current working directory prefixing.
-// Therefore all filesystems must support "." for current working dir.
-// Currently - in memfs and aefs - working dir always refers to fs.RootDir().
-//
-// memfs and aefs interpret / or nothing as starting with root.
-//
-// To access files directly under root, memfs and aefs must use ./filename
-//
-// All filesystems are now created with
-// a standardized method.
-// 		subpck.New(options...)
-//
-// The filesystem types are no longer exported.
-// To access implementation specific functionality, use
-//		subpck.Unwrap(fsi.FileSystem) SpecificFileSys
-//
-// Terminology:
-// ==============================
-// "name" or "filename" can mean either the basename or the full path of the file,
-// depending on the actual argument:
-// 		simply           'app1.log'
-// 		or     '/tmp/logs/app1.log'
-// In the first case, it refers to [current dir]/app1.log.
-// Which is for memfs and aefs        [root dir]/app1.log.
-//
-// Exception: os.FileInfo.Name()
-// always contains *only* the base name.
-//
-// Compare http://stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
+// Package fsi serves as universal abstraction
+// layer for all go programs that require a file system.
 
 package fsi
 

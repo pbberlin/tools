@@ -24,12 +24,20 @@ func (f *AeDir) ReadAt(b []byte, off int64) (n int, err error) {
 
 // Adapt (f *AeFile) Readdir also
 func (f *AeDir) Readdir(n int) (fis []os.FileInfo, err error) {
+
 	wantAll := n <= 0
 	fis, err = f.fSys.ReadDir(f.Dir + f.BName)
 	if wantAll {
 		return fis, nil
 	}
-	return fis, io.EOF // returning even more then requested, finalizing with io.EOF
+
+	if f.memDirFetchPos == 0 {
+		f.memDirFetchPos = len(fis)
+		return fis, nil
+	} else {
+		f.memDirFetchPos = 0
+		return []os.FileInfo{}, io.EOF
+	}
 }
 
 func (f *AeDir) Readdirnames(n int) (names []string, err error) {

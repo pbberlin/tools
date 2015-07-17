@@ -37,6 +37,9 @@ type AeDir struct {
 	isDir    bool        // distinct from os.FileInfo method IsDir()
 	MModTime time.Time   `datastore:"ModTime" json:"ModTime"`
 	MMode    os.FileMode `datastore:"-" json:"-"` // SaveProperty must be implemented
+
+	memDirFetchPos int // read position for f.Readdir
+
 }
 
 // Upper case field names sadly
@@ -55,5 +58,7 @@ type AeFile struct {
 	sync.Mutex
 	at     int64
 	closed bool // default open
+
+	memDirFetchPos int // read position for f.Readdir
 
 }

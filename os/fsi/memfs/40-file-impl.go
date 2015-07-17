@@ -34,15 +34,6 @@ func (f *InMemoryFile) Name() string {
 
 func (f *InMemoryFile) Readdir(n int) (fis []os.FileInfo, err error) {
 
-	wantAll := n <= 0
-
-	// Actually we would need a fetchPosition on file
-	// holding the latest retrieved file in
-	// a forwardly-linked-list of files.
-	// Compare https://golang.org/src/os/file_windows.go
-
-	// We stow that.
-	// We return all available files instead
 	fis = make([]os.FileInfo, 0, len(f.memDir))
 	for _, f1 := range f.memDir {
 		ff := f1.(*InMemoryFile)
@@ -50,10 +41,25 @@ func (f *InMemoryFile) Readdir(n int) (fis []os.FileInfo, err error) {
 	}
 	sort.Sort(byName(fis))
 
+	wantAll := n <= 0
+
 	if wantAll {
 		return fis, nil
 	}
-	return fis, io.EOF // returning even more then requested, finalizing with io.EOF
+
+	// Actually we would need memDirFetchPos
+	// holding the latest retrieved file in
+	// a forwardly-linked-list mimic.
+	// Compare https://golang.org/src/os/file_windows.go
+	// Instead: We either or return *all* available files
+	// or empty slice plus io.EOF
+	if f.memDirFetchPos == 0 {
+		f.memDirFetchPos = len(fis)
+		return fis, nil
+	} else {
+		f.memDirFetchPos = 0
+		return []os.FileInfo{}, io.EOF
+	}
 
 }
 

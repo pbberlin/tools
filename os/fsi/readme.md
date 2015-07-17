@@ -35,11 +35,11 @@ aefs.RemoveAll is built on this walk.
 
 #### Subpackage fstests 
 Contains tests for all filesystems.
-Tests on file are taken from [afero](https:github.com/spf13/afero).
+Tests on file level are taken from [afero](https:github.com/spf13/afero).
 I added a directory-tree-walk test suite and an httpfs-wrapper test.
 
 #### osfs 
-Osfs is the operating filesystem. Replace 
+Osfs is the operating system fs. Replace 
 	
 	os.Open() and ioutil.WriteFile()
 by 
@@ -54,7 +54,7 @@ Keeps directories and files completely in RAM.
 Good for quick testing. Cleanup is included.
 
 #### aefs
-With aefs you can write on appengine like onto a local hard disk.
+With aefs you can write on google's datastore like onto a local hard disk.
 See doc.go for details.
 
 
@@ -68,7 +68,7 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 
 - memfs was substantially recoded.
 
-- All filesystems are initialized with variadic option functions, as Dave Cheney [suggested](http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis)
+- All filesystems are initialized with variadic option functions, as Dave Cheney [suggested](http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis).
 
 ## Todos
 
@@ -95,24 +95,30 @@ memfs and aefs interpret / or nothing as starting with root.
 
 To access files directly under root, memfs and aefs must use ./filename
 
-All filesystems are now created with
-a standardized method.
-		subpck.New(options...)
-
 The filesystem types are no longer exported.
 To access implementation specific functionality, use
-		subpck.Unwrap(fsi.FileSystem) SpecificFileSys
+
+	subpck.Unwrap(fsi.FileSystem) SpecificFileSys
 
 Terminology:
 --------------------
 "name" or "filename" can mean either the basename or the full path of the file,
 depending on the actual argument:
-		simply           'app1.log'
-		or     '/tmp/logs/app1.log'
-In the first case, it refers to [current dir]/app1.log.
-Which is for memfs and aefs        [root dir]/app1.log.
 
-Exception: os.FileInfo.Name()
-always contains *only* the base name.
+	'app1.log'              # simply
+	'/tmp/logs/app1.log'    # full
 
-Compare http:stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path
+In the first case, it refers to 
+
+	[current dir]/app1.log.
+
+Which is for memfs and aefs        
+
+	[root dir]/app1.log.
+
+Exception: 
+
+	os.FileInfo.Name() # always contains *only* the base name.
+
+
+Compare [discussion](http:stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path)

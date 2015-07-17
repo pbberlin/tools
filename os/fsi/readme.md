@@ -29,8 +29,14 @@ Then create a pull-request and add your method to the interface and to all files
 
 #### Subpackage fsc 
 Holds common extensions to all filesystems.
+It contains an implementation of filepath.walk,
+that can be used for all contained filesystems.
+aefs.RemoveAll is built on this walk.
+
 #### Subpackage fstests 
 Contains tests for all filesystems.
+Tests on file are taken from [afero](https:github.com/spf13/afero).
+I added a directory-tree-walk test suite and an httpfs-wrapper test.
 
 #### osfs 
 Osfs is the operating filesystem. Replace 
@@ -57,6 +63,26 @@ Not yet adapted: A filesystem layer for amazon s3 and ceph
 
 #### httpfs
 This fs can wrap any previous filesystems and makes them serveable by a go http fileserver.
+
+## Improvements
+
+- memfs was substantially recoded.
+
+- All filesystems are initialized with variadic option functions, as Dave Cheney [suggested](http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis)
+
+## Todos
+
+### Locking
+
+- Can the locking approach of memfs be simplified?
+
+- Can the locking approach of memfs at least be explained in comments?
+
+- memfs registerWithParent locking seems neglected.
+
+- aefs needs a locking consideration for RemoveAll and Rename. 
+Behold the asynchroneus nature of aefs directories.
+
 
 Common Remarks:
 --------------------

@@ -27,7 +27,7 @@ Contact me, if you think, the interface needs
 additional *mandatory* methods.
 Then create a pull-request and add your method to the interface and to all filesystems.
 
-#### Subpackage fsc 
+#### Subpackage fsc (fs common)
 Holds common extensions to all filesystems.
 It contains an implementation of filepath.walk,
 that can be used for all contained filesystems.
@@ -70,9 +70,11 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 
 - All filesystems are initialized with variadic option functions, as Dave Cheney [suggested](http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis).
 
+- (Deterioration) appengine/aetest is now needed for all tests.
+
 ## Todos
 
-### Locking
+#### Locking
 
 - Can the locking approach of memfs be simplified?
 
@@ -83,8 +85,12 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 - aefs needs a locking consideration for RemoveAll and Rename. 
 Behold the asynchroneus nature of aefs directories.
 
+#### Tests
 
-Common Remarks:
+- A concurrent access test suite is missing.
+
+
+Common Remarks
 --------------------
 All filesystems need to maintain compatibility
 to relative paths of osfs; that is to current working directory prefixing.
@@ -100,7 +106,7 @@ To access implementation specific functionality, use
 
 	subpck.Unwrap(fsi.FileSystem) SpecificFileSys
 
-Terminology:
+Terminology
 --------------------
 "name" or "filename" can mean either the basename or the full path of the file,
 depending on the actual argument:
@@ -121,4 +127,4 @@ Exception:
 	os.FileInfo.Name() # always contains *only* the base name.
 
 
-Compare [discussion](http:stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path)
+Compare [discussion on stackoverflow](http:stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path)

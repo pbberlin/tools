@@ -1,6 +1,11 @@
 // Package httpfs wraps any other fsi filesystem
 // so that it works with http.FileServer;
 // it adds as basePath to inner filesystem.
+//
+// The following methods of the filesystems are
+// used:
+//   fs.Open()
+//   f.Readdir() - needs to return io.EOF at end of files.
 package httpfs
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.

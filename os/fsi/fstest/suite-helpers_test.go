@@ -17,13 +17,48 @@ package fstest
 import (
 	"io"
 	"io/ioutil"
+	"log"
 	"path"
 	"runtime"
 	"strings"
 	"testing"
 
+	"appengine/aetest"
+
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/memfs"
+	"github.com/pbberlin/tools/os/fsi/osfs"
 )
+
+func initFileSystems() (fss []fsi.FileSystem, c aetest.Context) {
+
+	var err error
+	c, err = aetest.NewContext(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// defer c.Close()
+	// Not here, but instead at the start of the test-funcs
+
+	// We cant make variadic options generic,
+	// since they need the concrete filesystem type.
+	fs1 := aefs.New(
+		aefs.MountName(aefs.MountPointNext()),
+		aefs.AeContext(c),
+	)
+
+	fs3 := osfs.New()
+
+	fs4 := memfs.New(
+		memfs.MountName("m"),
+	)
+
+	fss = []fsi.FileSystem{fs1, fs3, fs4}
+
+	return fss, c
+}
 
 func newFile(testName string, fs fsi.FileSystem, t *testing.T) (f fsi.File) {
 	// Use a local file system, not NFS.

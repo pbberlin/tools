@@ -138,6 +138,10 @@ func logRetrieve(w http.ResponseWriter, r *http.Request) {
 
 	for _, v := range sl {
 		sl1 := strings.Split(v, "%2B")
+		if len(sl1) < 4 {
+			continue
+		}
+
 		// 		 time+user+ip+logID
 		unixTS := sl1[0]
 		usr := sl1[1]

@@ -88,6 +88,10 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.Write(backendFragFsiAefs.Bytes())
 
+	b1.WriteString("<hr>\n")
+
+	b1.Write(backendFragBlob.Bytes())
+
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")
 	b1.WriteString("<a target='_gae' href='https://console.developers.google.com/project/347979071940' ><b>global</b> developer console</a><br>\n")

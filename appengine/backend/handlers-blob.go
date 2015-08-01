@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"appengine"
+
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
@@ -27,15 +29,15 @@ func init() {
 
 func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	// Here the parameter is the size of the form data that should
-	// be loaded in memory, the remaining being put in temporary
-	// files
+	c := appengine.NewContext(r)
+
 	r.ParseMultipartForm(1024 * 1024 * 2)
 
 	fields := []string{"title", "author", "description"}
 	for _, v := range fields {
 		s := spf("%12v => %q", v, r.FormValue(v))
 		fmt.Fprintln(w, s)
+		c.Infof(s)
 	}
 
 	ff := "filefield"
@@ -46,6 +48,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	}
 	if handler == nil {
 		fmt.Fprintf(w, "no multipart file %q\n", ff)
+		c.Infof("no multipart file %q\n", ff)
 	} else {
 		fmt.Fprintf(w, "extracted file %v\n", handler.Filename)
 
@@ -54,6 +57,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 			log.Println(err)
 		}
 		fmt.Fprintf(w, "extracted file content;  %v bytes\n", len(data))
+		c.Infof("extracted file %q ;  %v bytes\n", handler.Filename, len(data))
 
 		newFilename := "c:\\temp\\xx" + handler.Filename
 		err = ioutil.WriteFile(newFilename, data, 0777)

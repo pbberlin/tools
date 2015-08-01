@@ -76,8 +76,9 @@ const Head = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-	<link rel="icon" href="data:;base64,=">
-	<title>static-title</title>
+    <link rel="shortcut icon" href="data:;base64,=">
+    <link rel="icon"          href="data:;base64,=">
+    <title>static-title</title>
   </head>
   <body><style> pre {line-height:14px;}</style>`
 
@@ -89,7 +90,8 @@ const c_page_scaffold_01 = `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8">
-	<link rel="icon" href="data:;base64,=">
+    <link rel="shortcut icon" href="data:;base64,=">
+	<link rel="icon"          href="data:;base64,=">
 	<title>{{template "n_html_title"  }}</title>
 	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open Sans">
   </head>

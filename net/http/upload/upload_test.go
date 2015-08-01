@@ -24,6 +24,7 @@ func TestUpload(t *testing.T) {
 
 	urlUp := "https://google.com/upload"
 	urlUp = "http://localhost:8085/blob2/zipupload"
+	urlUp = "https://libertarian-islands.appspot.com/blob2/zipupload"
 
 	request, err := CreateFilePostRequest2(
 		urlUp, "filefield", filePath, extraParams)

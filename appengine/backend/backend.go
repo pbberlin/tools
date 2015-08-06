@@ -13,6 +13,7 @@ import (
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/paths"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"github.com/pbberlin/tools/net/http/upload"
 	_ "github.com/pbberlin/tools/os/fsi/aefs" // only http handler registration
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
@@ -22,6 +23,10 @@ var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
 var pfRestore func(format string, a ...interface{}) (int, error) = fmt.Printf
 var spf func(format string, a ...interface{}) string = fmt.Sprintf
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
+
+func init() {
+	upload.InitHandlers()
+}
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
@@ -90,6 +95,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.WriteString("<hr>\n")
 
+	backendFragBlob := upload.GetBackend()
 	b1.Write(backendFragBlob.Bytes())
 
 	b1.WriteString("<br>\n")

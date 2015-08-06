@@ -14,17 +14,17 @@ func TestUpload(t *testing.T) {
 	log.SetFlags(log.Lshortfile)
 
 	curdir, _ := os.Getwd()
-	filePath := curdir + "/test.pdf"
+	filePath := curdir + "/test.zip"
 
 	extraParams := map[string]string{
 		"title":       "My Document",
-		"author":      "Matt Aimonetti",
-		"description": "A document with all the Go programming language secrets",
+		"author":      "Pete",
+		"description": "A zip file - containing dirs and files",
 	}
 
 	urlUp := "https://google.com/upload"
 	urlUp = "http://localhost:8085/blob2/zipupload"
-	urlUp = "https://libertarian-islands.appspot.com/blob2/zipupload"
+	// urlUp = "https://libertarian-islands.appspot.com/blob2/zipupload"
 
 	request, err := CreateFilePostRequest2(
 		urlUp, "filefield", filePath, extraParams)

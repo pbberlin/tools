@@ -45,6 +45,7 @@ func TestPathCleanage(t *testing.T) {
 		[]string{"/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
 		[]string{"dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
 		[]string{"./dir1/", "mntX/", "dir1"},
+		[]string{"c:\\dir1\\dir2", "mntX/", "mntX/c:/dir1/dir2"},
 	}
 
 	fs := memfs.New(memfs.MountName("mntX"))

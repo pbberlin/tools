@@ -34,6 +34,7 @@ func cleanseLeadingSlash(p string) string {
 // name is the *external* path or filename.
 func PathInternalize(name, rootDir, rootName string) (dir, bname string) {
 
+	name = strings.Replace(name, "\\", "/", -1)
 	name = cleanseLeadingSlash(name)
 
 	// exchange current dir "." for root

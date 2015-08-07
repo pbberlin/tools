@@ -1,15 +1,17 @@
-package backend
+package webapi
 
 import (
 	"bytes"
+	"fmt"
+	"io"
 	"net/http"
+	"strconv"
 
 	"appengine"
 
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
-
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/aefs"
 	"github.com/pbberlin/tools/os/fsi/fstest"
@@ -17,15 +19,17 @@ import (
 	"github.com/pbberlin/tools/os/fsi/osfs"
 )
 
-var backendFragFsiAefs = new(bytes.Buffer)
+var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 var memMapFileSys = memfs.New()
 var osFileSys = osfs.New()
 
-func init() {
+// var aeFileSys = // cannot be instantiated without ae.context
 
-	//
-	// handler registration
+var whichType = 0
+
+func InitHandlers() {
+	http.HandleFunc("/fs/aefs/set-fs-type", loghttp.Adapter(setFSType))
 	http.HandleFunc("/fs/aefs/create-objects", loghttp.Adapter(createSys))
 	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
 	http.HandleFunc("/fs/aefs/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
@@ -35,27 +39,74 @@ func init() {
 	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
 
 	http.HandleFunc("/fs/aefs/reset", loghttp.Adapter(resetMountPoint))
+	http.HandleFunc("/fs/aefs/incr", loghttp.Adapter(incrMountPoint))
 	http.HandleFunc("/fs/aefs/decr", loghttp.Adapter(decrMountPoint))
+}
 
-	//
-	// admin widgets
-	htmlfrag.Wb(backendFragFsiAefs, "create", "/fs/aefs/create-objects")
+// userinterface rendered to HTML - not only the strings for title and url
+func BackendUIRendered() *bytes.Buffer {
 
-	htmlfrag.Wb(backendFragFsiAefs, "query", "/fs/aefs/retrieve-by-query")
-	htmlfrag.Wb(backendFragFsiAefs, "readdir", "/fs/aefs/retrieve-by-read-dir")
-	htmlfrag.Wb(backendFragFsiAefs, "walk", "/fs/aefs/walk")
-	htmlfrag.Wb(backendFragFsiAefs, "remove", "/fs/aefs/remove")
+	var b1 = new(bytes.Buffer)
 
-	htmlfrag.Wb(backendFragFsiAefs, "delete all fs entities", "/fs/aefs/delete-all")
+	htmlfrag.Wb(b1, "filesystem interface", "")
 
-	htmlfrag.Wb(backendFragFsiAefs, "reset", "/fs/aefs/reset")
-	htmlfrag.Wb(backendFragFsiAefs, "decr", "/fs/aefs/decr")
+	htmlfrag.Wb(b1, "set type", "/fs/aefs/set-fs-type")
+	htmlfrag.Wb(b1, "create", "/fs/aefs/create-objects")
+
+	htmlfrag.Wb(b1, "query", "/fs/aefs/retrieve-by-query")
+	htmlfrag.Wb(b1, "readdir", "/fs/aefs/retrieve-by-read-dir")
+	htmlfrag.Wb(b1, "walk", "/fs/aefs/walk")
+	htmlfrag.Wb(b1, "remove", "/fs/aefs/remove")
+
+	htmlfrag.Wb(b1, "delete all fs entities", "/fs/aefs/delete-all")
+
+	// htmlfrag.Wb(b1, , "")
+	htmlfrag.Wb(b1, "aefs mount", "nobr")
+	htmlfrag.Wb(b1, "decr", "/fs/aefs/decr")
+	htmlfrag.Wb(b1, "incr", "/fs/aefs/incr")
+	htmlfrag.Wb(b1, "reset", "/fs/aefs/reset")
+
+	return b1
 
 }
 
-func callTestX(w http.ResponseWriter, r *http.Request,
+func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	wpf(w, tplx.Head)
+	defer wpf(w, tplx.Foot)
+
+	stp := r.FormValue("type")
+	newTp, err := strconv.Atoi(stp)
+
+	if err == nil && newTp >= 0 && newTp <= 2 {
+		whichType = newTp
+		wpf(w, "new type: %v<br><br>\n", whichType)
+	}
+
+	if whichType != 0 {
+		wpf(w, "<a href='/fs/aefs/set-fs-type?type=0' >aefs</a><br>\n")
+	} else {
+		wpf(w, "<b>aefs</b><br>\n")
+	}
+	if whichType != 1 {
+		wpf(w, "<a href='/fs/aefs/set-fs-type?type=1' >osfs</a><br>\n")
+	} else {
+		wpf(w, "<b>osfs</b><br>\n")
+	}
+	if whichType != 2 {
+		wpf(w, "<a href='/fs/aefs/set-fs-type?type=2' >memfs</a><br>\n")
+	} else {
+		wpf(w, "<b>memfs</b><br>\n")
+	}
+
+}
+
+func runTestX(
+	w http.ResponseWriter,
+	r *http.Request,
 	f1 func() string,
-	f2 func(fsi.FileSystem) (*bytes.Buffer, string)) {
+	f2 func(fsi.FileSystem) (*bytes.Buffer, string),
+) {
 
 	wpf(w, tplx.Head)
 	wpf(w, "<pre>\n")
@@ -64,13 +115,21 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 
 	var fs fsi.FileSystem
 
-	if false {
-		fsc := aefs.New(aefs.MountName(f1()), aefs.AeContext(appengine.NewContext(r)))
-		fs = fsi.FileSystem(fsc)
-	} else if false {
+	switch whichType {
+	case 0:
+		// must be re-instantiated for each request
+		if f1 == nil {
+			f1 = aefs.MountPointLast
+		}
+		aeFileSys := aefs.New(aefs.MountName(f1()), aefs.AeContext(appengine.NewContext(r)))
+		fs = fsi.FileSystem(aeFileSys)
+	case 1:
 		fs = fsi.FileSystem(osFileSys)
-	} else {
+	case 2:
+		// re-instantiation would delete everything
 		fs = fsi.FileSystem(memMapFileSys)
+	default:
+		panic("invalid whichType ")
 	}
 
 	bb := new(bytes.Buffer)
@@ -84,23 +143,23 @@ func callTestX(w http.ResponseWriter, r *http.Request,
 }
 
 func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, aefs.MountPointNext, fstest.CreateSys)
+	runTestX(w, r, aefs.MountPointIncr, fstest.CreateSys)
 }
 
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, fstest.RetrieveByQuery)
+	runTestX(w, r, nil, fstest.RetrieveByQuery)
 }
 
 func retrieveByReadDir(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, fstest.RetrieveByReadDir)
+	runTestX(w, r, nil, fstest.RetrieveByReadDir)
 }
 
 func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, fstest.WalkDirs)
+	runTestX(w, r, nil, fstest.WalkDirs)
 }
 
 func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	callTestX(w, r, nil, fstest.RemoveSubtree)
+	runTestX(w, r, nil, fstest.RemoveSubtree)
 }
 
 //
@@ -124,6 +183,7 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	wpf(w, "\n")
 	wpf(w, "memMapFs new")
 
+	// cleanup must be manual
 	osFileSys = osfs.New()
 
 }
@@ -136,6 +196,17 @@ func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interf
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "reset %v\n", aefs.MountPointReset())
+
+}
+
+func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	wpf(w, tplx.Head)
+	wpf(w, "<pre>\n")
+	defer wpf(w, "\n</pre>")
+	defer wpf(w, tplx.Foot)
+
+	wpf(w, "counted up %v\n", aefs.MountPointIncr())
 
 }
 

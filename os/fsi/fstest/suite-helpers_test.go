@@ -45,7 +45,7 @@ func initFileSystems() (fss []fsi.FileSystem, c aetest.Context) {
 	// We cant make variadic options generic,
 	// since they need the concrete filesystem type.
 	fs1 := aefs.New(
-		aefs.MountName(aefs.MountPointNext()),
+		aefs.MountName(aefs.MountPointIncr()),
 		aefs.AeContext(c),
 	)
 

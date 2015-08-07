@@ -43,11 +43,16 @@ func GetSpanner() func(interface{}, int) string {
 
 }
 
-// Wb is a helper to write a block of html - an inline block with an link inside
+// Wb is a helper to write an inline block with an link inside.
+// If url is omitted, a newline + a chapter-header is rendered.
 func Wb(buf1 *bytes.Buffer, linktext, url string, descs ...string) {
 
 	if url == "" {
 		buf1.WriteString("<br>\n")
+	}
+
+	if url == "nobr" { // hack, indicating no break
+		url = ""
 	}
 
 	desc := ""

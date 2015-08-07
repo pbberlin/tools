@@ -14,7 +14,8 @@ import (
 	"github.com/pbberlin/tools/net/http/paths"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/net/http/upload"
-	_ "github.com/pbberlin/tools/os/fsi/aefs" // only http handler registration
+	// _ "github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/webapi"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 )
@@ -26,6 +27,8 @@ var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fp
 
 func init() {
 	upload.InitHandlers()
+	webapi.InitHandlers()
+
 }
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -55,12 +58,13 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	htmlfrag.Wb(b1, "datastore object view quoted printabe", "/dsu/show")
 
-	htmlfrag.Wb(b1, "Guest Book", "")
-	htmlfrag.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
-	htmlfrag.Wb(b1, "Einträge auflisten", "/guest-view")
-	htmlfrag.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
+	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
 
-	htmlfrag.Wb(b1, " ", "")
+	htmlfrag.Wb(b1, "Request Images ", "")
+	htmlfrag.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
+	htmlfrag.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
+	htmlfrag.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
+	htmlfrag.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
 	htmlfrag.Wb(b1, "Drawing a static chart", "/image/draw-lines-example")
 
 	htmlfrag.Wb(b1, "Big Query ...", "")
@@ -73,30 +77,28 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Show as Chart", "/big-query/show-chart")
 	htmlfrag.Wb(b1, "As HTML", "/big-query/html")
 
-	htmlfrag.Wb(b1, "Request Images ", "")
-	htmlfrag.Wb(b1, "WrapBlob from Datastore", "/image/img-from-datastore?p=chart1")
-	htmlfrag.Wb(b1, "base64 from Datastore", "/image/base64-from-datastore?p=chart1")
-	htmlfrag.Wb(b1, "base64 from Variable", "/image/base64-from-var?p=1")
-	htmlfrag.Wb(b1, "base64 from File", "/image/base64-from-file?p=static/pberg1.png")
-
 	htmlfrag.Wb(b1, "Namespaces + Task Queues", "")
 	htmlfrag.Wb(b1, "Increment", "/namespaced-counters/increment")
 	htmlfrag.Wb(b1, "Read", "/namespaced-counters/read")
 	htmlfrag.Wb(b1, "Push to task-queue", "/namespaced-counters/queue-push")
 
-	htmlfrag.Wb(b1, "URLs with/without ancestors", "")
+	htmlfrag.Wb(b1, "URLs with/without ancestors", "nobr")
 	htmlfrag.Wb(b1, "Backend", "/save-url/backend")
 
-	htmlfrag.Wb(b1, "Statistics", "/_ah/stats")
+	htmlfrag.Wb(b1, "Guest Book", "")
+	htmlfrag.Wb(b1, "Eintrag hinzufügen", "/guest-entry")
+	htmlfrag.Wb(b1, "Einträge auflisten", "/guest-view")
+	htmlfrag.Wb(b1, "Einträge auflisten - paged - serialized cursor", "/guest-view-cursor")
 
 	b1.WriteString("<hr>\n")
 
-	b1.Write(backendFragFsiAefs.Bytes())
+	uiAefs := webapi.BackendUIRendered()
+	b1.Write(uiAefs.Bytes())
 
 	b1.WriteString("<hr>\n")
 
-	backendFragBlob := upload.BackendUIRendered()
-	b1.Write(backendFragBlob.Bytes())
+	uiUpload := upload.BackendUIRendered()
+	b1.Write(uiUpload.Bytes())
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

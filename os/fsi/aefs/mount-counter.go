@@ -10,9 +10,10 @@ func MountPointLast() string {
 	return spf("mnt%02v", ret)
 }
 
-func MountPointNext() string {
+func MountPointIncr() string {
 	ret := spf("mnt%02v", cntr)
 	cntr++
+	// deliberate - if confusing; preventing init -1
 	return ret
 }
 
@@ -22,6 +23,10 @@ func MountPointReset() string {
 }
 
 func MountPointDecr() string {
-	cntr--
+	ret := cntr - 1
+	if ret < 0 {
+		ret = 0
+	}
+	cntr = ret
 	return spf("mnt%02v", cntr)
 }

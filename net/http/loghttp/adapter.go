@@ -114,7 +114,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			panicSignal := recover()
 			if panicSignal != nil {
 				miniStacktrace := ""
-				for i := 1; i < 8; i++ {
+				for i := 1; i < 11; i++ {
 					_, file, line, _ := runtime.Caller(i)
 					if strings.Index(file, `/src/pkg/runtime/`) > -1 {
 						miniStacktrace += fmt.Sprintf("<br>\n\t\t %s:%d ", file[len(file)-20:], line)
@@ -150,7 +150,6 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		if c == nil {
 			given(w, r, mp)
 		} else {
-
 			var given1 AppengineHandler
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "text/html; charset=utf-8") // automatically set on appengine live, but not on appengine dev
@@ -159,8 +158,9 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 				cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
 				fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
 			}
-			httpHandler := appstats.NewHandler(given1)
-			httpHandler.ServeHTTP(w, r)
+			// given1(c, w, r)
+			wrapped := appstats.NewHandler(given1)
+			wrapped.ServeHTTP(w, r)
 		}
 
 	}

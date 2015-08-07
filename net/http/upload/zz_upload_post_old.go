@@ -11,7 +11,7 @@ import (
 
 // CreateFilePostRequest prepares a multipart
 // file upload POST request
-func CreateFilePostRequest(url, fileParamName, filePath string,
+func CreateFilePostRequest_Old(url, fileParamName, filePath string,
 	extraParams map[string]string) (*http.Request, error) {
 
 	// try opening the file

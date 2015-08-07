@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/runtimepb"
@@ -106,6 +107,10 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	// Write to log/gae-log
 	// Adding src code info
 	line, file := runtimepb.LineFileXUp(1)
+	if strings.HasSuffix(file, "err-http.go") {
+		line, file = runtimepb.LineFileXUp(2)
+	}
+
 	s = fmt.Sprintf("%v - %v:%v", s, file, line)
 
 	// Log it
@@ -118,4 +123,17 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 		c.Infof(s)
 	}
 
+}
+
+type tLogFunc func(format string, is ...interface{})
+type tErrFunc func(error)
+
+func Logger(w http.ResponseWriter, r *http.Request) (tLogFunc, tErrFunc) {
+	fLog := func(format string, is ...interface{}) {
+		Pf(w, r, format, is...)
+	}
+	fErr := func(err error) {
+		Pf(w, r, "Err %v", err)
+	}
+	return fLog, fErr
 }

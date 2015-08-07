@@ -12,7 +12,7 @@ import (
 // Also used to check existence; returning ds.ErrNoSuchEntity
 func (fs *aeFileSys) dirByPath(name string) (AeDir, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 
 	fo := AeDir{}
 	fo.fSys = fs
@@ -47,7 +47,7 @@ func (fs *aeFileSys) dirByPath(name string) (AeDir, error) {
 // "warning" fsi.EmptyQueryResult
 func (fs *aeFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 
 	var fis []os.FileInfo
 
@@ -71,7 +71,7 @@ func (fs *aeFileSys) saveDirByPath(name string) (AeDir, error) {
 	fo.MModTime = time.Now()
 	fo.fSys = fs
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 	fo.Dir = dir
 	fo.BName = bname
 

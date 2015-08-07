@@ -1,5 +1,5 @@
-// +build extended
-// go test -tags=extended
+// +build dirwalk
+// go test -tags=dirwalk
 
 package fstest
 

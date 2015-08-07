@@ -16,7 +16,7 @@ func (m *memMapFs) findParent(name string) (fsi.File, error) {
 		return nil, nil
 	}
 
-	parent, _ := m.pathInternalize(name)
+	parent, _ := m.SplitX(name)
 	if len(parent) > 0 {
 		pfile, err := m.Open(parent)
 		if err != nil {
@@ -40,7 +40,7 @@ func (m *memMapFs) registerWithParent(name string) string {
 		// first try -dont care
 	}
 	if pDir == nil {
-		newPar, _ := m.pathInternalize(name)
+		newPar, _ := m.SplitX(name)
 		if len(newPar) > 0 {
 			// log.Printf("  create parent %-32q for %v\n", newPar, name)
 			err := m.MkdirAll(newPar, 0777)
@@ -76,7 +76,7 @@ func (m *memMapFs) registerWithParent(name string) string {
 // recursing upwards
 func (m *memMapFs) registerDirs(name string) {
 
-	parent, bname := m.pathInternalize(name)
+	parent, bname := m.SplitX(name)
 	name = path.Join(parent, bname)
 
 	// register upwardly
@@ -101,7 +101,7 @@ func (m *memMapFs) registerDirs(name string) {
 // remove f from it's parent's directory
 func (m *memMapFs) unRegisterWithParent(name string) error {
 
-	parent, bname := m.pathInternalize(name)
+	parent, bname := m.SplitX(name)
 	name = path.Join(parent, bname)
 
 	pDir, err := m.findParent(name)

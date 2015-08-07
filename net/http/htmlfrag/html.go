@@ -44,17 +44,30 @@ func GetSpanner() func(interface{}, int) string {
 }
 
 // Wb is a helper to write a block of html - an inline block with an link inside
-func Wb(buf1 *bytes.Buffer, linktext, url string) {
+func Wb(buf1 *bytes.Buffer, linktext, url string, descs ...string) {
 
 	if url == "" {
 		buf1.WriteString("<br>\n")
 	}
 
-	buf1.WriteString("<span style='display:inline-block; min-width:200px; margin: 6px 0px; margin-right:10px;'>\n")
+	desc := ""
+	if len(descs) > 0 {
+		desc = descs[0]
+	}
+
+	const styleX = "display:inline-block; width:13%; margin: 4px 0px; margin-right:12px; vertical-align:top"
+
+	buf1.WriteString("<span style='" + styleX + "'>\n")
 	if url == "" {
-		buf1.WriteString("\t" + linktext + "\n")
+		buf1.WriteString("\t<b>" + linktext + "</b>\n")
 	} else {
 		buf1.WriteString("\t<a target='_app' href='" + url + "' >" + linktext + "</a>\n")
+		if desc != "" {
+			buf1.WriteString("<br>\n ")
+			buf1.WriteString("<span style='" + styleX + ";width:90%;font-size:80%'>\n")
+			buf1.WriteString(desc)
+			buf1.WriteString("</span>\n")
+		}
 	}
 	buf1.WriteString("</span>\n")
 }

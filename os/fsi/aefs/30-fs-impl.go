@@ -24,7 +24,7 @@ func (fs aeFileSys) String() string { return fs.mount }
 func (fs *aeFileSys) Create(name string) (fsi.File, error) {
 
 	// WriteFile & Create
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 
 	f := AeFile{}
 	f.fSys = fs
@@ -232,7 +232,7 @@ func (fs *aeFileSys) ReadFile(path string) ([]byte, error) {
 func (fs *aeFileSys) WriteFile(name string, data []byte, perm os.FileMode) error {
 
 	// WriteFile & Create
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 	f := AeFile{}
 	f.Dir = dir
 	f.BName = bname

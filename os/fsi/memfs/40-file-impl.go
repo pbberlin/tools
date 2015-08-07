@@ -28,7 +28,7 @@ func (f *InMemoryFile) Close() error {
 
 // To remain consistent with osfs, we can only return base name.
 func (f *InMemoryFile) Name() string {
-	_, bname := f.fs.pathInternalize(f.name)
+	_, bname := f.fs.SplitX(f.name)
 	return bname
 }
 

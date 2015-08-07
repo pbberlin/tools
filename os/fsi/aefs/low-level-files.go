@@ -14,7 +14,7 @@ import (
 
 func (fs *aeFileSys) fileByPath(name string) (AeFile, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 
 	fo := AeFile{}
 	fo.fSys = fs
@@ -49,7 +49,7 @@ func (fs *aeFileSys) fileByPath(name string) (AeFile, error) {
 // similar to ReadDir but returning only files
 func (fs *aeFileSys) filesByPath(name string) ([]AeFile, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 
 	var files []AeFile
 
@@ -83,7 +83,7 @@ func (fs *aeFileSys) filesByPath(name string) ([]AeFile, error) {
 // Path is the directory, BName contains the base name.
 func (fs *aeFileSys) saveFileByPath(f *AeFile, name string) error {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 	f.Dir = dir
 	// bname was only submitted in the fileobject only
 	// correct previous

@@ -54,7 +54,7 @@ func TestPathCleanage(t *testing.T) {
 		_ = inpt
 		wnt1 := v[1]
 		wnt2 := v[2]
-		dir, bname := fsc.PathInternalize(v[0], fs.RootDir(), fs.RootName())
+		dir, bname := fsc.UnixPather(v[0], fs.RootDir())
 		fullpath := dir + bname
 
 		log.Printf("%-28v %-24v => %-16q %-12q ", inpt, dir, bname, fullpath)

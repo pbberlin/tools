@@ -153,6 +153,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 
 			var given1 AppengineHandler
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "text/html; charset=utf-8") // automatically set on appengine live, but not on appengine dev
 				given(w, r, mp)
 				distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
 				cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))

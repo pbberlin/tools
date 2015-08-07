@@ -95,7 +95,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.WriteString("<hr>\n")
 
-	backendFragBlob := upload.GetBackend()
+	backendFragBlob := upload.BackendUIRendered()
 	b1.Write(backendFragBlob.Bytes())
 
 	b1.WriteString("<br>\n")

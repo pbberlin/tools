@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"testing"
 )
 
@@ -13,41 +14,47 @@ func TestUpload(t *testing.T) {
 
 	log.SetFlags(log.Lshortfile)
 
-	curdir, _ := os.Getwd()
-	filePath := curdir + "/test.zip"
+	files := []string{"test.zip", "test.jpg"}
 
-	extraParams := map[string]string{
-		"title":       "My Document",
-		"author":      "Pete",
-		"description": "A zip file - containing dirs and files",
-	}
+	for _, v := range files {
 
-	urlUp := "https://google.com/upload"
-	urlUp = "http://localhost:8085/blob2/zipupload"
-	// urlUp = "https://libertarian-islands.appspot.com/blob2/zipupload"
+		curdir, _ := os.Getwd()
+		filePath := path.Join(curdir, v)
 
-	request, err := CreateFilePostRequest2(
-		urlUp, "filefield", filePath, extraParams)
-	if err != nil {
-		log.Fatal(err)
-	}
+		extraParams := map[string]string{
+			"title":       "My Document",
+			"author":      "Pete",
+			"description": "A zip file - containing dirs and files",
+		}
 
-	client := &http.Client{}
-	log.Printf("Sending req ...")
-	resp, err := client.Do(request)
+		urlUp := "https://google.com/upload"
+		urlUp = "http://localhost:8085/blob2/zipupload"
+		// urlUp = "https://libertarian-islands.appspot.com/blob2/zipupload"
 
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		bts, err := ioutil.ReadAll(resp.Body)
+		request, err := CreateFilePostRequest(
+			urlUp, "filefield", filePath, extraParams)
 		if err != nil {
 			log.Fatal(err)
 		}
-		resp.Body.Close()
-		fmt.Println(resp.StatusCode)
-		for k, v := range resp.Header {
-			fmt.Println("\tHdr: ", k, v)
+
+		client := &http.Client{}
+		log.Printf("Sending req ...")
+		resp, err := client.Do(request)
+
+		if err != nil {
+			log.Fatal(err)
+		} else {
+			bts, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+			resp.Body.Close()
+			fmt.Println(resp.StatusCode)
+			for k, v := range resp.Header {
+				fmt.Println("\tHdr: ", k, v)
+			}
+			fmt.Printf("%s", bts)
 		}
-		fmt.Printf("%s", bts)
+
 	}
 }

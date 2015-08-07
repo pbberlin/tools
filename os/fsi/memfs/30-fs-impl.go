@@ -31,7 +31,7 @@ func (m *memMapFs) createHelper(name string) *InMemoryFile {
 
 func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	f, ok := m.fos[name]
@@ -52,7 +52,7 @@ func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
 
 func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	f, ok := m.fos[name]
@@ -73,7 +73,7 @@ func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error 
 
 func (m *memMapFs) Create(name string) (fsi.File, error) {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	m.lock()
@@ -89,7 +89,7 @@ func (fs *memMapFs) Lstat(path string) (os.FileInfo, error) {
 
 func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	m.rlock()
@@ -114,7 +114,7 @@ func (m *memMapFs) MkdirAll(name string, perm os.FileMode) error {
 
 func (m *memMapFs) Open(name string) (fsi.File, error) {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	m.rlock()
@@ -152,7 +152,7 @@ func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
 
 func (m *memMapFs) Remove(name string) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	m.rlock()
@@ -169,7 +169,7 @@ func (m *memMapFs) Remove(name string) error {
 
 func (m *memMapFs) RemoveAll(name string) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	// log.Printf("starting removeall %v", name)
@@ -192,11 +192,11 @@ func (m *memMapFs) RemoveAll(name string) error {
 
 func (m *memMapFs) Rename(name, newname string) error {
 
-	dir, bname := m.pathInternalize(name)
+	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
 	{
-		dir, bname := m.pathInternalize(newname)
+		dir, bname := m.SplitX(newname)
 		newname = path.Join(dir, bname)
 	}
 

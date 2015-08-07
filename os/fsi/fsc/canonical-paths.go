@@ -32,9 +32,14 @@ func cleanseLeadingSlash(p string) string {
 }
 
 // name is the *external* path or filename.
-func PathInternalize(name, rootDir, rootName string) (dir, bname string) {
+func UnixPather(name, rootDir string) (dir, bname string) {
 
-	name = strings.Replace(name, "\\", "/", -1)
+	rootName := rootDir
+	if len(rootDir) > 1 {
+		rootName = rootDir[:len(rootDir)-1]
+	}
+
+	name = strings.Replace(name, "\\", "/", -1) // windows to unix; drive letters become directories
 	name = cleanseLeadingSlash(name)
 
 	// exchange current dir "." for root

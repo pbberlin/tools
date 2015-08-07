@@ -22,7 +22,7 @@ import (
 // The func could easily be enhanced chunked scanning.
 func (fs *aeFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
 
-	dir, bname := fs.pathInternalize(name)
+	dir, bname := fs.SplitX(name)
 	name = dir + bname
 	if !strings.HasSuffix(name, sep) {
 		name += sep

@@ -80,7 +80,11 @@ const Head = `<!DOCTYPE html>
     <link rel="icon"          href="data:;base64,=">
     <title>static-title</title>
   </head>
-  <body><style> pre {line-height:14px;}</style>`
+  <body>
+    <style> pre {line-height:14px;}
+      body {font-family:tahoma; font-size: 15px;}
+    </style>
+  `
 
 const Foot = `
   </body>

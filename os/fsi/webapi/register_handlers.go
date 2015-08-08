@@ -72,7 +72,7 @@ func BackendUIRendered() *bytes.Buffer {
 
 func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.Head)
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Set filesystem type"}))
 	defer wpf(w, tplx.Foot)
 
 	stp := r.FormValue("type")
@@ -108,9 +108,10 @@ func runTestX(
 	f2 func(fsi.FileSystem) (*bytes.Buffer, string),
 ) {
 
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Run a test"}))
 	defer wpf(w, tplx.Foot)
+
+	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
 
 	var fs fsi.FileSystem
@@ -166,10 +167,11 @@ func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 // aefs specific
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.Head)
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete all filesystem data"}))
+	defer wpf(w, tplx.Foot)
+
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
-	defer wpf(w, tplx.Foot)
 
 	fs := aefs.New(aefs.AeContext(appengine.NewContext(r)))
 	wpf(w, "aefs:\n")
@@ -190,10 +192,11 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.Head)
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint reset"}))
+	defer wpf(w, tplx.Foot)
+
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
-	defer wpf(w, tplx.Foot)
 
 	wpf(w, "reset %v\n", aefs.MountPointReset())
 
@@ -201,9 +204,10 @@ func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interf
 
 func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.Head)
-	wpf(w, "<pre>\n")
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint increment"}))
 	defer wpf(w, "\n</pre>")
+
+	wpf(w, "<pre>\n")
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "counted up %v\n", aefs.MountPointIncr())
@@ -212,10 +216,11 @@ func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 func decrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.Head)
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint decrement"}))
+	defer wpf(w, tplx.Foot)
+
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
-	defer wpf(w, tplx.Foot)
 
 	wpf(w, "counted down %v\n", aefs.MountPointDecr())
 

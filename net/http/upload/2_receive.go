@@ -28,13 +28,47 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 
 	err := r.ParseMultipartForm(1024 * 1024 * 2)
 	if err != nil {
-		lg("Multipart parsing failed %v", err)
+		lg("Multipart parsing failed: %v", err)
 		return
 	}
 
-	fields := []string{"getparam1", "description"}
+	fields := []string{"getparam1", "mountname", "description"}
 	for _, v := range fields {
 		lg("%12v => %q", v, r.FormValue(v))
+	}
+
+	mountPoint := aefs.MountPointLast()
+	if len(r.FormValue("mountname")) > 0 {
+		mountPoint = r.FormValue("mountname")
+	}
+
+	fs1 := aefs.New(
+		aefs.MountName(mountPoint),
+		aefs.AeContext(c),
+	)
+
+	// As closure, since we cannot define aefs.aeFileSys as parameter
+	funcSave := func(argName string, data []byte) (error, *bytes.Buffer) {
+
+		b1 := new(bytes.Buffer)
+
+		fs1 := aefs.New(
+			aefs.MountName(mountPoint),
+			aefs.AeContext(c),
+		)
+
+		dir, bname := fs1.SplitX(argName)
+
+		err := fs1.MkdirAll(dir, 0777)
+		wpf(b1, "mkdir %v - %v\n", dir, err)
+		if err != nil {
+			return err, b1
+		}
+
+		err = fs1.WriteFile(path.Join(dir, bname), data, 0777)
+		wpf(b1, "saved file content to %v - %v\n", argName, err)
+
+		return err, b1
 	}
 
 	ff := "filefield"
@@ -74,10 +108,6 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 			for _, f := range r.File {
 				newFilename = baseDirX + f.Name
 
-				fs1 := aefs.New(
-					aefs.MountName(aefs.MountPointLast()),
-					aefs.AeContext(c),
-				)
 				dir, bname := fs1.SplitX(newFilename)
 
 				if f.FileInfo().IsDir() {
@@ -124,7 +154,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 
 		} else {
 
-			err, b2 := funcSave(c, newFilename, data)
+			err, b2 := funcSave(newFilename, data)
 			lg("%s", b2)
 			if err != nil {
 				return
@@ -134,29 +164,5 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		lg("--------------------\n")
 
 	}
-
-}
-
-func funcSave(c appengine.Context, newFilename string, data []byte) (error, *bytes.Buffer) {
-
-	b1 := new(bytes.Buffer)
-
-	fs1 := aefs.New(
-		aefs.MountName(aefs.MountPointLast()),
-		aefs.AeContext(c),
-	)
-
-	dir, bname := fs1.SplitX(newFilename)
-
-	err := fs1.MkdirAll(dir, 0777)
-	wpf(b1, "mkdir %v - %v\n", dir, err)
-	if err != nil {
-		return err, b1
-	}
-
-	err = fs1.WriteFile(path.Join(dir, bname), data, 0777)
-	wpf(b1, "saved file content to %v - %v\n", newFilename, err)
-
-	return err, b1
 
 }

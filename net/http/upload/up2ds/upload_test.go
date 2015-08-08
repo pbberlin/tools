@@ -1,4 +1,4 @@
-package upload
+package main
 
 import (
 	"fmt"
@@ -9,6 +9,8 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/pbberlin/tools/net/http/upload"
 )
 
 func TestUpload(t *testing.T) {
@@ -24,14 +26,15 @@ func TestUpload(t *testing.T) {
 
 		extraParams := map[string]string{
 			"getparam1":   "val1",
+			"mountname":   "mnt01",
 			"description": "A zip file - containing dirs and files",
 		}
 
 		urlUp := "https://google.com/upload"
-		urlUp = "http://localhost:8085" + UrlUploadReceive
+		urlUp = "http://localhost:8085" + upload.UrlUploadReceive
 		// urlUp = "https://libertarian-islands.appspot.com" + UrlUploadReceive
 
-		request, err := CreateFilePostRequest(
+		request, err := upload.CreateFilePostRequest(
 			urlUp, "filefield", filePath, extraParams)
 		if err != nil {
 			log.Fatal(err)

@@ -11,4 +11,4 @@ var spf func(format string, a ...interface{}) string = fmt.Sprintf
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
 var baseDirX = "c:\\TEMP\\"
-var baseDirY = "c:/TEMP/"
+var docRootDataStore = "up/"

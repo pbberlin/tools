@@ -210,6 +210,9 @@ func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	wpf(w, "<pre>\n")
 	defer wpf(w, tplx.Foot)
 
+	xx := r.Header.Get("adapter_01")
+	wpf(w, "adapter set %q\n", xx)
+
 	wpf(w, "counted up %v\n", aefs.MountPointIncr())
 
 }

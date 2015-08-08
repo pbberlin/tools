@@ -26,7 +26,7 @@ func displayUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	}
 	defer fclose()
 
-	b1.WriteString(tplx.Head)
+	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Show a single file from datastore"}))
 	wpf(b1, "<pre>\n")
 
 	err := r.ParseForm()
@@ -36,16 +36,21 @@ func displayUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	}
 
 	p := r.FormValue("path")
-	wpf(b1, "path = %q\n", p)
+	mnt := aefs.MountPointLast()
+	if len(r.FormValue("mnt")) > 0 {
+		mnt = r.FormValue("mnt")
+	}
+
+	wpf(b1, "path = %q  mnt = %q \n", p, mnt)
 
 	if len(p) > 0 {
 
 		fs1 := aefs.New(
-			aefs.MountName(aefs.MountPointLast()),
+			aefs.MountName(mnt),
 			aefs.AeContext(c),
 		)
 
-		fullP := path.Join(baseDirY, p)
+		fullP := path.Join(docRootDataStore, p)
 
 		f, err := fs1.Open(fullP)
 		if err != nil {

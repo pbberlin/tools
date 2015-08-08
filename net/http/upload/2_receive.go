@@ -41,6 +41,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	if len(r.FormValue("mountname")) > 0 {
 		mountPoint = r.FormValue("mountname")
 	}
+	lg("mount point is %v", mountPoint)
 
 	fs1 := aefs.New(
 		aefs.MountName(mountPoint),
@@ -92,7 +93,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		defer file.Close()
 		lg("extracted file content;  %v bytes", len(data))
 
-		newFilename := baseDirX + handler.Filename
+		newFilename := docRootDataStore + handler.Filename
 		ext := path.Ext(newFilename)
 
 		if ext == ".zip" {
@@ -106,7 +107,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 			}
 
 			for _, f := range r.File {
-				newFilename = baseDirX + f.Name
+				newFilename = docRootDataStore + f.Name
 
 				dir, bname := fs1.SplitX(newFilename)
 

@@ -147,6 +147,8 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			}
 		}()
 
+		r.Header.Set("adapter_01", "a string set by adapter")
+
 		if c == nil {
 			given(w, r, mp)
 		} else {

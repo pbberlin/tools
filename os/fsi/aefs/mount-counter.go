@@ -13,6 +13,7 @@ func MountPointLast() string {
 func MountPointIncr() string {
 	ret := spf("mnt%02v", cntr)
 	cntr++
+
 	// deliberate - if confusing; preventing init -1
 	return ret
 }

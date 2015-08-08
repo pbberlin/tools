@@ -8,6 +8,7 @@ import (
 	"path"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi/aefs"
 
 	"archive/zip"
@@ -20,13 +21,18 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	lg, _ := loghttp.Logger(w, r)
 	c := appengine.NewContext(r)
 
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Receive an Upload"}))
+	defer wpf(w, tplx.Foot)
+	wpf(w, "<pre>")
+	defer wpf(w, "</pre>")
+
 	err := r.ParseMultipartForm(1024 * 1024 * 2)
 	if err != nil {
 		lg("Multipart parsing failed %v", err)
 		return
 	}
 
-	fields := []string{"title", "author", "description"}
+	fields := []string{"getparam1", "description"}
 	for _, v := range fields {
 		lg("%12v => %q", v, r.FormValue(v))
 	}

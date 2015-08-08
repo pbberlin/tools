@@ -2,6 +2,7 @@
 package tplx
 
 import (
+	"bytes"
 	"fmt"
 	"html"
 	tt "html/template"
@@ -78,15 +79,17 @@ const Head = `<!DOCTYPE html>
     <meta charset="utf-8">
     <link rel="shortcut icon" href="data:;base64,=">
     <link rel="icon"          href="data:;base64,=">
-    <title>static-title</title>
+    <title>{{ .HtmlTitle }}</title>
   </head>
   <body>
     <style> pre {line-height:14px;}
       body {font-family:tahoma; font-size: 15px;}
     </style>
+    <span class='body'></span>
   `
 
 const Foot = `
+    <span class='body'></span>
   </body>
 </html>`
 
@@ -242,4 +245,28 @@ func FuncTplBuilder(w http.ResponseWriter, r *http.Request) (f1 func(string, str
 	}
 
 	return f1, f2
+}
+
+// Simply combines one given template string
+// with one given map of params
+//  {{ .ParamX }} in template string
+// must match key in data map[string]string{"ParamX":"Val"}
+// No panic
+// Returns the unexecuted template on error
+func ExecTplHelper(templateString string, data map[string]string) string {
+
+	tplBase, err := tt.New("tplName").Parse(templateString) // tplName is irrelevant, only for inner reference if multiple templates were compiled into one
+	if err != nil {
+		return fmt.Sprintf("%v - tpl compilation failed: %v", templateString, err)
+	}
+
+	b := new(bytes.Buffer)
+
+	err = tplBase.ExecuteTemplate(b, "tplName", data)
+	if err != nil {
+		return fmt.Sprintf("%v - tpl execution failed: %v", templateString, err)
+	}
+
+	return b.String()
+
 }

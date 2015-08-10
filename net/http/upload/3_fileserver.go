@@ -31,7 +31,8 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	wpf(b1, "<pre>\n")
 
 	mnt := aefs.MountPointLast()
-	p := r.URL.String()
+
+	p := r.URL.Path
 	if strings.HasPrefix(p, "/") {
 		p = p[1:]
 	}
@@ -63,15 +64,36 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		}
 
 		inf, err := f.Stat()
-
 		if err != nil {
 			wpf(b1, "err opening fileinfo %v - %v\n", fullP, err)
 			return
 		}
 
+		if inf.IsDir() {
+
+			fullP += "/index.html"
+
+			f, err = fs1.Open(fullP)
+			if err != nil {
+				wpf(b1, "err opening index file %v - %v\n", fullP, err)
+				return
+			}
+
+			inf, err = f.Stat()
+			if err != nil {
+				wpf(b1, "err opening index fileinfo %v - %v\n", fullP, err)
+				return
+			}
+
+		}
+
 		wpf(b1, "opened file %v - %v -  %v\n", f.Name(), inf.Size(), err)
 
 		bts1, err := ioutil.ReadAll(f)
+		if err != nil {
+			wpf(b1, "err with ReadAll %v - %v\n", fullP, err)
+			return
+		}
 
 		tp := mime.TypeByExtension(path.Ext(fullP))
 

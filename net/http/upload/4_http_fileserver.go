@@ -21,6 +21,10 @@ func howIsContext(w http.ResponseWriter, r *http.Request, m map[string]interface
 	}
 }
 
+// A static fileserver is NOT working
+// Since we need an appengine.context
+//
+//
 func serveAefs(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	// Examples

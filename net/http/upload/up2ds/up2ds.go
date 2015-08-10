@@ -44,7 +44,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:  "mount, m",
-			Value: "mnt1",
+			Value: "mnt02",
 			Usage: "the mount name for the dsfs",
 		},
 	}

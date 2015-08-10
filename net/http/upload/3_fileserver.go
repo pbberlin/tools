@@ -6,6 +6,7 @@ import (
 	"mime"
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi/aefs"
@@ -13,7 +14,7 @@ import (
 	"appengine"
 )
 
-func displayUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -26,22 +27,25 @@ func displayUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	}
 	defer fclose()
 
-	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Show a single file from datastore"}))
+	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Half-Static-File-Server"}))
 	wpf(b1, "<pre>\n")
 
-	err := r.ParseForm()
-	if err != nil {
-		wpf(b1, "ParseFormErr %v", err)
-		return
-	}
-
-	p := r.FormValue("path")
 	mnt := aefs.MountPointLast()
-	if len(r.FormValue("mnt")) > 0 {
-		mnt = r.FormValue("mnt")
+	p := r.URL.String()
+	if strings.HasPrefix(p, "/") {
+		p = p[1:]
 	}
 
-	wpf(b1, "path = %q  mnt = %q \n", p, mnt)
+	wpf(b1, "raw path = %q \n", p)
+
+	dirs := strings.Split(p, "/")
+	// wpf(b1, "dirs = %q \n", dirs)
+	if len(dirs) > 0 {
+		mnt = dirs[0]
+		p = strings.Join(dirs[1:], "/")
+	}
+
+	wpf(b1, "mnt = %q  path = %q \n", mnt, p)
 
 	if len(p) > 0 {
 

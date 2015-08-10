@@ -35,6 +35,7 @@ func (d *AeDir) MemCacheGet(name string) error {
 	_ = unparsedjson
 	if err != nil && err != memcache.ErrCacheMiss {
 		panic(err)
+		// d.fSys.Ctx().Errorf("%v", err)
 	} else if err == memcache.ErrCacheMiss {
 		return err
 	}

@@ -10,12 +10,13 @@ import (
 )
 
 var cx appengine.Context
+var mountPoint string
 
 func howIsContext(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	if cx == nil {
 		wpf(w, "nil\n")
 	} else {
-		wpf(w, "context is well: %v\n", cx)
+		wpf(w, "context for mp %q is well: %v\n", mountPoint, cx)
 
 	}
 }
@@ -30,7 +31,7 @@ func serveAefs(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	c := appengine.NewContext(r)
 	cx = c
 
-	mountPoint := aefs.MountPointLast()
+	mountPoint = aefs.MountPointLast()
 	fs1 := aefs.New(
 		aefs.MountName(mountPoint),
 		aefs.AeContext(c),

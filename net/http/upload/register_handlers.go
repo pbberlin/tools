@@ -13,9 +13,9 @@ const UrlUploadReceive = "/blob2/post-receive"
 func InitHandlers() {
 	http.HandleFunc("/blob2/post-send", loghttp.Adapter(sendUpload))
 	http.HandleFunc(UrlUploadReceive, loghttp.Adapter(receiveUpload))
-	http.HandleFunc("/blob2/get-file", loghttp.Adapter(displayUpload))
-	http.HandleFunc("/blob2/serve-aefs", loghttp.Adapter(serveAefs))
-	http.HandleFunc("/blob2/how-is-context", loghttp.Adapter(howIsContext))
+	http.HandleFunc("/mnt00/", loghttp.Adapter(serveFile))
+	http.HandleFunc("/mnt01/", loghttp.Adapter(serveFile))
+	http.HandleFunc("/mnt02/", loghttp.Adapter(serveFile))
 
 }
 
@@ -25,6 +25,10 @@ func BackendUIRendered() *bytes.Buffer {
 	htmlfrag.Wb(backendFragBlob, "Upload zip files into aefs", "")
 	htmlfrag.Wb(backendFragBlob, "send", "/blob2/post-send", "via command line or via this form")
 	htmlfrag.Wb(backendFragBlob, "receive", UrlUploadReceive, "receive a plain file or a zip archive")
-	htmlfrag.Wb(backendFragBlob, "show", "/blob2/get-file", "show an aefs stored file by get param path")
+
+	htmlfrag.Wb(backendFragBlob, "serve file mnt00", "/mnt00/test.jpg", "")
+	htmlfrag.Wb(backendFragBlob, "serve file mnt01", "/mnt01/test.jpg", "")
+	htmlfrag.Wb(backendFragBlob, "serve file mnt02", "/mnt02/test.jpg", "")
+
 	return backendFragBlob
 }

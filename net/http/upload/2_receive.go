@@ -21,16 +21,17 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	lg, _ := loghttp.Logger(w, r)
 	c := appengine.NewContext(r)
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Receive an Upload"}))
-	defer wpf(w, tplx.Foot)
-	wpf(w, "<pre>")
-	defer wpf(w, "</pre>")
-
+	// parsing multipart before anything else
 	err := r.ParseMultipartForm(1024 * 1024 * 2)
 	if err != nil {
 		lg("Multipart parsing failed: %v", err)
 		return
 	}
+
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Receive an Upload"}))
+	defer wpf(w, tplx.Foot)
+	wpf(w, "<pre>")
+	defer wpf(w, "</pre>")
 
 	fields := []string{"getparam1", "mountname", "description"}
 	for _, v := range fields {

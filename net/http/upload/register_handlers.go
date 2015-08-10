@@ -14,6 +14,9 @@ func InitHandlers() {
 	http.HandleFunc("/blob2/post-send", loghttp.Adapter(sendUpload))
 	http.HandleFunc(UrlUploadReceive, loghttp.Adapter(receiveUpload))
 	http.HandleFunc("/blob2/get-file", loghttp.Adapter(displayUpload))
+	http.HandleFunc("/blob2/serve-aefs", loghttp.Adapter(serveAefs))
+	http.HandleFunc("/blob2/how-is-context", loghttp.Adapter(howIsContext))
+
 }
 
 // userinterface rendered to HTML - not only the strings for title and url

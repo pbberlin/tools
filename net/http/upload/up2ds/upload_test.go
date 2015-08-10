@@ -32,7 +32,7 @@ func TestUpload(t *testing.T) {
 
 		urlUp := "https://google.com/upload"
 		urlUp = "http://localhost:8085" + upload.UrlUploadReceive
-		// urlUp = "https://libertarian-islands.appspot.com" + UrlUploadReceive
+		urlUp = "https://libertarian-islands.appspot.com" + upload.UrlUploadReceive
 
 		request, err := upload.CreateFilePostRequest(
 			urlUp, "filefield", filePath, extraParams)

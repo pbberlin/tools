@@ -415,11 +415,11 @@ func dataStoreClone(w http.ResponseWriter, r *http.Request,
 }
 
 func init() {
-	http.Handle("/print", loghttp.Adapter(blobList))
-	http.Handle("/blob2", loghttp.Adapter(blobList))
-	http.Handle("/blob2/upload", loghttp.Adapter(submitUpload))
-	http.Handle("/blob2/processing-new-upload", loghttp.Adapter(processUpload))
-	http.Handle("/blob2/serve-full", loghttp.Adapter(serveFull))
-	http.Handle("/blob2/thumb", loghttp.Adapter(serveThumb))
-	http.Handle("/blob2/rename-delete", loghttp.Adapter(renameOrDelete))
+	http.HandleFunc("/print", loghttp.Adapter(blobList))
+	http.HandleFunc("/blob2", loghttp.Adapter(blobList))
+	http.HandleFunc("/blob2/upload", loghttp.Adapter(submitUpload))
+	http.HandleFunc("/blob2/processing-new-upload", loghttp.Adapter(processUpload))
+	http.HandleFunc("/blob2/serve-full", loghttp.Adapter(serveFull))
+	http.HandleFunc("/blob2/thumb", loghttp.Adapter(serveThumb))
+	http.HandleFunc("/blob2/rename-delete", loghttp.Adapter(renameOrDelete))
 }

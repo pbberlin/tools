@@ -16,7 +16,7 @@ import (
 func (memMapFs) Name() string { return "memfs" } // type
 // instance
 func (m *memMapFs) String() string {
-	return m.mount
+	return m.ident
 }
 
 func (m *memMapFs) createHelper(name string) *InMemoryFile {

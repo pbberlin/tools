@@ -52,7 +52,7 @@ func initFileSystems() (fss []fsi.FileSystem, c aetest.Context) {
 	fs3 := osfs.New()
 
 	fs4 := memfs.New(
-		memfs.MountName("m"),
+		memfs.Ident("m"),
 	)
 
 	fss = []fsi.FileSystem{fs1, fs3, fs4}

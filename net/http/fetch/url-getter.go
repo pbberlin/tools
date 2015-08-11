@@ -20,7 +20,9 @@ var LogLevel = 0
 
 // UrlGetter universal http getter for app engine and standalone go programs.
 // Previously response was returned. Forgot why. Dropped it.
-func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, *url.URL, error) {
+func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) (
+	[]byte, *url.URL, error,
+) {
 
 	client := &http.Client{}
 	if gaeReq == nil {
@@ -65,7 +67,7 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) ([]byte, *url.
 	}
 
 	if err != nil {
-		return nil, u, fmt.Errorf("get request failed: %v", err)
+		return nil, u, fmt.Errorf("get request failed: %v (%v)", err, u.Scheme)
 	}
 
 	if resp.StatusCode != http.StatusOK {

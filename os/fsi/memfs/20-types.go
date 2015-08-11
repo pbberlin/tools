@@ -17,16 +17,17 @@ type memMapFs struct {
 	fos   map[string]fsi.File
 	mutex *sync.RWMutex
 
-	// mount is a directory prefix, similar to a base directory.
-	// Useful to as a kind of current dir; to keep memfs exchangeable with osfs
-	mount string
+	// Could be expanded into a kind of "currentDir"
+	// for compatibility with osfs.
+	// Currently only used as instance name
+	ident string
 }
 
-// MountName is an option func, adding a specific mount name to the filesystem
-func MountName(mnt string) func(fsi.FileSystem) {
+// BaseDir is an option func, adding a specific base dir to the filesystem
+func Ident(mnt string) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*memMapFs)
-		fst.mount = mnt
+		fst.ident = mnt
 	}
 }
 
@@ -37,7 +38,7 @@ func MountName(mnt string) func(fsi.FileSystem) {
 func New(options ...func(fsi.FileSystem)) *memMapFs {
 	m := &memMapFs{
 		fos:   map[string]fsi.File{}, // secure init
-		mount: "mnt0",
+		ident: "mnt00",
 	}
 	for _, option := range options {
 		option(m)
@@ -46,11 +47,11 @@ func New(options ...func(fsi.FileSystem)) *memMapFs {
 }
 
 func (m *memMapFs) RootDir() string {
-	return m.mount + sep
+	return m.ident + sep
 }
 
 func (m *memMapFs) RootName() string {
-	return m.mount
+	return m.ident
 }
 
 func Unwrap(fs fsi.FileSystem) (*memMapFs, bool) {

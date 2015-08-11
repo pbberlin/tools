@@ -6,13 +6,17 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/url"
+	"os"
+	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
-	"github.com/pbberlin/tools/os/osutilpb"
+	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -22,12 +26,19 @@ type FullArticle struct {
 	Body []byte
 }
 
-func Fetch(rssUrl string, numberArticles int) {
+var fs fsi.FileSystem
+
+func init() {
+	fs = osfs.New()
+	os.Chdir(docRoot)
+	// fs = memfs.New()
+}
+
+func Fetch(rssUrl, uriPrefix string, numberArticles int) {
 
 	//
 	// setting up a 3 staged pipeline from bottom up
 	//
-
 	var fullArticles []FullArticle
 	const numWorkers = 3
 
@@ -36,7 +47,8 @@ func Fetch(rssUrl string, numberArticles int) {
 	var fin chan struct{} = make(chan struct{})         // downstream signals end to upstream
 	var stage3Wait sync.WaitGroup
 
-	// fire up the "collector", a fan-in, stage 3
+	// stage 3
+	// fire up the "collector", a fan-in
 	go func() {
 		stage3Wait.Add(1)
 		const delay1 = 800
@@ -48,7 +60,7 @@ func Fetch(rssUrl string, numberArticles int) {
 			case fa := <-out:
 				fullArticles = append(fullArticles, *fa)
 				u, _ := url.Parse(fa.Url)
-				pf("        fetched          %v \n", u.RequestURI())
+				pf("        fetched          %v \n", stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50))
 				cout = time.After(time.Millisecond * delay2) // refresh timeout
 			case <-cout:
 				pf("timeout after %v articles\n", len(fullArticles))
@@ -60,10 +72,10 @@ func Fetch(rssUrl string, numberArticles int) {
 				stage3Wait.Done()
 				return
 			}
-
 		}
 	}()
 
+	//
 	// stage 2
 	for i := 0; i < numWorkers; i++ {
 		// fire up a dedicated fetcher routine, a worker
@@ -75,12 +87,12 @@ func Fetch(rssUrl string, numberArticles int) {
 				select {
 				case a = <-inn:
 					var err error
-					a.Body, err = fetch.UrlGetter(a.Url, nil, false)
+					a.Body, _, err = fetch.UrlGetter(a.Url, nil, false)
 					logif.F(err)
 					out <- a
 					a = new(FullArticle)
 				case <-fin:
-					if a.Url != "" {
+					if a != nil && a.Url != "" {
 						u, _ := url.Parse(a.Url)
 						pf("    abandoned %v\n", u.RequestURI())
 					} else {
@@ -96,30 +108,29 @@ func Fetch(rssUrl string, numberArticles int) {
 	//
 	//
 	// stage 1
-	bts, err := fetch.UrlGetter(rssUrl, nil, false)
-	logif.F(err)
+	rssDoc := rssDir(rssUrl)
 
-	bts = bytes.Replace(bts, []byte("content:encoded>"), []byte("content-encoded>S"), -1)
-
-	var rssDoc RSS
-	err = xml.Unmarshal(bts, &rssDoc)
-	logif.E(err)
-
-	bdmp := stringspb.IndentedDumpBytes(rssDoc)
-	osutilpb.Bytes2File("outp_rss.xml", bdmp)
-	pf("RSS resp size, outp_rss.xml, : %v\n", len(bdmp))
-
+	cntr := 0
 	for i, lpItem := range rssDoc.Items.ItemList {
+
+		u, err := url.Parse(lpItem.Link)
+		logif.E(err)
+		short := stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50)
 
 		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
 		logif.E(err)
-		u, err := url.Parse(lpItem.Link)
-		logif.E(err)
-		pf("    feed #%02v: %v - %v\n", i, t.Format("15:04:05"), u.RequestURI())
 
+		if !strings.HasPrefix(u.RequestURI(), uriPrefix) {
+			// pf("\t\t      want %20v - got %v\n", uriPrefix, short)
+			pf("\t\tskipping %20v\n", short)
+			continue
+		}
+
+		pf("    feed #%02v: %v - %v\n", i, t.Format("15:04:05"), short)
 		inn <- &FullArticle{Url: lpItem.Link} // stage 1 loading
 
-		if i+1 >= numberArticles {
+		cntr++
+		if cntr > numberArticles {
 			break
 		}
 	}
@@ -133,8 +144,11 @@ func Fetch(rssUrl string, numberArticles int) {
 	// Saving as files
 	for idx, a := range fullArticles {
 		orig, numbered := fetchFileName(a.Url, idx+len(testDocs))
-		osutilpb.Bytes2File(orig, a.Body)
-		osutilpb.Bytes2File(numbered, a.Body)
+		err := fs.WriteFile(orig, a.Body, 0755)
+		logif.E(err)
+
+		err = fs.WriteFile(numbered, a.Body, 0755)
+		logif.E(err)
 	}
 
 	// Write out directory statistics
@@ -149,29 +163,38 @@ func Fetch(rssUrl string, numberArticles int) {
 	sr := sortmap.SortMapByCount(histoDir)
 
 	{
-		bts := []byte{}
-		for _, v := range sr {
-			bts = append(bts, []byte(v.Key)...)
-			bts = append(bts, '\t')
-			bts = append(bts, []byte(spf("%v", v.Cnt))...)
-			bts = append(bts, '\n')
-		}
-		// sr.Print(3)
-		fnDigest := filepath.Join(docRoot, "digest.txt")
-		osutilpb.Bytes2File(fnDigest, bts)
-	}
-
-	{
 		b, err := json.MarshalIndent(sr, "  ", "\t")
 		logif.E(err)
-		fnDigest := filepath.Join(docRoot, "digest1.json")
-		osutilpb.Bytes2File(fnDigest, b)
+		fnDigest := filepath.Join(docRoot, "digest_detailed.json")
+		err = fs.WriteFile(fnDigest, b, 0755)
+		logif.E(err)
 	}
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
 		logif.E(err)
-		fnDigest := filepath.Join(docRoot, "digest2.json")
-		osutilpb.Bytes2File(fnDigest, b)
+		fnDigest := filepath.Join(docRoot, "digest.json")
+		err = fs.WriteFile(fnDigest, b, 0755)
+		logif.E(err)
 	}
+}
+
+//
+func rssDir(rssUrl string) (rssDoc RSS) {
+
+	bts, urlRSS, err := fetch.UrlGetter(rssUrl, nil, false)
+	logif.F(err)
+
+	bts = bytes.Replace(bts, []byte("content:encoded>"), []byte("content-encoded>S"), -1) // hack
+
+	err = xml.Unmarshal(bts, &rssDoc)
+	logif.E(err)
+
+	// save it
+	bdmp := stringspb.IndentedDumpBytes(rssDoc)
+	err = fs.WriteFile(path.Join(docRoot, urlRSS.Host, "outp_rss.xml"), bdmp, 0755)
+	logif.E(err)
+	pf("RSS resp size, outp_rss.xml, : %v\n", len(bdmp))
+
+	return
 }

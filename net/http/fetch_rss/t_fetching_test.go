@@ -7,6 +7,6 @@ func Test2(t *testing.T) {
 	Serve()
 
 	url := spf("%v/contentexport/feed/schlagzeilen", hosts[0])
-	Fetch(url, 19)
+	Fetch(url, "/politik/", 7)
 
 }

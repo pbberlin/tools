@@ -5,7 +5,7 @@ import (
 
 	"appengine"
 
-	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/httpfs"
 )
 
@@ -25,7 +25,7 @@ func howIsContext(w http.ResponseWriter, r *http.Request, m map[string]interface
 // Since we need an appengine.context
 //
 //
-func serveAefs(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+func serveDsFs(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	// Examples
 	http.Handle("/img/", http.StripPrefix("/img/", http.FileServer(http.Dir("./img/"))))
@@ -35,10 +35,10 @@ func serveAefs(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	c := appengine.NewContext(r)
 	cx = c
 
-	mountPoint = aefs.MountPointLast()
-	fs1 := aefs.New(
-		aefs.MountName(mountPoint),
-		aefs.AeContext(c),
+	mountPoint = dsfs.MountPointLast()
+	fs1 := dsfs.New(
+		dsfs.MountName(mountPoint),
+		dsfs.AeContext(c),
 	)
 	httpFSys := &httpfs.HttpFs{SourceFs: fs1}
 

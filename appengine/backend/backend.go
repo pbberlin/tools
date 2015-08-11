@@ -14,7 +14,7 @@ import (
 	"github.com/pbberlin/tools/net/http/paths"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/net/http/upload"
-	// _ "github.com/pbberlin/tools/os/fsi/aefs"
+	// _ "github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/webapi"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
@@ -92,8 +92,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.WriteString("<hr>\n")
 
-	uiAefs := webapi.BackendUIRendered()
-	b1.Write(uiAefs.Bytes())
+	uiDsFs := webapi.BackendUIRendered()
+	b1.Write(uiDsFs.Bytes())
 
 	b1.WriteString("<hr>\n")
 

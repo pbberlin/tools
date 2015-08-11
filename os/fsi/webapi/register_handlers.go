@@ -13,10 +13,10 @@ import (
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/aefs"
-	"github.com/pbberlin/tools/os/fsi/fstest"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
+	"github.com/pbberlin/tools/os/fsi/test"
 )
 
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
@@ -29,18 +29,18 @@ var osFileSys = osfs.New()
 var whichType = 0
 
 func InitHandlers() {
-	http.HandleFunc("/fs/aefs/set-fs-type", loghttp.Adapter(setFSType))
-	http.HandleFunc("/fs/aefs/create-objects", loghttp.Adapter(createSys))
-	http.HandleFunc("/fs/aefs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
-	http.HandleFunc("/fs/aefs/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
-	http.HandleFunc("/fs/aefs/walk", loghttp.Adapter(walkH))
-	http.HandleFunc("/fs/aefs/remove", loghttp.Adapter(removeSubtree))
+	http.HandleFunc("/fs/dsfs/set-fs-type", loghttp.Adapter(setFSType))
+	http.HandleFunc("/fs/dsfs/create-objects", loghttp.Adapter(createSys))
+	http.HandleFunc("/fs/dsfs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
+	http.HandleFunc("/fs/dsfs/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
+	http.HandleFunc("/fs/dsfs/walk", loghttp.Adapter(walkH))
+	http.HandleFunc("/fs/dsfs/remove", loghttp.Adapter(removeSubtree))
 
-	http.HandleFunc("/fs/aefs/delete-all", loghttp.Adapter(deleteAll))
+	http.HandleFunc("/fs/dsfs/delete-all", loghttp.Adapter(deleteAll))
 
-	http.HandleFunc("/fs/aefs/reset", loghttp.Adapter(resetMountPoint))
-	http.HandleFunc("/fs/aefs/incr", loghttp.Adapter(incrMountPoint))
-	http.HandleFunc("/fs/aefs/decr", loghttp.Adapter(decrMountPoint))
+	http.HandleFunc("/fs/dsfs/reset", loghttp.Adapter(resetMountPoint))
+	http.HandleFunc("/fs/dsfs/incr", loghttp.Adapter(incrMountPoint))
+	http.HandleFunc("/fs/dsfs/decr", loghttp.Adapter(decrMountPoint))
 }
 
 // userinterface rendered to HTML - not only the strings for title and url
@@ -50,21 +50,21 @@ func BackendUIRendered() *bytes.Buffer {
 
 	htmlfrag.Wb(b1, "filesystem interface", "")
 
-	htmlfrag.Wb(b1, "set type", "/fs/aefs/set-fs-type")
-	htmlfrag.Wb(b1, "create", "/fs/aefs/create-objects")
+	htmlfrag.Wb(b1, "set type", "/fs/dsfs/set-fs-type")
+	htmlfrag.Wb(b1, "create", "/fs/dsfs/create-objects")
 
-	htmlfrag.Wb(b1, "query", "/fs/aefs/retrieve-by-query")
-	htmlfrag.Wb(b1, "readdir", "/fs/aefs/retrieve-by-read-dir")
-	htmlfrag.Wb(b1, "walk", "/fs/aefs/walk")
-	htmlfrag.Wb(b1, "remove", "/fs/aefs/remove")
+	htmlfrag.Wb(b1, "query", "/fs/dsfs/retrieve-by-query")
+	htmlfrag.Wb(b1, "readdir", "/fs/dsfs/retrieve-by-read-dir")
+	htmlfrag.Wb(b1, "walk", "/fs/dsfs/walk")
+	htmlfrag.Wb(b1, "remove", "/fs/dsfs/remove")
 
-	htmlfrag.Wb(b1, "delete all fs entities", "/fs/aefs/delete-all")
+	htmlfrag.Wb(b1, "delete all fs entities", "/fs/dsfs/delete-all")
 
 	// htmlfrag.Wb(b1, , "")
-	htmlfrag.Wb(b1, "aefs mount", "nobr")
-	htmlfrag.Wb(b1, "decr", "/fs/aefs/decr")
-	htmlfrag.Wb(b1, "incr", "/fs/aefs/incr")
-	htmlfrag.Wb(b1, "reset", "/fs/aefs/reset")
+	htmlfrag.Wb(b1, "dsfs mount", "nobr")
+	htmlfrag.Wb(b1, "decr", "/fs/dsfs/decr")
+	htmlfrag.Wb(b1, "incr", "/fs/dsfs/incr")
+	htmlfrag.Wb(b1, "reset", "/fs/dsfs/reset")
 
 	return b1
 
@@ -84,17 +84,17 @@ func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	}
 
 	if whichType != 0 {
-		wpf(w, "<a href='/fs/aefs/set-fs-type?type=0' >aefs</a><br>\n")
+		wpf(w, "<a href='/fs/dsfs/set-fs-type?type=0' >dsfs</a><br>\n")
 	} else {
-		wpf(w, "<b>aefs</b><br>\n")
+		wpf(w, "<b>dsfs</b><br>\n")
 	}
 	if whichType != 1 {
-		wpf(w, "<a href='/fs/aefs/set-fs-type?type=1' >osfs</a><br>\n")
+		wpf(w, "<a href='/fs/dsfs/set-fs-type?type=1' >osfs</a><br>\n")
 	} else {
 		wpf(w, "<b>osfs</b><br>\n")
 	}
 	if whichType != 2 {
-		wpf(w, "<a href='/fs/aefs/set-fs-type?type=2' >memfs</a><br>\n")
+		wpf(w, "<a href='/fs/dsfs/set-fs-type?type=2' >memfs</a><br>\n")
 	} else {
 		wpf(w, "<b>memfs</b><br>\n")
 	}
@@ -120,9 +120,9 @@ func runTestX(
 	case 0:
 		// must be re-instantiated for each request
 		if f1 == nil {
-			f1 = aefs.MountPointLast
+			f1 = dsfs.MountPointLast
 		}
-		aeFileSys := aefs.New(aefs.MountName(f1()), aefs.AeContext(appengine.NewContext(r)))
+		aeFileSys := dsfs.New(dsfs.MountName(f1()), dsfs.AeContext(appengine.NewContext(r)))
 		fs = fsi.FileSystem(aeFileSys)
 	case 1:
 		fs = fsi.FileSystem(osFileSys)
@@ -135,7 +135,7 @@ func runTestX(
 
 	bb := new(bytes.Buffer)
 	msg := ""
-	wpf(bb, "created fs %v\n\n", aefs.MountPointLast())
+	wpf(bb, "created fs %v\n\n", dsfs.MountPointLast())
 	bb, msg = f2(fs)
 	w.Write([]byte(msg))
 	w.Write([]byte("\n\n"))
@@ -144,27 +144,27 @@ func runTestX(
 }
 
 func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, aefs.MountPointIncr, fstest.CreateSys)
+	runTestX(w, r, dsfs.MountPointIncr, test.CreateSys)
 }
 
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, nil, fstest.RetrieveByQuery)
+	runTestX(w, r, nil, test.RetrieveByQuery)
 }
 
 func retrieveByReadDir(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, nil, fstest.RetrieveByReadDir)
+	runTestX(w, r, nil, test.RetrieveByReadDir)
 }
 
 func walkH(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, nil, fstest.WalkDirs)
+	runTestX(w, r, nil, test.WalkDirs)
 }
 
 func removeSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, nil, fstest.RemoveSubtree)
+	runTestX(w, r, nil, test.RemoveSubtree)
 }
 
 //
-// aefs specific
+// dsfs specific
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete all filesystem data"}))
@@ -173,8 +173,8 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
 
-	fs := aefs.New(aefs.AeContext(appengine.NewContext(r)))
-	wpf(w, "aefs:\n")
+	fs := dsfs.New(dsfs.AeContext(appengine.NewContext(r)))
+	wpf(w, "dsfs:\n")
 	msg, err := fs.DeleteAll()
 	if err != nil {
 		wpf(w, "err during delete %v\n", err)
@@ -198,7 +198,7 @@ func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interf
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
 
-	wpf(w, "reset %v\n", aefs.MountPointReset())
+	wpf(w, "reset %v\n", dsfs.MountPointReset())
 
 }
 
@@ -213,7 +213,7 @@ func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	xx := r.Header.Get("adapter_01")
 	wpf(w, "adapter set %q\n", xx)
 
-	wpf(w, "counted up %v\n", aefs.MountPointIncr())
+	wpf(w, "counted up %v\n", dsfs.MountPointIncr())
 
 }
 
@@ -225,6 +225,6 @@ func decrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
 
-	wpf(w, "counted down %v\n", aefs.MountPointDecr())
+	wpf(w, "counted down %v\n", dsfs.MountPointDecr())
 
 }

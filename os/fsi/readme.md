@@ -27,13 +27,13 @@ Contact me, if you think, the interface needs
 additional *mandatory* methods.
 Then create a pull-request and add your method to the interface and to all filesystems.
 
-#### Subpackage fsc (fs common)
+#### Subpackage common
 Holds common extensions to all filesystems.
 It contains an implementation of filepath.walk,
 that can be used for all contained filesystems.
-aefs.RemoveAll is built on this walk.
+dsfs.RemoveAll is built on this walk.
 
-#### Subpackage fstests 
+#### Subpackage tests 
 Contains tests for all filesystems.
 Tests on file level are taken from [afero](https:github.com/spf13/afero).
 I added a directory-tree-walk test suite and an httpfs-wrapper test.
@@ -53,8 +53,8 @@ by changing the instantiation.
 Keeps directories and files completely in RAM.
 Good for quick testing. Cleanup is included.
 
-#### aefs
-With aefs you can write on google's datastore like onto a local hard disk.
+#### dsfs
+With dsfs you can write on google's datastore like onto a local hard disk.
 See doc.go for details.
 
 
@@ -82,8 +82,8 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 
 - memfs registerWithParent locking seems neglected.
 
-- aefs needs a locking consideration for RemoveAll and Rename. 
-Behold the asynchroneus nature of aefs directories.
+- dsfs needs a locking consideration for RemoveAll and Rename. 
+Behold the asynchroneus nature of dsfs directories.
 
 #### Tests
 
@@ -95,11 +95,11 @@ Common Remarks
 All filesystems need to maintain compatibility
 to relative paths of osfs; that is to current working directory prefixing.
 Therefore all filesystems must support "." for current working dir.
-Currently - in memfs and aefs - working dir always refers to fs.RootDir().
+Currently - in memfs and dsfs - working dir always refers to fs.RootDir().
 
-memfs and aefs interpret / or nothing as starting with root.
+memfs and dsfs interpret / or nothing as starting with root.
 
-To access files directly under root, memfs and aefs must use ./filename
+To access files directly under root, memfs and dsfs must use ./filename
 
 The filesystem types are no longer exported.
 To access implementation specific functionality, use
@@ -118,7 +118,7 @@ In the first case, it refers to
 
 	[current dir]/app1.log.
 
-Which is for memfs and aefs        
+Which is for memfs and dsfs        
 
 	[root dir]/app1.log.
 

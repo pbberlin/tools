@@ -9,7 +9,7 @@ import (
 
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
-	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
 
 	"archive/zip"
 
@@ -38,25 +38,25 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		lg("%12v => %q", v, r.FormValue(v))
 	}
 
-	mountPoint := aefs.MountPointLast()
+	mountPoint := dsfs.MountPointLast()
 	if len(r.FormValue("mountname")) > 0 {
 		mountPoint = r.FormValue("mountname")
 	}
 	lg("mount point is %v", mountPoint)
 
-	fs1 := aefs.New(
-		aefs.MountName(mountPoint),
-		aefs.AeContext(c),
+	fs1 := dsfs.New(
+		dsfs.MountName(mountPoint),
+		dsfs.AeContext(c),
 	)
 
-	// As closure, since we cannot define aefs.aeFileSys as parameter
+	// As closure, since we cannot define dsfs.aeFileSys as parameter
 	funcSave := func(argName string, data []byte) (error, *bytes.Buffer) {
 
 		b1 := new(bytes.Buffer)
 
-		fs1 := aefs.New(
-			aefs.MountName(mountPoint),
-			aefs.AeContext(c),
+		fs1 := dsfs.New(
+			dsfs.MountName(mountPoint),
+			dsfs.AeContext(c),
 		)
 
 		dir, bname := fs1.SplitX(argName)

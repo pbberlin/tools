@@ -12,7 +12,7 @@ import (
 var (
 	// EmptyQueryResult is a warning, that implementations of ReadDir may return,
 	// if their results are based on weakly consistent indexes.
-	// It is defined here, since fsc.Walk() wants to ignore it.
+	// It is defined here, since common.Walk() wants to ignore it.
 	EmptyQueryResult = fmt.Errorf("Query found no results based on weakly consistent index.")
 
 	// If an implementation cannot support a method, it should at least return this testable error.
@@ -42,7 +42,7 @@ type FileSystem interface {
 	// Chtimes(name string, atime time.Time, mtime time.Time) error
 
 	Create(name string) (File, error)       // read write
-	Lstat(path string) (os.FileInfo, error) // for fsc.Walk
+	Lstat(path string) (os.FileInfo, error) // for common.Walk
 	Mkdir(name string, perm os.FileMode) error
 	MkdirAll(path string, perm os.FileMode) error
 	Open(name string) (File, error) // read only
@@ -73,7 +73,7 @@ type FileSystem interface {
 
 	// Walk() is inspired by filepath.Walk()
 	// Walk is implemented generically, purely on fsi.FileSystem,
-	// in package fsc. Implementing it here is discouraged:
+	// in package common. Implementing it here is discouraged:
 	// Walk(root string, walkFn WalkFunc) error
 
 }

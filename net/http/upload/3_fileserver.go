@@ -9,12 +9,16 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/net/http/tplx"
-	"github.com/pbberlin/tools/os/fsi/aefs"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
 
 	"appengine"
 )
 
-func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+// We cannot use http.FileServer(http.Dir("./css/") to dispatch our dsfs files.
+// We need the appengine context to initialize dsfs.
+//
+// Thus we re-implement a serveFile method:
+func serveDsFsFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 
@@ -30,7 +34,7 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Half-Static-File-Server"}))
 	wpf(b1, "<pre>\n")
 
-	mnt := aefs.MountPointLast()
+	mnt := dsfs.MountPointLast()
 
 	p := r.URL.Path
 	if strings.HasPrefix(p, "/") {
@@ -48,11 +52,15 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	wpf(b1, "mnt = %q  path = %q \n", mnt, p)
 
+	if p == "" {
+		p += "index.html"
+	}
+
 	if len(p) > 0 {
 
-		fs1 := aefs.New(
-			aefs.MountName(mnt),
-			aefs.AeContext(c),
+		fs1 := dsfs.New(
+			dsfs.MountName(mnt),
+			dsfs.AeContext(c),
 		)
 
 		fullP := path.Join(docRootDataStore, p)
@@ -70,6 +78,8 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		}
 
 		if inf.IsDir() {
+
+			wpf(b1, "%v is a directory - trying index.html...\n", fullP)
 
 			fullP += "/index.html"
 
@@ -100,7 +110,10 @@ func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		w.Header().Set("Content-Type", tp)
 		w.Write(bts1)
 
-		b1 = new(bytes.Buffer) // reset the log
+		// on success -
+		// reset the message log
+		// => dumps an empty buffer
+		b1 = new(bytes.Buffer)
 
 	}
 

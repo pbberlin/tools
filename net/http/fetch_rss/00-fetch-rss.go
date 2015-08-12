@@ -13,6 +13,7 @@ import (
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
@@ -29,6 +30,7 @@ var hosts = map[string]map[string]interface{}{
 
 type FullArticle struct {
 	Url  string
+	Mod  time.Time
 	Body []byte
 }
 
@@ -40,7 +42,7 @@ func init() {
 	fs = osfs.New(osfs.DirSort("byDateDesc"))
 	os.Chdir(docRoot)
 
-	// fs = memfs.New(memfs.DirSort("byDateDesc"))
+	fs = memfs.New(memfs.DirSort("byDateDesc"))
 }
 
 func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) {
@@ -99,7 +101,7 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 				case a = <-inn:
 					var err error
 					a.Body, _, err = fetch.UrlGetter(a.Url, nil, false)
-					logif.F(err)
+					logif.E(err)
 					out <- a
 					a = new(FullArticle)
 				case <-fin:
@@ -173,6 +175,8 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 		p := path.Join(docRoot, u.Host, semanticUri)
 		err = fs.WriteFile(p, a.Body, 0644)
 		logif.E(err)
+		err = fs.Chtimes(p, a.Mod, a.Mod)
+		logif.E(err)
 	}
 
 	// digests
@@ -230,12 +234,12 @@ func stuffStage1(config map[string]interface{}, inn chan *FullArticle, rssDoc *R
 		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
 		depthUri := strings.Count(semanticUri, "/")
 		if depthUri > depthPrefix+1+depthTolerance {
-			pf("\t\tskipping %20v - too deep (%v - %v)\n", semanticUri, depthPrefix, depthUri)
+			// pf("\t\tskipping %20v - too deep (%v - %v)\n", semanticUri, depthPrefix, depthUri)
 			continue
 		}
 
 		pf("    feed #%02v: %v - %v\n", i, t.Format("15:04:05"), short)
-		inn <- &FullArticle{Url: lpItem.Link} // stage 1 loading
+		inn <- &FullArticle{Url: lpItem.Link, Mod: t} // stage 1 loading
 
 		nFound++
 		if nFound >= nWant {

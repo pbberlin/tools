@@ -8,7 +8,7 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-func (f *AeFile) Close() error {
+func (f *DsFile) Close() error {
 
 	atomic.StoreInt64(&f.at, 0)
 	f.Lock()
@@ -26,7 +26,7 @@ func (f *AeFile) Close() error {
 
 // See fsi.File interface.
 // Adapt (f *AeDir) Readdir also
-func (f *AeFile) Readdir(n int) (fis []os.FileInfo, err error) {
+func (f *DsFile) Readdir(n int) (fis []os.FileInfo, err error) {
 
 	fis, err = f.fSys.ReadDir(f.Dir)
 
@@ -53,7 +53,7 @@ func (f *AeFile) Readdir(n int) (fis []os.FileInfo, err error) {
 }
 
 // See fsi.File interface.
-func (f *AeFile) Readdirnames(n int) (names []string, err error) {
+func (f *DsFile) Readdirnames(n int) (names []string, err error) {
 	fis, err := f.Readdir(n)
 	names = make([]string, 0, len(fis))
 	for _, lp := range fis {
@@ -62,7 +62,7 @@ func (f *AeFile) Readdirnames(n int) (names []string, err error) {
 	return names, err
 }
 
-func (f *AeFile) Read(b []byte) (n int, err error) {
+func (f *DsFile) Read(b []byte) (n int, err error) {
 	f.Lock()
 	defer f.Unlock()
 	if f.closed == true {
@@ -81,12 +81,12 @@ func (f *AeFile) Read(b []byte) (n int, err error) {
 	return
 }
 
-func (f *AeFile) ReadAt(b []byte, off int64) (n int, err error) {
+func (f *DsFile) ReadAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Read(b)
 }
 
-func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
+func (f *DsFile) Seek(offset int64, whence int) (int64, error) {
 	if f.closed == true {
 		return 0, fsi.ErrFileClosed
 	}
@@ -101,11 +101,11 @@ func (f *AeFile) Seek(offset int64, whence int) (int64, error) {
 	return f.at, nil
 }
 
-func (f *AeFile) Stat() (os.FileInfo, error) {
+func (f *DsFile) Stat() (os.FileInfo, error) {
 	return os.FileInfo(*f), nil
 }
 
-func (f *AeFile) Sync() error {
+func (f *DsFile) Sync() error {
 
 	err := f.fSys.saveFileByPath(f, f.Dir+f.BName)
 	if err != nil {
@@ -114,7 +114,7 @@ func (f *AeFile) Sync() error {
 	return nil
 }
 
-func (f *AeFile) Truncate(size int64) error {
+func (f *DsFile) Truncate(size int64) error {
 	if f.closed == true {
 		return fsi.ErrFileClosed
 	}
@@ -132,7 +132,7 @@ func (f *AeFile) Truncate(size int64) error {
 	return nil
 }
 
-func (f *AeFile) Write(b []byte) (n int, err error) {
+func (f *DsFile) Write(b []byte) (n int, err error) {
 	n = len(b)
 	cur := atomic.LoadInt64(&f.at)
 	f.Lock()
@@ -156,11 +156,11 @@ func (f *AeFile) Write(b []byte) (n int, err error) {
 	return
 }
 
-func (f *AeFile) WriteAt(b []byte, off int64) (n int, err error) {
+func (f *DsFile) WriteAt(b []byte, off int64) (n int, err error) {
 	atomic.StoreInt64(&f.at, off)
 	return f.Write(b)
 }
 
-func (f *AeFile) WriteString(s string) (ret int, err error) {
+func (f *DsFile) WriteString(s string) (ret int, err error) {
 	return f.Write([]byte(s))
 }

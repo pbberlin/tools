@@ -10,11 +10,11 @@ import (
 
 // Retrieves a directory in one go.
 // Also used to check existence; returning ds.ErrNoSuchEntity
-func (fs *dsFileSys) dirByPath(name string) (AeDir, error) {
+func (fs *dsFileSys) dirByPath(name string) (DsDir, error) {
 
 	dir, bname := fs.SplitX(name)
 
-	fo := AeDir{}
+	fo := DsDir{}
 	fo.fSys = fs
 
 	preciseK := ds.NewKey(fs.c, tdir, dir+bname, 0, nil)
@@ -64,11 +64,19 @@ func (fs *dsFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
 }
 
-func (fs *dsFileSys) saveDirByPath(name string) (AeDir, error) {
+func (fs *dsFileSys) saveDirByPath(name string) (DsDir, error) {
+	dir := DsDir{}
+	dir.MMode = 0755
+	dir.MModTime = time.Now()
+	return fs.saveDirByPathExt(dir, name)
+}
 
-	fo := AeDir{}
+func (fs *dsFileSys) saveDirByPathExt(dirObj DsDir, name string) (DsDir, error) {
+
+	fo := DsDir{}
 	fo.isDir = true
-	fo.MModTime = time.Now()
+	fo.MModTime = dirObj.MModTime
+	fo.MMode = dirObj.MMode
 	fo.fSys = fs
 
 	dir, bname := fs.SplitX(name)

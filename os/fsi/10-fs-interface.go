@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 )
 
 var (
@@ -36,10 +37,9 @@ type FileSystem interface {
 	Name() string   // the type of filesystem, i.e. "osfs"
 	String() string // a mountpoint or a drive letter
 
-	// Nobody restricts you from implementing following methods.
-	// But they are not mandatory for our interface:
-	// Chmod(name string, mode os.FileMode) error
-	// Chtimes(name string, atime time.Time, mtime time.Time) error
+	// Yes, interfaces should be as small as possible, but sooner or later you need these:
+	Chmod(name string, mode os.FileMode) error
+	Chtimes(name string, atime time.Time, mtime time.Time) error
 
 	Create(name string) (File, error)       // read write
 	Lstat(path string) (os.FileInfo, error) // for common.Walk

@@ -26,7 +26,7 @@ func init() {
 	// forcing our implementations
 	// to comply with our interfaces
 
-	f := AeFile{}
+	f := DsFile{}
 	ifa := fsi.File(&f)
 	_ = ifa
 

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"os"
-	"sort"
 	"sync/atomic"
 
 	"github.com/pbberlin/tools/os/fsi"
@@ -39,7 +38,7 @@ func (f *InMemoryFile) Readdir(n int) (fis []os.FileInfo, err error) {
 		ff := f1.(*InMemoryFile)
 		fis = append(fis, os.FileInfo(&InMemoryFileInfo{file: ff}))
 	}
-	sort.Sort(byName(fis))
+	f.fs.readdirsorter(fis)
 
 	wantAll := n <= 0
 

@@ -2,6 +2,7 @@ package memfs
 
 import (
 	"os"
+	"sort"
 	"sync"
 	"time"
 
@@ -21,13 +22,40 @@ type memMapFs struct {
 	// for compatibility with osfs.
 	// Currently only used as instance name
 	ident string
+	// readdirsorter []os.FileInfo
+	readdirsorter func([]os.FileInfo)
 }
 
-// BaseDir is an option func, adding a specific base dir to the filesystem
+// Ident is an option func, adding a specific identification to the filesystem
 func Ident(mnt string) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*memMapFs)
 		fst.ident = mnt
+	}
+}
+
+// Default sort for ReadDir... is ByNameAsc
+// We may want to change this; for instance sort byDate
+func DirSort(srt string) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*memMapFs)
+
+		switch srt {
+		case "byDateAsc":
+			fst.readdirsorter = func(fis []os.FileInfo) {
+				sort.Sort(byDateAsc(fis))
+			}
+
+		case "byDateDesc":
+			fst.readdirsorter = func(fis []os.FileInfo) {
+				sort.Sort(byDateDesc(fis))
+			}
+		case "byName":
+			fst.readdirsorter = func(fis []os.FileInfo) {
+				sort.Sort(byName(fis))
+			}
+
+		}
 	}
 }
 
@@ -37,8 +65,9 @@ func Ident(mnt string) func(fsi.FileSystem) {
 // http://dave.cheney.net/2014/10/17/functional-options-for-friendly-apis
 func New(options ...func(fsi.FileSystem)) *memMapFs {
 	m := &memMapFs{
-		fos:   map[string]fsi.File{}, // secure init
-		ident: "mnt00",
+		fos:           map[string]fsi.File{}, // secure init
+		ident:         "mnt00",
+		readdirsorter: func(fis []os.FileInfo) { sort.Sort(byName(fis)) },
 	}
 	for _, option := range options {
 		option(m)

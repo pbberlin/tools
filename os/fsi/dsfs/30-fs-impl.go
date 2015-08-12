@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"sort"
 	"sync/atomic"
+	"time"
 
 	"appengine/datastore"
 
@@ -26,7 +28,7 @@ func (fs *dsFileSys) Create(name string) (fsi.File, error) {
 	// WriteFile & Create
 	dir, bname := fs.SplitX(name)
 
-	f := AeFile{}
+	f := DsFile{}
 	f.fSys = fs
 	f.BName = bname
 	f.Dir = dir
@@ -40,6 +42,59 @@ func (fs *dsFileSys) Create(name string) (fsi.File, error) {
 	// return &f, nil
 	ff := fsi.File(&f)
 	return ff, err
+
+}
+
+func (fs *dsFileSys) Chmod(name string, mode os.FileMode) error {
+
+	f, err := fs.fileByPath(name)
+	if err == nil {
+		f.MMode = mode
+
+		err := f.Sync()
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		dir, err := fs.dirByPath(name)
+		if err != nil {
+			return err
+		}
+		dir.MMode = mode
+		_, err = fs.saveDirByPathExt(dir, path.Join(dir.Dir, dir.BName))
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+func (fs *dsFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
+
+	f, err := fs.fileByPath(name)
+	if err == nil {
+		f.MModTime = atime
+		err := f.Sync()
+		if err != nil {
+			return err
+		}
+		return nil
+	} else {
+		dir, err := fs.dirByPath(name)
+		if err != nil {
+			return err
+		}
+		dir.MModTime = atime
+		_, err = fs.saveDirByPathExt(dir, path.Join(dir.Dir, dir.BName))
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 
 }
 
@@ -233,7 +288,7 @@ func (fs *dsFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 
 	// WriteFile & Create
 	dir, bname := fs.SplitX(name)
-	f := AeFile{}
+	f := DsFile{}
 	f.Dir = dir
 	f.BName = bname
 	f.fSys = fs

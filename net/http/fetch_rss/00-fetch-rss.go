@@ -41,8 +41,7 @@ func init() {
 	fs = osfs.New()
 	os.Chdir(docRoot)
 
-	fs = memfs.New()
-	docRoot = ""
+	fs = memfs.New(memfs.DirSort("byDateDesc"))
 
 }
 

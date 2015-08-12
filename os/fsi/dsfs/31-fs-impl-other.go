@@ -12,7 +12,7 @@ func (fs *dsFileSys) DeleteAll() (string, error) {
 	msg := ""
 	{
 		q := datastore.NewQuery(tfil).KeysOnly()
-		var files []AeFile
+		var files []DsFile
 		keys, err := q.GetAll(fs.Ctx(), &files)
 		if err != nil {
 			msg += "could not get file keys\n"
@@ -31,7 +31,7 @@ func (fs *dsFileSys) DeleteAll() (string, error) {
 
 	{
 		q := datastore.NewQuery(tdir).KeysOnly()
-		var dirs []AeDir
+		var dirs []DsDir
 		keys, err := q.GetAll(fs.Ctx(), &dirs)
 		if err != nil {
 			msg += "could not get dir keys\n"

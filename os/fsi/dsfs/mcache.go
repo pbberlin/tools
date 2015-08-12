@@ -6,7 +6,7 @@ import (
 	"appengine/memcache"
 )
 
-func (d *AeDir) MemCacheSet() {
+func (d *DsDir) MemCacheSet() {
 
 	miPut := &memcache.Item{
 		Key:        d.Dir + d.BName,
@@ -22,14 +22,14 @@ func (d *AeDir) MemCacheSet() {
 	}
 }
 
-func (d *AeDir) MemCacheDelete() {
+func (d *DsDir) MemCacheDelete() {
 	err := memcache.Delete(d.fSys.Ctx(), d.Dir+d.BName)
 	if err != nil {
 		d.fSys.Ctx().Errorf("memcache delete dir %v => err %v", d.Dir+d.BName, err)
 	}
 }
 
-func (d *AeDir) MemCacheGet(name string) error {
+func (d *DsDir) MemCacheGet(name string) error {
 
 	unparsedjson, err := memcache.JSON.Get(d.fSys.c, name, d)
 	_ = unparsedjson

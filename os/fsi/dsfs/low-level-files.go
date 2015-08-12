@@ -12,11 +12,11 @@ import (
 	"appengine/datastore"
 )
 
-func (fs *dsFileSys) fileByPath(name string) (AeFile, error) {
+func (fs *dsFileSys) fileByPath(name string) (DsFile, error) {
 
 	dir, bname := fs.SplitX(name)
 
-	fo := AeFile{}
+	fo := DsFile{}
 	fo.fSys = fs
 
 	//
@@ -47,11 +47,11 @@ func (fs *dsFileSys) fileByPath(name string) (AeFile, error) {
 }
 
 // similar to ReadDir but returning only files
-func (fs *dsFileSys) filesByPath(name string) ([]AeFile, error) {
+func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 
 	dir, bname := fs.SplitX(name)
 
-	var files []AeFile
+	var files []DsFile
 
 	foDir, err := fs.dirByPath(dir + bname)
 	if err == datastore.ErrNoSuchEntity {
@@ -81,7 +81,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]AeFile, error) {
 //
 //
 // Path is the directory, BName contains the base name.
-func (fs *dsFileSys) saveFileByPath(f *AeFile, name string) error {
+func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 
 	dir, bname := fs.SplitX(name)
 	f.Dir = dir

@@ -20,7 +20,7 @@ import (
 // "warning" fsi.EmptyQueryResult
 //
 // The func could easily be enhanced chunked scanning.
-func (fs *dsFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]AeDir, error) {
+func (fs *dsFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]DsDir, error) {
 
 	dir, bname := fs.SplitX(name)
 	name = dir + bname
@@ -45,7 +45,7 @@ func (fs *dsFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]AeDi
 
 	// log.Printf("%v", q)
 
-	var children []AeDir
+	var children []DsDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
 		fs.Ctx().Errorf("Error getting all children of %v => %v", dir+bname, err)

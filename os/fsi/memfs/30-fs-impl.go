@@ -146,7 +146,6 @@ func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	// sort.Sort(byName(list)) // sorted in f.Readdir
 	return list, nil
 }
 

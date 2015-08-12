@@ -37,7 +37,7 @@ func Serve() (baseUrl string, topDirs []string) {
 
 	httpFSys := &httpfs.HttpFs{SourceFs: fs}
 	mux := http.NewServeMux()
-	fileserver1 := http.FileServer(httpFSys.Dir("./"))
+	fileserver1 := http.FileServer(httpFSys.Dir(docRoot))
 	mux.Handle("/", fileserver1)
 	mux.Handle("/static/", http.StripPrefix("/static/", fileserver1)) // same
 

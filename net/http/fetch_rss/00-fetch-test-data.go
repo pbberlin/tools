@@ -1,11 +1,5 @@
 package fetch_rss
 
-import (
-	"fmt"
-
-	"github.com/pbberlin/tools/os/osutilpb"
-)
-
 var testDocs = make([]string, 2)
 
 func init() {
@@ -62,9 +56,9 @@ func init() {
 			</ul>`
 
 	// write out to http doc root
-	for i := 0; i < len(testDocs); i++ {
-		fn := fmt.Sprintf(docRoot+"/%v/art%02v.html", hosts[0], i)
-		osutilpb.Bytes2File(fn, []byte(testDocs[i]))
-	}
+	// for i := 0; i < len(testDocs); i++ {
+	// 	fn := fmt.Sprintf(docRoot+"/%v/art%02v.html", hosts[0], i)
+	// 	osutilpb.Bytes2File(fn, []byte(testDocs[i]))
+	// }
 
 }

@@ -1,12 +1,17 @@
 package fetch_rss
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func Test2(t *testing.T) {
 
 	Serve()
 
-	url := spf("%v/contentexport/feed/schlagzeilen", hosts[0])
-	Fetch(url, "/politik/", 7)
+	for _, config := range hosts {
+		Fetch(config, "/politik/international/aa/bb", 12)
+	}
 
+	time.Sleep(220 * time.Second)
 }

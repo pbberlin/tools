@@ -3,12 +3,13 @@ package osfs
 import (
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/pbberlin/tools/os/fsi"
 )
 
-func (osFileSys) Name() string { return "osfs" }
+func (fs *osFileSys) Name() string { return "osfs" }
 
 func (fs osFileSys) String() string {
 	hn, err := os.Hostname()
@@ -18,64 +19,87 @@ func (fs osFileSys) String() string {
 	return hn
 }
 
+func (fs *osFileSys) Repl(name string) string {
+	if fs.replacePath {
+		return strings.Replace(name, "/", "\\", -1)
+	}
+	return name
+}
+
 //---------------------------------------
 
-func (osFileSys) Chmod(name string, mode os.FileMode) error {
+func (fs *osFileSys) Chmod(name string, mode os.FileMode) error {
+	name = fs.Repl(name)
 	return os.Chmod(name, mode)
 }
 
-func (osFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
+func (fs *osFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
+	name = fs.Repl(name)
 	return os.Chtimes(name, atime, mtime)
 }
 
-func (osFileSys) Create(name string) (fsi.File, error) {
+func (fs *osFileSys) Create(name string) (fsi.File, error) {
+	name = fs.Repl(name)
 	return os.Create(name)
 }
 
-func (osFileSys) Lstat(path string) (os.FileInfo, error) {
+func (fs *osFileSys) Lstat(path string) (os.FileInfo, error) {
+	path = fs.Repl(path)
 	return os.Lstat(path)
 }
 
-func (osFileSys) Mkdir(name string, perm os.FileMode) error {
+func (fs *osFileSys) Mkdir(name string, perm os.FileMode) error {
+	name = fs.Repl(name)
 	return os.Mkdir(name, perm)
 }
 
-func (osFileSys) MkdirAll(path string, perm os.FileMode) error {
+func (fs *osFileSys) MkdirAll(path string, perm os.FileMode) error {
+	path = fs.Repl(path)
 	return os.MkdirAll(path, perm)
 }
 
-func (osFileSys) Open(name string) (fsi.File, error) {
+func (fs *osFileSys) Open(name string) (fsi.File, error) {
+	name = fs.Repl(name)
 	return os.Open(name)
 }
 
-func (osFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
+func (fs *osFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
+	name = fs.Repl(name)
 	return os.OpenFile(name, flag, perm)
 }
 
-func (osFileSys) ReadDir(dirname string) ([]os.FileInfo, error) {
+func (fs *osFileSys) ReadDir(dirname string) ([]os.FileInfo, error) {
+	dirname = fs.Repl(dirname)
 	return ioutil.ReadDir(dirname)
 }
 
-func (osFileSys) Remove(name string) error {
+func (fs *osFileSys) Remove(name string) error {
+	name = fs.Repl(name)
 	return os.Remove(name)
 }
 
-func (osFileSys) RemoveAll(path string) error {
+func (fs *osFileSys) RemoveAll(path string) error {
+	path = fs.Repl(path)
 	return os.RemoveAll(path)
 }
 
-func (osFileSys) Rename(oldname, newname string) error {
+func (fs *osFileSys) Rename(oldname, newname string) error {
+	oldname = fs.Repl(oldname)
+	newname = fs.Repl(newname)
 	return os.Rename(oldname, newname)
 }
 
-func (osFileSys) Stat(name string) (os.FileInfo, error) {
+func (fs *osFileSys) Stat(name string) (os.FileInfo, error) {
+	name = fs.Repl(name)
 	return os.Stat(name)
 }
 
-func (osFileSys) ReadFile(filename string) ([]byte, error) {
+func (fs *osFileSys) ReadFile(filename string) ([]byte, error) {
+	filename = fs.Repl(filename)
 	return ioutil.ReadFile(filename)
 }
 
-func (osFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
+func (fs *osFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
+	filename = fs.Repl(filename)
 	return ioutil.WriteFile(filename, data, perm)
 }

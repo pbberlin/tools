@@ -1,31 +1,53 @@
 package fetch_rss
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+	"path"
 
+	"github.com/pbberlin/tools/os/fsi/httpfs"
+)
+
+// unused
 func serveSingleRootFile(pattern string, filename string) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, filename)
+		http.ServeFile(w, r, filename) // filename refers to local path; unusable for fsi
 	})
 }
 
-const docRoot = "c:/docroot/" // no relative path, 'cause working dir too flippant
+var msg []byte
 
-var hosts = []string{"www.handelsblatt.com"}
+func init() {
+	msg = []byte(`<p>This is an embedded static http server.</p>
+<p>
+It serves previously downloaded pages<br>
+ from handelsblatt or economist.
+</p>
+<p>
+	We want to find 
+	Longest Common Subsequences - LCS
+	in a DOM tree - but with tolerance for 20 characters.
+</p>
+`)
+}
 
-func Serve() (baseUrl string, possibleDirs []string) {
-	// http.HandleFunc("/", singlePage)
+func Serve() (baseUrl string, topDirs []string) {
 
-	// static resources - Mandatory root-based
-	serveSingleRootFile("/msg.html", docRoot+"msg.html")
-	// static resources - other
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(docRoot))))
+	fs.WriteFile(path.Join(docRoot, "msg.html"), msg, 0644)
+
+	httpFSys := &httpfs.HttpFs{SourceFs: fs}
+	mux := http.NewServeMux()
+	fileserver1 := http.FileServer(httpFSys.Dir("./"))
+	mux.Handle("/", fileserver1)
+	mux.Handle("/static/", http.StripPrefix("/static/", fileserver1)) // same
 
 	go func() {
-		// fmt.Println("listening on 4000")
-		http.ListenAndServe("localhost:4000", nil)
+		log.Fatal(http.ListenAndServe("localhost:4000", mux))
 	}()
 
-	possibleDirs = hosts
-	baseUrl = "http://localhost:4000/static/"
+	topDirs = make([]string, 0, len(hosts))
+	for k, _ := range hosts {
+		topDirs = append(topDirs, k)
+	}
 	return
 }

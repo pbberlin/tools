@@ -21,8 +21,7 @@ type memMapFs struct {
 	// Could be expanded into a kind of "currentDir"
 	// for compatibility with osfs.
 	// Currently only used as instance name
-	ident string
-	// readdirsorter []os.FileInfo
+	ident         string
 	readdirsorter func([]os.FileInfo)
 }
 

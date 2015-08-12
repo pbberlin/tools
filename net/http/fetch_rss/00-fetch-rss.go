@@ -13,7 +13,6 @@ import (
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
@@ -38,11 +37,10 @@ var fs fsi.FileSystem
 var docRoot = "c:/docroot/" // no relative path, 'cause working dir too flippant
 
 func init() {
-	fs = osfs.New()
+	fs = osfs.New(osfs.DirSort("byDateDesc"))
 	os.Chdir(docRoot)
 
-	fs = memfs.New(memfs.DirSort("byDateDesc"))
-
+	// fs = memfs.New(memfs.DirSort("byDateDesc"))
 }
 
 func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) {

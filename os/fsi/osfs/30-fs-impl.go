@@ -58,9 +58,26 @@ func (fs *osFileSys) MkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(path, perm)
 }
 
+// Type wraps os.File to overwrite os.File.Readdir()
+type fileWithCustomReaddir struct {
+	//                     fileWithCustomReaddir needs to fullfill fsi.File interface:
+	*os.File            // first  - wrap anonymously     => type implements all methods of os.File
+	f        *os.File   // second - wrap as named member => to reach back from the overwritten method
+	parFS    *osFileSys // to get the current readdirsorter
+}
+
+// Overwritten method
+func (f fileWithCustomReaddir) Readdir(n int) ([]os.FileInfo, error) {
+	fis, err := f.f.Readdir(n) // reaching back to os.File.Readdir()
+	f.parFS.readdirsorter(fis) // additional logic - purpose of the entire exercise
+	return fis, err
+}
+
 func (fs *osFileSys) Open(name string) (fsi.File, error) {
 	name = fs.Repl(name)
-	return os.Open(name)
+	osfile, err := os.Open(name)
+	wrappedOsFile := fileWithCustomReaddir{osfile, osfile, fs} // wrap it into
+	return wrappedOsFile, err
 }
 
 func (fs *osFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
@@ -69,8 +86,9 @@ func (fs *osFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 }
 
 func (fs *osFileSys) ReadDir(dirname string) ([]os.FileInfo, error) {
-	dirname = fs.Repl(dirname)
-	return ioutil.ReadDir(dirname)
+	fis, err := ioutil.ReadDir(dirname)
+	fs.readdirsorter(fis)
+	return fis, err
 }
 
 func (fs *osFileSys) Remove(name string) error {

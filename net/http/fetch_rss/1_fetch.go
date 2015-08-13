@@ -40,6 +40,11 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 
 	rssUrl := path.Join(config["host"].(string), config["rss-xml-uri"].(string))
 
+	// Fetching the rssXML takes time.
+	// We do it before the timouts of the pipeline stages are set off.
+	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
+
+	//
 	//
 	// setting up a 3 staged pipeline from bottom up
 	//
@@ -69,7 +74,7 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 				lg("timeout after %v articles", len(fullArticles))
 				// we are using channel == nil - channel closed combinations
 				// inspired by http://dave.cheney.net/2013/04/30/curious-channels
-				out = nil // not close(c)
+				out = nil // not close(out) => case above is now blocked
 				close(fin)
 				lg("fin closed; out nilled")
 				stage3Wait.Done()
@@ -111,7 +116,6 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 	//
 	//
 	// loading stage 1
-	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 	found := 0
 	uriPrefixExcl := "impossible"
 	for i := 0; i < 15; i++ {

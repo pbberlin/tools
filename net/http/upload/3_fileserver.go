@@ -18,7 +18,7 @@ import (
 // We need the appengine context to initialize dsfs.
 //
 // Thus we re-implement a serveFile method:
-func serveDsFsFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+func ServeDsFsFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	c := appengine.NewContext(r)
 

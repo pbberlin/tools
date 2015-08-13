@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/httpfs"
 )
 
@@ -31,7 +32,7 @@ It serves previously downloaded pages<br>
 `)
 }
 
-func Serve() (baseUrl string, topDirs []string) {
+func Serve(fs fsi.FileSystem) (baseUrl string, topDirs []string) {
 
 	fs.WriteFile(path.Join(docRoot, "msg.html"), msg, 0644)
 
@@ -39,7 +40,7 @@ func Serve() (baseUrl string, topDirs []string) {
 	mux := http.NewServeMux()
 	fileserver1 := http.FileServer(httpFSys.Dir(docRoot))
 	mux.Handle("/", fileserver1)
-	mux.Handle("/static/", http.StripPrefix("/static/", fileserver1)) // same
+	mux.Handle("/static2/", http.StripPrefix("/static2/", fileserver1)) // same
 
 	go func() {
 		log.Fatal(http.ListenAndServe("localhost:4000", mux))

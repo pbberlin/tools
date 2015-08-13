@@ -39,14 +39,9 @@ func DirSort(srt string) func(fsi.FileSystem) {
 
 		switch srt {
 		case "byDateAsc":
-			fst.readdirsorter = func(fis []os.FileInfo) {
-				sort.Sort(byDateAsc(fis))
-			}
-
+			fst.readdirsorter = func(fis []os.FileInfo) { sort.Sort(byDateAsc(fis)) }
 		case "byDateDesc":
-			fst.readdirsorter = func(fis []os.FileInfo) {
-				sort.Sort(byDateDesc(fis))
-			}
+			fst.readdirsorter = func(fis []os.FileInfo) { sort.Sort(byDateDesc(fis)) }
 		case "byName":
 			fst.readdirsorter = func(fis []os.FileInfo) {} // unchanged
 		}

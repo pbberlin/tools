@@ -1,6 +1,9 @@
 package dsfs
 
 import (
+	"os"
+	"sort"
+
 	"github.com/pbberlin/tools/os/fsi"
 
 	"appengine"
@@ -23,6 +26,25 @@ func MountName(mnt string) func(fsi.FileSystem) {
 	}
 }
 
+// Default sort for ReadDir... is ByNameAsc
+// We may want to change this; for instance sort byDate
+func DirSort(srt string) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*dsFileSys)
+		switch srt {
+		case "byDateAsc":
+			fst.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByDateAsc(fis)) }
+			fst.filesorter = func(fis []DsFile) { sort.Sort(DsFileByDateAsc(fis)) }
+		case "byDateDesc":
+			fst.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByDateDesc(fis)) }
+			fst.filesorter = func(fis []DsFile) { sort.Sort(DsFileByDateDesc(fis)) }
+		case "byName":
+			fst.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByName(fis)) }
+			fst.filesorter = func(fis []DsFile) { sort.Sort(DsFileByName(fis)) }
+		}
+	}
+}
+
 // New creates a new appengine datastore filesystem.
 // Notice that variadic options are submitted as functions,
 // as is explained and justified here:
@@ -38,6 +60,9 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 	if fs.mount == "" {
 		fs.mount = MountPointLast()
 	}
+
+	fs.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByName(fis)) }
+	fs.filesorter = func(fis []DsFile) { sort.Sort(DsFileByName(fis)) }
 
 	if fs.c == nil {
 		panic("this type of filesystem needs appengine context, submitted as option")

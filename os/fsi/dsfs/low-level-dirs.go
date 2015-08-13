@@ -2,7 +2,6 @@ package dsfs
 
 import (
 	"os"
-	"sort"
 	"time"
 
 	ds "appengine/datastore"
@@ -58,7 +57,7 @@ func (fs *dsFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 		fis = append(fis, fi)
 	}
 
-	sort.Sort(FileInfoByName(fis))
+	fs.dirsorter(fis)
 
 	return fis, err
 

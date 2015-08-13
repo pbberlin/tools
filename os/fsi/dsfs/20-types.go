@@ -17,6 +17,9 @@ type dsFileSys struct {
 	c appengine.Context `datastore:"-" json:"-"`
 
 	mount string // name of mount point, for remount
+
+	dirsorter  func([]os.FileInfo)
+	filesorter func([]DsFile)
 }
 
 // The distinction between AeDir and AeFile
@@ -39,7 +42,6 @@ type DsDir struct {
 	MMode    os.FileMode `datastore:"-" json:"-"` // SaveProperty must be implemented
 
 	memDirFetchPos int // read position for f.Readdir
-
 }
 
 // Upper case field names sadly

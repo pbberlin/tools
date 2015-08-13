@@ -12,12 +12,13 @@ import (
 
 func init() {
 	restoreLogFlags()
-	log.SetPrefix("#")
+	log.SetPrefix("")
 }
 
 func restoreLogFlags() {
 	log.SetFlags(log.Ltime | log.Lshortfile)
 	log.SetFlags(log.Lshortfile)
+	log.SetFlags(0)
 }
 
 // E (Err) mostly saves the if err != nil

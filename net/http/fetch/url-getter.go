@@ -67,7 +67,12 @@ func UrlGetter(sUrl string, gaeReq *http.Request, httpsOnly bool) (
 	}
 
 	if err != nil {
-		return nil, u, fmt.Errorf("get request failed: %v (%v)", err, u.Scheme)
+		hint := ""
+		errs := err.Error()
+		if strings.Contains(errs, "net/http: Client Transport of type init.failingTransport doesn't support CancelRequest; Timeout not supported") {
+			hint = "\n\n Did you forget to submit the AE Request?\n"
+		}
+		return nil, u, fmt.Errorf("get request failed: %v (%v) %v", err, u.Scheme, hint)
 	}
 
 	if resp.StatusCode != http.StatusOK {

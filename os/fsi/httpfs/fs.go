@@ -37,7 +37,7 @@ type HttpFs struct {
 }
 
 func (h HttpFs) Dir(s string) *httpDir {
-	log.Printf("httpfs (base)dir %v", s)
+	// log.Printf("httpfs (base)dir %v", s)
 	return &httpDir{basePath: s, fs: h}
 }
 

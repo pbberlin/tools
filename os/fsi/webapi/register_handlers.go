@@ -24,7 +24,7 @@ var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fp
 var memMapFileSys = memfs.New()
 var osFileSys = osfs.New()
 
-// var aeFileSys = // cannot be instantiated without ae.context
+// var dsFileSys = // cannot be instantiated without ae.context
 
 var whichType = 0
 
@@ -122,8 +122,8 @@ func runTestX(
 		if f1 == nil {
 			f1 = dsfs.MountPointLast
 		}
-		aeFileSys := dsfs.New(dsfs.MountName(f1()), dsfs.AeContext(appengine.NewContext(r)))
-		fs = fsi.FileSystem(aeFileSys)
+		dsFileSys := dsfs.New(dsfs.MountName(f1()), dsfs.AeContext(appengine.NewContext(r)))
+		fs = fsi.FileSystem(dsFileSys)
 	case 1:
 		fs = fsi.FileSystem(osFileSys)
 	case 2:

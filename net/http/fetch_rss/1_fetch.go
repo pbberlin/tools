@@ -3,18 +3,16 @@ package fetch_rss
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/memfs"
-	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -34,18 +32,11 @@ type FullArticle struct {
 	Body []byte
 }
 
-var fs fsi.FileSystem
+const numWorkers = 3
 
-var docRoot = "c:/docroot/" // no relative path, 'cause working dir too flippant
+func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map[string]interface{}, uriPrefix string, numberArticles int) {
 
-func init() {
-	fs = osfs.New(osfs.DirSort("byDateDesc"))
-	os.Chdir(docRoot)
-
-	fs = memfs.New(memfs.DirSort("byDateDesc"))
-}
-
-func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) {
+	lg, lge := loghttp.Logger(w, r)
 
 	rssUrl := path.Join(config["host"].(string), config["rss-xml-uri"].(string))
 
@@ -53,7 +44,6 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 	// setting up a 3 staged pipeline from bottom up
 	//
 	var fullArticles []FullArticle
-	const numWorkers = 3
 
 	var inn chan *FullArticle = make(chan *FullArticle) // jobs are stuffed in here
 	var out chan *FullArticle = make(chan *FullArticle) // completed jobs are delivered here
@@ -64,24 +54,24 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 	// fire up the "collector", a fan-in
 	go func() {
 		stage3Wait.Add(1)
-		const delay1 = 800
-		const delay2 = 400 // 400 good value; critical point at 35
-		cout := time.After(time.Millisecond * delay1)
+		const delayInitial = 1200
+		const delayRefresh = 800 // 400 good value; critical point at 35
+		cout := time.After(time.Millisecond * delayInitial)
 		for {
 			select {
 
 			case fa := <-out:
 				fullArticles = append(fullArticles, *fa)
 				u, _ := url.Parse(fa.Url)
-				pf("    fetched              %v \n", stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50))
-				cout = time.After(time.Millisecond * delay2) // refresh timeout
+				lg("    fetched              %v ", stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50))
+				cout = time.After(time.Millisecond * delayRefresh) // refresh timeout
 			case <-cout:
-				pf("timeout after %v articles\n", len(fullArticles))
+				lg("timeout after %v articles", len(fullArticles))
 				// we are using channel == nil - channel closed combinations
 				// inspired by http://dave.cheney.net/2013/04/30/curious-channels
 				out = nil // not close(c)
 				close(fin)
-				pf("fin closed; out nilled\n")
+				lg("fin closed; out nilled")
 				stage3Wait.Done()
 				return
 			}
@@ -100,16 +90,16 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 				select {
 				case a = <-inn:
 					var err error
-					a.Body, _, err = fetch.UrlGetter(a.Url, nil, false)
-					logif.E(err)
+					a.Body, _, err = fetch.UrlGetter(a.Url, r, false)
+					lge(err)
 					out <- a
 					a = new(FullArticle)
 				case <-fin:
 					if a != nil && a.Url != "" {
 						u, _ := url.Parse(a.Url)
-						pf("    abandoned %v\n", u.RequestURI())
+						lg("    abandoned %v", u.RequestURI())
 					} else {
-						pf("    worker spinning down\n")
+						lg("    worker spinning down")
 					}
 					return
 				}
@@ -121,18 +111,18 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 	//
 	//
 	// loading stage 1
-	rssDoc, rssUrlObj := rssXMLFile(rssUrl)
+	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 	found := 0
 	uriPrefixExcl := "impossible"
 	for i := 0; i < 15; i++ {
-		pf("  searching for prefix %q excl %q   - %v of %v\n", uriPrefix, uriPrefixExcl, found, numberArticles)
-		found += stuffStage1(config, inn, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
+		lg("  searching for prefix %q excl %q   - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
+		found += stuffStage1(w, r, config, inn, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
 		if found >= numberArticles {
 			break
 		}
 
 		if uriPrefix == "/" {
-			pf("  root exhausted\n")
+			lg("  root exhausted")
 			break
 		}
 
@@ -140,11 +130,11 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 		uriPrefixExcl = uriPrefix
 		uriPrefix = newPrefix
 	}
-	pf("  found %v of %v\n", found, numberArticles)
+	lg("  found %v of %v", found, numberArticles)
 
-	pf("stage3Wait.Wait() before\n")
+	lg("stage3Wait.Wait() before")
 	stage3Wait.Wait()
-	pf("stage3Wait.Wait() after\n")
+	lg("stage3Wait.Wait() after")
 
 	time.Sleep(3 * time.Millisecond) // not needed - workers spin down earlier
 
@@ -153,7 +143,7 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 	condenseTrailingDirs := config["condense-trailing-dirs"].(int)
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
-		logif.E(err)
+		lge(err)
 		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
 		dir := path.Dir(semanticUri)
 		histoDir[dir]++
@@ -164,36 +154,36 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 	for k, _ := range histoDir {
 		dir := path.Join(docRoot, rssUrlObj.Host, k)
 		err := fs.MkdirAll(dir, 0755)
-		logif.E(err)
+		lge(err)
 	}
 
 	// Saving as files
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
-		logif.E(err)
+		lge(err)
 		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
 		p := path.Join(docRoot, u.Host, semanticUri)
 		err = fs.WriteFile(p, a.Body, 0644)
-		logif.E(err)
+		lge(err)
 		err = fs.Chtimes(p, a.Mod, a.Mod)
-		logif.E(err)
+		lge(err)
 	}
 
-	// digests
+	// Save digests
 	{
 		b, err := json.MarshalIndent(sr, "  ", "\t")
-		logif.E(err)
+		lge(err)
 		fnDigest := path.Join(docRoot, "digest_detailed.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
-		logif.E(err)
+		lge(err)
 	}
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
-		logif.E(err)
+		lge(err)
 		fnDigest := path.Join(docRoot, "digest.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
-		logif.E(err)
+		lge(err)
 	}
 
 	// fsm, ok := memfs.Unwrap(fs)
@@ -203,7 +193,12 @@ func Fetch(config map[string]interface{}, uriPrefix string, numberArticles int) 
 
 }
 
-func stuffStage1(config map[string]interface{}, inn chan *FullArticle, rssDoc *RSS, uriPrefixIncl, uriPrefixExcl string, nWant int) (nFound int) {
+// stuffStage1 ranges of the RSS entries and filters out unwanted directories.
+// Wanted urls are sent to the stage one channel.
+func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]interface{}, inn chan *FullArticle, rssDoc *RSS,
+	uriPrefixIncl, uriPrefixExcl string, nWant int) (nFound int) {
+
+	lg, lge := loghttp.Logger(w, r)
 
 	depthPrefix := strings.Count(uriPrefixIncl, "/")
 	if uriPrefixIncl == "/" {
@@ -215,30 +210,30 @@ func stuffStage1(config map[string]interface{}, inn chan *FullArticle, rssDoc *R
 	for i, lpItem := range rssDoc.Items.ItemList {
 
 		u, err := url.Parse(lpItem.Link)
-		logif.E(err)
+		lge(err)
 		short := stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50)
 
 		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
-		logif.E(err)
+		lge(err)
 
 		if strings.HasPrefix(u.RequestURI(), uriPrefixExcl) {
-			// pf("\t\tskipping %20v\n", short)
+			// lg("\t\tskipping %20v", short)
 			continue
 		}
 
 		if !strings.HasPrefix(u.RequestURI(), uriPrefixIncl) {
-			// pf("\t\tskipping %20v\n", short)
+			// lg("\t\tskipping %20v", short)
 			continue
 		}
 
 		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
 		depthUri := strings.Count(semanticUri, "/")
 		if depthUri > depthPrefix+1+depthTolerance {
-			// pf("\t\tskipping %20v - too deep (%v - %v)\n", semanticUri, depthPrefix, depthUri)
+			// lg("\t\tskipping %20v - too deep (%v - %v)", semanticUri, depthPrefix, depthUri)
 			continue
 		}
 
-		pf("    feed #%02v: %v - %v\n", i, t.Format("15:04:05"), short)
+		lg("    feed #%02v: %v - %v", i, t.Format("15:04:05"), short)
 		inn <- &FullArticle{Url: lpItem.Link, Mod: t} // stage 1 loading
 
 		nFound++

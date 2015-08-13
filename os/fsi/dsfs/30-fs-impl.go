@@ -178,7 +178,7 @@ func (fs *dsFileSys) ReadDir(name string) ([]os.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	sort.Sort(AeFileByName(files))
+	sort.Sort(DsFileByName(files))
 
 	for _, v := range files {
 		dirs = append(dirs, os.FileInfo(v))

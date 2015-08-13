@@ -2,7 +2,6 @@ package dsfs
 
 import (
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
@@ -73,7 +72,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 		files[i].fSys = fs
 	}
 
-	sort.Sort(AeFileByName(files))
+	fs.filesorter(files)
 
 	return files, err
 }

@@ -4,33 +4,39 @@ import (
 	"bytes"
 	"encoding/xml"
 	"log"
+	"net/http"
 	"net/url"
 	"path"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/stringspb"
 )
 
 //
-func rssXMLFile(rssUrl string) (rssDoc RSS, rssUrlObj *url.URL) {
+func rssXMLFile(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, rssUrl string) (rssDoc RSS, rssUrlObj *url.URL) {
+
+	lg, lge := loghttp.Logger(w, r)
 
 	var bts []byte
 	var err error
 
-	bts, rssUrlObj, err = fetch.UrlGetter(rssUrl, nil, false)
-	logif.F(err)
+	bts, rssUrlObj, err = fetch.UrlGetter(rssUrl, r, false)
+	lge(err)
 
 	bts = bytes.Replace(bts, []byte("content:encoded>"), []byte("content-encoded>S"), -1) // hack
 
 	err = xml.Unmarshal(bts, &rssDoc)
-	logif.E(err)
+	lge(err)
 
 	// save it
 	bdmp := stringspb.IndentedDumpBytes(rssDoc)
+	err = fs.MkdirAll(path.Join(docRoot, rssUrlObj.Host), 0755)
+	lge(err)
 	err = fs.WriteFile(path.Join(docRoot, rssUrlObj.Host, "outp_rss.xml"), bdmp, 0755)
-	logif.E(err)
-	pf("RSS resp size, outp_rss.xml, : %v\n", len(bdmp))
+	lge(err)
+	lg("RSS resp size, outp_rss.xml, : %v", len(bdmp))
 
 	return
 }

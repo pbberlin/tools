@@ -49,7 +49,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		dsfs.AeContext(c),
 	)
 
-	// As closure, since we cannot define dsfs.aeFileSys as parameter
+	// As closure, since we cannot define dsfs.dsFileSys as parameter
 	funcSave := func(argName string, data []byte) (error, *bytes.Buffer) {
 
 		b1 := new(bytes.Buffer)

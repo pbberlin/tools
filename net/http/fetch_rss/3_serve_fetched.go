@@ -1,13 +1,6 @@
 package fetch_rss
 
-import (
-	"log"
-	"net/http"
-	"path"
-
-	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/fsi/httpfs"
-)
+import "net/http"
 
 // unused
 func serveSingleRootFile(pattern string, filename string) {
@@ -32,23 +25,23 @@ It serves previously downloaded pages<br>
 `)
 }
 
-func Serve(fs fsi.FileSystem) (baseUrl string, topDirs []string) {
+// func Serve(fs fsi.FileSystem) (baseUrl string, topDirs []string) {
 
-	fs.WriteFile(path.Join(docRoot, "msg.html"), msg, 0644)
+// 	fs.WriteFile(path.Join(docRoot, "msg.html"), msg, 0644)
 
-	httpFSys := &httpfs.HttpFs{SourceFs: fs}
-	mux := http.NewServeMux()
-	fileserver1 := http.FileServer(httpFSys.Dir(docRoot))
-	mux.Handle("/", fileserver1)
-	mux.Handle("/static2/", http.StripPrefix("/static2/", fileserver1)) // same
+// 	httpFSys := &httpfs.HttpFs{SourceFs: fs}
+// 	mux := http.NewServeMux()
+// 	fileserver1 := http.FileServer(httpFSys.Dir(docRoot))
+// 	mux.Handle("/", fileserver1)
+// 	mux.Handle("/static2/", http.StripPrefix("/static2/", fileserver1)) // same
 
-	go func() {
-		log.Fatal(http.ListenAndServe("localhost:4000", mux))
-	}()
+// 	go func() {
+// 		log.Fatal(http.ListenAndServe("localhost:4000", mux))
+// 	}()
 
-	topDirs = make([]string, 0, len(hosts))
-	for k, _ := range hosts {
-		topDirs = append(topDirs, k)
-	}
-	return
-}
+// 	topDirs = make([]string, 0, len(hosts))
+// 	for k, _ := range hosts {
+// 		topDirs = append(topDirs, k)
+// 	}
+// 	return
+// }

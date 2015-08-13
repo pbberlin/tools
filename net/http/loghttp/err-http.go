@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
@@ -103,8 +102,10 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	}
 
 	// Write it to http response
-	w.Write([]byte(s))
-	w.Write([]byte{'\n'})
+	if w != nil {
+		w.Write([]byte(s))
+		w.Write([]byte{'\n'})
+	}
 
 	// Write to log/gae-log
 	// Adding src code info
@@ -118,9 +119,7 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	// Log it
 	c, _ := util_appengine.SafeGaeCheck(r)
 	if c == nil {
-		// log.SetFlags(0)
 		lnp.Printf(s)
-		// log.SetFlags(log.Lshortfile)
 	} else {
 		c.Infof(s)
 	}
@@ -144,36 +143,6 @@ func Logger(w http.ResponseWriter, r *http.Request) (tLogFunc, tErrFunc) {
 			Pf(w, r, "Err %v", err)
 		}
 	}
-
-	if w == nil && r == nil {
-
-		line, file := runtimepb.LineFileXUp(0)
-		if strings.HasSuffix(file, "err-http.go") {
-			line, file = runtimepb.LineFileXUp(1)
-		}
-		last1 := filepath.Base(file)
-		last2 := filepath.Base(filepath.Dir(file))
-
-		fileLine := fmt.Sprintf("%v:%-4v", last2+"/"+last1, line)
-
-		if len(fileLine) > maxPref {
-			fileLine = fileLine[len(fileLine)-maxPref:]
-		}
-		if len(fileLine) < maxPref {
-			fileLine = strings.Repeat(" ", maxPref-len(fileLine)) + fileLine
-		}
-
-		fLog = func(format string, is ...interface{}) {
-			s := fmt.Sprintf(format, is...)
-			lnp.Printf("%v %s", fileLine, s)
-		}
-		fErr = func(err error) {
-			if err != nil {
-				s := fmt.Sprintf("Err %v", err)
-				lnp.Printf("%v %s", fileLine, s)
-			}
-		}
-	}
-
 	return fLog, fErr
+
 }

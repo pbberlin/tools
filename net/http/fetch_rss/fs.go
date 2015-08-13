@@ -16,7 +16,7 @@ import (
 )
 
 var docRoot = ""                                           // no relative path, 'cause working dir too flippant
-var whichType = 2                                          // which type of filesystem, default is memfs
+var whichType = 0                                          // which type of filesystem, default is memfs
 var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
 
 //

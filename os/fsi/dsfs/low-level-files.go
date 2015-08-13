@@ -3,7 +3,6 @@ package dsfs
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/runtimepb"
@@ -96,7 +95,7 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 	}
 	f.BName = bname
 
-	f.MModTime = time.Now()
+	// f.MModTime = time.Now()
 	f.fSys = fs
 
 	//

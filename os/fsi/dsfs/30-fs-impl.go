@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"sort"
 	"sync/atomic"
 	"time"
 
@@ -20,30 +19,6 @@ func (fs dsFileSys) Name() string { return "dsfs" }
 func (fs dsFileSys) String() string { return fs.mount }
 
 //---------------------------------------
-
-// Create opens for read-write.
-// Open opens for readonly access.
-func (fs *dsFileSys) Create(name string) (fsi.File, error) {
-
-	// WriteFile & Create
-	dir, bname := fs.SplitX(name)
-
-	f := DsFile{}
-	f.fSys = fs
-	f.BName = bname
-	f.Dir = dir
-
-	// let all the properties by set by fs.saveFileByPath
-	err := f.Sync()
-	if err != nil {
-		return nil, err
-	}
-
-	// return &f, nil
-	ff := fsi.File(&f)
-	return ff, err
-
-}
 
 func (fs *dsFileSys) Chmod(name string, mode os.FileMode) error {
 
@@ -95,6 +70,32 @@ func (fs *dsFileSys) Chtimes(name string, atime time.Time, mtime time.Time) erro
 	}
 
 	return nil
+
+}
+
+// Create opens for read-write.
+// Open opens for readonly access.
+func (fs *dsFileSys) Create(name string) (fsi.File, error) {
+
+	// WriteFile & Create
+	dir, bname := fs.SplitX(name)
+
+	f := DsFile{}
+	f.fSys = fs
+	f.BName = bname
+	f.Dir = dir
+	f.MModTime = time.Now()
+	f.MMode = 0644
+
+	// let all the properties by set by fs.saveFileByPath
+	err := f.Sync()
+	if err != nil {
+		return nil, err
+	}
+
+	// return &f, nil
+	ff := fsi.File(&f)
+	return ff, err
 
 }
 
@@ -172,13 +173,13 @@ func (fs *dsFileSys) ReadDir(name string) ([]os.FileInfo, error) {
 	if err != nil && err != fsi.EmptyQueryResult {
 		return nil, err
 	}
-	sort.Sort(FileInfoByName(dirs))
+	fs.dirsorter(dirs)
 
 	files, err := fs.filesByPath(name)
 	if err != nil {
 		return nil, err
 	}
-	sort.Sort(DsFileByName(files))
+	fs.filesorter(files)
 
 	for _, v := range files {
 		dirs = append(dirs, os.FileInfo(v))
@@ -292,6 +293,7 @@ func (fs *dsFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 	f.Dir = dir
 	f.BName = bname
 	f.fSys = fs
+	f.MModTime = time.Now()
 
 	var err error
 	_, err = f.Write(data)

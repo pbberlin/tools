@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"sync/atomic"
+	"time"
 
 	"github.com/pbberlin/tools/os/fsi"
 )
@@ -106,7 +107,6 @@ func (f *DsFile) Stat() (os.FileInfo, error) {
 }
 
 func (f *DsFile) Sync() error {
-
 	err := f.fSys.saveFileByPath(f, f.Dir+f.BName)
 	if err != nil {
 		return err
@@ -129,6 +129,7 @@ func (f *DsFile) Truncate(size int64) error {
 	} else {
 		f.Data = f.Data[0:size]
 	}
+	f.MModTime = time.Now()
 	return nil
 }
 
@@ -151,8 +152,8 @@ func (f *DsFile) Write(b []byte) (n int, err error) {
 		f.Data = append(f.Data[:cur], b...)
 		f.Data = append(f.Data, tail...)
 	}
-
 	atomic.StoreInt64(&f.at, int64(len(f.Data)))
+	f.MModTime = time.Now()
 	return
 }
 

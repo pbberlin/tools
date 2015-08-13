@@ -53,6 +53,9 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 
 	fs := dsFileSys{}
 
+	fs.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByName(fis)) }
+	fs.filesorter = func(fis []DsFile) { sort.Sort(DsFileByName(fis)) }
+
 	for _, option := range options {
 		option(&fs)
 	}
@@ -60,9 +63,6 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 	if fs.mount == "" {
 		fs.mount = MountPointLast()
 	}
-
-	fs.dirsorter = func(fis []os.FileInfo) { sort.Sort(FileInfoByName(fis)) }
-	fs.filesorter = func(fis []DsFile) { sort.Sort(DsFileByName(fis)) }
 
 	if fs.c == nil {
 		panic("this type of filesystem needs appengine context, submitted as option")

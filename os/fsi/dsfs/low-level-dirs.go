@@ -65,8 +65,6 @@ func (fs *dsFileSys) dirsByPath(name string) ([]os.FileInfo, error) {
 
 func (fs *dsFileSys) saveDirByPath(name string) (DsDir, error) {
 	dir := DsDir{}
-	dir.MMode = 0755
-	dir.MModTime = time.Now()
 	return fs.saveDirByPathExt(dir, name)
 }
 
@@ -75,7 +73,19 @@ func (fs *dsFileSys) saveDirByPathExt(dirObj DsDir, name string) (DsDir, error) 
 	fo := DsDir{}
 	fo.isDir = true
 	fo.MModTime = dirObj.MModTime
-	fo.MMode = dirObj.MMode
+
+	if dirObj.MMode == 0 {
+		fo.MMode = 0755
+	} else {
+		fo.MMode = dirObj.MMode
+	}
+
+	if dirObj.MModTime.IsZero() {
+		fo.MModTime = time.Now()
+	} else {
+		fo.MModTime = dirObj.MModTime
+	}
+
 	fo.fSys = fs
 
 	dir, bname := fs.SplitX(name)

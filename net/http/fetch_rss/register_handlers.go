@@ -18,10 +18,10 @@ func InitHandlers() {
 
 	http.HandleFunc("/fetch/request", loghttp.Adapter(requestFetch))
 
+	http.HandleFunc(uriMountNameY, loghttp.Adapter(serveFile))
+
 	// working only for memfs
 	http.Handle("/fetch/reservoire/static/", http.StripPrefix("/fetch/reservoire/static/", fileserver1))
-
-	http.HandleFunc(uriMountNameY, loghttp.Adapter(serveFile))
 
 }
 
@@ -38,9 +38,9 @@ func BackendUIRendered() *bytes.Buffer {
 
 	htmlfrag.Wb(b1, "add", "/fetch/request", "add")
 
-	htmlfrag.Wb(b1, "reservoire static", "/fetch/reservoire/static/", "browse - memfs only")
-
 	htmlfrag.Wb(b1, "reservoire BOTH", uriMountNameY, "browse ANY fsi.FileSystem")
+
+	htmlfrag.Wb(b1, "reservoire static", "/fetch/reservoire/static/", "browse - memfs only")
 	return b1
 }
 
@@ -63,13 +63,13 @@ func requestFetch(w http.ResponseWriter, r *http.Request, m map[string]interface
 	// err = fs.WriteFile(path.Join(docRoot, "index.html"), []byte("content of index.html"), 0644)
 	// lge(err)
 
-	err = fs.Mkdir(path.Join(docRoot, "dirX"), 0755)
+	err = fs.MkdirAll(path.Join(docRoot, "testDirX/testDirY"), 0755)
 	lge(err)
 
-	lg("static fileserver created")
-
+	//
 	for _, config := range hosts {
-		Fetch(w, r, fs, config, "/politik/international/aa/bb", 12)
+		Fetch(w, r, fs, config, "/politik/international/aa/bb", 5)
+		Fetch(w, r, fs, config, "/politik/deutschland/aa/bb", 5)
 	}
 
 	lg("fetching complete")

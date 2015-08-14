@@ -1,7 +1,7 @@
 // +build dirwalk
 // go test -tags=dirwalk
 
-package test
+package tests
 
 import (
 	"bytes"

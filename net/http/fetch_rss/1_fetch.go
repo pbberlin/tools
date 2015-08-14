@@ -59,8 +59,8 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 	// fire up the "collector", a fan-in
 	go func() {
 		stage3Wait.Add(1)
-		const delayInitial = 1200
-		const delayRefresh = 800 // 400 good value; critical point at 35
+		const delayInitial = 600
+		const delayRefresh = 400 // 400 good value; critical point at 35
 		cout := time.After(time.Millisecond * delayInitial)
 		for {
 			select {
@@ -119,7 +119,7 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 	found := 0
 	uriPrefixExcl := "impossible"
 	for i := 0; i < 15; i++ {
-		lg("  searching for prefix   %v excl %q   - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
+		lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
 		found += stuffStage1(w, r, config, inn, fin, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
 		if found >= numberArticles {
 			break
@@ -244,7 +244,7 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]inter
 		case inn <- &FullArticle{Url: lpItem.Link, Mod: t}:
 			// stage 1 loading
 		case <-fin:
-			// upper stage has shut down
+			lg("downstream stage has shut down, stop stuffing stage1")
 			return
 		}
 

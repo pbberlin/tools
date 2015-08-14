@@ -108,7 +108,7 @@ func uploadFile(filename, mountName, effUpUrl string) {
 
 	client := &http.Client{}
 	fmt.Printf("    sending %v\n", filePath)
-	fmt.Printf("      ... to %v\n", effUpUrl)
+	fmt.Printf("     ... to %v\n", effUpUrl)
 	resp, err := client.Do(request)
 
 	if err != nil {

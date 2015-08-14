@@ -1,7 +1,7 @@
-// package test runs tests on all fsi subpackages;
+// package tests runs tests on all fsi subpackages;
 // some of which require an appengine context;
 // and which must be run by goapp test.
-package test
+package tests
 
 import (
 	"fmt"

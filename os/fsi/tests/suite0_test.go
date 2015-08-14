@@ -1,7 +1,7 @@
 // +build suite0
 // go test -tags=suite0
 
-package test
+package tests
 
 import (
 	"io/ioutil"

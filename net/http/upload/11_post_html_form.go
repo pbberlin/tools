@@ -33,7 +33,7 @@ var str = `
 		/><br>
 
 		<span class='b' >MountName </span> 
-		<input name='mountname' type='text' value='mnt01' length=5 /><br>
+		<input name='mountname' type='text' value='mnt02' length=5 /><br>
 
 
 		<span class='b' > </span> 

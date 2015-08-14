@@ -1,7 +1,7 @@
 // +build http
 // go test -tags=http
 
-package test
+package tests
 
 import (
 	"bytes"

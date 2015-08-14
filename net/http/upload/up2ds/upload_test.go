@@ -26,7 +26,7 @@ func TestUpload(t *testing.T) {
 
 		extraParams := map[string]string{
 			"getparam1":   "val1",
-			"mountname":   "mnt01",
+			"mountname":   "mnt02",
 			"description": "A zip file - containing dirs and files",
 		}
 

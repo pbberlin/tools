@@ -1,7 +1,7 @@
 // +build suite3
 // go test -tags=suite3
 
-package test
+package tests
 
 // Copyright © 2014 Steve Francia <spf@spf13.com>.
 // Copyright 2009 The Go Authors. All rights reserved.

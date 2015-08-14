@@ -119,8 +119,8 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 	found := 0
 	uriPrefixExcl := "impossible"
 	for i := 0; i < 15; i++ {
-		lg("  searching for prefix %q excl %q   - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
-		found += stuffStage1(w, r, config, inn, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
+		lg("  searching for prefix   %v excl %q   - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
+		found += stuffStage1(w, r, config, inn, fin, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
 		if found >= numberArticles {
 			break
 		}
@@ -199,7 +199,8 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 
 // stuffStage1 ranges of the RSS entries and filters out unwanted directories.
 // Wanted urls are sent to the stage one channel.
-func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]interface{}, inn chan *FullArticle, rssDoc *RSS,
+func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]interface{},
+	inn chan *FullArticle, fin chan struct{}, rssDoc *RSS,
 	uriPrefixIncl, uriPrefixExcl string, nWant int) (nFound int) {
 
 	lg, lge := loghttp.Logger(w, r)
@@ -238,7 +239,14 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]inter
 		}
 
 		lg("    feed #%02v: %v - %v", i, t.Format("15:04:05"), short)
-		inn <- &FullArticle{Url: lpItem.Link, Mod: t} // stage 1 loading
+
+		select {
+		case inn <- &FullArticle{Url: lpItem.Link, Mod: t}:
+			// stage 1 loading
+		case <-fin:
+			// upper stage has shut down
+			return
+		}
 
 		nFound++
 		if nFound >= nWant {

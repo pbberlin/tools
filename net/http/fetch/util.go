@@ -9,9 +9,21 @@ import (
 	"github.com/pbberlin/tools/logif"
 )
 
-func HostFromReq(r *http.Request) string { return inner(r.Host) }
+func HostFromReq(r *http.Request) string {
+	return inner(r.Host)
+}
 
-func HostFromUrl(u *url.URL) string { return inner(u.Host) }
+func HostFromUrl(u *url.URL) string {
+
+	// Prevent u.Host from "google.com" without scheme is ""
+	surl := u.String()
+	if !strings.HasPrefix(surl, "http://") && strings.HasPrefix(surl, "https://") {
+		surl += "http://" + surl
+	}
+	url2, _ := url.Parse(surl)
+
+	return inner(url2.Host)
+}
 
 func inner(hp string) string {
 

@@ -50,6 +50,8 @@ const c_formFetchUrl = `
 
 func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	lg, lge := loghttp.Logger(w, r)
+
 	// on live server => always use https
 	if r.URL.Scheme != "https" && !util_appengine.IsLocalEnviron() {
 		r.URL.Scheme = "https"
@@ -78,12 +80,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 			rURL = r.FormValue("url")
 		}
 	}
-	logif.Pf("%q %q", urlAs, rURL)
-
-	renderInPre := false
-	if len(r.FormValue("renderInPre")) > 0 {
-		renderInPre = true
-	}
+	// lg("received %v:  %q", urlAs, rURL)
 
 	if len(rURL) == 0 {
 
@@ -108,20 +105,15 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
 		bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
-		if err != nil {
-			loghttp.Pf(w, r, "%v %v", err, rURL)
-		}
+		lge(err)
 
 		cntnt := string(bts)
 		cntnt = insertNewlines.Replace(cntnt)
 		cntnt = undouble.Replace(cntnt)
 
-		if renderInPre {
-			fmt.Fprintf(w, "content is: <pre>"+cntnt+"</pre>")
-		} else {
-			cntnt = domclean1.ModifyHTML(r, u, cntnt)
-			fmt.Fprintf(w, cntnt)
-		}
+		lg("clean %v - %v - %v - %v", u, rURL, u.Host, fetch.HostFromUrl(u))
+		cntnt = domclean1.ModifyHTML(r, u, cntnt)
+		fmt.Fprintf(w, cntnt)
 
 	}
 

@@ -17,7 +17,7 @@ import (
 	"appengine/urlfetch"
 )
 
-var LogLevel = 1
+var LogLevel = 0
 
 type Options struct {
 	URL string
@@ -48,6 +48,9 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
 		req.URL.Scheme = "https"
 	}
+	// Prevent u.Host from "google.com" without scheme is ""
+	surl := req.URL.String()
+	req.URL, _ = url.Parse(surl)
 
 	// Optional: force https
 	if options.HttpsOnly {

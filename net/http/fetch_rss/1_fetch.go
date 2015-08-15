@@ -17,28 +17,50 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-var hosts = map[string]map[string]interface{}{
-	"www.handelsblatt.com": map[string]interface{}{
-		"host":                   "www.handelsblatt.com",
-		"rss-xml-uri":            "/contentexport/feed/schlagzeilen",
-		"condense-trailing-dirs": 2,
-		"depth-tolerance":        1, // The last one or two directories might be article titles or ids
-	},
-}
-
+// FullArticle is the main struct passed
+// between the pipeline stages
 type FullArticle struct {
 	Url  string
 	Mod  time.Time
 	Body []byte
 }
 
+// parallel fetchers routines
 const numWorkers = 3
 
-func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map[string]interface{}, uriPrefix string, numberArticles int) {
+// rssSourcesAndConfig contains sources of type map[string]interface{},
+// that can be passed to Fetch() as config parameter
+var rssSourcesAndConfig = map[string]map[string]interface{}{
+	"handelsblatt-src": map[string]interface{}{
+		"host":                   "www.handelsblatt.com",
+		"rss-xml-uri":            "/contentexport/feed/schlagzeilen",
+		"search-prefix":          "/politik/international/aa/bb",
+		"condense-trailing-dirs": 2, // The last one or two directories might be article titles or ids
+		"depth-tolerance":        1,
+	},
+	"economist-src": map[string]interface{}{
+		"host":                   "www.economist.com",
+		"rss-xml-uri":            "/sections/international/rss.xml",
+		"search-prefix":          "/news/international",
+		"condense-trailing-dirs": 1,
+		"depth-tolerance":        2,
+	},
+}
+
+// Fetch takes a RSS XML uri and fetches some of its documents.
+// It uses a three staged pipeline for parallel fetching.
+// Results are stored into the given filesystem fs.
+// Config points to the source of RSS XML,
+// and has some rules for conflating URI directories.
+// uriPrefix and numberArticles tell the func
+// which subdirs of the RSS dir should be fetched - and how many at max.
+func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
+	config map[string]interface{}, numberArticles int) {
 
 	lg, lge := loghttp.Logger(w, r)
 
 	rssUrl := path.Join(config["host"].(string), config["rss-xml-uri"].(string))
+	uriPrefix := config["search-prefix"].(string)
 
 	// Fetching the rssXML takes time.
 	// We do it before the timouts of the pipeline stages are set off.
@@ -95,7 +117,7 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, config map
 				select {
 				case a = <-inn:
 					var err error
-					a.Body, _, err = fetch.UrlGetter(a.Url, r, false)
+					a.Body, _, err = fetch.UrlGetter(r, fetch.Options{URL: a.Url})
 					lge(err)
 					out <- a
 					a = new(FullArticle)

@@ -107,7 +107,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		w.Header().Set("Content-type", "text/html; charset=utf-8")
 		// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
-		bts, u, err := fetch.UrlGetter(rURL, r, false)
+		bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
 		if err != nil {
 			loghttp.Pf(w, r, "%v %v", err, rURL)
 		}

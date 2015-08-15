@@ -22,7 +22,7 @@ func rssXMLFile(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, rssUr
 	var bts []byte
 	var err error
 
-	bts, rssUrlObj, err = fetch.UrlGetter(rssUrl, r, false)
+	bts, rssUrlObj, err = fetch.UrlGetter(r, fetch.Options{URL: rssUrl})
 	lge(err)
 
 	bts = bytes.Replace(bts, []byte("content:encoded>"), []byte("content-encoded>S"), -1) // hack

@@ -23,11 +23,6 @@ var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable r
 var httpFSys = &httpfs.HttpFs{SourceFs: fsi.FileSystem(memMapFileSys)} // memMap is always ready
 var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
 
-const uriSetType = "/fetch/set-fs-type"
-
-const mountName = "mntftch"
-const uriMountNameY = "/" + mountName + "/serve-file/"
-
 func getFs(c appengine.Context) (fs fsi.FileSystem) {
 	switch whichType {
 	case 0:

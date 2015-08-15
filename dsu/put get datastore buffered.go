@@ -98,7 +98,7 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 
 func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 
-	ii := instance_mgt.Get(c, map[string]interface{}{})
+	ii := instance_mgt.Get(c)
 
 	/*
 		making a get request to all instances
@@ -108,7 +108,6 @@ func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 
 		// http://[inst0-2].[v2].default.libertarian-islands.appspot.com/instance-info
 
-		// note that Hostname already has VersionMajor and Module name as prefixed subdomains
 		url := fmt.Sprintf("https://%v.%v/_ah/invalidate-instance-cache?mkk=%v&senderInstanceId=%v",
 			i,
 			ii.Hostname,
@@ -153,7 +152,7 @@ func invalidate(w http.ResponseWriter, r *http.Request) {
 
 	c := appengine.NewContext(r)
 
-	ii := instance_mgt.Get(c, map[string]interface{}{})
+	ii := instance_mgt.Get(c)
 
 	mkk := r.FormValue("mkk")
 	sii := r.FormValue("senderInstanceId")

@@ -14,23 +14,23 @@ import (
 
 var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fprintf
 
-const UriSetFSType = "/fs/dsfs/set-fs-type"
-const UriDeleteSubtree = "/fs/dsfs/delete-subtree"
+const UriSetFSType = "/fsi/set-fs-type"
+const UriDeleteSubtree = "/fsi/delete-subtree"
 
 func InitHandlers() {
 	http.HandleFunc(UriSetFSType, loghttp.Adapter(setFSType))
-	http.HandleFunc("/fs/dsfs/create-objects", loghttp.Adapter(createSys))
-	http.HandleFunc("/fs/dsfs/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
-	http.HandleFunc("/fs/dsfs/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
-	http.HandleFunc("/fs/dsfs/walk", loghttp.Adapter(walkH))
-	http.HandleFunc("/fs/dsfs/remove", loghttp.Adapter(removeSubtree))
+	http.HandleFunc("/fsi/create-objects", loghttp.Adapter(createSys))
+	http.HandleFunc("/fsi/retrieve-by-query", loghttp.Adapter(retrieveByQuery))
+	http.HandleFunc("/fsi/retrieve-by-read-dir", loghttp.Adapter(retrieveByReadDir))
+	http.HandleFunc("/fsi/walk", loghttp.Adapter(walkH))
+	http.HandleFunc("/fsi/remove", loghttp.Adapter(removeSubtree))
 
-	http.HandleFunc("/fs/dsfs/delete-all", loghttp.Adapter(deleteAll))
+	http.HandleFunc("/fsi/delete-all", loghttp.Adapter(deleteAll))
 	http.HandleFunc(UriDeleteSubtree, loghttp.Adapter(deleteSubtree))
 
-	http.HandleFunc("/fs/dsfs/reset", loghttp.Adapter(resetMountPoint))
-	http.HandleFunc("/fs/dsfs/incr", loghttp.Adapter(incrMountPoint))
-	http.HandleFunc("/fs/dsfs/decr", loghttp.Adapter(decrMountPoint))
+	http.HandleFunc("/fsi/cntr/reset", loghttp.Adapter(resetMountPoint))
+	http.HandleFunc("/fsi/cntr/incr", loghttp.Adapter(incrMountPoint))
+	http.HandleFunc("/fsi/cntr/decr", loghttp.Adapter(decrMountPoint))
 }
 
 // userinterface rendered to HTML - not only the strings for title and url
@@ -41,21 +41,21 @@ func BackendUIRendered() *bytes.Buffer {
 	htmlfrag.Wb(b1, "filesystem interface", "")
 
 	htmlfrag.Wb(b1, "set type", UriSetFSType)
-	htmlfrag.Wb(b1, "create", "/fs/dsfs/create-objects")
+	htmlfrag.Wb(b1, "create", "/fsi/create-objects")
 
-	htmlfrag.Wb(b1, "query", "/fs/dsfs/retrieve-by-query")
-	htmlfrag.Wb(b1, "readdir", "/fs/dsfs/retrieve-by-read-dir")
-	htmlfrag.Wb(b1, "walk", "/fs/dsfs/walk")
-	htmlfrag.Wb(b1, "remove", "/fs/dsfs/remove")
+	htmlfrag.Wb(b1, "query", "/fsi/retrieve-by-query")
+	htmlfrag.Wb(b1, "readdir", "/fsi/retrieve-by-read-dir")
+	htmlfrag.Wb(b1, "walk", "/fsi/walk")
+	htmlfrag.Wb(b1, "remove", "/fsi/remove")
 
-	htmlfrag.Wb(b1, "delete all", "/fs/dsfs/delete-all", "all fs types")
-	htmlfrag.Wb(b1, "delete tree", "/fs/dsfs/delete-subtree", "of selected fs")
+	htmlfrag.Wb(b1, "delete all", "/fsi/delete-all", "all fs types")
+	htmlfrag.Wb(b1, "delete tree", UriDeleteSubtree, "of selected fs")
 
 	// htmlfrag.Wb(b1, , "")
 	htmlfrag.Wb(b1, "dsfs mount", "nobr")
-	htmlfrag.Wb(b1, "decr", "/fs/dsfs/decr")
-	htmlfrag.Wb(b1, "incr", "/fs/dsfs/incr")
-	htmlfrag.Wb(b1, "reset", "/fs/dsfs/reset")
+	htmlfrag.Wb(b1, "decr", "/fsi/cntr/decr")
+	htmlfrag.Wb(b1, "incr", "/fsi/cntr/incr")
+	htmlfrag.Wb(b1, "reset", "/fsi/cntr/reset")
 
 	return b1
 

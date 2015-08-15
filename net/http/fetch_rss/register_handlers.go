@@ -13,6 +13,13 @@ import (
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
+const uriSetType = "/fetch/set-fs-type"
+const mountName = "mntftch"
+const uriMountNameY = "/" + mountName + "/serve-file/"
+
+const uriFetchCommandReceiver = "/fetch/command-receive"
+const uriFetchCommandSender = "/fetch/command-send"
+
 func InitHandlers() {
 	http.HandleFunc(uriSetType, loghttp.Adapter(setFSType))
 
@@ -22,6 +29,9 @@ func InitHandlers() {
 
 	// working only for memfs
 	http.Handle("/fetch/reservoire/static/", http.StripPrefix("/fetch/reservoire/static/", fileserver1))
+
+	http.HandleFunc(uriFetchCommandSender, loghttp.Adapter(fetchCommandSender))
+	http.HandleFunc(uriFetchCommandReceiver, loghttp.Adapter(fetchCommandReceiver))
 
 }
 
@@ -41,6 +51,10 @@ func BackendUIRendered() *bytes.Buffer {
 	htmlfrag.Wb(b1, "reservoire BOTH", uriMountNameY, "browse ANY fsi.FileSystem")
 
 	htmlfrag.Wb(b1, "reservoire static", "/fetch/reservoire/static/", "browse - memfs only")
+
+	htmlfrag.Wb(b1, "send", uriFetchCommandSender, "send fetch command")
+	htmlfrag.Wb(b1, "recv", uriFetchCommandReceiver, "receive fetch command")
+
 	return b1
 }
 
@@ -54,6 +68,7 @@ func requestFetch(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Requesting files"}))
 	defer wpf(w, tplx.Foot)
+
 	wpf(w, "<pre>")
 	defer wpf(w, "</pre>")
 
@@ -67,9 +82,8 @@ func requestFetch(w http.ResponseWriter, r *http.Request, m map[string]interface
 	lge(err)
 
 	//
-	for _, config := range hosts {
-		Fetch(w, r, fs, config, "/politik/international/aa/bb", 5)
-		Fetch(w, r, fs, config, "/politik/deutschland/aa/bb", 5)
+	for _, config := range rssSourcesAndConfig {
+		Fetch(w, r, fs, config, 5)
 	}
 
 	lg("fetching complete")

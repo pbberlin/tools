@@ -50,12 +50,7 @@ func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete Subtree for curr FS"}))
 	defer wpf(w, tplx.Foot)
 
-	if r.Method != "POST" {
-		tData := map[string]string{"Url": UriDeleteSubtree}
-		err := tplBase.ExecuteTemplate(w, "tplName01", tData)
-		lge(err)
-
-	} else {
+	if r.Method == "POST" {
 		wpf(w, "<pre>\n")
 		defer wpf(w, "\n</pre>")
 
@@ -81,6 +76,11 @@ func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 			lg("success")
 		}
 
+	} else {
+		tData := map[string]string{"Url": UriDeleteSubtree}
+		err := tplBase.ExecuteTemplate(w, "tplName01", tData)
+		lge(err)
+
 	}
 
 }
@@ -90,9 +90,18 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete all filesystem data"}))
 	defer wpf(w, tplx.Foot)
 
+	confirm := r.FormValue("confirm")
+	if confirm != "yes" {
+		wpf(w, "All dsfs contents are deletes. All memfs contents are deleted<br>\n")
+		wpf(w, "Put a get param into the URL ?confirm - and set it to 'yes'<br>\n")
+		return
+	}
+
 	wpf(w, "<pre>\n")
 	defer wpf(w, "\n</pre>")
 
+	//
+	//
 	fs := dsfs.New(dsfs.AeContext(appengine.NewContext(r)))
 	wpf(w, "dsfs:\n")
 	msg, err := fs.DeleteAll()

@@ -68,7 +68,7 @@ func SuppressPanicUponDoubleRegistration(w http.ResponseWriter, r *http.Request,
 }
 
 func collectInfo(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	instance_mgt.Get(appengine.NewContext(r), m)
+	instance_mgt.Get(appengine.NewContext(r))
 }
 
 func init() {

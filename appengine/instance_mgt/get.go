@@ -13,13 +13,13 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-var ii = new(Instance)
+var ii *Instance = new(Instance) // initialization check via ii.LastUpdated.IsZero()
 
 func GetStatic() *Instance {
 	return ii
 }
 
-func Get(c appengine.Context, m map[string]interface{}) *Instance {
+func Get(c appengine.Context) *Instance {
 
 	startFunc := time.Now()
 
@@ -79,16 +79,15 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
 	// http://[0-2].1.default.libertarian-islands.appspot.com/instance-info
 
-	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName,
-		ii.VersionMajor, "")
-
+	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "")
 	if err != nil {
 		c.Errorf("%v", err)
 	}
 
-	if !util_appengine.IsLocalEnviron() {
-		ii.HostnameInst0, err = appengine.ModuleHostname(c, ii.ModuleName,
-			ii.VersionMajor, "0")
+	ii.PureHostname = appengine.DefaultVersionHostname(c)
+
+	if !appengine.IsDevAppServer() {
+		ii.HostnameInst0, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "0")
 		if err != nil && (err.Error() == autoScalingErr1 || err.Error() == autoScalingErr2) {
 			c.Infof("inst 0: " + autoScalingErrMsg)
 			err = nil
@@ -97,8 +96,7 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 			c.Errorf("%v", err)
 		}
 
-		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName,
-			ii.VersionMajor, "1")
+		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "1")
 		if err != nil && (err.Error() == autoScalingErr1 || err.Error() == autoScalingErr2) {
 			c.Infof("inst 1: " + autoScalingErrMsg)
 			err = nil
@@ -116,10 +114,9 @@ func Get(c appengine.Context, m map[string]interface{}) *Instance {
 
 	ii.LastUpdated = time.Now()
 
-	c.Infof("collectInfo() completed, %v.%v.%v.%v, took %v",
+	c.Infof("collectInfo() completed, %v  - %v - %v - %v - %v, took %v",
 		stringspb.Ellipsoider(ii.InstanceID, 4), ii.VersionMajor, ii.ModuleName,
-		ii.Hostname,
-		ii.LastUpdated.Sub(startFunc))
+		ii.Hostname, ii.PureHostname, time.Now().Sub(startFunc))
 
 	return ii
 }

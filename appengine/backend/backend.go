@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -151,7 +150,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	sEnc := "Theo - wir fahrn nach Łódź <  " + stringspb.IncrementString("Łódź") + x1 + x2 + x3 + x4
 	b1.WriteString(fmt.Sprint("restore string string(  []byte(sEnc) ): ", string([]byte(sEnc)), "<br>"))
 
-	logif.E(fmt.Errorf("fictive error that is *now* logged to gae. "))
+	// logif.E(fmt.Errorf("fictive error that is *now* logged to gae. "))
 
 	b1.WriteString(tplx.Foot)
 

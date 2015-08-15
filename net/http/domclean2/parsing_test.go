@@ -51,7 +51,7 @@ func main() {
 		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
 		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
 		fn3, fnKey := weedoutFilename(i, 0)
-		resBytes, err := fetch.UrlGetter(url, nil, false)
+		resBytes, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
 		if err != nil {
 			log.Fatal(err)
 		}

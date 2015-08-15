@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"mime"
 	"net/http"
 	"net/url"
@@ -124,7 +123,7 @@ func dirList(w http.ResponseWriter, f fsi.File) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	for {
-		log.Printf("\n READDIR %v", f.Name())
+		// log.Printf("\n dirList.READDIR %v", f.Name())
 		dirs, err := f.Readdir(100)
 		if err != nil || len(dirs) == 0 {
 			break

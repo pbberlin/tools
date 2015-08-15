@@ -40,11 +40,12 @@ type Instance struct {
 	HostnameInst1 string
 	HostnameMod02 string
 	LastUpdated   time.Time
+
+	PureHostname string // without version, module
 }
 
 //var info = new(Instance)
-var m1 map[string]*Instance = map[string]*Instance{"dummy": new(Instance)}
-var ci chan *Instance = make(chan *Instance)
+// var ci chan *Instance = make(chan *Instance)
 
 //  &proto.RequiredNotSetError{field:"{Unknown}"}
 const autoScalingErr1 = `proto: required field "{Unknown}" not set`
@@ -58,18 +59,15 @@ func (i *Instance) String() string {
 	}
 
 	b1 := new(bytes.Buffer)
-	b1.WriteString(fmt.Sprintf("Module %q Version %q %q \n", i.ModuleName,
-		i.VersionMajor, i.VersionMinor))
+	b1.WriteString(fmt.Sprintf("Module %q Version %q %q \n", i.ModuleName, i.VersionMajor, i.VersionMinor))
 	b1.WriteString(fmt.Sprintf("Number of Instances %v \n", i.NumInstances))
 	b1.WriteString(fmt.Sprintf("Instance Id %q  \n", i.InstanceID))
 	b1.WriteString("\n")
 
-	b1.WriteString(fmt.Sprintf("Hostname Module 'default' Inst 'x'  %q \n",
-		i.Hostname))
-	b1.WriteString(fmt.Sprintf("Hostname Module '%v' Inst '0'  %q \n",
-		i.ModuleName, i.HostnameInst0))
-	b1.WriteString(fmt.Sprintf("Hostname Module '%v' Inst '1'  %q \n",
-		i.ModuleName, i.HostnameInst1))
+	b1.WriteString(fmt.Sprintf("Hostname Pure                       %q \n", i.PureHostname))
+	b1.WriteString(fmt.Sprintf("Hostname Module 'default' Inst 'x'  %q \n", i.Hostname))
+	b1.WriteString(fmt.Sprintf("Hostname Module '%v' Inst '0'  %q \n", i.ModuleName, i.HostnameInst0))
+	b1.WriteString(fmt.Sprintf("Hostname Module '%v' Inst '1'  %q \n", i.ModuleName, i.HostnameInst1))
 	b1.WriteString(fmt.Sprintf("Hostname Module 'mod02'   Inst 'x'  %q \n", i.HostnameMod02))
 
 	b1.WriteString("\n")
@@ -100,14 +98,15 @@ func init() {
 	http.HandleFunc("/_ah/stop", onStop)
 
 	go func() {
-		for i := 0; i < 22222; i++ {
-			// s := fmt.Sprintf("%v - %#v\n", util.TimeMarker(), info)
-			_, ok := m1["info"]
-			if ok {
-				s := fmt.Sprintf("%v", m1["info"].Hostname)
-				log.Print(s)
+		for {
+			if ii.LastUpdated.IsZero() {
+				time.Sleep(36 * time.Second)
+				continue
 			}
-			time.Sleep(12000 * time.Millisecond)
+
+			s := fmt.Sprintf("hostname is %v, pure hostname is %v (%v)", ii.Hostname, ii.PureHostname, time.Now().Sub(ii.LastUpdated))
+			log.Println(s)
+			time.Sleep(36 * time.Second)
 		}
 
 	}()

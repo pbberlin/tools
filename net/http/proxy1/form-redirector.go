@@ -40,7 +40,7 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		rURL = fmt.Sprintf("%v&%v=%v", rURL, key, val)
 	}
 
-	bts, u, err := fetch.UrlGetter(rURL, r, false)
+	bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
 	logif.E(err)
 
 	cntnt = string(bts)

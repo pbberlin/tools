@@ -32,7 +32,7 @@ func writeMethods(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	client := urlfetch.Client(c)
 
-	ii := instance_mgt.Get(c)
+	ii := instance_mgt.Get(r)
 	resp2, err := client.Get(spf(`http://%s/write-methods-read`, ii.PureHostname))
 	loghttp.E(w, r, err, false)
 

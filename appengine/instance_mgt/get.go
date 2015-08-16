@@ -2,6 +2,8 @@
 package instance_mgt
 
 import (
+	"net/http"
+
 	"appengine"
 	"appengine/module"
 
@@ -19,13 +21,20 @@ func GetStatic() *Instance {
 	return ii
 }
 
-func Get(c appengine.Context) *Instance {
+func Get(r *http.Request) *Instance {
+	c := util_appengine.SafelyExtractGaeContext(r)
+	return GetByContext(c)
+}
 
-	startFunc := time.Now()
+// Todo: When c==nil we are in a non-appengine environment.
+// We still want to return at least ii.PureHostname
+func GetByContext(c appengine.Context) *Instance {
+
+	tstart := time.Now()
 
 	if !ii.LastUpdated.IsZero() {
 
-		age := startFunc.Sub(ii.LastUpdated)
+		age := tstart.Sub(ii.LastUpdated)
 
 		if age < 200*time.Millisecond {
 			c.Infof("instance info update too recently: %v, skipping.\n", age)
@@ -116,7 +125,7 @@ func Get(c appengine.Context) *Instance {
 
 	c.Infof("collectInfo() completed, %v  - %v - %v - %v - %v, took %v",
 		stringspb.Ellipsoider(ii.InstanceID, 4), ii.VersionMajor, ii.ModuleName,
-		ii.Hostname, ii.PureHostname, time.Now().Sub(startFunc))
+		ii.Hostname, ii.PureHostname, time.Now().Sub(tstart))
 
 	return ii
 }

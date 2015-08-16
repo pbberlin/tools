@@ -11,6 +11,7 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/runtimepb"
 	"github.com/pbberlin/tools/stringspb"
 )
 
@@ -44,6 +45,8 @@ func rssXMLFile(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, rssUr
 func condenseTrailingDir(uri string, n int) (ret string) {
 
 	switch n {
+	case 0:
+		return uri
 	case 1:
 		return uri
 	case 2:
@@ -56,7 +59,8 @@ func condenseTrailingDir(uri string, n int) (ret string) {
 
 		ret = path.Join(rdir2, base2+"-"+base1)
 	default:
-		log.Fatalf("not implemented n > 2")
+		runtimepb.StackTrace(4)
+		log.Fatalf("not implemented n > 2 (%v)", n)
 	}
 
 	return

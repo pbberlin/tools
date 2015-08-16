@@ -28,42 +28,29 @@ type FullArticle struct {
 // parallel fetchers routines
 const numWorkers = 3
 
-// rssSourcesAndConfig contains sources of type map[string]interface{},
-// that can be passed to Fetch() as config parameter
-var rssSourcesAndConfig = map[string]map[string]interface{}{
-	"handelsblatt-src": map[string]interface{}{
-		"host":                   "www.handelsblatt.com",
-		"rss-xml-uri":            "/contentexport/feed/schlagzeilen",
-		"search-prefix":          "/politik/international/aa/bb",
-		"condense-trailing-dirs": 2, // The last one or two directories might be article titles or ids
-		"depth-tolerance":        1,
-	},
-	"economist-src": map[string]interface{}{
-		"host":                   "www.economist.com",
-		"rss-xml-uri":            "/sections/international/rss.xml",
-		"search-prefix":          "/news/international",
-		"condense-trailing-dirs": 1,
-		"depth-tolerance":        2,
-	},
-}
-
 // Fetch takes a RSS XML uri and fetches some of its documents.
 // It uses a three staged pipeline for parallel fetching.
 // Results are stored into the given filesystem fs.
 // Config points to the source of RSS XML,
 // and has some rules for conflating URI directories.
-// uriPrefix and numberArticles tell the func
+// uriPrefix and config.DesiredNumber tell the func
 // which subdirs of the RSS dir should be fetched - and how many at max.
-func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
-	config map[string]interface{}, numberArticles int) {
+func Fetch(w http.ResponseWriter, r *http.Request,
+	fs fsi.FileSystem, config FetchCommand,
+) {
 
 	lg, lge := loghttp.Logger(w, r)
 
-	rssUrl := path.Join(config["host"].(string), config["rss-xml-uri"].(string))
-	uriPrefix := config["search-prefix"].(string)
+	if config.Host == "" {
+		lg(" empty host; returning")
+		return
+	}
 
 	// Fetching the rssXML takes time.
 	// We do it before the timouts of the pipeline stages are set off.
+	lg(" ")
+	lg(config.Host)
+	rssUrl := path.Join(config.Host, config.RssXMLURI)
 	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 
 	//
@@ -81,8 +68,10 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
 	// fire up the "collector", a fan-in
 	go func() {
 		stage3Wait.Add(1)
-		const delayInitial = 600
-		const delayRefresh = 400 // 400 good value; critical point at 35
+		// 400 good value; critical point at 35
+		// economist.com required 800 ms
+		const delayInitial = 1200
+		const delayRefresh = 800
 		cout := time.After(time.Millisecond * delayInitial)
 		for {
 			select {
@@ -119,14 +108,19 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
 					var err error
 					a.Body, _, err = fetch.UrlGetter(r, fetch.Options{URL: a.Url})
 					lge(err)
-					out <- a
+					select {
+					case out <- a:
+					case <-fin:
+						lg("    worker spinning down; branch 1; abandoning %v", a.Url)
+						return
+					}
 					a = new(FullArticle)
 				case <-fin:
 					if a != nil && a.Url != "" {
 						u, _ := url.Parse(a.Url)
 						lg("    abandoned %v", u.RequestURI())
 					} else {
-						lg("    worker spinning down")
+						lg("    worker spinning down; branch 2")
 					}
 					return
 				}
@@ -138,39 +132,45 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
 	//
 	//
 	// loading stage 1
-	found := 0
-	uriPrefixExcl := "impossible"
-	for i := 0; i < 15; i++ {
-		lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, numberArticles)
-		found += stuffStage1(w, r, config, inn, fin, &rssDoc, uriPrefix, uriPrefixExcl, numberArticles-found)
-		if found >= numberArticles {
-			break
-		}
+	for _, uriPrefix := range config.SearchPrefixs {
+		found := 0
+		uriPrefixExcl := "impossible"
+		for i := 0; i < 15; i++ {
+			lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, config.DesiredNumber)
+			found += stuffStage1(w, r, config, inn, fin, &rssDoc,
+				uriPrefix, uriPrefixExcl, config.DesiredNumber-found)
 
-		if uriPrefix == "/" {
-			lg("  root exhausted")
-			break
-		}
+			if found >= config.DesiredNumber {
+				break
+			}
 
-		newPrefix := path.Dir(uriPrefix)
-		uriPrefixExcl = uriPrefix
-		uriPrefix = newPrefix
+			if uriPrefix == "/" {
+				lg("  root exhausted")
+				break
+			}
+
+			newPrefix := path.Dir(uriPrefix)
+			uriPrefixExcl = uriPrefix
+			uriPrefix = newPrefix
+		}
+		lg("  found %v of %v", found, config.DesiredNumber)
 	}
-	lg("  found %v of %v", found, numberArticles)
 
 	lg("stage3Wait.Wait() before")
 	stage3Wait.Wait()
 	lg("stage3Wait.Wait() after")
 
-	time.Sleep(3 * time.Millisecond) // not needed - workers spin down earlier
+	// workers spin down earlier -
+	// but ae log writer and response writer need some time
+	// to record the spin-down messages
+	time.Sleep(120 * time.Millisecond)
 
 	// compile out directory statistics
 	histoDir := map[string]int{}
-	condenseTrailingDirs := config["condense-trailing-dirs"].(int)
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
 		lge(err)
-		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
+		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
 		dir := path.Dir(semanticUri)
 		histoDir[dir]++
 	}
@@ -186,8 +186,10 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
 	// Saving as files
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
+		u.Fragment = ""
+		u.RawQuery = ""
 		lge(err)
-		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
+		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
 		p := path.Join(docRoot, u.Host, semanticUri)
 		err = fs.WriteFile(p, a.Body, 0644)
 		lge(err)
@@ -221,7 +223,7 @@ func Fetch(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem,
 
 // stuffStage1 ranges of the RSS entries and filters out unwanted directories.
 // Wanted urls are sent to the stage one channel.
-func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]interface{},
+func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	inn chan *FullArticle, fin chan struct{}, rssDoc *RSS,
 	uriPrefixIncl, uriPrefixExcl string, nWant int) (nFound int) {
 
@@ -231,14 +233,12 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]inter
 	if uriPrefixIncl == "/" {
 		depthPrefix = 0
 	}
-	condenseTrailingDirs := config["condense-trailing-dirs"].(int)
-	depthTolerance := config["depth-tolerance"].(int)
 
 	for i, lpItem := range rssDoc.Items.ItemList {
 
 		u, err := url.Parse(lpItem.Link)
 		lge(err)
-		short := stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50)
+		short := stringspb.Ellipsoider(u.Path, 50)
 
 		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
 		lge(err)
@@ -253,10 +253,14 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config map[string]inter
 			continue
 		}
 
-		semanticUri := condenseTrailingDir(u.RequestURI(), condenseTrailingDirs)
+		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
 		depthUri := strings.Count(semanticUri, "/")
-		if depthUri > depthPrefix+1+depthTolerance {
-			// lg("\t\tskipping %20v - too deep (%v - %v)", semanticUri, depthPrefix, depthUri)
+		if depthUri > depthPrefix+1+config.DepthTolerance {
+			lg("\t\tskipping too deep    %v of %v - %20v", depthUri, depthPrefix, semanticUri)
+			continue
+		}
+		if depthUri <= depthPrefix {
+			lg("\t\tskipping too shallow %v of %v - %20v", depthUri, depthPrefix, semanticUri)
 			continue
 		}
 

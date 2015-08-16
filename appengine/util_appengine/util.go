@@ -35,18 +35,26 @@ func IsLocalEnviron() bool {
 
 }
 
-func SafeGaeCheck(r *http.Request) (appengine.Context, error) {
-
+//
+func SafelyExtractGaeCtxError(r *http.Request) (appengine.Context, error) {
 	if r == nil {
 		return nil, fmt.Errorf("Request is not appengine - request is nil")
 	}
-
 	c := checkPanicking(r)
 	if c != nil {
 		return c, nil
 	} else {
 		return nil, fmt.Errorf("Request is not appengine")
 	}
+}
+
+// Same as SafelyExtractGaeCtxError(), but without an error
+func SafelyExtractGaeContext(r *http.Request) appengine.Context {
+	if r == nil {
+		return nil
+	}
+	c := checkPanicking(r)
+	return c
 }
 
 func checkPanicking(r *http.Request) appengine.Context {

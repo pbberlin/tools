@@ -98,7 +98,7 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 
 func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 
-	ii := instance_mgt.Get(c)
+	ii := instance_mgt.GetByContext(c)
 
 	/*
 		making a get request to all instances
@@ -152,7 +152,7 @@ func invalidate(w http.ResponseWriter, r *http.Request) {
 
 	c := appengine.NewContext(r)
 
-	ii := instance_mgt.Get(c)
+	ii := instance_mgt.GetByContext(c)
 
 	mkk := r.FormValue("mkk")
 	sii := r.FormValue("senderInstanceId")

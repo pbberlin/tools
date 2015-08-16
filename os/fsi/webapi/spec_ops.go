@@ -12,6 +12,7 @@ import (
 	tt "html/template"
 
 	"appengine"
+	"appengine/memcache"
 )
 
 var str = `
@@ -72,7 +73,11 @@ func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		lg("removing %v/*... ", pathPrefix)
 		err := fs.RemoveAll(pathPrefix)
 		lge(err)
-		if err == nil {
+
+		errMc := memcache.Flush(appengine.NewContext(r))
+		lge(errMc)
+
+		if err == nil && errMc == nil {
 			lg("success")
 		}
 

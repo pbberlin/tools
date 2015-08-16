@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"appengine"
-
 	// sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 
 	"github.com/pbberlin/tools/appengine/instance_mgt"
@@ -68,7 +66,7 @@ func SuppressPanicUponDoubleRegistration(w http.ResponseWriter, r *http.Request,
 }
 
 func collectInfo(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	instance_mgt.Get(appengine.NewContext(r))
+	instance_mgt.Get(r)
 }
 
 func init() {

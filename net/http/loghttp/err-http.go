@@ -70,14 +70,14 @@ func E(w http.ResponseWriter, r *http.Request,
 		}
 
 		if continueExecution {
-			c, _ := util_appengine.SafeGaeCheck(r)
+			c, _ := util_appengine.SafelyExtractGaeCtxError(r)
 			if c == nil {
 				log.Printf(s)
 			} else {
 				c.Infof(s)
 			}
 		} else {
-			c, _ := util_appengine.SafeGaeCheck(r)
+			c, _ := util_appengine.SafelyExtractGaeCtxError(r)
 			if c == nil {
 				log.Printf(s)
 			} else {
@@ -101,8 +101,8 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 		s = f
 	}
 
-	// Write it to http response
-	if w != nil {
+	// Write it to http response - unless prefix 'lo ' - log only
+	if w != nil && !strings.HasPrefix(s, "lo ") {
 		w.Write([]byte(s))
 		w.Write([]byte{'\n'})
 	}
@@ -117,7 +117,7 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 	s = fmt.Sprintf("%v - %v:%v", s, file, line)
 
 	// Log it
-	c, _ := util_appengine.SafeGaeCheck(r)
+	c, _ := util_appengine.SafelyExtractGaeCtxError(r)
 	if c == nil {
 		lnp.Printf(s)
 	} else {

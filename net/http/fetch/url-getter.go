@@ -44,13 +44,16 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	req := options.Req
 
-	// No protocol defaults to https
-	if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
-		req.URL.Scheme = "https"
-	}
 	// Prevent u.Host from "google.com" without scheme is ""
+	// Also make no protocol default to https
 	surl := req.URL.String()
-	req.URL, _ = url.Parse(surl)
+	if !strings.HasPrefix(surl, "http://") && !strings.HasPrefix(surl, "https://") {
+		surl = "https://" + surl
+	}
+	req.URL, err = url.Parse(surl)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	// Optional: force https
 	if options.HttpsOnly {
@@ -62,7 +65,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	if gaeReq == nil {
 		client.Timeout = time.Duration(5 * time.Second) // GAE does not allow
 	} else {
-		c, _ := util_appengine.SafeGaeCheck(gaeReq)
+		c := util_appengine.SafelyExtractGaeContext(gaeReq)
 		if c != nil {
 			client = urlfetch.Client(c)
 

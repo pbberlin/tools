@@ -56,6 +56,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	if r.URL.Scheme != "https" && !util_appengine.IsLocalEnviron() {
 		r.URL.Scheme = "https"
 		r.URL.Host = r.Host
+		lg("lo - redirect %v", r.URL.String())
 		http.Redirect(w, r, r.URL.String(), http.StatusFound)
 	}
 
@@ -111,7 +112,6 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		cntnt = insertNewlines.Replace(cntnt)
 		cntnt = undouble.Replace(cntnt)
 
-		lg("clean %v - %v - %v - %v", u, rURL, u.Host, fetch.HostFromUrl(u))
 		cntnt = domclean1.ModifyHTML(r, u, cntnt)
 		fmt.Fprintf(w, cntnt)
 

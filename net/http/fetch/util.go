@@ -10,22 +10,22 @@ import (
 )
 
 func HostFromReq(r *http.Request) string {
-	return inner(r.Host)
+	return splitPort(r.Host)
 }
 
 func HostFromUrl(u *url.URL) string {
 
-	// Prevent u.Host from "google.com" without scheme is ""
+	// Prevent "google.com" => u.Host == "" when scheme == ""
 	surl := u.String()
-	if !strings.HasPrefix(surl, "http://") && strings.HasPrefix(surl, "https://") {
-		surl += "http://" + surl
+	if !strings.HasPrefix(surl, "http://") && !strings.HasPrefix(surl, "https://") {
+		surl = "https://" + surl
 	}
 	url2, _ := url.Parse(surl)
 
-	return inner(url2.Host)
+	return splitPort(url2.Host)
 }
 
-func inner(hp string) string {
+func splitPort(hp string) string {
 
 	host, port, err := net.SplitHostPort(hp)
 	_ = port

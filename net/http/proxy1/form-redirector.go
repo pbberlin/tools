@@ -22,7 +22,7 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
 	rURL = r.FormValue("redirect-to")
-	lg("redirect to: %v", rURL)
+	lg("lo redirect to: %v", rURL)
 
 	if len(r.PostForm) > 0 {
 		// loghttp.Pf(w, r, "post unimplemented:<br> %#v <br>\n", r.PostForm)

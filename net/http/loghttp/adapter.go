@@ -75,7 +75,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 
 		start := time.Now()
 
-		c, _ := util_appengine.SafeGaeCheck(r)
+		c, _ := util_appengine.SafelyExtractGaeCtxError(r)
 		lgi := log.Printf
 		lge := log.Fatalf
 		if c != nil {

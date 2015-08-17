@@ -48,6 +48,9 @@ func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 
 	lg, lge := loghttp.Logger(w, r)
 
+	err := r.ParseForm()
+	lge(err)
+
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete Subtree for curr FS"}))
 	defer wpf(w, tplx.Foot)
 

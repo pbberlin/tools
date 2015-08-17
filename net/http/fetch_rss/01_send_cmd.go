@@ -48,15 +48,15 @@ func staticFetchViaPosting2Receiver(w http.ResponseWriter, r *http.Request, m ma
 	wpf(w, "<pre>")
 	defer wpf(w, "</pre>")
 
-	b, err := post2Receiver(r, testCommands)
+	b, err := Post2Receiver(r, testCommands)
 
 	lge(err)
-	lg("msg from post2Receiver:")
+	lg("msg from Post2Receiver:")
 	lg(b.String())
 
 }
 
-func post2Receiver(r *http.Request, commands []FetchCommand) (*bytes.Buffer, error) {
+func Post2Receiver(r *http.Request, commands []FetchCommand) (*bytes.Buffer, error) {
 
 	b := new(bytes.Buffer)
 

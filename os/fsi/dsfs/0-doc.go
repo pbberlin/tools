@@ -1,4 +1,4 @@
-// package dsfs builds a fully distributed
+// Package dsfs builds a fully distributed
 // filesystem layer on top of google datastore.
 package dsfs
 

@@ -1,7 +1,5 @@
 // Package dsfs builds a fully distributed
 // filesystem layer on top of google datastore.
-package dsfs
-
 //
 // Architecture
 // ==============================
@@ -54,3 +52,4 @@ package dsfs
 // See memfs, for how this could be done.
 //
 // Nice to have: Links
+package dsfs

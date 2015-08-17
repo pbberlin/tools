@@ -1,3 +1,5 @@
+// Package colors contains some simple RGB color scheme
+// for the chart package; it can vary the shade of a given color.
 package colors
 
 import "fmt"

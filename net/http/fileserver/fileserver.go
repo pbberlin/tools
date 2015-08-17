@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
@@ -17,6 +18,7 @@ import (
 )
 
 var wpf = fmt.Fprintf
+var spf = fmt.Sprintf
 
 // We cannot use http.FileServer(http.Dir("./css/")
 // to dispatch our dsfs files.
@@ -140,9 +142,11 @@ func dirList(w http.ResponseWriter, f fsi.File) {
 			linktitle = stringspb.Ellipsoider(linktitle, 40)
 
 			url := url.URL{Path: name}
-			wpf(w, "<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", url.String(), linktitle)
-			wpf(w, " %v\n", d.ModTime().Format("2006-01-02 15:04:05 MST"))
-			wpf(w, "<br>\n")
+
+			oneLine := spf("<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", url.String(), linktitle)
+			// wpf(w, " %v\n", d.ModTime().Format("2006-01-02 15:04:05 MST"))
+			oneLine += spf(" %v<br>\n", d.ModTime().Format(time.RFC1123Z))
+			wpf(w, oneLine)
 		}
 	}
 

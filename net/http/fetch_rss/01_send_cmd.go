@@ -13,22 +13,25 @@ import (
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
+type FetchCommand struct {
+	Host                 string   // www.handelsblatt.com,
+	RssXMLURI            string   // /contentexport/feed/schlagzeilen,
+	SearchPrefixs        []string // /politik/international/aa/bb,
+	DesiredNumber        int
+	CondenseTrailingDirs int // The last one or two directories might be article titles or ids
+	DepthTolerance       int
+}
+
 var testCommands = []FetchCommand{
 	FetchCommand{
-		Host:                 "www.handelsblatt.com",
-		RssXMLURI:            "/contentexport/feed/schlagzeilen",
-		SearchPrefixs:        []string{"/politik/international/aa/bb", "/politik/deutschland/aa/bb"},
-		DesiredNumber:        5,
-		CondenseTrailingDirs: 2,
-		DepthTolerance:       1,
+		Host:          "www.handelsblatt.com",
+		RssXMLURI:     "/contentexport/feed/schlagzeilen",
+		SearchPrefixs: []string{"/politik/international/aa/bb", "/politik/deutschland/aa/bb"},
 	},
 	FetchCommand{
-		"www.economist.com",
-		"/sections/europe/rss.xml",
-		[]string{"/news/europe/aa"},
-		5,
-		0,
-		2,
+		Host:          "www.economist.com",
+		RssXMLURI:     "/sections/europe/rss.xml",
+		SearchPrefixs: []string{"/news/europe/aa"},
 	},
 }
 

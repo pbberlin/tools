@@ -14,17 +14,38 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-type FetchCommand struct {
-	Host                 string   // www.handelsblatt.com,
-	RssXMLURI            string   // /contentexport/feed/schlagzeilen,
-	SearchPrefixs        []string // /politik/international/aa/bb,
-	DesiredNumber        int
-	CondenseTrailingDirs int // The last one or two directories might be article titles or ids
-	DepthTolerance       int
+var ConfigDefaults = map[string]FetchCommand{
+	"unspecified": FetchCommand{
+		CondenseTrailingDirs: 0,
+		DepthTolerance:       0,
+		DesiredNumber:        5,
+	},
+	"www.handelsblatt.com": FetchCommand{
+		CondenseTrailingDirs: 2,
+		DepthTolerance:       1,
+		DesiredNumber:        5,
+	},
+	"www.economist.com": FetchCommand{
+		CondenseTrailingDirs: 0,
+		DepthTolerance:       2,
+		DesiredNumber:        5,
+	},
+	"www.welt.de": FetchCommand{
+		CondenseTrailingDirs: 2,
+		DepthTolerance:       0,
+		DesiredNumber:        5,
+	},
 }
 
-//  curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
-//  curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
+/*
+
+ curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
+ curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
+
+ curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
+
+
+*/
 
 func fetchCommandReceiver(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
@@ -98,9 +119,30 @@ func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 	lge(err)
 
 	for _, config := range fcs {
+		config = addDefaults(config)
 		Fetch(w, r, fs, config)
 	}
 
 	lg("fetching complete")
 
+}
+
+func addDefaults(in FetchCommand) FetchCommand {
+
+	var preset FetchCommand
+
+	h := in.Host
+	if exactPreset, ok := ConfigDefaults[h]; ok {
+		preset = exactPreset
+	} else {
+		preset = ConfigDefaults["unspecified"]
+	}
+
+	in.DepthTolerance = preset.DepthTolerance
+	in.CondenseTrailingDirs = preset.CondenseTrailingDirs
+	if in.DesiredNumber == 0 {
+		in.DesiredNumber = preset.DesiredNumber
+	}
+
+	return in
 }

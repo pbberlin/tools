@@ -79,7 +79,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 			case fa := <-out:
 				fullArticles = append(fullArticles, *fa)
 				u, _ := url.Parse(fa.Url)
-				lg("    fetched              %v ", stringspb.Ellipsoider(path.Dir(u.RequestURI()), 50))
+				lg("    fetched              %v ", stringspb.Ellipsoider(u.Path, 50))
 				cout = time.After(time.Millisecond * delayRefresh) // refresh timeout
 			case <-cout:
 				lg("timeout after %v articles", len(fullArticles))
@@ -175,11 +175,14 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 		histoDir[dir]++
 	}
 	sr := sortmap.SortMapByCount(histoDir)
+	_ = sr
 
 	// Create dirs
 	for k, _ := range histoDir {
 		dir := path.Join(docRoot, rssUrlObj.Host, k)
 		err := fs.MkdirAll(dir, 0755)
+		lge(err)
+		err = fs.Chtimes(dir, time.Now(), time.Now())
 		lge(err)
 	}
 
@@ -198,18 +201,18 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	}
 
 	// Save digests
-	{
-		b, err := json.MarshalIndent(sr, "  ", "\t")
-		lge(err)
-		fnDigest := path.Join(docRoot, "digest_detailed.json")
-		err = fs.WriteFile(fnDigest, b, 0755)
-		lge(err)
-	}
+	// {
+	// 	b, err := json.MarshalIndent(sr, "  ", "\t")
+	// 	lge(err)
+	// 	fnDigest := path.Join(docRoot, rssUrlObj.Host, "digest_detailed.json")
+	// 	err = fs.WriteFile(fnDigest, b, 0755)
+	// 	lge(err)
+	// }
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
 		lge(err)
-		fnDigest := path.Join(docRoot, "digest.json")
+		fnDigest := path.Join(docRoot, rssUrlObj.Host, "digest.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
 		lge(err)
 	}
@@ -240,7 +243,8 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 		lge(err)
 		short := stringspb.Ellipsoider(u.Path, 50)
 
-		t, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
+		t, err := time.Parse(time.RFC1123Z, lpItem.Published)
+		//     := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
 		lge(err)
 
 		if strings.HasPrefix(u.RequestURI(), uriPrefixExcl) {

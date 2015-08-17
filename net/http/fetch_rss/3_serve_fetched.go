@@ -15,7 +15,7 @@ func init() {
 	msg = []byte(`<p>This is an embedded static http server.</p>
 <p>
 It serves previously downloaded pages<br>
- from handelsblatt or economist.
+ i.e. from handelsblatt or economist.
 </p>
 <p>
 	We want to find 
@@ -24,24 +24,3 @@ It serves previously downloaded pages<br>
 </p>
 `)
 }
-
-// func Serve(fs fsi.FileSystem) (baseUrl string, topDirs []string) {
-
-// 	fs.WriteFile(path.Join(docRoot, "msg.html"), msg, 0644)
-
-// 	httpFSys := &httpfs.HttpFs{SourceFs: fs}
-// 	mux := http.NewServeMux()
-// 	fileserver1 := http.FileServer(httpFSys.Dir(docRoot))
-// 	mux.Handle("/", fileserver1)
-// 	mux.Handle("/static2/", http.StripPrefix("/static2/", fileserver1)) // same
-
-// 	go func() {
-// 		log.Fatal(http.ListenAndServe("localhost:4000", mux))
-// 	}()
-
-// 	topDirs = make([]string, 0, len(hosts))
-// 	for k, _ := range hosts {
-// 		topDirs = append(topDirs, k)
-// 	}
-// 	return
-// }

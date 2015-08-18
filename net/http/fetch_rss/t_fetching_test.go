@@ -20,11 +20,11 @@ func Test2(t *testing.T) {
 	defer c.Close()
 
 	whichType = 2
-	fs := getFs(c)
+	fs := GetFS(c)
 	lg(fs.Name() + "-" + fs.String())
 
-	for _, config := range hosts {
-		Fetch(nil, nil, fs, config, "/politik/international/aa/bb", 12)
+	for _, config := range testCommands {
+		Fetch(nil, nil, fs, config)
 	}
 
 }

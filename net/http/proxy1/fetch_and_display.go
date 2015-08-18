@@ -46,8 +46,8 @@ const c_formFetchUrl = `
 
 `
 
-// var host, port string
-
+// handleFetchURL either displays a form for requesting an url
+// or it returns the URL´s contents.
 func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, lge := loghttp.Logger(w, r)

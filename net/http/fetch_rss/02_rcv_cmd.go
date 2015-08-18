@@ -107,7 +107,7 @@ func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 	lg, lge := loghttp.Logger(w, r)
 	var err error
 
-	fs := getFs(appengine.NewContext(r))
+	fs := GetFS(appengine.NewContext(r))
 	// fs = fsi.FileSystem(memMapFileSys)
 
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Requesting files"}))

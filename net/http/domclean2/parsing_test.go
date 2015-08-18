@@ -8,36 +8,61 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 	"testing"
 	"time"
 
+	"appengine"
+	"appengine/aetest"
+
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
+	"github.com/pbberlin/tools/net/http/fileserver"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
 
-var baseUrl string
-var subdirs []string
-
-func init() {
-	baseUrl, subdirs = fetch_rss.Serve()
-}
-
-func Test1(t *testing.T) {
-	main()
-}
-
 var numTotal = 0 // comparable html docs
 const stageMax = 3
 
-func main() {
+const cTestHost = "localhost:63222"
 
-	pf("waiting for webserver\n")
+var baseUrl = fetch_rss.UriMountNameY
+var subdirs []string
+
+func prepare(t *testing.T, c appengine.Context) {
+
+	serveFile := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+		fs1 := fetch_rss.GetFS(c)
+		fileserver.FsiFileServer(fs1, fetch_rss.UriMountNameY, w, r)
+	}
+	http.HandleFunc(fetch_rss.UriMountNameY, loghttp.Adapter(serveFile))
+
+	log.Fatal(
+		http.ListenAndServe(cTestHost, nil),
+	)
+
+}
+
+func Test1(t *testing.T) {
+
+	lg, lge := loghttp.Logger(nil, nil)
+
+	c, err := aetest.NewContext(nil)
+	if err != nil {
+		lge(err)
+		t.Fatal(err)
+	}
+	defer c.Close()
+
+	prepare(t, c)
+
+	lg("waiting for webserver\n")
 	time.Sleep(2 * time.Millisecond)
 
 	//
@@ -51,7 +76,10 @@ func main() {
 		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
 		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
 		fn3, fnKey := weedoutFilename(i, 0)
-		resBytes, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
+
+		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
+		_ = effUrl
+
 		if err != nil {
 			log.Fatal(err)
 		}

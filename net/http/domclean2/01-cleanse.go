@@ -3,7 +3,7 @@ package domclean2
 import "golang.org/x/net/html"
 
 var (
-	removes = map[string]bool{
+	unwanteds = map[string]bool{
 		"meta":     true,
 		"link":     true,
 		"style":    true,
@@ -17,7 +17,7 @@ var (
 		"wbr": true,
 	}
 
-	simplifies = map[string]string{
+	exotics = map[string]string{
 		"header":  "div",
 		"footer":  "div",
 		"nav":     "div",
@@ -94,6 +94,9 @@ var (
 	attrDistinct = map[string]int{}
 )
 
+var directlyRemoveUnwanted = true
+
+// maxTreeDepth returns the depth of given DOM node
 func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
 
 	maxLvl = lvl
@@ -107,6 +110,8 @@ func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
 	return
 }
 
+// cleansDom performs brute reduction and simplification
+//
 func cleanseDom(n *html.Node, lvl int) {
 
 	n.Attr = removeAttr(n.Attr, removeAttributes)
@@ -116,15 +121,15 @@ func cleanseDom(n *html.Node, lvl int) {
 		cleanseDom(c, lvl+1)
 	}
 
-	if true {
-		removeDirect(n)
+	if directlyRemoveUnwanted {
+		removeUnwanted(n)
 	} else {
-		convertToComment(n)
+		convertUnwanted(n)
 	}
 
 	// ---
 
-	normalizeToDiv(n)
+	convertExotic(n)
 
 	// one time text normalization
 	if n.Type == html.TextNode {
@@ -133,13 +138,17 @@ func cleanseDom(n *html.Node, lvl int) {
 
 }
 
-// convertToComment neutralizes a node.
-// Note: We can not Remove() nor Replace()
+// convertUnwanted neutralizes a node.
+// Note: We can not directly Remove() nor Replace()
 // Since that breaks the recursion one step above!
-// At a later stage we will employ horizontal traversal
+// At a later stage we employ horizontal traversal
 // to actually remove unwanted nodes.
-func convertToComment(n *html.Node) {
-	if removes[n.Data] {
+//
+// Meanwhile we have devised removeUnwanted() which
+// makes convertUnwanted-removeComment obsolete.
+//
+func convertUnwanted(n *html.Node) {
+	if unwanteds[n.Data] {
 		n.Type = html.CommentNode
 		n.Data = n.Data + " replaced"
 	}
@@ -151,20 +160,22 @@ func convertToComment(n *html.Node) {
 // Therefore:
 //   First assemble children separately.
 //   Then remove them.
-func removeDirect(n *html.Node) {
+func removeUnwanted(n *html.Node) {
 	cc := []*html.Node{}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		cc = append(cc, c)
 	}
 	for _, c := range cc {
-		if removes[c.Data] {
+		if unwanteds[c.Data] {
 			n.RemoveChild(c)
 		}
 	}
 }
 
-func normalizeToDiv(n *html.Node) {
-	if repl, ok := simplifies[n.Data]; ok {
+// convertExotic standardizes <section> or <header> nodes
+// towards <div> nodes.
+func convertExotic(n *html.Node) {
+	if repl, ok := exotics[n.Data]; ok {
 		n.Attr = append(n.Attr, html.Attribute{"", "cfrm", n.Data})
 		n.Data = repl
 	}

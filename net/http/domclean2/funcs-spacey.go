@@ -10,16 +10,18 @@ var replTabs = strings.NewReplacer("\t", " ")
 
 var doubleSpaces = regexp.MustCompile("([ ]+)")
 
+// isSpacey detects all possible occurrences of whitespace
 func isSpacey(sarg string) bool {
-	s := sarg
-	s = replNewLines.Replace(s)
-	s = strings.TrimSpace(s)
+	s := strings.TrimSpace(sarg) // TrimSpace removes leading-trailing \n \r\n
 	if s == "" {
 		return true
 	}
 	return false
 }
 
+// All kinds of newlines, tabs and double spaces
+// are reduced to single space.
+// It paves the way for later beautification.
 func textNormalize(s string) string {
 	s = replNewLines.Replace(s)
 	s = replTabs.Replace(s)

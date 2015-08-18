@@ -23,7 +23,7 @@ var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable r
 var httpFSys = &httpfs.HttpFs{SourceFs: fsi.FileSystem(memMapFileSys)} // memMap is always ready
 var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
 
-func getFs(c appengine.Context) (fs fsi.FileSystem) {
+func GetFS(c appengine.Context) (fs fsi.FileSystem) {
 	switch whichType {
 	case 0:
 		// must be re-instantiated for each request

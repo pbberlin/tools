@@ -45,7 +45,7 @@ func condenseNestedDivs(n *html.Node, lvl int) {
 
 	// Children
 	if true {
-		// like in removeDirect, we first assemble children separately.
+		// like in removeUnwanted, we first assemble children separately.
 		// since "NextSibling" might be set to nil during condension
 		cc := []*html.Node{}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {

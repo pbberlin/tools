@@ -22,6 +22,7 @@ func InitHandlers() {
 	http.HandleFunc(uriSetType, loghttp.Adapter(setFSType))
 
 	http.HandleFunc("/fetch/request-static", loghttp.Adapter(staticFetchDirect))
+
 	http.HandleFunc(uriFetchCommandSender, loghttp.Adapter(staticFetchViaPosting2Receiver))
 	http.HandleFunc(uriFetchCommandReceiver, loghttp.Adapter(fetchCommandReceiver))
 

@@ -39,11 +39,18 @@ var ConfigDefaults = map[string]FetchCommand{
 
 /*
 
- curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
- curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
+[{ 	'Host':           'www.handelsblatt.com',
+ 	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
+ 	'SearchPrefixs':  [ '/politik/international', '/politik/deutschland' ]
+}]
 
- curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
 
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
+
+curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
+
+"www.welt.de/wirtschaft/?service=Rss"
 
 */
 

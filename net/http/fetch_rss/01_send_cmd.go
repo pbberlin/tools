@@ -82,7 +82,7 @@ func Post2Receiver(r *http.Request, commands []FetchCommand) (*bytes.Buffer, err
 		wpf(b, "creation of POST request failed\n")
 		return b, err
 	}
-	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("X-Custom-Header-Counter", "nocounter")
 	req.Header.Set("Content-Type", "application/json")
 
 	bts, reqUrl, err := fetch.UrlGetter(r, fetch.Options{Req: req})

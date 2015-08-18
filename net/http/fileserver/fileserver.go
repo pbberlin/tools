@@ -3,6 +3,7 @@ package fileserver
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime"
@@ -37,6 +38,11 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Half-Static-File-Server"}))
 	wpf(b1, "<pre>\n")
+
+	err := r.ParseForm()
+	if err != nil {
+		wpf(b1, "err parsing request (ParseForm)%v\n", err)
+	}
 
 	p := r.URL.Path
 
@@ -84,7 +90,13 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 		} else {
 
 			wpf(b1, "err opening index file %v - %v\n", fullP, err)
-			dirList(w, f)
+
+			if r.FormValue("fmt") == "html" {
+				dirListHtml(w, r, f)
+			} else {
+				dirListJson(w, r, f)
+			}
+
 			b1 = new(bytes.Buffer) // success => reset the message log => dumps an empty buffer
 			return
 		}
@@ -109,7 +121,10 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 }
 
 // inspired by https://golang.org/src/net/http/fs.go
-
+//
+// name may contain '?' or '#', which must be escaped to remain
+// part of the URL path, and not indicate the start of a query
+// string or fragment.
 var htmlReplacer = strings.NewReplacer(
 	"&", "&amp;",
 	"<", "&lt;",
@@ -120,12 +135,14 @@ var htmlReplacer = strings.NewReplacer(
 	"'", "&#39;",
 )
 
-func dirList(w http.ResponseWriter, f fsi.File) {
+func dirListJson(w http.ResponseWriter, r *http.Request, f fsi.File) {
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	r.Header.Set("X-Custom-Header-Counter", "nocounter")
+	r.Header.Set("Content-Type", "application/json")
+
+	mp := []map[string]string{}
 
 	for {
-		// log.Printf("\n dirList.READDIR %v", f.Name())
 		dirs, err := f.Readdir(100)
 		if err != nil || len(dirs) == 0 {
 			break
@@ -135,13 +152,46 @@ func dirList(w http.ResponseWriter, f fsi.File) {
 			if d.IsDir() {
 				name += "/"
 			}
-			// name may contain '?' or '#', which must be escaped to remain
-			// part of the URL path, and not indicate the start of a query
-			// string or fragment.
+			name = htmlReplacer.Replace(name)
+
+			url := url.URL{Path: name}
+
+			mpl := map[string]string{
+				"path": url.String(),
+				"mod":  d.ModTime().Format(time.RFC1123Z),
+			}
+
+			mp = append(mp, mpl)
+		}
+	}
+
+	bdirListHtml, err := json.MarshalIndent(mp, "", "\t")
+	if err != nil {
+		wpf(w, "marshalling to []byte failed - mp was %v\n", mp)
+		return
+	}
+	w.Write(bdirListHtml)
+
+}
+func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	for {
+		// log.Printf("\n dirListHtml.READDIR %v", f.Name())
+		dirs, err := f.Readdir(100)
+		if err != nil || len(dirs) == 0 {
+			break
+		}
+		for _, d := range dirs {
+			name := d.Name()
+			if d.IsDir() {
+				name += "/"
+			}
 			linktitle := htmlReplacer.Replace(name)
 			linktitle = stringspb.Ellipsoider(linktitle, 40)
 
-			url := url.URL{Path: name}
+			url := url.URL{Path: path.Join(r.URL.Path, name), RawQuery: "fmt=html"}
 
 			oneLine := spf("<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", url.String(), linktitle)
 			// wpf(w, " %v\n", d.ModTime().Format("2006-01-02 15:04:05 MST"))

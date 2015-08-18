@@ -154,11 +154,19 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		} else {
 			var given1 AppengineHandler
 			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "text/html; charset=utf-8") // automatically set on appengine live, but not on appengine dev
+
 				given(w, r, mp)
-				distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
-				cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
-				fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
+
+				if r.Header.Get("Content-Type") == "" {
+					w.Header().Set("Content-Type", "text/html; charset=utf-8")
+					// automatically set on appengine live, but not on appengine dev
+				}
+
+				if r.Header.Get("X-Custom-Header-Counter") != "nocounter" {
+					distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
+					cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
+					fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
+				}
 			}
 			// given1(c, w, r)
 			wrapped := appstats.NewHandler(given1)

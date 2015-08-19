@@ -77,7 +77,10 @@ func Test1(t *testing.T) {
 		lg("%s", msg)
 	}
 
-	lg("dirs1 %v", stringspb.IndentedDump(dirs1))
+	lg("dirs1")
+	for _, v := range dirs1 {
+		lg("    %v", v)
+	}
 
 	least3Files := []string{}
 	for _, v1 := range dirs1 {
@@ -107,37 +110,44 @@ func Test1(t *testing.T) {
 		return
 	}
 
-	lg("  fils2 %v", stringspb.IndentedDump(least3Files))
+	lg("fils2")
+	for _, v := range least3Files {
+		lg("    %v", v)
+	}
 
 	logdir := osutilpb.DirOfExecutable()
 	logdir = filepath.Join(".", "outp")
 	lg("logdir is %v ", logdir)
-	err = os.Mkdir(logdir, 0755)
-	if err != nil && !os.IsExist(err) {
+
+	rmPath := spf("./%v/", logdir)
+	err = os.RemoveAll(rmPath)
+	if err != nil {
 		lge(err)
 		return
 	}
-	err = os.RemoveAll(logdir)
-	if err != nil {
+	lg("removed %q", rmPath)
+
+	err = os.Mkdir(logdir, 0755)
+	if err != nil && !os.IsExist(err) {
 		lge(err)
 		return
 	}
 
 	iter := []int{0, 1, 2}
 
-	weedoutFilename := func(articleId, weedoutStage int) (string, string) {
-		stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
-		prefix := fmt.Sprintf("outp_%03v", articleId)
-		return stagedFn, prefix
-	}
-
 	for i, _ := range iter {
 
 		var doc *html.Node
 		url := spf("%v/%v", hostWithPref, least3Files[i])
-		fn1 := spf("outp_%03v_xpath.txt", i)
-		fn2 := spf("outp_%03v_texts.txt", i)
-		fn3, fnKey := weedoutFilename(i, 0)
+
+		fnKey := fmt.Sprintf("outp_%03v", i)
+		fNames := []string{}
+		weedoutStage := 0
+		for i := 0; i < 11; i++ {
+			fn := fmt.Sprintf("outp_%03v_%v", i, weedoutStage)
+			fn = filepath.Join(logdir, fn)
+			fNames = append(fNames, fn)
+		}
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
 		if err != nil {
@@ -145,37 +155,49 @@ func Test1(t *testing.T) {
 			return
 		}
 		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
-		continue
 
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
 		if err != nil {
-			log.Fatal(err)
+			lge(err)
+			return
 		}
 
+		osutilpb.Dom2File(fNames[0]+".html", doc)
+
 		cleanseDom(doc, 0)
+		removeComments_intertagWhitespace(NdX{doc, 0})
 
-		physicalNodeRemoval(NdX{doc, 0})
-
-		convEmptyElementLeafs(doc, 0)
-
-		condenseNestedDivs(doc, 0)
-
-		dumpXPath(doc, 0)
-
-		computeOutline(doc, 0, []int{0})
-		nodeCountHoriz(doc, 0, 1)
-
-		textExtraction(doc, 0)
-
-		textsBytes, textsSorted := orderByOutline(textsByOutl)
-		osutilpb.Bytes2File(fn2, textsBytes)
-		textsByArticOutl[fnKey] = textsSorted
+		osutilpb.Dom2File(fNames[1]+".html", doc)
 
 		reIndent(doc, 0)
 
-		osutilpb.Bytes2File(fn1, xPathDump)
-		osutilpb.Dom2File(fn3, doc)
+		osutilpb.Dom2File(fNames[2]+".html", doc)
+
+		removeComments_intertagWhitespace(NdX{doc, 0})
+
+		osutilpb.Dom2File(fNames[3]+".html", doc)
+
+		if false {
+
+			convEmptyElementLeafs(doc, 0)
+
+			condenseNestedDivs(doc, 0)
+
+			dumpXPath(doc, 0)
+
+			computeOutline(doc, 0, []int{0})
+			nodeCountHoriz(doc, 0, 1)
+
+			textExtraction(doc, 0)
+
+			textsBytes, textsSorted := orderByOutline(textsByOutl)
+			osutilpb.Bytes2File(fNames[1], textsBytes)
+			textsByArticOutl[fnKey] = textsSorted
+
+			reIndent(doc, 0)
+
+		}
 
 		numTotal++
 	}
@@ -263,4 +285,10 @@ func globFixes(b []byte) []byte {
 
 	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
 	return b
+}
+
+func weedoutFilename(articleId, weedoutStage int) (string, string) {
+	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
+	prefix := fmt.Sprintf("outp_%03v", articleId)
+	return stagedFn, prefix
 }

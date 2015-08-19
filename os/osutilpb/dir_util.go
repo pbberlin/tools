@@ -14,7 +14,7 @@ func DirOfExecutable() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(dir)
+	// fmt.Println(dir)
 	return dir
 }
 

@@ -1,6 +1,6 @@
-// Package paths contains route path constants,
+// Package routes contains route path constants,
 // that would otherwise cause circular dependencies.
-package paths
+package routes
 
 const FetchUrl = "/fetch-url-x"
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pbberlin/tools/net/http/paths"
+	"github.com/pbberlin/tools/net/http/routes"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"golang.org/x/net/html"
@@ -29,7 +29,7 @@ func rewriteAttributes(attributes []html.Attribute, proxyHostPort, remoteHost st
 		}
 
 		if attr.Key == "href" {
-			attr.Val = fmt.Sprintf("%v?url=%v", paths.FetchUrl, attr.Val)
+			attr.Val = fmt.Sprintf("%v?url=%v", routes.FetchUrl, attr.Val)
 		}
 
 		if attr.Key == "src" {
@@ -39,9 +39,9 @@ func rewriteAttributes(attributes []html.Attribute, proxyHostPort, remoteHost st
 		if attr.Key == "action" {
 			// attr.Val = fmt.Sprintf("/blob2/form-redirector?redirect-to=%v", attr.Val) // appended as form field, thus not needed here
 			if util_appengine.IsLocalEnviron() {
-				attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, paths.FormRedirector)
+				attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, routes.FormRedirector)
 			} else {
-				attr.Val = fmt.Sprintf("https://%v%v", proxyHostPort, paths.FormRedirector)
+				attr.Val = fmt.Sprintf("https://%v%v", proxyHostPort, routes.FormRedirector)
 			}
 
 		}

@@ -1,3 +1,5 @@
+// Package webapi contains handlers to manage and test
+// fsi filesystems from a html UI.
 package webapi
 
 import (

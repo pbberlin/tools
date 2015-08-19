@@ -15,6 +15,8 @@ var (
 		"object": true,
 
 		"wbr": true,
+
+		"comment": true,
 	}
 
 	exotics = map[string]string{

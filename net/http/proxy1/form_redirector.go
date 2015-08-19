@@ -9,7 +9,7 @@ import (
 	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/paths"
+	"github.com/pbberlin/tools/net/http/routes"
 )
 
 func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -58,5 +58,5 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.Handle(paths.FormRedirector, loghttp.Adapter(formRedirector))
+	http.Handle(routes.FormRedirector, loghttp.Adapter(formRedirector))
 }

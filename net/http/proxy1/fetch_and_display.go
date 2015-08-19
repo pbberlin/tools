@@ -13,7 +13,7 @@ import (
 	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/paths"
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
@@ -91,7 +91,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		m := map[string]string{
 			"protocol": "https",
 			"host":     r.Host, // not  fetch.HostFromReq(r)
-			"path":     paths.FetchUrl,
+			"path":     routes.FetchUrl,
 			"val":      "google.com",
 		}
 		if util_appengine.IsLocalEnviron() {
@@ -120,5 +120,5 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.HandleFunc(paths.FetchUrl, loghttp.Adapter(handleFetchURL))
+	http.HandleFunc(routes.FetchUrl, loghttp.Adapter(handleFetchURL))
 }

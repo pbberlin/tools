@@ -29,11 +29,15 @@ func attrX(attributes []html.Attribute, key string) (s string) {
 }
 
 func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.Attribute {
+
 	ret := []html.Attribute{}
 	var alt, title string
+
 	for _, a := range attributes {
-		if removeKeys[strings.TrimSpace(a.Key)] ||
-			strings.HasPrefix(a.Key, "data") {
+		a.Key = strings.TrimSpace(a.Key)
+		a.Val = strings.TrimSpace(a.Val)
+		if removeKeys[a.Key] || strings.HasPrefix(a.Key, "data") {
+			//
 		} else {
 			if a.Key == "alt" {
 				alt = a.Val

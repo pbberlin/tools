@@ -10,6 +10,7 @@ import (
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/runtimepb"
+	"github.com/pbberlin/tools/stringspb"
 )
 
 /*
@@ -114,6 +115,9 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 		line, file = runtimepb.LineFileXUp(2)
 	}
 
+	if len(s) < 60 {
+		s = stringspb.ToLen(s, 60)
+	}
 	s = fmt.Sprintf("%v - %v:%v", s, file, line)
 
 	// Log it

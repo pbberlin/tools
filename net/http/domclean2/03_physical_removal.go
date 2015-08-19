@@ -15,8 +15,8 @@ type NdX struct {
 	Lvl int
 }
 
-// physicalNodeRemoval employs horizontal traversal using a queue
-func physicalNodeRemoval(lp interface{}) {
+// removeComments_intertagWhitespace employs horizontal traversal using a queue
+func removeComments_intertagWhitespace(lp interface{}) {
 
 	var queue = util.NewQueue(10)
 

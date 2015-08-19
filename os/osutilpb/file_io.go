@@ -11,6 +11,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+func WriteBytesToFilename(filename string, ptrB *bytes.Buffer) {
+	Bytes2File(filename, ptrB.Bytes())
+}
+
 // Dom2File writes DOM to file
 func Dom2File(fn string, node *html.Node) {
 	var b bytes.Buffer

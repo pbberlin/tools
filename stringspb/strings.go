@@ -49,8 +49,26 @@ func LowerCasedUnderscored(s string) string {
 	return replaced
 }
 
+func Reverse(s string) string {
+	rn := []rune(s)
+	rev := make([]rune, len(rn))
+	for idx, cp := range rn {
+		pos := len(rn) - idx - 1
+		rev[pos] = cp
+	}
+
+	return string(rev)
+}
+
 // ToLen chops or extends string to the exactly desired length
 // format strings like %4v do not restrict.
+func ToLenR(s string, nx int) string {
+	s = Reverse(s)
+	s = ToLen(s, nx)
+	s = Reverse(s)
+	return s
+}
+
 func ToLen(s string, nx int) string {
 
 	ret := make([]rune, 0, nx)

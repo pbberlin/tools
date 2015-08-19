@@ -124,7 +124,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	//
 	if resp.StatusCode != http.StatusOK {
-		return nil, req.URL, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
+		return nil, req.URL, fmt.Errorf("bad http resp code: %v - %v", resp.StatusCode, req.URL.String())
 	}
 
 	defer resp.Body.Close()

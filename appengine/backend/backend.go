@@ -54,9 +54,6 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
 	htmlfrag.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 
-	htmlfrag.Wb(b1, "JSON encode", "/json-encode")
-	htmlfrag.Wb(b1, "JSON decode", "/json-decode")
-
 	htmlfrag.Wb(b1, "Fulltext put", "/fulltext-search/put")
 	htmlfrag.Wb(b1, "Fulltext get", "/fulltext-search/get")
 

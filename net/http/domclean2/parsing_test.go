@@ -9,7 +9,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -34,7 +36,6 @@ const cTestHostDev = "localhost:8085"
 const cTestHostOwn = "localhost:63222"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
-var subdirs []string
 
 func prepare(t *testing.T, c appengine.Context) {
 
@@ -68,45 +69,84 @@ func Test1(t *testing.T) {
 	lg("waiting for webserver")
 	time.Sleep(2 * time.Millisecond)
 
-	recPath := "www.welt.de"
+	expandingPath := "www.welt.de"
 
-	subdirs, _, msg, err := fileserver.GetDirContents(hostWithPref, recPath)
+	dirs1, _, msg, err := fileserver.GetDirContents(hostWithPref, expandingPath)
 	if err != nil {
 		lge(err)
 		lg("%s", msg)
 	}
 
-	lg("subdirs %v", stringspb.IndentedDump(subdirs))
+	lg("dirs1 %v", stringspb.IndentedDump(dirs1))
 
-	for _, v := range subdirs {
+	least3Files := []string{}
+	for _, v1 := range dirs1 {
 
-		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(recPath, v))
+		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(expandingPath, v1))
+		_ = dirs2
 		if err != nil {
 			lge(err)
 			lg("%s", msg)
 		}
-		lg("  dirs2 %v", stringspb.IndentedDump(dirs2))
-		lg("  fils2 %v", stringspb.IndentedDump(fils2))
+		// lg("  dirs2 %v", stringspb.IndentedDump(dirs2))
+		// lg("  fils2 %v", stringspb.IndentedDump(fils2))
+
+		if len(fils2) > 2 {
+			for i2, v2 := range fils2 {
+				least3Files = append(least3Files, path.Join(expandingPath, v1, v2))
+				if i2 == 2 {
+					break
+				}
+			}
+			break
+		}
 	}
 
-	return
+	if len(least3Files) < 3 {
+		lg("not enough files in rss fetcher cache")
+		return
+	}
+
+	lg("  fils2 %v", stringspb.IndentedDump(least3Files))
+
+	logdir := osutilpb.DirOfExecutable()
+	logdir = filepath.Join(".", "outp")
+	lg("logdir is %v ", logdir)
+	err = os.Mkdir(logdir, 0755)
+	if err != nil && !os.IsExist(err) {
+		lge(err)
+		return
+	}
+	err = os.RemoveAll(logdir)
+	if err != nil {
+		lge(err)
+		return
+	}
 
 	iter := []int{0, 1, 2}
+
+	weedoutFilename := func(articleId, weedoutStage int) (string, string) {
+		stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
+		prefix := fmt.Sprintf("outp_%03v", articleId)
+		return stagedFn, prefix
+	}
 
 	for i, _ := range iter {
 
 		var doc *html.Node
-		url := spf("%v/%v/art0%v.html", hostWithPref, subdirs[0], i)
+		url := spf("%v/%v", hostWithPref, least3Files[i])
 		fn1 := spf("outp_%03v_xpath.txt", i)
 		fn2 := spf("outp_%03v_texts.txt", i)
 		fn3, fnKey := weedoutFilename(i, 0)
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
-		_ = effUrl
-
 		if err != nil {
-			log.Fatal(err)
+			lge(err)
+			return
 		}
+		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
+		continue
+
 		resBytes = globFixes(resBytes)
 		doc, err = html.Parse(bytes.NewReader(resBytes))
 		if err != nil {
@@ -139,6 +179,8 @@ func Test1(t *testing.T) {
 
 		numTotal++
 	}
+
+	return
 
 	// statistics on elements and attributes
 	sorted1 := sortmap.SortMapByCount(attrDistinct)

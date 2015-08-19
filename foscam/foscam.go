@@ -1,3 +1,5 @@
+// Package foscam allows setting and
+// clearing alarm mode of such cam via http.
 package foscam
 
 import (

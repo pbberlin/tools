@@ -1,4 +1,5 @@
 // Package fulltext is just an exercise in Google fulltext API.
+//
 package fulltext
 
 import (

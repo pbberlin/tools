@@ -1,23 +1,5 @@
 package big_query
 
-/*
-	Normally, datastore types are restricted.
-	For intstance a
-	   map[string]map[string]float64
-	can not be a datastore field.
-
-	Therefore, this package takes a complex struct
-	and *globs* it into a byte array,
-	quasi normalizing it.
-
-	It then saves the byte array within a dsu.WrapBlob
-
-	This way, any struct can be saved into into datastore
-	using dsu.WrapBlob.
-
-
-*/
-
 import (
 	"bytes"
 	"encoding/gob"
@@ -30,7 +12,21 @@ import (
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
-// chart data
+// Chart data
+//
+// Normally, datastore types are restricted.
+// For intstance a
+//    map[string]map[string]float64
+// can not be a datastore field.
+//
+// Therefore, this package takes a complex struct
+// and *globs* it into a byte array,
+// quasi normalizing it.
+//
+// It then saves the byte array within a dsu.WrapBlob
+//
+// This way, any struct can be saved into into datastore
+// using dsu.WrapBlob.
 type CData struct {
 	M          map[string]map[string]float64
 	VPeriods   []string

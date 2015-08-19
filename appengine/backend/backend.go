@@ -1,6 +1,5 @@
 // Package backend ties together
 // the visual controls and utils.
-//
 package backend
 
 import (

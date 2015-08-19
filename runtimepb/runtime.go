@@ -1,4 +1,4 @@
-// Package uruntime gives a stracktrace and traces memory allocactions.
+// Package uruntime gives a stracktrace and traces memory allocations.
 package runtimepb
 
 import (

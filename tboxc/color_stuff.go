@@ -1,4 +1,6 @@
-// Package tboxc contains comfort functions for go terminal box (termbox-go).
+// Package tboxc contains comfort functions
+// for go terminal box (termbox-go).
+//
 package tboxc
 
 import "github.com/pbberlin/termbox-go"

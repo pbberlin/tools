@@ -109,7 +109,7 @@ func makeRequest(w http.ResponseWriter, r *http.Request, path string) CGI_Result
 	if cgiRes.Result != "0" {
 		wpf(w, "<b>RESPONSE shows bad mood:</b><br>\n")
 		psXml := stringspb.IndentedDump(cgiRes)
-		dis := strings.Trim(*psXml, "{}")
+		dis := strings.Trim(psXml, "{}")
 		wpf(w, "<pre style='font-size:10px;line-height:11px;'>%v</pre>", dis)
 	}
 
@@ -189,7 +189,7 @@ func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface
 	cgiRes := makeRequest(w, r, path_get_alarm)
 
 	psXml := stringspb.IndentedDump(cgiRes)
-	dis := strings.Trim(*psXml, "{}")
+	dis := strings.Trim(psXml, "{}")
 	dis = strings.Replace(dis, "\t", "", -1)
 	dis = strings.Replace(dis, " ", "", -1)
 	dis = strings.Replace(dis, "\"", "", -1)

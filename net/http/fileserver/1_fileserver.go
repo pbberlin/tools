@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime"
 	"net/http"
@@ -18,7 +19,12 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-var wpf = fmt.Fprintf
+var wpf = func(w io.Writer, format string, a ...interface{}) (int, error) {
+	fmt.Fprintf(w, format, a...)
+	fmt.Fprintf(w, "\n")
+	return 0, nil
+}
+
 var spf = fmt.Sprintf
 
 // We cannot use http.FileServer(http.Dir("./css/")
@@ -37,11 +43,11 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	defer fclose()
 
 	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Half-Static-File-Server"}))
-	wpf(b1, "<pre>\n")
+	wpf(b1, "<pre>")
 
 	err := r.ParseForm()
 	if err != nil {
-		wpf(b1, "err parsing request (ParseForm)%v\n", err)
+		wpf(b1, "err parsing request (ParseForm)%v", err)
 	}
 
 	p := r.URL.Path
@@ -49,32 +55,32 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	if strings.HasPrefix(p, prefix) {
 		p = p[len(prefix):]
 	} else {
-		wpf(b1, "route must start with prefix %v - but is %v\n", prefix, p)
+		wpf(b1, "route must start with prefix %v - but is %v", prefix, p)
 	}
 
 	if strings.HasPrefix(p, "/") {
 		p = p[1:]
 	}
-	wpf(b1, "effective path = %q \n", p)
+	wpf(b1, "effective path = %q", p)
 
 	// fullP := path.Join(docRootDataStore, p)
 	fullP := p
 
 	f, err := fs.Open(fullP)
 	if err != nil {
-		wpf(b1, "err opening file %v - %v\n", fullP, err)
+		wpf(b1, "err opening file %v - %v", fullP, err)
 		return
 	}
 
 	inf, err := f.Stat()
 	if err != nil {
-		wpf(b1, "err opening fileinfo %v - %v\n", fullP, err)
+		wpf(b1, "err opening fileinfo %v - %v", fullP, err)
 		return
 	}
 
 	if inf.IsDir() {
 
-		wpf(b1, "%v is a directory - trying index.html...\n", fullP)
+		wpf(b1, "%v is a directory - trying index.html...", fullP)
 
 		fullP += "/index.html"
 
@@ -82,14 +88,14 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 		if err == nil {
 			inf, err = fIndex.Stat()
 			if err != nil {
-				wpf(b1, "err opening index fileinfo %v - %v\n", fullP, err)
+				wpf(b1, "err opening index fileinfo %v - %v", fullP, err)
 				return
 			}
 
 			f = fIndex
 		} else {
 
-			wpf(b1, "err opening index file %v - %v\n", fullP, err)
+			wpf(b1, "err opening index file %v - %v", fullP, err)
 
 			if r.FormValue("fmt") == "html" {
 				dirListHtml(w, r, f)
@@ -103,11 +109,11 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 	}
 
-	wpf(b1, "opened file %v - %v -  %v\n", f.Name(), inf.Size(), err)
+	wpf(b1, "opened file %v - %v -  %v", f.Name(), inf.Size(), err)
 
 	bts1, err := ioutil.ReadAll(f)
 	if err != nil {
-		wpf(b1, "err with ReadAll %v - %v\n", fullP, err)
+		wpf(b1, "err with ReadAll %v - %v", fullP, err)
 		return
 	}
 
@@ -167,7 +173,7 @@ func dirListJson(w http.ResponseWriter, r *http.Request, f fsi.File) {
 
 	bdirListHtml, err := json.MarshalIndent(mp, "", "\t")
 	if err != nil {
-		wpf(w, "marshalling to []byte failed - mp was %v\n", mp)
+		wpf(w, "marshalling to []byte failed - mp was %v", mp)
 		return
 	}
 	w.Write(bdirListHtml)
@@ -178,7 +184,6 @@ func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	for {
-		// log.Printf("\n dirListHtml.READDIR %v", f.Name())
 		dirs, err := f.Readdir(100)
 		if err != nil || len(dirs) == 0 {
 			break
@@ -194,8 +199,8 @@ func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
 			url := url.URL{Path: path.Join(r.URL.Path, name), RawQuery: "fmt=html"}
 
 			oneLine := spf("<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", url.String(), linktitle)
-			// wpf(w, " %v\n", d.ModTime().Format("2006-01-02 15:04:05 MST"))
-			oneLine += spf(" %v<br>\n", d.ModTime().Format(time.RFC1123Z))
+			// wpf(w, " %v", d.ModTime().Format("2006-01-02 15:04:05 MST"))
+			oneLine += spf(" %v<br>", d.ModTime().Format(time.RFC1123Z))
 			wpf(w, oneLine)
 		}
 	}

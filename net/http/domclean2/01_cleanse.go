@@ -33,7 +33,7 @@ var (
 		"figcaption": "p",
 	}
 
-	removeAttributes = map[string]bool{
+	unwantedAttrs = map[string]bool{
 		"style": true,
 		"class": true,
 		// "alt":                 true,
@@ -114,7 +114,7 @@ func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
 //
 func cleanseDom(n *html.Node, lvl int) {
 
-	n.Attr = removeAttr(n.Attr, removeAttributes)
+	n.Attr = removeAttr(n.Attr, unwantedAttrs)
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {

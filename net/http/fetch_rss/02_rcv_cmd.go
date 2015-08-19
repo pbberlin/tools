@@ -93,7 +93,7 @@ func fetchCommandReceiver(w http.ResponseWriter, r *http.Request, m map[string]i
 				lge(err)
 				return
 			}
-			lg("command loop is: %s", *stringspb.IndentedDump(fcs))
+			lg("command loop is: %s", stringspb.IndentedDump(fcs))
 		}
 
 	}

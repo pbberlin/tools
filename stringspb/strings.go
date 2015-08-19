@@ -175,21 +175,26 @@ func IncrementString(s string) string {
 // Big disadvantage: no unexported fields.
 // For unexported fields fall back to
 //		fmt.Println(spew.Sdump(nd))
+//
 // http://play.golang.org/p/AQASTC4mBl suggests,
 // that strings are copied upon call and upon return
-func IndentedDump(v interface{}) *string {
+//
+// Brad Fitz at google groups reccommends return a value
+// https://groups.google.com/forum/#!topic/golang-nuts/AdO_d4E_x6k
+func IndentedDump(v interface{}) string {
 
-	firstColLeftMostPrefix := " "
-	byts, err := json.MarshalIndent(v, firstColLeftMostPrefix, "\t")
-	if err != nil {
-		s := fmt.Sprintf("error indent: %v\n", err)
-		return &s
-	}
+	// firstColLeftMostPrefix := " "
+	// byts, err := json.MarshalIndent(v, firstColLeftMostPrefix, "\t")
+	// if err != nil {
+	// 	s := fmt.Sprintf("error indent: %v\n", err)
+	// 	return s
+	// }
 
-	var reverseJSONTagEscaping = strings.NewReplacer(`\u003c`, "<", `\u003e`, ">", `\n`, "\n")
-	s := reverseJSONTagEscaping.Replace(string(byts))
+	// var reverseJSONTagEscaping = strings.NewReplacer(`\u003c`, "<", `\u003e`, ">", `\n`, "\n")
+	// s := reverseJSONTagEscaping.Replace(string(byts))
 
-	return &s
+	bts := IndentedDumpBytes(v)
+	return string(bts)
 }
 
 func IndentedDumpBytes(v interface{}) []byte {

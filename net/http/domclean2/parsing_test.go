@@ -9,12 +9,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 	"testing"
 	"time"
 
 	"appengine"
-	"appengine/aetest"
 
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
@@ -30,9 +30,10 @@ import (
 var numTotal = 0 // comparable html docs
 const stageMax = 3
 
-const cTestHost = "localhost:63222"
+const cTestHostDev = "localhost:8085"
+const cTestHostOwn = "localhost:63222"
 
-var baseUrl = fetch_rss.UriMountNameY
+var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
 var subdirs []string
 
 func prepare(t *testing.T, c appengine.Context) {
@@ -43,9 +44,11 @@ func prepare(t *testing.T, c appengine.Context) {
 	}
 	http.HandleFunc(fetch_rss.UriMountNameY, loghttp.Adapter(serveFile))
 
-	log.Fatal(
-		http.ListenAndServe(cTestHost, nil),
-	)
+	go func() {
+		log.Fatal(
+			http.ListenAndServe(cTestHostOwn, nil),
+		)
+	}()
 
 }
 
@@ -53,28 +56,49 @@ func Test1(t *testing.T) {
 
 	lg, lge := loghttp.Logger(nil, nil)
 
-	c, err := aetest.NewContext(nil)
-	if err != nil {
-		lge(err)
-		t.Fatal(err)
-	}
-	defer c.Close()
+	// c, err := aetest.NewContext(nil)
+	// if err != nil {
+	// 	lge(err)
+	// 	t.Fatal(err)
+	// }
+	// defer c.Close()
 
-	prepare(t, c)
+	// prepare(t, c)
 
-	lg("waiting for webserver\n")
+	lg("waiting for webserver")
 	time.Sleep(2 * time.Millisecond)
 
-	//
-	// ================================================
-	// iter := make([]int, len(testDocs))
-	iter := append([]int{0, 1}, []int{2, 3, 4}...)
+	recPath := "www.welt.de"
+
+	subdirs, _, msg, err := fileserver.GetDirContents(hostWithPref, recPath)
+	if err != nil {
+		lge(err)
+		lg("%s", msg)
+	}
+
+	lg("subdirs %v", stringspb.IndentedDump(subdirs))
+
+	for _, v := range subdirs {
+
+		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(recPath, v))
+		if err != nil {
+			lge(err)
+			lg("%s", msg)
+		}
+		lg("  dirs2 %v", stringspb.IndentedDump(dirs2))
+		lg("  fils2 %v", stringspb.IndentedDump(fils2))
+	}
+
+	return
+
+	iter := []int{0, 1, 2}
 
 	for i, _ := range iter {
+
 		var doc *html.Node
-		url := fmt.Sprintf("%v/%v/art0%v.html", baseUrl, subdirs[0], i)
-		fn1 := fmt.Sprintf("outp_%03v_xpath.txt", i)
-		fn2 := fmt.Sprintf("outp_%03v_texts.txt", i)
+		url := spf("%v/%v/art0%v.html", hostWithPref, subdirs[0], i)
+		fn1 := spf("outp_%03v_xpath.txt", i)
+		fn2 := spf("outp_%03v_texts.txt", i)
 		fn3, fnKey := weedoutFilename(i, 0)
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})

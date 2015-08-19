@@ -41,7 +41,6 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			return nil, nil, err
 		}
 	}
-
 	req := options.Req
 
 	// Prevent u.Host from "google.com" without scheme is ""
@@ -90,22 +89,40 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	resp, err := client.Do(req)
 
+	cond := false
 	if err != nil {
+		cond = strings.Contains(err.Error(), "SSL_CERTIFICATE_ERROR") ||
+			strings.Contains(err.Error(), "tls: oversized record received with length")
+	}
 
+	// Under narrow conditions => fallback to http
+	if err != nil {
+		if req.URL.Scheme == "https" && cond && req.Method == "GET" {
+			req.URL.Scheme = "http"
+			var err2nd error
+			resp, err2nd = client.Do(req)
+			if err2nd != nil {
+				return nil, req.URL, fmt.Errorf("cannot do https requests on dev server, fallback to http: %v",
+					err2nd)
+			}
+			err = nil // CLEAR error
+		}
+	}
+
+	if err != nil {
 		hint := ""
-		if strings.Contains(err.Error(), "SSL_CERTIFICATE_ERROR") && req.URL.Scheme == "https" {
-
-			return nil, req.URL, fmt.Errorf("we cannot do https requests on the dev server: %v", err)
-			// We cannot repeat a request - the r.Body.Reader is consumed
+		if req.URL.Scheme == "https" && cond {
+			// We cannot repeat a post request - the r.Body.Reader is consumed
 			// options.Req.URL.Scheme = "http"
 			// resp, err = client.Do(options.Req)
+			return nil, req.URL, fmt.Errorf("cannot do https requests on dev server: %v", err)
 		} else if strings.Contains(err.Error(), "net/http: Client Transport of type init.failingTransport doesn't support CancelRequest; Timeout not supported") {
 			hint = "\n\n Did you forget to submit the AE Request?\n"
 		}
 		return nil, req.URL, fmt.Errorf("request failed: %v - %v", err, hint)
-
 	}
 
+	//
 	if resp.StatusCode != http.StatusOK {
 		return nil, req.URL, fmt.Errorf("bad http resp code: %v", resp.StatusCode)
 	}

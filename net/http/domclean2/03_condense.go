@@ -41,33 +41,20 @@ func convEmptyElementLeafs(n *html.Node, lvl int) {
 
 }
 
-func condenseNestedDivs(n *html.Node, lvl int) {
+func condenseNestedDivs(n *html.Node, lvl, lvlExec int) {
 
-	// Children
-	if true {
-		// like in removeUnwanted, we first assemble children separately.
-		// since "NextSibling" might be set to nil during condension
-		cc := []*html.Node{}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			cc = append(cc, c)
-		}
-		for _, c := range cc {
-			condenseNestedDivs(c, lvl+1)
-		}
-	} else {
-		// this also worked,
-		// but required 45 (!) repetitive traversals...
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			condenseNestedDivs(c, lvl+1)
-		}
+	// like in removeUnwanted, we first assemble children separately.
+	// since "NextSibling" might be set to nil during condension
+	cc := []*html.Node{}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		cc = append(cc, c)
 	}
 
-	condenseUpwards(n, []string{"div", "div"}, "div")
+	for _, c := range cc {
+		condenseNestedDivs(c, lvl+1, lvlExec)
+	}
 
-	// condenseUpwards(n, []string{"div", "ul"}, "ul")  // incompatible with separate assembly, move to separate traversal
-
-	// condenseUpwards(n, []string{"ul", "ul"}, "ul")  // incompatible with separate assembly, move to separate traversal
-
-	// condenseUpwards(n, []string{"li", "div"}, "li") // questionable
+	// position at the end => process from deepest level on upwards
+	condenseUpwards2(n, "div", map[string]bool{"div": true, "ul": true, "form": true}, "div")
 
 }

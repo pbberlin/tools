@@ -1,7 +1,15 @@
 // Package dom supplies simple node manipulations.
 package dom
 
-import "golang.org/x/net/html"
+import (
+	"bytes"
+	"fmt"
+	"strings"
+
+	"golang.org/x/net/html"
+)
+
+var wpf = fmt.Fprintf
 
 // inspired by https://github.com/PuerkitoBio/goquery/blob/master/manipulation.go
 
@@ -51,4 +59,24 @@ func cloneNodeWithSubtree(n *html.Node) *html.Node {
 		nn.AppendChild(cloneNodeWithSubtree(c)) // recursion
 	}
 	return nn
+}
+
+//
+func PrintSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
+
+	if b == nil {
+		b = new(bytes.Buffer)
+	}
+
+	ind := strings.Repeat(" ", lvl)
+	wpf(b, "%sL%v", ind, lvl)
+	wpf(b, "T%v", n.Type)
+	wpf(b, " D%v\n", n.Data)
+	lvl++
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		PrintSubtree(c, b, lvl) // recursion
+	}
+
+	return b
 }

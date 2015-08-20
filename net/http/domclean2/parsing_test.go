@@ -29,8 +29,8 @@ import (
 	"golang.org/x/net/html"
 )
 
-var numTotal = 0 // comparable html docs
-const stageMax = 3
+const numTotal = 3 // comparable html docs
+const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"
 const cTestHostOwn = "localhost:63222"
@@ -94,10 +94,10 @@ func Test1(t *testing.T) {
 		// lg("  dirs2 %v", stringspb.IndentedDump(dirs2))
 		// lg("  fils2 %v", stringspb.IndentedDump(fils2))
 
-		if len(fils2) > 2 {
+		if len(fils2) > numTotal-1 {
 			for i2, v2 := range fils2 {
 				least3Files = append(least3Files, path.Join(expandingPath, v1, v2))
-				if i2 == 2 {
+				if i2 == numTotal-1 {
 					break
 				}
 			}
@@ -105,7 +105,7 @@ func Test1(t *testing.T) {
 		}
 	}
 
-	if len(least3Files) < 3 {
+	if len(least3Files) < numTotal {
 		lg("not enough files in rss fetcher cache")
 		return
 	}
@@ -115,26 +115,9 @@ func Test1(t *testing.T) {
 		lg("    %v", v)
 	}
 
-	logdir := osutilpb.DirOfExecutable()
-	logdir = filepath.Join(".", "outp")
-	lg("logdir is %v ", logdir)
+	logdir := prepareLogDir()
 
-	rmPath := spf("./%v/", logdir)
-	err = os.RemoveAll(rmPath)
-	if err != nil {
-		lge(err)
-		return
-	}
-	lg("removed %q", rmPath)
-
-	err = os.Mkdir(logdir, 0755)
-	if err != nil && !os.IsExist(err) {
-		lge(err)
-		return
-	}
-
-	iter := []int{0, 1, 2}
-
+	iter := make([]int, numTotal)
 	for i, _ := range iter {
 
 		var doc *html.Node
@@ -143,8 +126,8 @@ func Test1(t *testing.T) {
 		fnKey := fmt.Sprintf("outp_%03v", i)
 		fNames := []string{}
 		weedoutStage := 0
-		for i := 0; i < 11; i++ {
-			fn := fmt.Sprintf("outp_%03v_%v", i, weedoutStage)
+		for j := 0; j < 11; j++ {
+			fn := fmt.Sprintf("outp_%03v_%v_%v", i, j, weedoutStage)
 			fn = filepath.Join(logdir, fn)
 			fNames = append(fNames, fn)
 		}
@@ -167,22 +150,19 @@ func Test1(t *testing.T) {
 
 		cleanseDom(doc, 0)
 		removeComments_intertagWhitespace(NdX{doc, 0})
-
-		osutilpb.Dom2File(fNames[1]+".html", doc)
+		convEmptyElementLeafs(doc, 0)
 
 		reIndent(doc, 0)
-
-		osutilpb.Dom2File(fNames[2]+".html", doc)
+		osutilpb.Dom2File(fNames[1]+".html", doc)
 
 		removeComments_intertagWhitespace(NdX{doc, 0})
 
-		osutilpb.Dom2File(fNames[3]+".html", doc)
+		condenseNestedDivs(doc, 0, 333)
+
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNames[2]+".html", doc)
 
 		if false {
-
-			convEmptyElementLeafs(doc, 0)
-
-			condenseNestedDivs(doc, 0)
 
 			dumpXPath(doc, 0)
 
@@ -199,7 +179,6 @@ func Test1(t *testing.T) {
 
 		}
 
-		numTotal++
 	}
 
 	return
@@ -291,4 +270,31 @@ func weedoutFilename(articleId, weedoutStage int) (string, string) {
 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
 	prefix := fmt.Sprintf("outp_%03v", articleId)
 	return stagedFn, prefix
+}
+
+func prepareLogDir() string {
+
+	lg, lge := loghttp.Logger(nil, nil)
+
+	logdir := "outp"
+	lg("logdir is %v ", logdir)
+
+	// sweep previous
+	rmPath := spf("./%v/", logdir)
+	err := os.RemoveAll(rmPath)
+	if err != nil {
+		lge(err)
+		os.Exit(1)
+	}
+	lg("removed %q", rmPath)
+
+	// create anew
+	err = os.Mkdir(logdir, 0755)
+	if err != nil && !os.IsExist(err) {
+		lge(err)
+		os.Exit(1)
+	}
+
+	return logdir
+
 }

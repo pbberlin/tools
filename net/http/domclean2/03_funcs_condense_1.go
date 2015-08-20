@@ -15,13 +15,27 @@ import "golang.org/x/net/html"
 	Removes each child and reattaches it one level higher.
 	Finally the intermediary, now childless div is removed.
 
-*/
-func condenseUpwards(n *html.Node, couple []string, parentType string) {
 
-	p := n.Parent
-	if p == nil {
+
+
+   \                  /
+    \       /\       /
+     \_____/  \_____/
+
+     \              /
+      \_____/\_____/
+
+       \__________/
+
+
+
+*/
+func condenseUpwards1(n *html.Node, couple []string, parentType string) {
+
+	if noParent(n) {
 		return
 	}
+	p := n.Parent
 
 	parDiv := p.Type == html.ElementNode && p.Data == couple[0] // Parent is a div
 	iAmDiv := n.Type == html.ElementNode && n.Data == couple[1] // I am a div
@@ -34,7 +48,7 @@ func condenseUpwards(n *html.Node, couple []string, parentType string) {
 
 	_, _ = noSiblings, noChildren
 
-	if iAmDiv && parDiv {
+	if parDiv && iAmDiv {
 
 		if only1Child || svrlChildn {
 
@@ -48,15 +62,18 @@ func condenseUpwards(n *html.Node, couple []string, parentType string) {
 
 				n.RemoveChild(c1)
 
-				if c1.Type != html.TextNode {
-					p.InsertBefore(c1, insertionPoint)
-					insertionPoint = c1
-				} else {
+				if c1.Type == html.TextNode || c1.Data == "a" {
+					// pf("wrapping %v\n", NodeTypeStr(c1.Type))
 					wrap := html.Node{Type: html.ElementNode, Data: "p",
 						Attr: []html.Attribute{html.Attribute{Key: "cfrm", Val: "div"}}}
 					wrap.FirstChild = c1
 					p.InsertBefore(&wrap, insertionPoint)
+					c1.Parent = &wrap
 					insertionPoint = &wrap
+
+				} else {
+					p.InsertBefore(c1, insertionPoint)
+					insertionPoint = c1
 				}
 
 			}

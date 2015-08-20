@@ -33,6 +33,8 @@ var spf = fmt.Sprintf
 // Thus we have to re-implement a serveFile method:
 func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *http.Request) {
 
+	r.Header.Set("X-Custom-Header-Counter", "nocounter")
+
 	b1 := new(bytes.Buffer)
 
 	fclose := func() {
@@ -143,7 +145,6 @@ var htmlReplacer = strings.NewReplacer(
 
 func dirListJson(w http.ResponseWriter, r *http.Request, f fsi.File) {
 
-	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 	r.Header.Set("Content-Type", "application/json")
 
 	mp := []map[string]string{}
@@ -179,6 +180,7 @@ func dirListJson(w http.ResponseWriter, r *http.Request, f fsi.File) {
 	w.Write(bdirListHtml)
 
 }
+
 func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")

@@ -25,7 +25,11 @@ import "golang.org/x/net/html"
      \              /
       \_____/\_____/
 
-       \__________/
+       \__________/     => Breaks are gone
+
+
+       \p1___p2___/     => Wrapping preserves breaks
+
 
 
 

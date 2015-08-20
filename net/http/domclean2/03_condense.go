@@ -55,6 +55,10 @@ func condenseNestedDivs(n *html.Node, lvl, lvlExec int) {
 	}
 
 	// position at the end => process from deepest level on upwards
-	condenseUpwards2(n, "div", map[string]bool{"div": true, "ul": true, "form": true}, "div")
+	condenseUpwards2(n, map[string]bool{"div": true},
+		map[string]bool{"div": true, "ul": true, "form": true, "li": true, "p": true,
+			"a": true, "span": true})
+
+	// condenseUpwards2(n, "li", map[string]bool{"a": true, "div": true}, "li")
 
 }

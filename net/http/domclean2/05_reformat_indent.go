@@ -1,6 +1,7 @@
 package domclean2
 
 import (
+	"log"
 	"strings"
 
 	"github.com/pbberlin/tools/net/http/dom"
@@ -13,6 +14,18 @@ import (
 const cScaffoldLvls = 2
 
 func reIndent(n *html.Node, lvl int) {
+
+	if lvl > cScaffoldLvls && n.Parent == nil {
+		bb := dom.PrintSubtree(n, nil, 0)
+		_ = bb
+		// log.Printf("%s", bb.Bytes())
+		hint := ""
+		if ml3[n] > 0 {
+			hint = "   from ml3"
+		}
+		log.Print("reIndent: no parent ", hint)
+		return
+	}
 
 	// Before children processing
 	switch n.Type {

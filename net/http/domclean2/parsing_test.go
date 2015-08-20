@@ -34,6 +34,8 @@ const cTestHostOwn = "localhost:63222"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
 
+var ml3 = map[*html.Node]int{}
+
 func prepare(t *testing.T) aetest.Context {
 
 	lg, lge := loghttp.Logger(nil, nil)
@@ -120,6 +122,7 @@ func Test1(t *testing.T) {
 	logdir := prepareLogDir()
 
 	iter := make([]int, numTotal)
+
 	for i, _ := range iter {
 
 		var doc *html.Node
@@ -159,6 +162,8 @@ func Test1(t *testing.T) {
 
 		removeComments_intertagWhitespace(NdX{doc, 0})
 		condenseNestedDivs(doc, 0, 333)
+
+		// convEmptyElementLeafs(doc, 0)
 
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNames[2]+".html", doc)

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/pbberlin/tools/runtimepb"
@@ -24,22 +25,31 @@ func RemoveNode(n *html.Node) {
 	par := n.Parent
 	if par != nil {
 		par.RemoveChild(n)
+	} else {
+		log.Printf("\nNode to remove has no Parent\n")
+		runtimepb.StackTrace(4)
 	}
 }
 
 // InsertBefore inserts before itself.
 // node.InsertBefore refers to its children
-func InsertBefore(self, dst *html.Node) {
-	if self.Parent != nil {
-		self.Parent.InsertBefore(dst, self)
+func InsertBefore(insPnt, toInsert *html.Node) {
+	if insPnt.Parent != nil {
+		insPnt.Parent.InsertBefore(toInsert, insPnt)
+	} else {
+		log.Printf("\nInsertBefore - insPnt has no Parent\n")
+		runtimepb.StackTrace(4)
 	}
 }
 
 // InsertBefore inserts at the end, when NextSibling is null.
 // compare http://stackoverflow.com/questions/4793604/how-to-do-insert-after-in-javascript-without-using-a-library
-func InsertAfter(self, dst *html.Node) {
-	if self.Parent != nil {
-		self.Parent.InsertBefore(dst, self.NextSibling)
+func InsertAfter(insPnt, toInsert *html.Node) {
+	if insPnt.Parent != nil {
+		insPnt.Parent.InsertBefore(toInsert, insPnt.NextSibling)
+	} else {
+		log.Printf("\nInsertAfter - insPnt has no Parent\n")
+		runtimepb.StackTrace(4)
 	}
 }
 
@@ -70,14 +80,18 @@ func PrintSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
 		b = new(bytes.Buffer)
 	}
 
+	if lvl > 40 {
+		log.Printf("%s", b.String())
+		log.Printf("possible circular relationship\n")
+		os.Exit(1)
+	}
+
 	ind := strings.Repeat(" ", lvl)
-	wpf(b, "%sL%v", ind, lvl)
-	wpf(b, "T%v", n.Type)
-	wpf(b, " D%v\n", n.Data)
-	lvl++
+	wpf(b, "%sL%v %v", ind, lvl, NodeTypeStr(n.Type))
+	wpf(b, " %v\n", n.Data)
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		PrintSubtree(c, b, lvl) // recursion
+		PrintSubtree(c, b, lvl+1) // recursion
 	}
 
 	return b

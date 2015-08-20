@@ -1,9 +1,6 @@
 package domclean2
 
-import (
-	"github.com/pbberlin/tools/net/http/dom"
-	"golang.org/x/net/html"
-)
+import "golang.org/x/net/html"
 
 // Condense upwards builds a three-levels subtree
 // starting from param node l1
@@ -22,8 +19,12 @@ import (
 // but the "all-or-nothing" logic is clearer
 func condenseUpwards2(l1 *html.Node, l2Types map[string]bool, l3Types map[string]bool) {
 
-	if l1.Type != html.ElementNode || l1.Data == "span" || l1.Data == "a" {
-		return // cannot assign to textnode ; want not assign to
+	if l1.Type != html.ElementNode &&
+		l1.Type != html.DocumentNode {
+		return // cannot assign to - do not unable to have children
+	}
+	if l1.Data == "span" || l1.Data == "a" {
+		return // want not condense into
 	}
 
 	// dig two levels deeper
@@ -78,22 +79,5 @@ func condenseUpwards2(l1 *html.Node, l2Types map[string]bool, l3Types map[string
 
 		}
 	}
-
-}
-
-func noParent(n *html.Node) bool {
-
-	p := n.Parent
-	if p == nil {
-		if n.Type == html.DoctypeNode || n.Type == html.DocumentNode {
-			return true
-		}
-		pf("parent is nil\n")
-		b := dom.PrintSubtree(n, nil, 0)
-		pf("%s", b)
-		return true
-	}
-
-	return false
 
 }

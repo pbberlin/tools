@@ -1,6 +1,9 @@
 package domclean2
 
-import "golang.org/x/net/html"
+import (
+	"github.com/pbberlin/tools/net/http/dom"
+	"golang.org/x/net/html"
+)
 
 /*
    div                     div
@@ -89,5 +92,22 @@ func condenseUpwards1(n *html.Node, couple []string, parentType string) {
 		}
 
 	}
+
+}
+
+func noParent(n *html.Node) bool {
+
+	p := n.Parent
+	if p == nil {
+		if n.Type == html.DoctypeNode || n.Type == html.DocumentNode {
+			return true
+		}
+		pf("parent is nil\n")
+		b := dom.PrintSubtree(n, nil, 0)
+		pf("%s", b)
+		return true
+	}
+
+	return false
 
 }

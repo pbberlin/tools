@@ -14,9 +14,9 @@ var (
 	xPathDump []byte
 )
 
-// dumpXPath writes an xpath log.
-// dumpXPath also collects frequency of node type data.
-func dumpXPath(n *html.Node, lvl int) {
+// computeXPathStack writes an xpath log.
+// computeXPathStack also collects frequency of node type data.
+func computeXPathStack(n *html.Node, lvl int) {
 
 	if lvl == 0 {
 		xPathDump = []byte{}
@@ -38,7 +38,7 @@ func dumpXPath(n *html.Node, lvl int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		dumpXPath(c, lvl+1)
+		computeXPathStack(c, lvl+1)
 	}
 
 	// After children processing

@@ -5,20 +5,17 @@ package domclean2
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
-	"appengine"
+	"appengine/aetest"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/fileserver"
@@ -37,7 +34,16 @@ const cTestHostOwn = "localhost:63222"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
 
-func prepare(t *testing.T, c appengine.Context) {
+func prepare(t *testing.T) aetest.Context {
+
+	lg, lge := loghttp.Logger(nil, nil)
+	_ = lg
+
+	c, err := aetest.NewContext(nil)
+	if err != nil {
+		lge(err)
+		t.Fatal(err)
+	}
 
 	serveFile := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 		fs1 := fetch_rss.GetFS(c)
@@ -51,20 +57,16 @@ func prepare(t *testing.T, c appengine.Context) {
 		)
 	}()
 
+	return c
+
 }
 
 func Test1(t *testing.T) {
 
 	lg, lge := loghttp.Logger(nil, nil)
 
-	// c, err := aetest.NewContext(nil)
-	// if err != nil {
-	// 	lge(err)
-	// 	t.Fatal(err)
-	// }
+	// c := prepare(t)
 	// defer c.Close()
-
-	// prepare(t, c)
 
 	lg("waiting for webserver")
 	time.Sleep(2 * time.Millisecond)
@@ -156,32 +158,29 @@ func Test1(t *testing.T) {
 		osutilpb.Dom2File(fNames[1]+".html", doc)
 
 		removeComments_intertagWhitespace(NdX{doc, 0})
-
 		condenseNestedDivs(doc, 0, 333)
 
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNames[2]+".html", doc)
 
-		if false {
+		//
+		removeComments_intertagWhitespace(NdX{doc, 0})
+		addIdAttr(doc, 0, 1) // prevent id count with textnodes
 
-			dumpXPath(doc, 0)
+		addOutlineAttr(doc, 0, []int{0})
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNames[3]+".html", doc)
 
-			computeOutline(doc, 0, []int{0})
-			nodeCountHoriz(doc, 0, 1)
+		computeXPathStack(doc, 0)
+		osutilpb.Bytes2File(fNames[1]+".txt", xPathDump)
 
-			textExtraction(doc, 0)
-
-			textsBytes, textsSorted := orderByOutline(textsByOutl)
-			osutilpb.Bytes2File(fNames[1], textsBytes)
-			textsByArticOutl[fnKey] = textsSorted
-
-			reIndent(doc, 0)
-
-		}
+		//
+		textExtraction(doc, 0)
+		textsBytes, textsSorted := orderByOutline(textsByOutl)
+		osutilpb.Bytes2File(fNames[2]+".txt", textsBytes)
+		textsByArticOutl[fnKey] = textsSorted
 
 	}
-
-	return
 
 	// statistics on elements and attributes
 	sorted1 := sortmap.SortMapByCount(attrDistinct)
@@ -189,6 +188,8 @@ func Test1(t *testing.T) {
 	fmt.Println()
 	sorted2 := sortmap.SortMapByCount(nodeDistinct)
 	sorted2.Print(6)
+
+	return
 
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
@@ -232,27 +233,6 @@ func Test1(t *testing.T) {
 		}
 		flattenTraverse(doc)
 		osutilpb.Dom2File(fnOut, doc)
-	}
-
-	{
-		const jsonStream = `{
-		  	"\\": 11,
-		  	"\\panorama\\aus-aller-welt": 1,
-		  	"\\politik\\international": 3,
-		  	"\\politik\\konjunktur\\nachrichten": 1,
-		  	"\\sport\\fussball": 1,
-		  	"\\unternehmen\\dienstleister\\werber-rat": 1,
-		  	"\\unternehmen\\handel-konsumgueter": 1
-		}`
-		// type Message struct {
-		// 	Name, Text string
-		// }
-
-		dec := json.NewDecoder(strings.NewReader(jsonStream))
-		var mp map[string]int
-		err := dec.Decode(&mp)
-		logif.E(err)
-		fmt.Printf("%v\n", mp)
 	}
 
 	pf("correct finish\n")

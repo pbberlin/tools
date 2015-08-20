@@ -4,8 +4,10 @@ package dom
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"strings"
 
+	"github.com/pbberlin/tools/runtimepb"
 	"golang.org/x/net/html"
 )
 
@@ -79,4 +81,26 @@ func PrintSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
 	}
 
 	return b
+}
+
+func Nd(ntype string, content ...string) *html.Node {
+
+	nd0 := new(html.Node)
+
+	if ntype == "text" {
+		nd0.Type = html.TextNode
+		if len(content) > 0 {
+			nd0.Data = content[0]
+		}
+	} else {
+		nd0.Type = html.ElementNode
+		nd0.Data = ntype
+		if len(content) > 0 {
+			runtimepb.StackTrace(4)
+			log.Printf("Element nodes can't have content")
+		}
+	}
+
+	return nd0
+
 }

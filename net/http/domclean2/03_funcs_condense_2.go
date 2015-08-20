@@ -13,7 +13,8 @@ import (
 //
 // For <a> or "text" l3 nodes, we could introduce wrappers
 //
-// l2Types so far always is "div". Multiple l2Types are difficult to imagine.
+// l2Types so far always is "div".
+// Multiple l2Types are possible, but difficult to imagine.
 //
 // l1 type could be changed - from div to ul for instance, but I found no use for that
 //

@@ -74,8 +74,8 @@ func ModifyHTML(r *http.Request, u *url.URL, s string) string {
 	// ----------------------
 
 	fRecurse = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "form" {
 
+		if n.Type == html.ElementNode && n.Data == "form" {
 			hidFld := new(html.Node)
 			hidFld.Type = html.ElementNode
 			hidFld.Data = "input"
@@ -146,27 +146,18 @@ func ModifyHTML(r *http.Request, u *url.URL, s string) string {
 				n.AppendChild(textReplacement)
 			}
 
+			// Insert a  || and a newline before every <a...>
 			if n.Data == "a" {
-				prev := n.PrevSibling
-				if prev != nil {
+				prev := n
 
-					breaker0 := new(html.Node)
-					breaker0.Type = html.TextNode
-					breaker0.Data = " || "
-					n.Parent.InsertBefore(breaker0, prev)
+				breaker0 := dom.Nd("text", "||")
+				n.Parent.InsertBefore(breaker0, prev)
 
-					breaker1 := new(html.Node)
-					breaker1.Type = html.ElementNode
-					// breaker1.Data =  "||<br>\n"
-					breaker1.Data = "br"
-					n.Parent.InsertBefore(breaker1, prev)
+				breaker1 := dom.Nd("br")
+				n.Parent.InsertBefore(breaker1, prev)
 
-					breaker2 := new(html.Node)
-					breaker2.Type = html.TextNode
-					breaker2.Data = "\n"
-					n.Parent.InsertBefore(breaker2, prev)
-
-				}
+				breaker2 := dom.Nd("text", "\n")
+				n.Parent.InsertBefore(breaker2, prev)
 			}
 
 		}

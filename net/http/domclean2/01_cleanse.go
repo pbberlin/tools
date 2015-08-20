@@ -33,6 +33,8 @@ var (
 
 		"figure":     "div",
 		"figcaption": "p",
+
+		"i": "em",
 	}
 
 	unwantedAttrs = map[string]bool{
@@ -54,6 +56,7 @@ var (
 		"onclick":     true,
 		"onmousedown": true,
 		"onerror":     true,
+		"onsubmit":    true,
 
 		"readonly":       true,
 		"accept-charset": true,
@@ -89,7 +92,8 @@ var (
 		"content":  true,
 		"language": true,
 
-		"role": true,
+		"role":  true,
+		"sizes": true,
 	}
 
 	nodeDistinct = map[string]int{}

@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
+func addOutlineAttr(n *html.Node, lvl int, argOutline []int) (outline []int) {
 
 	outline = argOutline
 
@@ -29,7 +29,7 @@ func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		outline = computeOutline(c, lvl+1, outline)
+		outline = addOutlineAttr(c, lvl+1, outline)
 	}
 
 	if n.Type == html.ElementNode && lvl > cScaffoldLvls {
@@ -39,7 +39,7 @@ func computeOutline(n *html.Node, lvl int, argOutline []int) (outline []int) {
 	return
 }
 
-func nodeCountHoriz(n *html.Node, lvl int, argNum int) (num int) {
+func addIdAttr(n *html.Node, lvl int, argNum int) (num int) {
 
 	num = argNum
 
@@ -51,7 +51,7 @@ func nodeCountHoriz(n *html.Node, lvl int, argNum int) (num int) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		num = nodeCountHoriz(c, lvl+1, num+1)
+		num = addIdAttr(c, lvl+1, num+1)
 	}
 
 	return

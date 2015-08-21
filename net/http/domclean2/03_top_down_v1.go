@@ -37,7 +37,7 @@ import (
 
 
 */
-func condenseUpwards1(n *html.Node, couple []string, parentType string) {
+func topDownV1(n *html.Node, couple []string, parentType string) {
 
 	if noParent(n) {
 		return

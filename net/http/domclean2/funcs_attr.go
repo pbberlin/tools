@@ -28,6 +28,18 @@ func attrX(attributes []html.Attribute, key string) (s string) {
 	return
 }
 
+func attrSet(attrs []html.Attribute, key, val string) []html.Attribute {
+	for i, a := range attrs {
+		if a.Key == key {
+			attrs[i].Val = val
+			return attrs
+		}
+	}
+	// attr does not exist => append it
+	attrs = append(attrs, html.Attribute{Key: key, Val: val})
+	return attrs
+}
+
 func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.Attribute {
 
 	ret := []html.Attribute{}

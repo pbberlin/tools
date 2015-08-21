@@ -15,8 +15,8 @@ type NdX struct {
 	Lvl int
 }
 
-// removeComments_intertagWhitespace employs horizontal traversal using a queue
-func removeComments_intertagWhitespace(lp interface{}) {
+// removeCommentsAndIntertagWhitespace employs horizontal traversal using a queue
+func removeCommentsAndIntertagWhitespace(lp interface{}) {
 
 	var queue = util.NewQueue(10)
 

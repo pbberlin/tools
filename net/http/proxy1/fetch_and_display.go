@@ -3,7 +3,9 @@ package proxy1
 
 import (
 	"fmt"
+	"mime"
 	"net/http"
+	"path"
 	"strings"
 
 	_ "html"
@@ -102,11 +104,20 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 	} else {
 
-		w.Header().Set("Content-type", "text/html; charset=utf-8")
-		// w.Header().Set("Content-type", "text/html; charset=latin-1")
+		r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
 		bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
 		lge(err)
+
+		tp := mime.TypeByExtension(path.Ext(u.Path))
+		w.Header().Set("Content-Type", tp)
+		// w.Header().Set("Content-type", "text/html; charset=latin-1")
+
+		if r.FormValue("dbg") != "" {
+			w.Header().Set("Content-type", "text/html; charset=utf-8")
+			fmt.Fprintf(w, "%s<br>\n  %s<br>\n %v", u.Path, tp, u.String())
+			return
+		}
 
 		cntnt := string(bts)
 		cntnt = insertNewlines.Replace(cntnt)

@@ -128,14 +128,8 @@ func Test1(t *testing.T) {
 		var doc *html.Node
 		url := spf("%v/%v", hostWithPref, least3Files[i])
 
-		fnKey := fmt.Sprintf("outp_%03v", i)
-		fNames := []string{}
-		weedoutStage := 0
-		for j := 0; j < 11; j++ {
-			fn := fmt.Sprintf("outp_%03v_%v_%v", i, j, weedoutStage)
-			fn = filepath.Join(logdir, fn)
-			fNames = append(fNames, fn)
-		}
+		fNamer := FileNamer(logdir, i)
+		fnKey := fNamer() // first call yields key
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
 		if err != nil {
@@ -151,38 +145,56 @@ func Test1(t *testing.T) {
 			return
 		}
 
-		osutilpb.Dom2File(fNames[0]+".html", doc)
-
-		cleanseDom(doc, 0)
-		removeComments_intertagWhitespace(NdX{doc, 0})
-		convEmptyElementLeafs(doc, 0)
-
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNames[1]+".html", doc)
-
-		removeComments_intertagWhitespace(NdX{doc, 0})
-		condenseNestedDivs(doc, 0, 333)
-
-		// convEmptyElementLeafs(doc, 0)
-
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNames[2]+".html", doc)
+		osutilpb.Dom2File(fNamer()+".html", doc)
 
 		//
-		removeComments_intertagWhitespace(NdX{doc, 0})
-		addIdAttr(doc, 0, 1) // prevent id count with textnodes
-
-		addOutlineAttr(doc, 0, []int{0})
+		//
+		cleanseDom(doc, 0)
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		removeEmptyNodes(doc, 0)
 		reIndent(doc, 0)
-		osutilpb.Dom2File(fNames[3]+".html", doc)
+		osutilpb.Dom2File(fNamer()+".html", doc)
 
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		condenseTopDown(doc, 0, 333)
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		// proxify(doc, "libertarian-islands.appspot.com", effUrl)
+		proxify(doc, "localhost:8085", effUrl)
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		condenseBottomUp(doc)
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		addOutlineAttr(doc, 0, []int{0}) // prevent id count with textnodes
+		addIdAttr(doc, 0, 1)
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
 		computeXPathStack(doc, 0)
-		osutilpb.Bytes2File(fNames[1]+".txt", xPathDump)
+		osutilpb.Bytes2File(fNamer()+".txt", xPathDump)
 
 		//
 		textExtraction(doc, 0)
 		textsBytes, textsSorted := orderByOutline(textsByOutl)
-		osutilpb.Bytes2File(fNames[2]+".txt", textsBytes)
+		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
 		textsByArticOutl[fnKey] = textsSorted
 
 	}
@@ -282,4 +294,18 @@ func prepareLogDir() string {
 
 	return logdir
 
+}
+
+func FileNamer(logdir string, fileNumber int) func() string {
+	cntr := -2
+	return func() string {
+		cntr++
+		if cntr == -1 {
+			return spf("outp_%03v", fileNumber) // prefix/filekey
+		} else {
+			fn := spf("outp_%03v_%v", fileNumber, cntr) // filename with stage
+			fn = filepath.Join(logdir, fn)
+			return fn
+		}
+	}
 }

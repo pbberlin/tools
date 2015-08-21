@@ -70,8 +70,7 @@ func getAttrVal(attributes []html.Attribute, key string) string {
 }
 
 func absolutize(val, host string) string {
-	if strings.HasPrefix(val, "/") &&
-		!strings.HasPrefix(val, "//ssl.") {
+	if strings.HasPrefix(val, "/") && !strings.HasPrefix(val, "//ssl.") {
 		val = fmt.Sprintf("https://%v%v", host, val)
 	}
 	return val

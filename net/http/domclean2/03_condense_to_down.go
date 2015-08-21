@@ -6,7 +6,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-func convEmptyElementLeafs(n *html.Node, lvl int) {
+func removeEmptyNodes(n *html.Node, lvl int) {
 
 	// children
 	cc := []*html.Node{}
@@ -14,7 +14,7 @@ func convEmptyElementLeafs(n *html.Node, lvl int) {
 		cc = append(cc, c)
 	}
 	for _, c := range cc {
-		convEmptyElementLeafs(c, lvl+1)
+		removeEmptyNodes(c, lvl+1)
 	}
 
 	// processing
@@ -41,7 +41,7 @@ func convEmptyElementLeafs(n *html.Node, lvl int) {
 
 }
 
-func condenseNestedDivs(n *html.Node, lvl, lvlExec int) {
+func condenseTopDown(n *html.Node, lvl, lvlExec int) {
 
 	// like in removeUnwanted, we first assemble children separately.
 	// since "NextSibling" might be set to nil during condension
@@ -51,17 +51,17 @@ func condenseNestedDivs(n *html.Node, lvl, lvlExec int) {
 	}
 
 	for _, c := range cc {
-		condenseNestedDivs(c, lvl+1, lvlExec)
+		condenseTopDown(c, lvl+1, lvlExec)
 	}
 
 	// position at the end => process from deepest level on upwards
 	if lvl == 9 || true {
-		condenseUpwards3(n, map[string]bool{"div": true},
+		topDownV3(n, map[string]bool{"div": true},
 			map[string]bool{"div": true, "ul": true, "form": true, "li": true, "p": true,
 				"a": true, "span": true})
 
 	}
 
-	// condenseUpwards2(n, "li", map[string]bool{"a": true, "div": true}, "li")
+	// condenseTopDown2(n, "li", map[string]bool{"a": true, "div": true}, "li")
 
 }

@@ -22,7 +22,13 @@ func addOutlineAttr(n *html.Node, lvl int, argOutline []int) (outline []int) {
 		if strings.HasSuffix(s, ".") {
 			s = s[:len(s)-1]
 		}
-		n.Attr = append(n.Attr, html.Attribute{"", "ol", s})
+
+		attr := html.Attribute{"", "ol", s}
+
+		newAttrs := make([]html.Attribute, 0, len(n.Attr)+2) // make space for outline now - and id later
+		newAttrs = append(newAttrs, attr)
+		newAttrs = append(newAttrs, n.Attr...)
+		n.Attr = newAttrs
 
 		outline = append(outline, 0) // add children lvl
 	}
@@ -45,7 +51,12 @@ func addIdAttr(n *html.Node, lvl int, argNum int) (num int) {
 
 	if lvl > cScaffoldLvls {
 		if n.Type == html.ElementNode {
-			n.Attr = append(n.Attr, html.Attribute{"", "id", spf("%v", num)})
+
+			attr := html.Attribute{"", "id", spf("%v", num)}
+
+			prep := []html.Attribute{attr}
+			n.Attr = append(prep, n.Attr...)
+
 		}
 	}
 

@@ -15,9 +15,9 @@ import "golang.org/x/net/html"
 //
 // l1 type could be changed - from div to ul for instance, but I found no use for that
 //
-// Implementation yields similar result as condenseUpwards1
+// Implementation yields similar result as condenseTopDown1
 // but the "all-or-nothing" logic is clearer
-func condenseUpwards2(l1 *html.Node, l2Types map[string]bool, l3Types map[string]bool) {
+func topDownV2(l1 *html.Node, l2Types map[string]bool, l3Types map[string]bool) {
 
 	if l1.Type != html.ElementNode &&
 		l1.Type != html.DocumentNode {

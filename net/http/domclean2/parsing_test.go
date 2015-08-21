@@ -34,8 +34,6 @@ const cTestHostOwn = "localhost:63222"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
 
-var ml3 = map[*html.Node]int{}
-
 func prepare(t *testing.T) aetest.Context {
 
 	lg, lge := loghttp.Logger(nil, nil)
@@ -162,30 +160,33 @@ func Test1(t *testing.T) {
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNamer()+".html", doc)
 
-		//
-		//
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		// proxify(doc, "libertarian-islands.appspot.com", effUrl)
-		proxify(doc, "localhost:8085", effUrl)
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
+		splitAnchSubtreesByImage(doc)
 
-		//
-		//
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		condenseBottomUp(doc)
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
+		/*
+			//
+			//
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			// proxify(doc, "libertarian-islands.appspot.com", effUrl)
+			proxify(doc, "localhost:8085", effUrl)
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			reIndent(doc, 0)
+			osutilpb.Dom2File(fNamer()+".html", doc)
 
-		//
-		//
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		addOutlineAttr(doc, 0, []int{0}) // prevent id count with textnodes
-		addIdAttr(doc, 0, 1)
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
+			//
+			//
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			condenseBottomUp(doc)
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			reIndent(doc, 0)
+			osutilpb.Dom2File(fNamer()+".html", doc)
+			//
+			//
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			addOutlineAttr(doc, 0, []int{0}) // prevent id count with textnodes
+			addIdAttr(doc, 0, 1)
+			reIndent(doc, 0)
+			osutilpb.Dom2File(fNamer()+".html", doc)
+		*/
 
 		//
 		computeXPathStack(doc, 0)

@@ -7,17 +7,17 @@ type NodeTypeStr html.NodeType
 func (n NodeTypeStr) String() string {
 	switch n {
 	case 0:
-		return "ErrorNode"
+		return "ErroNd"
 	case 1:
-		return "TextNode"
+		return "Text  "
 	case 2:
-		return "DocumentNode"
+		return "DocmNd"
 	case 3:
-		return "ElementNode"
+		return "Elem  "
 	case 4:
-		return "CommentNode"
+		return "CommNd"
 	case 5:
-		return "DoctypeNode"
+		return "DoctNd"
 	}
 	return "unknown Node type"
 }

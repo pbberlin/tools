@@ -58,7 +58,7 @@ func InsertAfter(insPnt, toInsert *html.Node) {
 // Deep copy a node.
 // The new node has clones of all the original node's
 // children but none of its parents or siblingCNo
-func cloneNodeWithSubtree(n *html.Node) *html.Node {
+func CloneNodeWithSubtree(n *html.Node) *html.Node {
 	nn := &html.Node{
 		Type:     n.Type,
 		DataAtom: n.DataAtom,
@@ -68,17 +68,17 @@ func cloneNodeWithSubtree(n *html.Node) *html.Node {
 
 	copy(nn.Attr, n.Attr)
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		nn.AppendChild(cloneNodeWithSubtree(c)) // recursion
+		nn.AppendChild(CloneNodeWithSubtree(c)) // recursion
 	}
 	return nn
 }
 
 //
-func PrintSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
-
-	if b == nil {
-		b = new(bytes.Buffer)
-	}
+func PrintSubtree(n *html.Node) *bytes.Buffer {
+	b := new(bytes.Buffer)
+	return printSubtree(n, b, 0)
+}
+func printSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
 
 	if lvl > 40 {
 		log.Printf("%s", b.String())
@@ -86,12 +86,13 @@ func PrintSubtree(n *html.Node, b *bytes.Buffer, lvl int) *bytes.Buffer {
 		os.Exit(1)
 	}
 
-	ind := strings.Repeat(" ", lvl)
-	wpf(b, "%sL%v %v", ind, lvl, NodeTypeStr(n.Type))
-	wpf(b, " %v\n", n.Data)
+	ind := strings.Repeat("  ", lvl)
+	slvl := fmt.Sprintf("%sL%v", ind, lvl)
+	wpf(b, "%-10v %v", slvl, NodeTypeStr(n.Type))
+	wpf(b, " %v\n", strings.TrimSpace(n.Data))
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		PrintSubtree(c, b, lvl+1) // recursion
+		printSubtree(c, b, lvl+1) // recursion
 	}
 
 	return b

@@ -103,7 +103,7 @@ func noParent(n *html.Node) bool {
 			return true
 		}
 		pf("parent is nil\n")
-		b := dom.PrintSubtree(n, nil, 0)
+		b := dom.PrintSubtree(n)
 		pf("%s", b)
 		return true
 	}

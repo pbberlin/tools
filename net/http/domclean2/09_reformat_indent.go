@@ -13,10 +13,12 @@ import (
 //        0    1    2
 const cScaffoldLvls = 2
 
+var ml3 = map[*html.Node]int{}
+
 func reIndent(n *html.Node, lvl int) {
 
 	if lvl > cScaffoldLvls && n.Parent == nil {
-		bb := dom.PrintSubtree(n, nil, 0)
+		bb := dom.PrintSubtree(n)
 		_ = bb
 		// log.Printf("%s", bb.Bytes())
 		hint := ""

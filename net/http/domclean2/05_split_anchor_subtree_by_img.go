@@ -109,6 +109,10 @@ func splitAnchSubtreesByImage(n *html.Node) {
 			b2 := dom.PrintSubtree(a1)
 			log.Printf("\n%s\n", b2)
 			log.Printf("--------------------\n")
+
+			n.Parent.AppendChild(img)
+			n.Parent.AppendChild(a1)
+
 		} else {
 			// log.Printf("no img in a\n")
 		}

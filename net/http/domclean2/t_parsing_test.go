@@ -157,12 +157,29 @@ func Test1(t *testing.T) {
 		//
 		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
 		condenseTopDown(doc, 0, 333)
+		breakoutImagesFromAnchorTrees(doc)
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNamer()+".html", doc)
 
-		splitAnchSubtreesByImage(doc)
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		// condenseBottomUp(doc)
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
 
 		/*
+
+			//
+			//
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			addOutlineAttr(doc, 0, []int{0}) // prevent id count with textnodes
+			addIdAttr(doc, 0, 1)
+			reIndent(doc, 0)
+			osutilpb.Dom2File(fNamer()+".html", doc)
+
+
 			//
 			//
 			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
@@ -172,20 +189,6 @@ func Test1(t *testing.T) {
 			reIndent(doc, 0)
 			osutilpb.Dom2File(fNamer()+".html", doc)
 
-			//
-			//
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			condenseBottomUp(doc)
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			reIndent(doc, 0)
-			osutilpb.Dom2File(fNamer()+".html", doc)
-			//
-			//
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			addOutlineAttr(doc, 0, []int{0}) // prevent id count with textnodes
-			addIdAttr(doc, 0, 1)
-			reIndent(doc, 0)
-			osutilpb.Dom2File(fNamer()+".html", doc)
 		*/
 
 		//

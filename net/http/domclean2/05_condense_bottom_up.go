@@ -2,7 +2,6 @@ package domclean2
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/pbberlin/tools/net/http/dom"
 	"golang.org/x/net/html"
@@ -15,8 +14,8 @@ func condenseDetail(n *html.Node, b *bytes.Buffer, depth int) *bytes.Buffer {
 	}
 
 	switch {
-	case n.Type == html.ElementNode && n.Data == "img":
-		wpf(b, fmt.Sprintf("[img] %v %v | ", attrX(n.Attr, "title"), attrX(n.Attr, "src")))
+	// case n.Type == html.ElementNode && n.Data == "img":
+	// 	wpf(b, fmt.Sprintf("[img] %v %v | ", attrX(n.Attr, "title"), attrX(n.Attr, "src")))
 	case n.Type == html.ElementNode && n.Data == "a":
 		wpf(b, "[a] ")
 	case n.Type == html.TextNode && n.Data != "":
@@ -46,16 +45,6 @@ func condenseBottomUp(n *html.Node) {
 
 		b := condenseDetail(n, nil, 0)
 		nodeRepl := dom.Nd("text", b.String())
-
-		// changing images to links:
-		if n.Data == "img" {
-			n.Data = "a"
-			for i := 0; i < len(n.Attr); i++ {
-				if n.Attr[i].Key == "src" {
-					n.Attr[i].Key = "href"
-				}
-			}
-		}
 
 		// We want to remove all existing children.
 		// Direct loop impossible, since "NextSibling" is set to nil by Remove().

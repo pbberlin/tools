@@ -16,6 +16,7 @@ var testDocs = make([]string, 2)
 
 func init() {
 
+	// inp
 	testDocs[0] = `<!DOCTYPE html><html><head>
 		</head><body>
 
@@ -25,7 +26,7 @@ func init() {
 				</a>
 				<a href="/some/first/page.html">Links2:
 					<span>text bef</span>
-					<img src="/img1src" />
+					<img src="/img1src" title="img-title-01" />
 					<span>text aft</span>
 				</a>
 				
@@ -36,7 +37,7 @@ func init() {
 						<span>text2 bef</span>
 						<span>
 							<span>text3 bef</span>
-							<img src="/img1src" />
+							<img src="/img1src" title="img-title-02" />
 							<span>text3 aft</span>
 						</span>
 						<span>text2 aft</span>
@@ -45,6 +46,7 @@ func init() {
 			</div>
 		</body></html>`
 
+	// want
 	testDocs[1] = `<!DOCTYPE html><html><head></head><body>
 	<p>
 		<a href="/some/first/page.html">Links1:
@@ -54,7 +56,8 @@ func init() {
 			<span>text bef 
 			</span>
 		</a>
-		<img src="/img1src"/>
+		<a href="/img1src" title="img-title-01" cfrom="img">[img] img-title-01 /img1src | 
+		</a>
 		<a href="/some/first/page.html">
 			<span>text aft 
 			</span>
@@ -70,7 +73,8 @@ func init() {
 					</span>
 				</span>
 			</a>
-			<img src="/img1src"/>
+			<a href="/img1src" title="img-title-02" cfrom="img">[img] img-title-02 /img1src | 
+			</a>
 			<a href="/some/first/page.html">
 				<span>
 					<span>text3 aft 
@@ -95,7 +99,7 @@ func Test2(t *testing.T) {
 	}
 	removeCommentsAndIntertagWhitespace(NdX{doc, 0})
 
-	splitAnchSubtreesByImage(doc)
+	breakoutImagesFromAnchorTrees(doc)
 
 	removeCommentsAndIntertagWhitespace(NdX{doc, 0})
 	reIndent(doc, 0)
@@ -106,8 +110,9 @@ func Test2(t *testing.T) {
 		t.Errorf("output unexpted")
 	}
 
-	// osutilpb.Dom2File("xx.html", doc)
-	// osutilpb.Bytes2File("xw.html", []byte(testDocs[0]))
+	// osutilpb.Bytes2File("outp1_inp.html", []byte(testDocs[0]))
+	// osutilpb.Dom2File("outp2_got.html", doc)
+	// osutilpb.Bytes2File("outp3_want.html", []byte(testDocs[1]))
 
 	lg("end")
 

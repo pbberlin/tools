@@ -35,6 +35,7 @@ var (
 		"figcaption": "p",
 
 		"i": "em",
+		"b": "strong",
 	}
 
 	unwantedAttrs = map[string]bool{

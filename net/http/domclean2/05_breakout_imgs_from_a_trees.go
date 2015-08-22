@@ -10,24 +10,24 @@ import (
 
 var debugBreakOut = false
 
-func searchImg(n *html.Node, fnd *html.Node, lvl int) *html.Node {
+func searchImg(n *html.Node, fnd *html.Node, lvl int) (*html.Node, int) {
 
 	if n.Type == html.ElementNode && n.Data == "img" {
 		// log.Printf("  a has img on lvl %v\n", lvl)
 		if fnd == nil {
 			fnd = n
-			return fnd
+			return fnd, lvl
 		}
 	}
 
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		fnd = searchImg(c, fnd, lvl+1)
+		fnd, lvlfnd := searchImg(c, fnd, lvl+1)
 		if fnd != nil {
-			return fnd
+			return fnd, lvlfnd
 		}
 	}
 
-	return fnd
+	return fnd, lvl
 }
 
 type DeleterFunc func(*html.Node, int, bool) bool
@@ -94,34 +94,53 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 	}
 
 	if n.Type == html.ElementNode && n.Data == "a" {
-		img := searchImg(n, nil, 0)
+
+		img, lvl := searchImg(n, nil, 0)
+
 		if img != nil {
 
-			if debugBreakOut {
-				b0 := dom.PrintSubtree(n)
-				log.Printf("\n%s\n", b0)
+			only1Child := n.FirstChild != nil && n.FirstChild == n.LastChild
+			if lvl == 1 && only1Child {
+				// log.Printf("only child image lvl %v a\n", lvl)
+				n.RemoveChild(img)
+				n.Parent.InsertBefore(img, n.NextSibling) // "insert after; if n.NextSibling==nil => insert at the end"
+				n.AppendChild(dom.Nd("text", "[was img]"))
+			} else {
+
+				if debugBreakOut {
+					b0 := dom.PrintSubtree(n)
+					log.Printf("\n%s\n", b0)
+				}
+
+				// log.Printf("  got it  %v\n", img.Data)
+				a1 := dom.CloneNodeWithSubtree(n)
+				fc1 := closureDeleter(true)
+				fc1(n, 0, false)
+
+				if debugBreakOut {
+					b1 := dom.PrintSubtree(n)
+					log.Printf("\n%s\n", b1)
+				}
+
+				fc2 := closureDeleter(false)
+				fc2(a1, 0, false)
+				if debugBreakOut {
+					b2 := dom.PrintSubtree(a1)
+					log.Printf("\n%s\n", b2)
+					log.Printf("--------------------\n")
+				}
+
+				if true {
+					n.Parent.InsertBefore(img, n.NextSibling) // "insert after; if n.NextSibling==nil => insert at the end"
+					n.Parent.InsertBefore(a1, img.NextSibling)
+				} else {
+					// old way ; sequence corrpution if n had rightwise siblings.
+					n.Parent.AppendChild(img)
+					n.Parent.AppendChild(a1)
+
+				}
+
 			}
-
-			// log.Printf("  got it  %v\n", img.Data)
-			a1 := dom.CloneNodeWithSubtree(n)
-			fc1 := closureDeleter(true)
-			fc1(n, 0, false)
-
-			if debugBreakOut {
-				b1 := dom.PrintSubtree(n)
-				log.Printf("\n%s\n", b1)
-			}
-
-			fc2 := closureDeleter(false)
-			fc2(a1, 0, false)
-			if debugBreakOut {
-				b2 := dom.PrintSubtree(a1)
-				log.Printf("\n%s\n", b2)
-				log.Printf("--------------------\n")
-			}
-
-			n.Parent.AppendChild(img)
-			n.Parent.AppendChild(a1)
 
 			// changing image to link:
 			if img.Data == "img" {

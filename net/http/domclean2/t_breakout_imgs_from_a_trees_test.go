@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/os/osutilpb"
 	"golang.org/x/net/html"
 )
 
@@ -110,9 +111,9 @@ func Test2(t *testing.T) {
 		t.Errorf("output unexpted")
 	}
 
-	// osutilpb.Bytes2File("outp1_inp.html", []byte(testDocs[0]))
-	// osutilpb.Dom2File("outp2_got.html", doc)
-	// osutilpb.Bytes2File("outp3_want.html", []byte(testDocs[1]))
+	osutilpb.Bytes2File("outp1_inp.html", []byte(testDocs[0]))
+	osutilpb.Dom2File("outp2_got.html", doc)
+	osutilpb.Bytes2File("outp3_want.html", []byte(testDocs[1]))
 
 	lg("end")
 

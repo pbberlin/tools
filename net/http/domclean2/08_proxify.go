@@ -23,7 +23,9 @@ func closuredProxifier(argProxyHostPort string, urlSrc *url.URL) FuncType2 {
 	// needed to get the current request into the
 	// "static" recursive functions
 	var closProxyHostPort = argProxyHostPort // port included!
+
 	var closRemoteHost = fetch.HostFromUrl(urlSrc)
+	// log.Printf("ProxyHost %v, RemoteHost %v (%s)", closProxyHostPort, closRemoteHost, urlSrc)
 
 	// --------------------------
 	// ----------------------
@@ -72,11 +74,14 @@ func closuredProxifier(argProxyHostPort string, urlSrc *url.URL) FuncType2 {
 
 }
 
-func absolutize(val, host string) string {
+func absolutize(scheme, host, val string) (ret string) {
 	if strings.HasPrefix(val, "/") && !strings.HasPrefix(val, "//ssl.") {
-		val = fmt.Sprintf("https://%v%v", host, val)
+		ret = fmt.Sprintf("%v://%v%v", scheme, host, val)
+		// log.Printf("absolutized %v %v - %v", val, host, ret)
+	} else {
+		ret = val
 	}
-	return val
+	return
 }
 
 func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remoteHost string) []html.Attribute {
@@ -89,19 +94,30 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 
 		// Make all absolute
 		if attr.Key == "href" || attr.Key == "src" || attr.Key == "action" { //  make absolute
-			attr.Val = absolutize(attr.Val, remoteHost)
+
+			if attrX(attributes, "cfrom") == "img" {
+				attr.Val = absolutize("http", remoteHost, attr.Val)
+			} else {
+				attr.Val = absolutize("https", remoteHost, attr.Val)
+			}
+
 		}
 
 		if attr.Key == "href" {
 
-			// proxify - v1
-			attr.Val = fmt.Sprintf("%v?url=%v", routes.FetchUrl, attr.Val)
-
-			if util_appengine.IsLocalEnviron() {
-				attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, attr.Val)
+			if attrX(attributes, "cfrom") == "img" {
+				// dont proxif image links
 			} else {
-				attr.Val = fmt.Sprintf("https://%v%v", proxyHostPort, attr.Val)
+				// proxify - v1
+				attr.Val = fmt.Sprintf("%v?url=%v", routes.FetchUrl, attr.Val)
+
+				if util_appengine.IsLocalEnviron() {
+					attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, attr.Val)
+				} else {
+					attr.Val = fmt.Sprintf("https://%v%v", proxyHostPort, attr.Val)
+				}
 			}
+
 		}
 
 		if attr.Key == "action" {
@@ -134,7 +150,7 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 	if isRedirectInput {
 		for _, attr := range rew {
 			if attr.Key == "value" {
-				attr.Val = absolutize(attr.Val, remoteHost)
+				attr.Val = absolutize("https", remoteHost, attr.Val)
 			}
 		}
 	}

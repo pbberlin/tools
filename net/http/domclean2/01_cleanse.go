@@ -27,6 +27,8 @@ var (
 		"article": "div",
 		"aside":   "div",
 
+		"fieldset": "div", // check this
+
 		"dl": "ul",
 		"dt": "li",
 		"dd": "p",

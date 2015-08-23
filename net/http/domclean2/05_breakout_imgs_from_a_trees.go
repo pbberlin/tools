@@ -3,6 +3,9 @@ package domclean2
 import (
 	"fmt"
 	"log"
+	"net/url"
+	"regexp"
+	"strings"
 
 	"github.com/pbberlin/tools/net/http/dom"
 	"golang.org/x/net/html"
@@ -104,7 +107,11 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 				// log.Printf("only child image lvl %v a\n", lvl)
 				n.RemoveChild(img)
 				n.Parent.InsertBefore(img, n.NextSibling) // "insert after; if n.NextSibling==nil => insert at the end"
-				n.AppendChild(dom.Nd("text", "[was img]"))
+				contnt := urlBeautify(attrX(n.Attr, "href"))
+				if len(contnt) < 6 {
+					contnt = "[was img] " + contnt
+				}
+				n.AppendChild(dom.Nd("text", contnt))
 			} else {
 
 				if debugBreakOut {
@@ -143,22 +150,54 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 			}
 
 			// changing image to link:
-			if img.Data == "img" {
-				img.Data = "a"
-				for i := 0; i < len(img.Attr); i++ {
-					if img.Attr[i].Key == "src" {
-						img.Attr[i].Key = "href"
-					}
-				}
-				imgContent := fmt.Sprintf("[img] %v %v | ", attrX(img.Attr, "title"), attrX(img.Attr, "href"))
-				img.Attr = attrSet(img.Attr, "cfrom", "img")
-				nd := dom.Nd("text", imgContent)
-				img.AppendChild(nd)
-			}
+			img2Link(img)
 
 		} else {
 			// log.Printf("no img in a\n")
 		}
 	}
+
+}
+
+func img2Link(img *html.Node) {
+
+	if img.Data == "img" {
+		img.Data = "a"
+		for i := 0; i < len(img.Attr); i++ {
+			if img.Attr[i].Key == "src" {
+				img.Attr[i].Key = "href"
+			}
+		}
+		imgContent := fmt.Sprintf("[img] %v %v | ", attrX(img.Attr, "title"), urlBeautify(attrX(img.Attr, "href")))
+		img.Attr = attrSet(img.Attr, "cfrom", "img")
+		nd := dom.Nd("text", imgContent)
+		img.AppendChild(nd)
+	}
+
+}
+
+var allNumbers = regexp.MustCompile(`[0-9]+`)
+
+func urlBeautify(surl string) string {
+	if !strings.HasPrefix(surl, "http://") && !strings.HasPrefix(surl, "https://") {
+		surl = "https://" + surl
+	}
+
+	url2, err := url.Parse(surl)
+	if err != nil {
+		return surl
+	}
+
+	hst := url2.Host
+	if strings.Count(hst, ".") > 1 {
+		parts := strings.Split(hst, ".")
+		lenP := len(parts)
+		hst = parts[lenP-2] + "." + parts[lenP-1]
+	}
+
+	pth := url2.Path
+	pth = allNumbers.ReplaceAllString(pth, "")
+
+	return hst + pth
 
 }

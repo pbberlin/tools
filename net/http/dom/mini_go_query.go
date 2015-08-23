@@ -57,7 +57,7 @@ func InsertAfter(insPnt, toInsert *html.Node) {
 //
 // Deep copy a node.
 // The new node has clones of all the original node's
-// children but none of its parents or siblingCNo
+// children but none of its parents or siblings
 func CloneNodeWithSubtree(n *html.Node) *html.Node {
 	nn := &html.Node{
 		Type:     n.Type,
@@ -70,6 +70,21 @@ func CloneNodeWithSubtree(n *html.Node) *html.Node {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		nn.AppendChild(CloneNodeWithSubtree(c)) // recursion
 	}
+	return nn
+}
+
+//
+//
+// Deep copy a node.
+// no children, no parent, no siblings
+func CloneNode(n *html.Node) *html.Node {
+	nn := &html.Node{
+		Type:     n.Type,
+		DataAtom: n.DataAtom,
+		Data:     n.Data,
+		Attr:     make([]html.Attribute, len(n.Attr)),
+	}
+	copy(nn.Attr, n.Attr)
 	return nn
 }
 

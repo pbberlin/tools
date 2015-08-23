@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -71,9 +72,9 @@ func Test1(t *testing.T) {
 	lg("waiting for webserver")
 	time.Sleep(2 * time.Millisecond)
 
-	expandingPath := "www.welt.de"
+	remoteHostname := "www.welt.de"
 
-	dirs1, _, msg, err := fileserver.GetDirContents(hostWithPref, expandingPath)
+	dirs1, _, msg, err := fileserver.GetDirContents(hostWithPref, remoteHostname)
 	if err != nil {
 		lge(err)
 		lg("%s", msg)
@@ -87,7 +88,7 @@ func Test1(t *testing.T) {
 	least3Files := []string{}
 	for _, v1 := range dirs1 {
 
-		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(expandingPath, v1))
+		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(remoteHostname, v1))
 		_ = dirs2
 		if err != nil {
 			lge(err)
@@ -98,7 +99,7 @@ func Test1(t *testing.T) {
 
 		if len(fils2) > numTotal-1 {
 			for i2, v2 := range fils2 {
-				least3Files = append(least3Files, path.Join(expandingPath, v1, v2))
+				least3Files = append(least3Files, path.Join(remoteHostname, v1, v2))
 				if i2 == numTotal-1 {
 					break
 				}
@@ -124,12 +125,12 @@ func Test1(t *testing.T) {
 	for i, _ := range iter {
 
 		var doc *html.Node
-		url := spf("%v/%v", hostWithPref, least3Files[i])
+		surl := spf("%v/%v", hostWithPref, least3Files[i])
 
 		fNamer := FileNamer(logdir, i)
 		fnKey := fNamer() // first call yields key
 
-		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: url})
+		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
 		if err != nil {
 			lge(err)
 			return
@@ -149,7 +150,16 @@ func Test1(t *testing.T) {
 		//
 		cleanseDom(doc, 0)
 		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		removeEmptyNodes(doc, 0)
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		{
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+			condenseTopDown(doc, 0, 0)
+			removeEmptyNodes(doc, 0)
+		}
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNamer()+".html", doc)
 
@@ -159,7 +169,29 @@ func Test1(t *testing.T) {
 			removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
 			breakoutImagesFromAnchorTrees(doc)
 		}
-		// condenseBottomUp(doc)
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		{
+			removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
+			// condenseBottomUpV3(doc, 0, 8, map[string]bool{"div": true})
+			condenseBottomUpV3(doc, 0, 7, map[string]bool{"div": true})
+			condenseBottomUpV3(doc, 0, 6, map[string]bool{"div": true})
+			condenseBottomUpV3(doc, 0, 5, map[string]bool{"div": true})
+			condenseBottomUpV3(doc, 0, 4, map[string]bool{"div": true})
+
+		}
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
+		reIndent(doc, 0)
+		osutilpb.Dom2File(fNamer()+".html", doc)
+
+		//
+		//
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		// proxify(doc, "libertarian-islands.appspot.com", url.Url{Host: remoteHostname})
+		proxify(doc, "localhost:8085", &url.URL{Scheme: "http", Host: remoteHostname})
 		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
 		reIndent(doc, 0)
 		osutilpb.Dom2File(fNamer()+".html", doc)
@@ -171,20 +203,12 @@ func Test1(t *testing.T) {
 			{
 				removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent id count with textnodes
 				addOutlineAttr(doc, 0, []int{0})
+				addIdAttr(doc, 0, 1)
 			}
-			addIdAttr(doc, 0, 1)
 			reIndent(doc, 0)
 			osutilpb.Dom2File(fNamer()+".html", doc)
 
 
-			//
-			//
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			// proxify(doc, "libertarian-islands.appspot.com", effUrl)
-			proxify(doc, "localhost:8085", effUrl)
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			reIndent(doc, 0)
-			osutilpb.Dom2File(fNamer()+".html", doc)
 
 		*/
 

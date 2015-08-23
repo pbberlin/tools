@@ -40,6 +40,13 @@ func reIndent(n *html.Node, lvl int) {
 		dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n"})
 	case html.TextNode:
 		n.Data = strings.TrimSpace(n.Data) + " "
+		if !strings.HasPrefix(n.Data, ",") {
+			n.Data = " " + n.Data
+		}
+		// link texts without trailing space
+		if n.Parent != nil && n.Parent.Data == "a" {
+			n.Data = strings.TrimSpace(n.Data)
+		}
 	}
 
 	// Children
@@ -54,8 +61,13 @@ func reIndent(n *html.Node, lvl int) {
 		// but this needs to happend AFTER the children
 		if lvl > cScaffoldLvls && n.Parent.Type == html.ElementNode {
 			ind := strings.Repeat("\t", lvl-2)
+			ind = "\n" + ind
+			// link texts without new line
+			if n.Data == "a" {
+				ind = ""
+			}
 			if n.LastChild != nil {
-				dom.InsertAfter(n.LastChild, &html.Node{Type: html.TextNode, Data: "\n" + ind})
+				dom.InsertAfter(n.LastChild, &html.Node{Type: html.TextNode, Data: ind})
 			}
 		}
 	}

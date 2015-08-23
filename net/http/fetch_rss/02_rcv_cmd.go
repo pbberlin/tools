@@ -14,6 +14,7 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
+// ConfigDefaults are default values for FetchCommands
 var ConfigDefaults = map[string]FetchCommand{
 	"unspecified": FetchCommand{
 		CondenseTrailingDirs: 0,
@@ -47,13 +48,13 @@ var ConfigDefaults = map[string]FetchCommand{
 
 curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
 curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
-
 curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
 
-"www.welt.de/wirtschaft/?service=Rss"
 
 */
 
+// fetchCommandReceiver takes http post requests, extracts the JSON commands
+// and submits them to FetchHTML
 func fetchCommandReceiver(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, lge := loghttp.Logger(w, r)
@@ -102,6 +103,8 @@ func fetchCommandReceiver(w http.ResponseWriter, r *http.Request, m map[string]i
 
 }
 
+// FetchHTML executes the fetch commands.
+// It creates the configured filesystem and calls the fetcher.
 func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 
 	lg, lge := loghttp.Logger(w, r)

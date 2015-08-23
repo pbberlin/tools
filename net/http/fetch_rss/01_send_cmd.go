@@ -13,6 +13,8 @@ import (
 	"github.com/pbberlin/tools/net/http/tplx"
 )
 
+// FetchCommand contains a RSS location
+// and details which items we want to fetch from it.
 type FetchCommand struct {
 	Host                 string   // www.handelsblatt.com,
 	RssXMLURI            string   // /contentexport/feed/schlagzeilen,
@@ -35,12 +37,12 @@ var testCommands = []FetchCommand{
 	},
 }
 
+// Submit test commands internally, without http request.
 func staticFetchDirect(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-
 	FetchHTML(w, r, testCommands)
-
 }
 
+// Submit test commands by http posting them.
 func staticFetchViaPosting2Receiver(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, lge := loghttp.Logger(w, r)
@@ -59,6 +61,8 @@ func staticFetchViaPosting2Receiver(w http.ResponseWriter, r *http.Request, m ma
 
 }
 
+// Post2Receiver takes commands and http posts them to
+// the command receiver
 func Post2Receiver(r *http.Request, commands []FetchCommand) (*bytes.Buffer, error) {
 
 	b := new(bytes.Buffer)

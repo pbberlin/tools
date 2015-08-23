@@ -32,7 +32,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:   "file, f",
-			Value:  "test.zip",
+			Value:  "public.zip",
 			Usage:  "filename to upload",
 			EnvVar: "ENV_VAR_UP2DS_FILENAME_1,ENV_VAR_UP2DS_FILENAME_2",
 		},

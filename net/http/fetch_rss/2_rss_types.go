@@ -5,20 +5,25 @@ import (
 	"fmt"
 )
 
-var pf func(format string, a ...interface{}) (int, error) = fmt.Printf
-var pfRestore func(format string, a ...interface{}) (int, error) = fmt.Printf
+var pf = fmt.Printf
+var pfRestore = fmt.Printf
 
-var spf func(format string, a ...interface{}) string = fmt.Sprintf
+var spf = fmt.Sprintf
 var wpf = fmt.Fprintf
 
+// RSS directory
 type RSS struct {
 	XMLName xml.Name `xml:"rss"`
 	Items   Items    `xml:"channel"`
 }
+
+// List of elements of an RSS directory
 type Items struct {
 	XMLName  xml.Name `xml:"channel"`
 	ItemList []Item   `xml:"item"`
 }
+
+// Element of an RSS directory
 type Item struct {
 	Title       string    `xml:"title"`
 	Link        string    `xml:"link"`

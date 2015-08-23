@@ -15,7 +15,7 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-//
+// Fetches the RSS.xml file.
 func rssXMLFile(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, rssUrl string) (rssDoc RSS, rssUrlObj *url.URL) {
 
 	lg, lge := loghttp.Logger(w, r)

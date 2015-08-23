@@ -1,4 +1,6 @@
-// Package fetch_rss downloads html files in parallel.
+// Package fetch_rss takes http JSON commands;
+// downloading html files in parallel from the designated source;
+// making them available via static http fileserver.
 package fetch_rss
 
 import (
@@ -224,7 +226,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 }
 
-// stuffStage1 ranges of the RSS entries and filters out unwanted directories.
+// stuffStage1 ranges over the RSS entries and filters out unwanted directories.
 // Wanted urls are sent to the stage one channel.
 func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	inn chan *FullArticle, fin chan struct{}, rssDoc *RSS,

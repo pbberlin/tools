@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"net/http"
 
-	"appengine"
-
-	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 )
@@ -18,6 +15,8 @@ const UriMountNameY = "/" + mountName + "/serve-file/"
 const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"
 
+// InitHandlers is called from outside,
+// and makes the endpoints available.
 func InitHandlers() {
 	http.HandleFunc(uriSetType, loghttp.Adapter(setFSType))
 
@@ -33,12 +32,7 @@ func InitHandlers() {
 
 }
 
-func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	fs1 := GetFS(appengine.NewContext(r))
-	fileserver.FsiFileServer(fs1, UriMountNameY, w, r)
-}
-
-// userinterface rendered to HTML - not only the strings for title and url
+// BackendUIRendered returns a userinterface rendered to HTML
 func BackendUIRendered() *bytes.Buffer {
 	var b1 = new(bytes.Buffer)
 	htmlfrag.Wb(b1, "Fetcher", "")

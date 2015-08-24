@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
 
@@ -48,6 +49,7 @@ func removeAttr(attributes []html.Attribute, removeKeys map[string]bool) []html.
 	for _, a := range attributes {
 		a.Key = strings.TrimSpace(a.Key)
 		a.Val = strings.TrimSpace(a.Val)
+		a.Val = stringspb.NormalizeInnerWhitespace(a.Val) // having encountered title or alt values with newlines
 		if removeKeys[a.Key] || strings.HasPrefix(a.Key, "data") {
 			//
 		} else {

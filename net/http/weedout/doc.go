@@ -18,10 +18,6 @@ func pfDevNull(format string, a ...interface{}) (int, error) {
 	return 0, nil // sucking void
 }
 
-var (
-	textsByArticOutl = map[string][]SortEl{}
-)
-
 // !DOCTYPE html head
 // !DOCTYPE html body
 //        0    1    2

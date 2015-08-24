@@ -2,6 +2,7 @@ package weedout
 
 import (
 	"bytes"
+	"sort"
 	"strings"
 
 	"github.com/pbberlin/tools/stringspb"
@@ -17,29 +18,28 @@ var levelsTolerance = 0
 
 const excerptLen = 20
 
-func rangeOverTexts() []fragment {
+func rangeOverTexts(mp map[string][]SortEl) []TextifiedTree {
 
 	pf = pfDevNull
 	defer func() { pf = pfRestore }()
 
-	frags := []fragment{}
+	frags := []TextifiedTree{}
 
-	for articleId, atexts := range textsByArticOutl {
-		pf("%v\n", articleId)
+	for fnKey, atexts := range mp {
+		pf("%v\n", fnKey)
 
 		for _, se := range atexts {
-			outl, text := se.Outl, se.Text
-			lvl := strings.Count(outl, ".") + 1
+			lvl := strings.Count(se.Outl, ".") + 1
 			if !levelsToProcess[lvl] {
 				continue
 			}
-			text = cleanseTextForComparisonOnly(text)
-			fr := fragment{articleId, lvl, outl, text, []similarity{}}
+			text := cleanseTextForComparisonOnly(se.Text)
+			fr := TextifiedTree{fnKey, lvl, se.Outl, text, []Similar{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
 				string(fr.Text[:util.Min(len(fr.Text)-1, 3*excerptLen)]))
 
-			rangeOverTexts2(&fr)
+			rangeOverTexts2(&fr, mp)
 
 			if len(fr.Similars) > 0 {
 				frags = append(frags, fr)
@@ -51,20 +51,20 @@ func rangeOverTexts() []fragment {
 	return frags
 }
 
-func rangeOverTexts2(src *fragment) {
+func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 
 	// srcE := word.WrapAsEqualer(string(src.Text), true) // ssrc as Equaler
 	srcE := wordb.WrapAsEqualer(src.Text, true)
 	srcLen := float64(len(src.Text))
 
-	for articleId, atexts := range textsByArticOutl {
+	for fnKey, atexts := range mp {
 
-		if articleId == src.ArticleUrl {
-			pf("    to %v SKIP self\n", articleId)
+		if fnKey == src.ArticleUrl {
+			pf("    to %v SKIP self\n", fnKey)
 			continue
 		}
 
-		pf("    to %v\n", articleId)
+		pf("    to %v\n", fnKey)
 
 		cntr, br := 0, true
 		for _, se := range atexts {
@@ -106,8 +106,8 @@ func rangeOverTexts2(src *fragment) {
 				cntr++
 				br = false
 
-				sim := similarity{}
-				sim.ArticleUrl = articleId
+				sim := Similar{}
+				sim.ArticleUrl = fnKey
 				sim.Lvl = lvl
 				sim.Outline = outl
 				sim.AbsLevenshtein = absDist
@@ -133,9 +133,36 @@ func rangeOverTexts2(src *fragment) {
 }
 
 func cleanseTextForComparisonOnly(text []byte) []byte {
-	text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
-	text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
-	text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
-	text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
-	return text
+	// text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
+
+	text = bytes.Replace(text, []byte{46}, []byte{32}, -1) // dot
+	text = bytes.Replace(text, []byte{44}, []byte{}, -1)   // comma
+	text = bytes.Replace(text, []byte{45}, []byte{32}, -1) // hyphen
+	text = bytes.Replace(text, []byte{47}, []byte{32}, -1) // forward slash
+
+	words := bytes.Split(text, []byte{byte(32)})
+
+	mp := map[string]int{}
+	for _, word := range words {
+		mp[string(word)]++
+	}
+
+	keys := make([]string, 0, len(mp))
+	for k, _ := range mp {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	buf := []byte{32}
+	for _, key := range keys {
+		if len(key) > 1 {
+			buf = append(buf, []byte(key)...)
+			buf = append(buf, byte(32))
+		}
+	}
+
+	return buf
 }

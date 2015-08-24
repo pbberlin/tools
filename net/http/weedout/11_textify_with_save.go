@@ -26,10 +26,20 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 		if len(cs) > 0 {
 			cs = append(cs, byte(' '))
 		}
+	} else if n.Type == html.ElementNode {
+
+		for _, v := range []string{"alt", "title"} {
+			val := attrX(n.Attr, v)
+			if len(val) > 0 {
+				cs = append(cs, val...)
+				cs = append(cs, byte(32))
+			}
+		}
+
 	}
-	if content, ok := inlineNodeToText(n); ok {
-		cs = append(cs, content...)
-	}
+	// if content, ok := inlineNodeToText(n); ok {
+	// 	cs = append(cs, content...)
+	// }
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -51,7 +61,7 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	b := new(bytes.Buffer)
 	b.Write(cs)
 	b.Write(cc)
-	b.WriteString(addHardBreaks(n))
+	// b.WriteString(addHardBreaks(n))
 
 	return b.Bytes()
 

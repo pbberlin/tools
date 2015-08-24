@@ -6,7 +6,7 @@ import (
 	"github.com/pbberlin/tools/os/osutilpb"
 )
 
-func similaritiesToFile(frags []fragment, stage int) {
+func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
 
 	// bfrags := stringspb.IndentedDumpBytes(frags)
 	bfrags := []byte{}
@@ -33,11 +33,11 @@ func similaritiesToFile(frags []fragment, stage int) {
 		}
 		bfrags = append(bfrags, '\n')
 	}
-	osutilpb.Bytes2File(spf("outp_frags_st%v.txt", stage), bfrags)
+	osutilpb.Bytes2File(spf("%v/outp_frags_st%v.txt", logdir, stage), bfrags)
 
 }
 
-func assembleWeedout(frags []fragment, ret map[string]map[string]bool) map[string]map[string]bool {
+func assembleWeedout(frags []TextifiedTree, ret map[string]map[string]bool) map[string]map[string]bool {
 
 	for _, v := range frags {
 

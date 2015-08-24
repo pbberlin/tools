@@ -5,7 +5,8 @@ type SortEl struct {
 	Text []byte
 }
 
-type similarity struct {
+// Similarity relationship towards another TextifiedTree
+type Similar struct {
 	ArticleUrl     string
 	Lvl            int
 	Outline        string
@@ -14,10 +15,10 @@ type similarity struct {
 	Text           []byte
 }
 
-type fragment struct {
+type TextifiedTree struct {
 	ArticleUrl string
 	Lvl        int
 	Outline    string
 	Text       []byte
-	Similars   []similarity
+	Similars   []Similar
 }

@@ -7,13 +7,10 @@ import (
 	"bytes"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"path"
 	"testing"
 	"time"
-
-	"appengine/aetest"
 
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
@@ -26,46 +23,15 @@ import (
 )
 
 const numTotal = 3 // comparable html docs
-const stageMax = 3 // weedstages
+const stageMax = 2 // weedstages
 
 const cTestHostDev = "localhost:8085"
-const cTestHostOwn = "localhost:63222"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
-
-func prepare(t *testing.T) aetest.Context {
-
-	lg, lge := loghttp.Logger(nil, nil)
-	_ = lg
-
-	c, err := aetest.NewContext(nil)
-	if err != nil {
-		lge(err)
-		t.Fatal(err)
-	}
-
-	serveFile := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-		fs1 := fetch_rss.GetFS(c)
-		fileserver.FsiFileServer(fs1, fetch_rss.UriMountNameY, w, r)
-	}
-	http.HandleFunc(fetch_rss.UriMountNameY, loghttp.Adapter(serveFile))
-
-	go func() {
-		log.Fatal(
-			http.ListenAndServe(cTestHostOwn, nil),
-		)
-	}()
-
-	return c
-
-}
 
 func Test1(t *testing.T) {
 
 	lg, lge := loghttp.Logger(nil, nil)
-
-	// c := prepare(t)
-	// defer c.Close()
 
 	lg("waiting for webserver")
 	time.Sleep(2 * time.Millisecond)
@@ -120,12 +86,14 @@ func Test1(t *testing.T) {
 
 	iter := make([]int, numTotal)
 
+	//
+	// domclean
 	for i, _ := range iter {
 
 		surl := spf("%v/%v", hostWithPref, least3Files[i])
 
 		fNamer := domclean2.FileNamer(logdir, i)
-		fnKey := fNamer() // first call yields key
+		fNamer() // first call yields key
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
 		if err != nil {
@@ -141,21 +109,14 @@ func Test1(t *testing.T) {
 
 		osutilpb.Dom2File(fNamer()+".html", doc)
 
-		//
-		bts, mp := BubbledUpTextExtraction(doc, 0)
-		osutilpb.Bytes2File(fNamer()+".txt", bts)
-
-		textsBytes, textsSorted := orderByOutline(mp)
-		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
-		textsByArticOutl[fnKey] = textsSorted
-
 	}
 
+	//
+	// Textify with brute force
 	for i, _ := range iter {
 
 		fNamer := domclean2.FileNamer(logdir, i)
-		fnKey := fNamer() // first call yields key
-		_ = fnKey
+		fNamer() // first call yields key
 
 		bts := osutilpb.BytesFromFile(fNamer() + ".html")
 		doc, err := html.Parse(bytes.NewReader(bts))
@@ -171,17 +132,42 @@ func Test1(t *testing.T) {
 		b = bytes.Replace(b, []byte("[br]"), []byte("\n"), -1)
 
 		osutilpb.Bytes2File(fNamer()+"_raw"+".txt", b)
-
 	}
 
-	return
+	//
+	// Textify with more finetuning.
+	// Save result to memory.
+	textsByArticOutl := map[string][]SortEl{}
+	for i, _ := range iter {
 
+		fNamer := domclean2.FileNamer(logdir, i)
+		fnKey := fNamer() // first call yields key
+
+		bts := osutilpb.BytesFromFile(fNamer() + ".html")
+		doc, err := html.Parse(bytes.NewReader(bts))
+		lge(err)
+
+		fNamer() // one more
+
+		//
+		bts, mp := BubbledUpTextExtraction(doc, 0)
+		osutilpb.Bytes2File(fNamer()+".txt", bts)
+
+		textsBytes, textsSorted := orderByOutline(mp)
+		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
+		textsByArticOutl[fnKey] = textsSorted
+	}
+
+	//
+	//
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
 		levelsToProcess = map[int]bool{weedStage: true}
-		frags := rangeOverTexts()
+		frags := rangeOverTexts(textsByArticOutl)
 
-		similaritiesToFile(frags, weedStage)
+		similaritiesToFile(logdir, frags, weedStage)
+
+		continue
 
 		weedoutMap := map[string]map[string]bool{}
 		for i, _ := range iter {

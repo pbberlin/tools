@@ -61,3 +61,14 @@ func (sbc SortByCnt) Print(cols int) {
 	}
 	fmt.Println()
 }
+
+func (s SortByCnt) String() string {
+	b := []byte{}
+	for _, v := range s {
+		b = append(b, []byte(v.Key)...)
+		b = append(b, byte(32))
+		b = append(b, []byte(fmt.Sprintf("%v", v.Cnt))...)
+		b = append(b, byte(32))
+	}
+	return string(b)
+}

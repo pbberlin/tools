@@ -18,8 +18,6 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/weedout"
-	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -137,10 +135,8 @@ func Test1(t *testing.T) {
 		opts.FNamer = fNamer
 		opts.RemoteHost = remoteHostname
 		doc, err := DomClean(resBytes, opts)
-
-		//
-		b2 := weedout.TextExtraction(doc, 0)
-		osutilpb.Bytes2File(fNamer()+".txt", b2)
+		lge(err)
+		_ = doc
 
 	}
 

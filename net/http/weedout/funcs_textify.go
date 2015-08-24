@@ -1,56 +1,38 @@
 package weedout
 
 import (
-	"bytes"
-
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
 
-func TextExtraction(n *html.Node, lvl int) (b []byte) {
+// one under starting node,
+// one under lvl 0
+func textifySubtreeBruteForce(n *html.Node, lvl int) (ret string) {
 
-	if lvl == 0 {
-		textsByOutl = map[string][]byte{}
-	}
-
-	var cs []byte // content self
-	var cc []byte // content children
-	if n.Type == html.TextNode {
-		cs = bytes.TrimSpace([]byte(n.Data))
-		if len(cs) > 0 {
-			cs = append(cs, byte(' '))
+	if lvl > 0 {
+		if n.Type == html.ElementNode {
+			ret += spf("[%v] ", n.Data)
+			for _, v := range []string{"src", "alt", "title", "name", "type", "value"} {
+				av := attrX(n.Attr, v)
+				if len(av) > 0 {
+					ret += spf("%v ", av)
+					// ret += spf("%v ", stringspb.Ellipsoider(av, 5))
+				}
+			}
+		} else if n.Type == html.TextNode {
+			ret += n.Data
 		}
 	}
-	if content, ok := inlineNodesToText(n); ok {
-		cs = append(cs, content...)
-	}
 
-	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		var ccX []byte // content child X
-		ccX = TextExtraction(c, lvl+1)
-		ccX = bytes.TrimSpace(ccX)
-		if len(ccX) > 0 {
-			ccX = append(ccX, byte(' '))
-			cc = append(cc, ccX...)
-		}
+		ret += textifySubtreeBruteForce(c, lvl+1)
 	}
 
-	b = append(b, cs...)
-	b = append(b, cc...)
-	b = append(b, addHardBreaks(n)...)
-
-	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
-		csCc := append(cs, cc...)
-		ol := attrX(n.Attr, "ol")
-		textsByOutl[ol] = csCc
-	}
 	return
-
 }
 
 // img and a nodes are converted into text nodes.
-func inlineNodesToText(n *html.Node) (ct string, ok bool) {
+func inlineNodeToText(n *html.Node) (ct string, ok bool) {
 
 	if n.Type == html.ElementNode {
 		switch n.Data {
@@ -63,6 +45,7 @@ func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 			stype := attrX(n.Attr, "type")
 			val := attrX(n.Attr, "value")
 			ct = spf("[inp] %v %v %v", name, stype, val)
+			ok = true
 
 		case "img":
 			src := attrX(n.Attr, "src")

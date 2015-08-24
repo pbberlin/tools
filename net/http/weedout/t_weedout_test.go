@@ -134,17 +134,43 @@ func Test1(t *testing.T) {
 		}
 		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
 		opts := domclean2.CleaningOptions{Proxify: true}
-		opts.FNamer = fNamer
+		// opts.FNamer = fNamer
+		opts.AddOutline = true
 		opts.RemoteHost = remoteHostname
 		doc, err := domclean2.DomClean(resBytes, opts)
 
-		//
-		b2 := TextExtraction(doc, 0)
-		osutilpb.Bytes2File(fNamer()+".txt", b2)
+		osutilpb.Dom2File(fNamer()+".html", doc)
 
-		textsBytes, textsSorted := orderByOutline(textsByOutl)
+		//
+		bts, mp := BubbledUpTextExtraction(doc, 0)
+		osutilpb.Bytes2File(fNamer()+".txt", bts)
+
+		textsBytes, textsSorted := orderByOutline(mp)
 		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
 		textsByArticOutl[fnKey] = textsSorted
+
+	}
+
+	for i, _ := range iter {
+
+		fNamer := domclean2.FileNamer(logdir, i)
+		fnKey := fNamer() // first call yields key
+		_ = fnKey
+
+		bts := osutilpb.BytesFromFile(fNamer() + ".html")
+		doc, err := html.Parse(bytes.NewReader(bts))
+		lge(err)
+
+		textifyBruteForce(doc)
+
+		var buf bytes.Buffer
+		err = html.Render(&buf, doc)
+		lge(err)
+
+		b := buf.Bytes()
+		b = bytes.Replace(b, []byte("[br]"), []byte("\n"), -1)
+
+		osutilpb.Bytes2File(fNamer()+"_raw"+".txt", b)
 
 	}
 
@@ -179,19 +205,6 @@ func Test1(t *testing.T) {
 			weedoutApply(weedoutMap[fnKey], doc)
 			osutilpb.Dom2File(fnOut, doc)
 		}
-	}
-
-	for i, _ := range iter {
-		fnInn, _ := weedoutFilename(i, stageMax)
-		fnOut, _ := weedoutFilename(i, stageMax+1)
-
-		resBytes := osutilpb.BytesFromFile(fnInn)
-		doc, err := html.Parse(bytes.NewReader(resBytes))
-		if err != nil {
-			log.Fatal(err)
-		}
-		flattenTraverse(doc)
-		osutilpb.Dom2File(fnOut, doc)
 	}
 
 	pf("correct finish\n")

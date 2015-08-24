@@ -1,4 +1,4 @@
-package domclean2
+package weedout
 
 import (
 	"bytes"
@@ -7,10 +7,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-var textsByOutl = map[string][]byte{}
-var textsByArticOutl = map[string][]SortEl{}
-
-func textExtraction(n *html.Node, lvl int) (b []byte) {
+func TextExtraction(n *html.Node, lvl int) (b []byte) {
 
 	if lvl == 0 {
 		textsByOutl = map[string][]byte{}
@@ -31,7 +28,7 @@ func textExtraction(n *html.Node, lvl int) (b []byte) {
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		var ccX []byte // content child X
-		ccX = textExtraction(c, lvl+1)
+		ccX = TextExtraction(c, lvl+1)
 		ccX = bytes.TrimSpace(ccX)
 		if len(ccX) > 0 {
 			ccX = append(ccX, byte(' '))
@@ -63,8 +60,9 @@ func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 
 		case "input":
 			name := attrX(n.Attr, "name")
+			stype := attrX(n.Attr, "type")
 			val := attrX(n.Attr, "value")
-			ct = spf("[inp] %v %v", name, val)
+			ct = spf("[inp] %v %v %v", name, stype, val)
 
 		case "img":
 			src := attrX(n.Attr, "src")

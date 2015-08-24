@@ -13,6 +13,21 @@ import (
 var nonAscii = regexp.MustCompile(`[^a-zA-Z0-9\.\_]+`)
 var mutatedVowels = strings.NewReplacer("ä", "ae", "ö", "oe", "ü", "ue", "Ä", "ae", "Ö", "oe", "Ü", "ue")
 
+// normalize spaces
+var replNewLines = strings.NewReplacer("\r\n", " ", "\r", " ", "\n", " ")
+var replTabs = strings.NewReplacer("\t", " ")
+var doubleSpaces = regexp.MustCompile("([ ]+)")
+
+// All kinds of newlines, tabs and double spaces
+// are reduced to single space.
+// It paves the way for later beautification.
+func NormalizeInnerWhitespace(s string) string {
+	s = replNewLines.Replace(s)
+	s = replTabs.Replace(s)
+	s = doubleSpaces.ReplaceAllString(s, " ")
+	return s
+}
+
 func StringNormalize(s string) string {
 	return LowerCasedUnderscored(s)
 }

@@ -1,4 +1,4 @@
-package domclean2
+package weedout
 
 type SortEl struct {
 	Outl string

@@ -1,9 +1,10 @@
-// +build parsing
-// go test -tags=parsing
+// +build weed
+// go test -tags=weed
 
-package domclean2
+package weedout
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net/http"
@@ -14,14 +15,14 @@ import (
 
 	"appengine/aetest"
 
+	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/weedout"
 	"github.com/pbberlin/tools/os/osutilpb"
-	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
+	"golang.org/x/net/html"
 )
 
 const numTotal = 3 // comparable html docs
@@ -123,9 +124,8 @@ func Test1(t *testing.T) {
 
 		surl := spf("%v/%v", hostWithPref, least3Files[i])
 
-		fNamer := FileNamer(logdir, i)
+		fNamer := domclean2.FileNamer(logdir, i)
 		fnKey := fNamer() // first call yields key
-		_ = fnKey
 
 		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
 		if err != nil {
@@ -133,26 +133,75 @@ func Test1(t *testing.T) {
 			return
 		}
 		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
-		opts := CleaningOptions{Proxify: true}
+		opts := domclean2.CleaningOptions{Proxify: true}
 		opts.FNamer = fNamer
 		opts.RemoteHost = remoteHostname
-		doc, err := DomClean(resBytes, opts)
+		doc, err := domclean2.DomClean(resBytes, opts)
 
 		//
-		b2 := weedout.TextExtraction(doc, 0)
+		b2 := TextExtraction(doc, 0)
 		osutilpb.Bytes2File(fNamer()+".txt", b2)
+
+		textsBytes, textsSorted := orderByOutline(textsByOutl)
+		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
+		textsByArticOutl[fnKey] = textsSorted
 
 	}
 
-	// statistics on elements and attributes
-	sorted1 := sortmap.SortMapByCount(attrDistinct)
-	sorted1.Print(6)
-	fmt.Println()
-	sorted2 := sortmap.SortMapByCount(nodeDistinct)
-	sorted2.Print(6)
+	return
+
+	for weedStage := 1; weedStage <= stageMax; weedStage++ {
+
+		levelsToProcess = map[int]bool{weedStage: true}
+		frags := rangeOverTexts()
+
+		similaritiesToFile(frags, weedStage)
+
+		weedoutMap := map[string]map[string]bool{}
+		for i, _ := range iter {
+			_, fnKey := weedoutFilename(i, weedStage)
+			weedoutMap[fnKey] = map[string]bool{}
+		}
+		weedoutMap = assembleWeedout(frags, weedoutMap)
+
+		bb := stringspb.IndentedDumpBytes(weedoutMap)
+		osutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
+
+		for i, _ := range iter {
+			fnInn, _ := weedoutFilename(i, weedStage-1)
+			fnOut, fnKey := weedoutFilename(i, weedStage)
+
+			resBytes := osutilpb.BytesFromFile(fnInn)
+			doc, err := html.Parse(bytes.NewReader(resBytes))
+			if err != nil {
+				log.Fatal(err)
+			}
+			weedoutApply(weedoutMap[fnKey], doc)
+			osutilpb.Dom2File(fnOut, doc)
+		}
+	}
+
+	for i, _ := range iter {
+		fnInn, _ := weedoutFilename(i, stageMax)
+		fnOut, _ := weedoutFilename(i, stageMax+1)
+
+		resBytes := osutilpb.BytesFromFile(fnInn)
+		doc, err := html.Parse(bytes.NewReader(resBytes))
+		if err != nil {
+			log.Fatal(err)
+		}
+		flattenTraverse(doc)
+		osutilpb.Dom2File(fnOut, doc)
+	}
 
 	pf("correct finish\n")
 
+}
+
+func weedoutFilename(articleId, weedoutStage int) (string, string) {
+	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
+	prefix := fmt.Sprintf("outp_%03v", articleId)
+	return stagedFn, prefix
 }
 
 func prepareLogDir() string {

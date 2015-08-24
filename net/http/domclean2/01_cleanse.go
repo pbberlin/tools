@@ -1,8 +1,23 @@
 package domclean2
 
-import "golang.org/x/net/html"
+import (
+	"github.com/pbberlin/tools/stringspb"
+	"golang.org/x/net/html"
+)
+
+// !DOCTYPE html head
+// !DOCTYPE html body
+//        0    1    2
+const cScaffoldLvls = 2
 
 var (
+	ml3 = map[*html.Node]int{}
+
+	directlyRemoveUnwanted = true
+
+	nodeDistinct = map[string]int{}
+	attrDistinct = map[string]int{}
+
 	unwanteds = map[string]bool{
 		"meta":     true,
 		"link":     true,
@@ -41,6 +56,9 @@ var (
 	}
 
 	unwantedAttrs = map[string]bool{
+
+		"border": true, // check this
+
 		"style": true,
 		"class": true,
 		// "alt":                 true,
@@ -98,12 +116,7 @@ var (
 		"role":  true,
 		"sizes": true,
 	}
-
-	nodeDistinct = map[string]int{}
-	attrDistinct = map[string]int{}
 )
-
-var directlyRemoveUnwanted = true
 
 // maxTreeDepth returns the depth of given DOM node
 func maxTreeDepth(n *html.Node, lvl int) (maxLvl int) {
@@ -142,7 +155,7 @@ func cleanseDom(n *html.Node, lvl int) {
 
 	// one time text normalization
 	if n.Type == html.TextNode {
-		n.Data = textNormalize(n.Data)
+		n.Data = stringspb.NormalizeInnerWhitespace(n.Data)
 	}
 
 }

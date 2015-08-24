@@ -7,7 +7,6 @@ import (
 
 var replNewLines = strings.NewReplacer("\r\n", " ", "\r", " ", "\n", " ")
 var replTabs = strings.NewReplacer("\t", " ")
-
 var doubleSpaces = regexp.MustCompile("([ ]+)")
 
 // isSpacey detects all possible occurrences of whitespace
@@ -17,14 +16,4 @@ func isSpacey(sarg string) bool {
 		return true
 	}
 	return false
-}
-
-// All kinds of newlines, tabs and double spaces
-// are reduced to single space.
-// It paves the way for later beautification.
-func textNormalize(s string) string {
-	s = replNewLines.Replace(s)
-	s = replTabs.Replace(s)
-	s = doubleSpaces.ReplaceAllString(s, " ")
-	return s
 }

@@ -1,5 +1,8 @@
 package osutilpb
 
+// commented due to appengine upload error
+// github.com/go-fsnotify/fsnotify/
+
 import (
 	"errors"
 	"fmt"

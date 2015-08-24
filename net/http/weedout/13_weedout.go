@@ -1,4 +1,4 @@
-package domclean2
+package weedout
 
 import "golang.org/x/net/html"
 

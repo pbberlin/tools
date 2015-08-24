@@ -8,13 +8,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-// !DOCTYPE html head
-// !DOCTYPE html body
-//        0    1    2
-const cScaffoldLvls = 2
-
-var ml3 = map[*html.Node]int{}
-
 func reIndent(n *html.Node, lvl int) {
 
 	if lvl > cScaffoldLvls && n.Parent == nil {

@@ -61,8 +61,12 @@ func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 		case "br":
 			ct, ok = "sbr ", true
 
-		case "img":
+		case "input":
+			name := attrX(n.Attr, "name")
+			val := attrX(n.Attr, "value")
+			ct = spf("[inp] %v %v", name, val)
 
+		case "img":
 			src := attrX(n.Attr, "src")
 			src = stringspb.Ellipsoider(src, 5)
 
@@ -80,7 +84,6 @@ func inlineNodesToText(n *html.Node) (ct string, ok bool) {
 			ok = true
 
 		case "a":
-
 			href := attrX(n.Attr, "href")
 			href = stringspb.Ellipsoider(href, 5)
 

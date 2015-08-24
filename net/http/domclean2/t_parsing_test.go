@@ -8,10 +8,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -124,7 +122,6 @@ func Test1(t *testing.T) {
 
 	for i, _ := range iter {
 
-		var doc *html.Node
 		surl := spf("%v/%v", hostWithPref, least3Files[i])
 
 		fNamer := FileNamer(logdir, i)
@@ -136,88 +133,15 @@ func Test1(t *testing.T) {
 			return
 		}
 		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
-
-		resBytes = globFixes(resBytes)
-		doc, err = html.Parse(bytes.NewReader(resBytes))
-		if err != nil {
-			lge(err)
-			return
-		}
-
-		osutilpb.Dom2File(fNamer()+".html", doc)
+		opts := CleaningOptions{Proxify: true}
+		opts.FNamer = fNamer
+		opts.RemoteHost = remoteHostname
+		doc, err := DomClean(resBytes, opts)
 
 		//
-		//
-		cleanseDom(doc, 0)
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
+		b2 := textExtraction(doc, 0)
+		osutilpb.Bytes2File(fNamer()+".txt", b2)
 
-		//
-		//
-		{
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-			condenseTopDown(doc, 0, 0)
-			removeEmptyNodes(doc, 0)
-		}
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
-
-		//
-		//
-		{
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
-			breakoutImagesFromAnchorTrees(doc)
-		}
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
-
-		//
-		//
-		{
-			removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
-			// condenseBottomUpV3(doc, 0, 8, map[string]bool{"div": true})
-			condenseBottomUpV3(doc, 0, 7, map[string]bool{"div": true})
-			condenseBottomUpV3(doc, 0, 6, map[string]bool{"div": true})
-			condenseBottomUpV3(doc, 0, 5, map[string]bool{"div": true})
-			condenseBottomUpV3(doc, 0, 4, map[string]bool{"div": true})
-
-		}
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
-
-		//
-		//
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		// proxify(doc, "libertarian-islands.appspot.com", url.Url{Host: remoteHostname})
-		proxify(doc, "localhost:8085", &url.URL{Scheme: "http", Host: remoteHostname})
-		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
-		reIndent(doc, 0)
-		osutilpb.Dom2File(fNamer()+".html", doc)
-
-		/*
-
-			//
-			//
-			{
-				removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent id count with textnodes
-				addOutlineAttr(doc, 0, []int{0})
-				addIdAttr(doc, 0, 1)
-			}
-			reIndent(doc, 0)
-			osutilpb.Dom2File(fNamer()+".html", doc)
-
-
-
-		*/
-
-		//
-		computeXPathStack(doc, 0)
-		osutilpb.Bytes2File(fNamer()+".txt", xPathDump)
-
-		//
-		textExtraction(doc, 0)
 		textsBytes, textsSorted := orderByOutline(textsByOutl)
 		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
 		textsByArticOutl[fnKey] = textsSorted
@@ -281,13 +205,6 @@ func Test1(t *testing.T) {
 
 }
 
-func globFixes(b []byte) []byte {
-	// <!--(.*?)-->
-
-	b = bytes.Replace(b, []byte("<!--<![endif]-->"), []byte("<![endif]-->"), -1)
-	return b
-}
-
 func weedoutFilename(articleId, weedoutStage int) (string, string) {
 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
 	prefix := fmt.Sprintf("outp_%03v", articleId)
@@ -319,18 +236,4 @@ func prepareLogDir() string {
 
 	return logdir
 
-}
-
-func FileNamer(logdir string, fileNumber int) func() string {
-	cntr := -2
-	return func() string {
-		cntr++
-		if cntr == -1 {
-			return spf("outp_%03v", fileNumber) // prefix/filekey
-		} else {
-			fn := spf("outp_%03v_%v", fileNumber, cntr) // filename with stage
-			fn = filepath.Join(logdir, fn)
-			return fn
-		}
-	}
 }

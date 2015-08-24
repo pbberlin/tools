@@ -84,7 +84,7 @@ func flattenSubtreeV3Inner(n, nClone *html.Node, lvl int) {
 
 }
 
-func condenseBottomUpV3(n *html.Node, lvl, lvlDo int, types map[string]bool) {
+func condenseBottomUpV3(n *html.Node, lvl, lvlDo int, unusedTypes map[string]bool) {
 
 	if lvl < lvlDo {
 
@@ -94,7 +94,7 @@ func condenseBottomUpV3(n *html.Node, lvl, lvlDo int, types map[string]bool) {
 			cs = append(cs, c)
 		}
 		for _, c := range cs {
-			condenseBottomUpV3(c, lvl+1, lvlDo, types)
+			condenseBottomUpV3(c, lvl+1, lvlDo, unusedTypes)
 		}
 
 	} else {

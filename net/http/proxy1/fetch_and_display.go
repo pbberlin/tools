@@ -2,6 +2,7 @@
 package proxy1
 
 import (
+	"bytes"
 	"fmt"
 	"mime"
 	"net/http"
@@ -13,10 +14,12 @@ import (
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/domclean1"
+	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"golang.org/x/net/html"
 )
 
 var insertNewlines = strings.NewReplacer(
@@ -119,12 +122,28 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 			return
 		}
 
-		cntnt := string(bts)
-		cntnt = insertNewlines.Replace(cntnt)
-		cntnt = undouble.Replace(cntnt)
+		// using domcleaner1
+		if false {
+			cntnt := string(bts)
+			cntnt = insertNewlines.Replace(cntnt)
+			cntnt = undouble.Replace(cntnt)
+			cntnt = domclean1.ModifyHTML(r, u, cntnt)
+			fmt.Fprintf(w, cntnt)
+		}
 
-		cntnt = domclean1.ModifyHTML(r, u, cntnt)
-		fmt.Fprintf(w, cntnt)
+		opts := domclean2.CleaningOptions{Proxify: true}
+		opts.RemoteHost = fetch.HostFromStringUrl(rURL)
+
+		if !util_appengine.IsLocalEnviron() {
+			opts.ProxyHost = fetch.HostFromReq(r)
+		}
+
+		doc, err := domclean2.DomClean(bts, opts)
+
+		var bufRend bytes.Buffer
+		err = html.Render(&bufRend, doc)
+		lge(err)
+		w.Write(bufRend.Bytes())
 
 	}
 

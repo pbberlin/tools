@@ -19,11 +19,27 @@ func removeEmptyNodes(n *html.Node, lvl int) {
 
 	// processing
 	// empty element nodes
-	if n.Type == html.ElementNode &&
-		n.FirstChild == nil &&
-		(n.Data == "div" || n.Data == "span" ||
-			n.Data == "li" || n.Data == "p") {
-		// n.Type = html.CommentNode
+	if n.Type == html.ElementNode && n.Data == "img" {
+		src := attrX(n.Attr, "src")
+		if src == "" {
+			n.Parent.RemoveChild(n)
+		}
+	}
+
+	if n.Type == html.ElementNode && n.FirstChild == nil && n.Data == "a" {
+		href := attrX(n.Attr, "href")
+		if href == "#" || href == "" {
+			n.Parent.RemoveChild(n)
+		}
+	}
+
+	if n.Type == html.ElementNode && n.FirstChild == nil &&
+		(n.Data == "em" || n.Data == "strong") {
+		n.Parent.RemoveChild(n)
+	}
+
+	if n.Type == html.ElementNode && n.FirstChild == nil &&
+		(n.Data == "div" || n.Data == "span" || n.Data == "li" || n.Data == "p") {
 		n.Parent.RemoveChild(n)
 	}
 
@@ -59,6 +75,8 @@ func condenseTopDown(n *html.Node, lvl, lvlExec int) {
 		topDownV3(n, map[string]bool{"div": true},
 			map[string]bool{"div": true, "ul": true, "form": true, "li": true, "p": true,
 				"a": true, "span": true})
+
+		topDownV3(n, map[string]bool{"li": true}, map[string]bool{"div": true})
 
 	}
 

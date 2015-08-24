@@ -162,6 +162,7 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 func img2Link(img *html.Node) {
 
 	if img.Data == "img" {
+
 		img.Data = "a"
 		for i := 0; i < len(img.Attr); i++ {
 			if img.Attr[i].Key == "src" {

@@ -40,7 +40,7 @@ func reIndent(n *html.Node, lvl int) {
 		dom.InsertBefore(n, &html.Node{Type: html.TextNode, Data: "\n"})
 	case html.TextNode:
 		n.Data = strings.TrimSpace(n.Data) + " "
-		if !strings.HasPrefix(n.Data, ",") {
+		if !strings.HasPrefix(n.Data, ",") && !strings.HasPrefix(n.Data, ".") {
 			n.Data = " " + n.Data
 		}
 		// link texts without trailing space

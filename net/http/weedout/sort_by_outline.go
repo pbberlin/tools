@@ -8,7 +8,7 @@ import (
 	"github.com/pbberlin/tools/util"
 )
 
-type sortByOutline []string
+type sortByOutline []*TextifiedTree
 
 func (s sortByOutline) Len() int {
 	return len(s)
@@ -23,8 +23,8 @@ func (s sortByOutline) Less(i, j int) bool {
 	var sortByLevelFirst bool = true
 
 	if sortByLevelFirst {
-		lvl1 := strings.Count(s[i], ".")
-		lvl2 := strings.Count(s[j], ".")
+		lvl1 := strings.Count(s[i].Outline, ".")
+		lvl2 := strings.Count(s[j].Outline, ".")
 		if lvl1 < lvl2 {
 			return true
 		}
@@ -35,8 +35,8 @@ func (s sortByOutline) Less(i, j int) bool {
 
 	// A pure number comparison
 	// 1.1, 1.2, 2.1, 2.1.1.
-	st1 := strings.Split(s[i], ".")
-	st2 := strings.Split(s[j], ".")
+	st1 := strings.Split(s[i].Outline, ".")
+	st2 := strings.Split(s[j].Outline, ".")
 
 	for idx, v1 := range st1 {
 
@@ -61,7 +61,7 @@ func (s sortByOutline) Less(i, j int) bool {
 }
 
 //
-// px prints debug info for the outline sorting
+// px prints deebug info for the outline sorting
 func px(st1, st2 []string, idx int, op string) {
 
 	var ps1, ps2 []byte
@@ -96,26 +96,18 @@ func px(st1, st2 []string, idx int, op string) {
 }
 
 // apply ordering
-func orderByOutline(m map[string][]byte) ([]byte, []SortEl) {
-
-	outlines := make([]string, 0, len(m))
-	for k := range m {
-		outlines = append(outlines, k)
-	}
+func orderByOutline(m []*TextifiedTree) ([]*TextifiedTree, []byte) {
 
 	// sort.Strings(outlines)
-	sort.Sort(sortByOutline(outlines))
+	sort.Sort(sortByOutline(m))
 
-	ret1 := []byte{}
-	ret2 := []SortEl{}
+	buf := []byte{}
 
-	for _, outl := range outlines {
-		row := fmt.Sprintf("%-12v: %s\n", outl, m[outl])
-		ret1 = append(ret1, row...)
-
-		ret2 = append(ret2, SortEl{outl, m[outl]})
+	for _, tt := range m {
+		row := fmt.Sprintf("%-12v: %s\n", tt.Outline, tt.Text)
+		buf = append(buf, row...)
 	}
 
-	return ret1, ret2
+	return m, buf
 
 }

@@ -5,20 +5,23 @@ type SortEl struct {
 	Text []byte
 }
 
-// Similarity relationship towards another TextifiedTree
-type Similar struct {
-	ArticleUrl     string
-	Lvl            int
-	Outline        string
-	AbsLevenshtein int
-	RelLevenshtein float64
-	Text           []byte
+type TextifiedTree struct {
+	SourceID  string
+	Lvl       int
+	Outline   string
+	NumTokens int
+	Text      []byte
+
+	Similars []Similar
 }
 
-type TextifiedTree struct {
-	ArticleUrl string
-	Lvl        int
-	Outline    string
-	Text       []byte
-	Similars   []Similar
+// Similarity relationship towards another TextifiedTree
+type Similar struct {
+	SourceID string
+	Lvl      int
+	Outline  string
+	Text     []byte
+
+	AbsLevenshtein int
+	RelLevenshtein float64
 }

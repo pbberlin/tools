@@ -11,7 +11,7 @@ func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
 	// bfrags := stringspb.IndentedDumpBytes(frags)
 	bfrags := []byte{}
 	for _, v := range frags {
-		bfrags = append(bfrags, v.ArticleUrl...)
+		bfrags = append(bfrags, v.SourceID...)
 		bfrags = append(bfrags, ' ')
 		bfrags = append(bfrags, fmt.Sprintf("%v", v.Lvl)...)
 		bfrags = append(bfrags, ' ')
@@ -20,7 +20,7 @@ func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
 		bfrags = append(bfrags, string(v.Text)...)
 		bfrags = append(bfrags, '\n')
 		for _, v1 := range v.Similars {
-			bfrags = append(bfrags, v1.ArticleUrl...)
+			bfrags = append(bfrags, v1.SourceID...)
 			bfrags = append(bfrags, ' ')
 			bfrags = append(bfrags, fmt.Sprintf("%v", v1.Lvl)...)
 			bfrags = append(bfrags, ' ')
@@ -53,18 +53,18 @@ func assembleWeedout(frags []TextifiedTree, ret map[string]map[string]bool) map[
 
 			for _, v1 := range v.Similars {
 				if v1.Lvl == lvlHighest {
-					// if ret[v1.ArticleUrl] == nil {
-					// 	pf("WANT %v\n", v1.ArticleUrl)
+					// if ret[v1.SourceID] == nil {
+					// 	pf("WANT %v\n", v1.SourceID)
 					// 	for k, _ := range ret {
 					// 		pf("     %v\n", k)
 					// 	}
 					// 	os.Exit(1)
 					// }
-					ret[v1.ArticleUrl][v1.Outline] = true
+					ret[v1.SourceID][v1.Outline] = true
 				}
 			}
 			if v.Lvl == lvlHighest {
-				ret[v.ArticleUrl][v.Outline] = true
+				ret[v.SourceID][v.Outline] = true
 			}
 
 		}

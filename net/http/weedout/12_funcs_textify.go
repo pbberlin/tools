@@ -119,7 +119,7 @@ var sortCompactReplace = map[rune]rune{
 	'9': ' ',
 }
 
-func sortCompact(text []byte) []byte {
+func sortCompact(text []byte) (buf []byte, numTokens int) {
 
 	// text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
 	// text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
@@ -146,14 +146,16 @@ func sortCompact(text []byte) []byte {
 			mp[sword]++
 		}
 	}
+	numTokens = len(mp)
 
 	keys := make([]string, 0, len(mp))
 	for k, _ := range mp {
 		keys = append(keys, k)
 	}
+
 	sort.Strings(keys)
 
-	buf := []byte{32}
+	buf = []byte{32}
 	for _, key := range keys {
 		if len(key) > 1 {
 			buf = append(buf, []byte(key)...)
@@ -164,5 +166,5 @@ func sortCompact(text []byte) []byte {
 		}
 	}
 
-	return buf
+	return
 }

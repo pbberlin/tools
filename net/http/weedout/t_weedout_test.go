@@ -6,7 +6,6 @@ package weedout
 import (
 	"bytes"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"testing"
@@ -23,11 +22,38 @@ import (
 )
 
 const numTotal = 3 // comparable html docs
-const stageMax = 2 // weedstages
+const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"
 
 var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
+
+func prepareLogDir() string {
+
+	lg, lge := loghttp.Logger(nil, nil)
+
+	logdir := "outp"
+	lg("logdir is %v ", logdir)
+
+	// sweep previous
+	rmPath := spf("./%v/", logdir)
+	err := os.RemoveAll(rmPath)
+	if err != nil {
+		lge(err)
+		os.Exit(1)
+	}
+	lg("removed %q", rmPath)
+
+	// create anew
+	err = os.Mkdir(logdir, 0755)
+	if err != nil && !os.IsExist(err) {
+		lge(err)
+		os.Exit(1)
+	}
+
+	return logdir
+
+}
 
 func Test1(t *testing.T) {
 
@@ -101,7 +127,7 @@ func Test1(t *testing.T) {
 			return
 		}
 		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
-		opts := domclean2.CleaningOptions{Proxify: true}
+		opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
 		// opts.FNamer = fNamer
 		opts.AddOutline = true
 		opts.RemoteHost = remoteHostname
@@ -137,7 +163,7 @@ func Test1(t *testing.T) {
 	//
 	// Textify with more finetuning.
 	// Save result to memory.
-	textsByArticOutl := map[string][]SortEl{}
+	textsByArticOutl := map[string][]*TextifiedTree{}
 	for i, _ := range iter {
 
 		fNamer := domclean2.FileNamer(logdir, i)
@@ -150,12 +176,20 @@ func Test1(t *testing.T) {
 		fNamer() // one more
 
 		//
-		bts, mp := BubbledUpTextExtraction(doc, 0)
+		mp, bts := BubbledUpTextExtraction(doc, fnKey)
 		osutilpb.Bytes2File(fNamer()+".txt", bts)
 
-		textsBytes, textsSorted := orderByOutline(mp)
-		osutilpb.Bytes2File(fNamer()+".txt", textsBytes)
-		textsByArticOutl[fnKey] = textsSorted
+		mpSorted, dump := orderByOutline(mp)
+		osutilpb.Bytes2File(fNamer()+".txt", dump)
+		textsByArticOutl[fnKey] = mpSorted
+
+		// for k, v := range mpSorted {
+		// 	if k%33 != 0 {
+		// 		continue
+		// 	}
+		// 	log.Printf("%3v: %v %14v  %v\n", k, v.SourceID, v.Outline, v.Lvl)
+		// }
+
 	}
 
 	//
@@ -163,36 +197,37 @@ func Test1(t *testing.T) {
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
 		levelsToProcess = map[int]bool{weedStage: true}
-		frags := rangeOverTexts(textsByArticOutl)
+		frags := similarTextifiedTrees(textsByArticOutl, true)
 
 		similaritiesToFile(logdir, frags, weedStage)
 
 		continue
 
-		weedoutMap := map[string]map[string]bool{}
-		for i, _ := range iter {
-			_, fnKey := weedoutFilename(i, weedStage)
-			weedoutMap[fnKey] = map[string]bool{}
-		}
-		weedoutMap = assembleWeedout(frags, weedoutMap)
+		// 	weedoutMap := map[string]map[string]bool{}
+		// 	for i, _ := range iter {
+		// 		_, fnKey := weedoutFilename(i, weedStage)
+		// 		weedoutMap[fnKey] = map[string]bool{}
+		// 	}
+		// 	weedoutMap = assembleWeedout(frags, weedoutMap)
 
-		bb := stringspb.IndentedDumpBytes(weedoutMap)
-		osutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
+		// 	bb := stringspb.IndentedDumpBytes(weedoutMap)
+		// 	osutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
 
-		for i, _ := range iter {
-			fnInn, _ := weedoutFilename(i, weedStage-1)
-			fnOut, fnKey := weedoutFilename(i, weedStage)
+		// 	for i, _ := range iter {
+		// 		fnInn, _ := weedoutFilename(i, weedStage-1)
+		// 		fnOut, fnKey := weedoutFilename(i, weedStage)
 
-			resBytes := osutilpb.BytesFromFile(fnInn)
-			doc, err := html.Parse(bytes.NewReader(resBytes))
-			if err != nil {
-				log.Fatal(err)
-			}
-			weedoutApply(weedoutMap[fnKey], doc)
-			osutilpb.Dom2File(fnOut, doc)
-		}
+		// 		resBytes := osutilpb.BytesFromFile(fnInn)
+		// 		doc, err := html.Parse(bytes.NewReader(resBytes))
+		// 		if err != nil {
+		// 			log.Fatal(err)
+		// 		}
+		// 		weedoutApply(weedoutMap[fnKey], doc)
+		// 		osutilpb.Dom2File(fnOut, doc)
+		// 	}
 	}
 
+	pf("Applied Levensthein %v - SimpleCompare %v\n", appliedLevenshtein, appliedCompare)
 	pf("correct finish\n")
 
 }
@@ -201,31 +236,4 @@ func weedoutFilename(articleId, weedoutStage int) (string, string) {
 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
 	prefix := fmt.Sprintf("outp_%03v", articleId)
 	return stagedFn, prefix
-}
-
-func prepareLogDir() string {
-
-	lg, lge := loghttp.Logger(nil, nil)
-
-	logdir := "outp"
-	lg("logdir is %v ", logdir)
-
-	// sweep previous
-	rmPath := spf("./%v/", logdir)
-	err := os.RemoveAll(rmPath)
-	if err != nil {
-		lge(err)
-		os.Exit(1)
-	}
-	lg("removed %q", rmPath)
-
-	// create anew
-	err = os.Mkdir(logdir, 0755)
-	if err != nil && !os.IsExist(err) {
-		lge(err)
-		os.Exit(1)
-	}
-
-	return logdir
-
 }

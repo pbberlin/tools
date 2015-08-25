@@ -1,7 +1,8 @@
 package weedout
 
 import (
-	"strings"
+	"bytes"
+	"fmt"
 
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/text/levenshtein"
@@ -16,48 +17,46 @@ var levelsTolerance = 0
 
 const excerptLen = 20
 
-func rangeOverTexts(mp map[string][]SortEl) []TextifiedTree {
+var appliedLevenshtein = 0
+var appliedCompare = 0
+
+func similarTextifiedTrees(mp map[string][]*TextifiedTree, onlyFirst bool) []TextifiedTree {
 
 	pf = pfDevNull
 	defer func() { pf = pfRestore }()
 
 	frags := []TextifiedTree{}
 
-	for fnKey, atexts := range mp {
+	for fnKey, tts := range mp {
 		pf("%v\n", fnKey)
 
-		for _, se := range atexts {
-			lvl := strings.Count(se.Outl, ".") + 1
-			if !levelsToProcess[lvl] {
+		for _, tt := range tts {
+			if !levelsToProcess[tt.Lvl] {
 				continue
 			}
-
-			fr := TextifiedTree{fnKey, lvl, se.Outl, se.Text, []Similar{}}
-			pf("  cmp %5v lvl%v - len%v   %v \n",
-				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
-				string(fr.Text[:util.Min(len(fr.Text)-1, 3*excerptLen)]))
-
-			rangeOverTexts2(&fr, mp)
-
-			if len(fr.Similars) > 0 {
-				frags = append(frags, fr)
+			similarTextifiedTrees2(tt, mp)
+			if len(tt.Similars) > 0 {
+				frags = append(frags, *tt)
 			}
 
+		}
+		if onlyFirst {
+			break
 		}
 	}
 
 	return frags
 }
 
-func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
+func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree) {
 
 	// srcE := word.WrapAsEqualer(string(src.Text), true) // ssrc as Equaler
 	srcE := wordb.WrapAsEqualer(src.Text, true)
 	srcLen := float64(len(src.Text))
 
-	for fnKey, atexts := range mp {
+	for fnKey, tts := range mp {
 
-		if fnKey == src.ArticleUrl {
+		if fnKey == src.SourceID {
 			pf("    to %v SKIP self\n", fnKey)
 			continue
 		}
@@ -65,51 +64,75 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 		pf("    to %v\n", fnKey)
 
 		cntr, br := 0, true
-		for _, se := range atexts {
-			// outl, text := se.Outl, se.Text
+		for _, tt := range tts {
+			// outl, text := tt.Outl, tt.Text
 
-			lvl := strings.Count(se.Outl, ".") + 1
-
-			if lvl > src.Lvl+levelsTolerance {
+			if tt.Lvl > src.Lvl+levelsTolerance {
 				break // since we are now sorted by lvl, we can this is safe
 			}
 
-			if lvl == src.Lvl ||
-				(lvl > src.Lvl && lvl <= src.Lvl+levelsTolerance) {
+			if tt.Lvl == src.Lvl ||
+				(tt.Lvl > src.Lvl && tt.Lvl <= src.Lvl+levelsTolerance) {
 				// proceed
 			} else {
 				continue
 			}
 
-			relSize := srcLen / float64(util.Max(1, len(se.Text)))
+			if src.NumTokens < 2 {
+				continue
+			}
+
+			if src.NumTokens < 5 && tt.NumTokens > 7 {
+				continue
+			}
+
+			relSize := srcLen / float64(util.Max(1, len(tt.Text)))
 			if relSize < 0.33 || relSize > 3 {
 				continue
 			}
 
-			dstE := wordb.WrapAsEqualer(se.Text, true) // destinations as Equaler
-			m := levenshtein.New(srcE, dstE, opt)
-			absDist, relDist := m.Distance()
+			absDist, relDist := 0, 0.0
+
+			if tt.NumTokens == src.NumTokens &&
+				len(tt.Text) == len(src.Text) &&
+				bytes.Equal(tt.Text, src.Text) {
+				absDist, relDist = 0, 0.0
+				appliedCompare++
+			} else {
+				dstE := wordb.WrapAsEqualer(tt.Text, true) // destinations as Equaler
+				m := levenshtein.New(srcE, dstE, opt)
+				absDist, relDist = m.Distance()
+				appliedLevenshtein++
+			}
+
+			if relDist < 0.3 && relDist > 0.0 {
+				fmt.Printf("%v %14v %4v %5.2v %s %s\n", src.SourceID, tt.Outline, absDist, relDist,
+					stringspb.ToLen(string(src.Text), 30),
+					stringspb.ToLen(string(tt.Text), 30),
+				)
+			}
 
 			//
 			if relDist < 0.26 && absDist < 10 {
 				if br {
 					pf("\t")
 				}
-				sd := string(se.Text[:util.Min(2*excerptLen, len(se.Text)-1)])
+
+				sd := ""
+				sd = string(tt.Text[:util.Min(2*excerptLen, len(tt.Text)-1)])
 				sd = stringspb.ToLen(sd, 2*excerptLen+1)
-				_ = sd
-				pf("%12v %v %4v %5.2v   ", se.Outl, sd, absDist, relDist)
+				pf("%12v %v %4v %5.2v   ", tt.Outline, sd, absDist, relDist)
 
 				cntr++
 				br = false
 
 				sim := Similar{}
-				sim.ArticleUrl = fnKey
-				sim.Lvl = lvl
-				sim.Outline = se.Outl
+				sim.SourceID = fnKey
+				sim.Lvl = tt.Lvl
+				sim.Outline = tt.Outline
 				sim.AbsLevenshtein = absDist
 				sim.RelLevenshtein = relDist
-				sim.Text = se.Text
+				sim.Text = tt.Text
 				src.Similars = append(src.Similars, sim)
 
 				if cntr%2 == 0 || cntr > 20 {

@@ -6,17 +6,17 @@ import (
 	"golang.org/x/net/html"
 )
 
-func BubbledUpTextExtraction(n *html.Node, lvl int) ([]byte, map[string][]byte) {
+func BubbledUpTextExtraction(n *html.Node, fnKey string) ([]*TextifiedTree, []byte) {
 
 	// reset
-	mp := map[string][]byte{}
+	mp := []*TextifiedTree{}
 
-	b := textExtract(n, 0, mp)
+	bts, mp := textExtract(n, fnKey, 0, mp)
 
-	return b, mp
+	return mp, bts
 }
 
-func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
+func textExtract(n *html.Node, fnKey string, lvl int, mp []*TextifiedTree) ([]byte, []*TextifiedTree) {
 
 	var cs []byte // content self
 	var cc []byte // content children
@@ -44,7 +44,7 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		var cChX []byte // content child X
-		cChX = textExtract(c, lvl+1, mp)
+		cChX, mp = textExtract(c, fnKey, lvl+1, mp)
 		if len(cChX) > 0 {
 			cChX = append(cChX, byte(' '))
 			cc = append(cc, cChX...)
@@ -54,7 +54,14 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
 		ol := attrX(n.Attr, "ol")
-		mp[ol] = sortCompact(csCc)
+		compacted, numTokens := sortCompact(csCc)
+		tt := &TextifiedTree{}
+		tt.SourceID = fnKey
+		tt.Lvl = lvl - cScaffoldLvls
+		tt.Outline = ol
+		tt.NumTokens = numTokens
+		tt.Text = compacted
+		mp = append(mp, tt)
 	}
 
 	b := new(bytes.Buffer)
@@ -62,6 +69,6 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	b.Write(cc)
 	// b.WriteString(addHardBreaks(n))
 
-	return b.Bytes()
+	return b.Bytes(), mp
 
 }

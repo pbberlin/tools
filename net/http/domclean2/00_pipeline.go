@@ -18,6 +18,8 @@ type CleaningOptions struct {
 	RemoteHost string
 
 	AddOutline bool
+
+	Beautify bool // make pretty at the end
 }
 
 func FileNamer(logdir string, fileNumber int) func() string {
@@ -106,6 +108,12 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 
 		proxify(doc, opt.ProxyHost, &url.URL{Scheme: "http", Host: opt.RemoteHost})
 		fileDump(doc, opt.FNamer)
+	}
+
+	if opt.Beautify {
+		removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+		reIndent(doc, 0)
+
 	}
 
 	//

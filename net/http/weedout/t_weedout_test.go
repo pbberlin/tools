@@ -194,38 +194,49 @@ func Test1(t *testing.T) {
 
 	//
 	//
+	// We progress from level 1 downwards.
+	// Lower levels skip weeded out higher levels,
+	// to save expensive levenshtein comparisons
+	var skipPrefixes = map[string]bool{}
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
+		fNamer := domclean2.FileNamer(logdir, 0)
+		fnKey := fNamer() // first call yields key
+
 		levelsToProcess = map[int]bool{weedStage: true}
-		frags := similarTextifiedTrees(textsByArticOutl, true)
+		frags := similarTextifiedTrees(textsByArticOutl, skipPrefixes, map[string]bool{fnKey: true})
 
 		similaritiesToFile(logdir, frags, weedStage)
 
-		continue
+		for _, frag := range frags {
+			if len(frag.Similars) >= numTotal-1 &&
+				frag.SumRelLevenshtein/(numTotal-1) < 0.2 {
+				skipPrefixes[frag.Outline+"."] = true
+			}
+		}
+		b := new(bytes.Buffer)
+		for k, _ := range skipPrefixes {
+			b.WriteString(k)
+			b.WriteByte(32)
+		}
+		// log.Printf("%v\n", b.String())
 
-		// 	weedoutMap := map[string]map[string]bool{}
-		// 	for i, _ := range iter {
-		// 		_, fnKey := weedoutFilename(i, weedStage)
-		// 		weedoutMap[fnKey] = map[string]bool{}
-		// 	}
-		// 	weedoutMap = assembleWeedout(frags, weedoutMap)
-
-		// 	bb := stringspb.IndentedDumpBytes(weedoutMap)
-		// 	osutilpb.Bytes2File(spf("outp_wd_%v.txt", weedStage), bb)
-
-		// 	for i, _ := range iter {
-		// 		fnInn, _ := weedoutFilename(i, weedStage-1)
-		// 		fnOut, fnKey := weedoutFilename(i, weedStage)
-
-		// 		resBytes := osutilpb.BytesFromFile(fnInn)
-		// 		doc, err := html.Parse(bytes.NewReader(resBytes))
-		// 		if err != nil {
-		// 			log.Fatal(err)
-		// 		}
-		// 		weedoutApply(weedoutMap[fnKey], doc)
-		// 		osutilpb.Dom2File(fnOut, doc)
-		// 	}
 	}
+
+	//
+	// Apply weedout
+	fNamer := domclean2.FileNamer(logdir, 0)
+	fNamer() // first call yields key
+
+	bts := osutilpb.BytesFromFile(fNamer() + ".html")
+	doc, err := html.Parse(bytes.NewReader(bts))
+	lge(err)
+
+	weedoutApply(doc, skipPrefixes)
+
+	domclean2.DomCleanSmall(doc)
+
+	osutilpb.Dom2File(fNamer()+".html", doc)
 
 	pf("Applied Levensthein %v - SimpleCompare %v\n", appliedLevenshtein, appliedCompare)
 	pf("correct finish\n")

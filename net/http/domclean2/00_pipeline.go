@@ -18,6 +18,7 @@ type CleaningOptions struct {
 	RemoteHost string
 
 	AddOutline bool
+	AddID      bool
 
 	Beautify bool // make pretty at the end
 }
@@ -120,7 +121,11 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 	//
 	if opt.AddOutline {
 		addOutlineAttr(doc, 0, []int{0})
+	}
+	if opt.AddID {
 		addIdAttr(doc, 0, 1)
+	}
+	if opt.AddOutline || opt.AddID {
 		fileDump(doc, opt.FNamer)
 	}
 
@@ -131,5 +136,13 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 	}
 
 	return doc, nil
+
+}
+
+func DomCleanSmall(doc *html.Node) {
+
+	removeEmptyNodes(doc, 0)
+	removeCommentsAndIntertagWhitespace(NdX{doc, 0})
+	reIndent(doc, 0)
 
 }

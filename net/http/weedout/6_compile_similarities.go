@@ -1,6 +1,7 @@
 package weedout
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/pbberlin/tools/os/osutilpb"
@@ -9,68 +10,22 @@ import (
 func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
 
 	// bfrags := stringspb.IndentedDumpBytes(frags)
-	bfrags := []byte{}
+	b := new(bytes.Buffer)
 	for _, v := range frags {
-		bfrags = append(bfrags, v.SourceID...)
-		bfrags = append(bfrags, ' ')
-		bfrags = append(bfrags, fmt.Sprintf("%v", v.Lvl)...)
-		bfrags = append(bfrags, ' ')
-		bfrags = append(bfrags, fmt.Sprintf("%-8v", string(v.Outline))...)
-		bfrags = append(bfrags, "             "...)
-		bfrags = append(bfrags, string(v.Text)...)
-		bfrags = append(bfrags, '\n')
+		b.WriteString(fmt.Sprintf("%v %2v ", v.SourceID, v.Lvl))
+		b.WriteString(fmt.Sprintf("%-8v             ", v.Outline))
+		b.Write(v.Text)
+		b.WriteString("\n")
 		for _, v1 := range v.Similars {
-			bfrags = append(bfrags, v1.SourceID...)
-			bfrags = append(bfrags, ' ')
-			bfrags = append(bfrags, fmt.Sprintf("%v", v1.Lvl)...)
-			bfrags = append(bfrags, ' ')
-			bfrags = append(bfrags, fmt.Sprintf("%-8v", string(v1.Outline))...)
-			bfrags = append(bfrags, "    "...)
-			bfrags = append(bfrags, spf("%2v ", v1.AbsLevenshtein)...)
-			bfrags = append(bfrags, spf("%-5.2v ", v1.RelLevenshtein)...)
-			bfrags = append(bfrags, string(v1.Text)...)
-			bfrags = append(bfrags, '\n')
+			b.WriteString(fmt.Sprintf("%v %2v ", v1.SourceID, v1.Lvl))
+			b.WriteString(fmt.Sprintf("%-8v    ", string(v1.Outline)))
+			b.WriteString(spf("%2v ", v1.AbsLevenshtein))
+			b.WriteString(spf("%-5.2v ", v1.RelLevenshtein))
+			b.Write(v1.Text)
+			b.WriteByte(10)
 		}
-		bfrags = append(bfrags, '\n')
+		b.WriteByte(10)
 	}
-	osutilpb.Bytes2File(spf("%v/outp_frags_st%v.txt", logdir, stage), bfrags)
+	osutilpb.Bytes2File(spf("%v/outp_frags_st%v.txt", logdir, stage), b.Bytes())
 
-}
-
-func assembleWeedout(frags []TextifiedTree, ret map[string]map[string]bool) map[string]map[string]bool {
-
-	for _, v := range frags {
-
-		// if len(v.Similars) >= numTotal-1 {
-		if len(v.Similars) >= 2 {
-
-			lvlHighest := v.Lvl
-			for _, v1 := range v.Similars {
-				if v1.Lvl < lvlHighest {
-					lvlHighest = v1.Lvl
-				}
-			}
-
-			for _, v1 := range v.Similars {
-				if v1.Lvl == lvlHighest {
-					// if ret[v1.SourceID] == nil {
-					// 	pf("WANT %v\n", v1.SourceID)
-					// 	for k, _ := range ret {
-					// 		pf("     %v\n", k)
-					// 	}
-					// 	os.Exit(1)
-					// }
-					ret[v1.SourceID][v1.Outline] = true
-				}
-			}
-			if v.Lvl == lvlHighest {
-				ret[v.SourceID][v.Outline] = true
-			}
-
-		}
-
-	}
-
-	// pf("%v\n", ret)
-	return ret
 }

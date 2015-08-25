@@ -2,6 +2,7 @@ package weedout
 
 import (
 	"bytes"
+	"strings"
 
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/text/levenshtein"
@@ -19,7 +20,7 @@ const excerptLen = 20
 var appliedLevenshtein = 0
 var appliedCompare = 0
 
-func similarTextifiedTrees(mp map[string][]*TextifiedTree, onlyFirst bool) []TextifiedTree {
+func similarTextifiedTrees(mp map[string][]*TextifiedTree, skipPrefix map[string]bool, onlyKeys map[string]bool) []TextifiedTree {
 
 	pf = pfDevNull
 	defer func() { pf = pfRestore }()
@@ -27,27 +28,41 @@ func similarTextifiedTrees(mp map[string][]*TextifiedTree, onlyFirst bool) []Tex
 	frags := []TextifiedTree{}
 
 	for fnKey, tts := range mp {
+		if !onlyKeys[fnKey] {
+			continue
+		}
 		pf("%v\n", fnKey)
 
+	MarkX:
 		for _, tt := range tts {
+
 			if !levelsToProcess[tt.Lvl] {
 				continue
 			}
-			similarTextifiedTrees2(tt, mp)
+
+			outls := strings.Split(tt.Outline, ".")
+			for i := 0; i < len(outls)-1; i++ {
+				jn := strings.Join(outls[0:i+1], ".") + "."
+				if skipPrefix[jn] {
+					// log.Printf("  %-8v contains %-6v => skip\n", tt.Outline, jn)
+					continue MarkX
+				} else {
+					// log.Printf("  %-8v proccessing ...\n", tt.Outline)
+				}
+
+			}
+
+			similarTextifiedTrees2(tt, mp, skipPrefix)
 			if len(tt.Similars) > 0 {
 				frags = append(frags, *tt)
 			}
-
-		}
-		if onlyFirst {
-			break
 		}
 	}
 
 	return frags
 }
 
-func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree) {
+func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree, skipPrefix map[string]bool) {
 
 	// srcE := word.WrapAsEqualer(string(src.Text), true) // ssrc as Equaler
 	srcE := wordb.WrapAsEqualer(src.Text, true)
@@ -77,7 +92,7 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree) 
 				continue
 			}
 
-			if src.NumTokens < 2 {
+			if src.NumTokens < 1 {
 				continue
 			}
 
@@ -135,6 +150,8 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree) 
 				sim.RelLevenshtein = relDist
 				sim.Text = tt.Text
 				src.Similars = append(src.Similars, sim)
+				src.SumAbsLevenshtein += absDist
+				src.SumRelLevenshtein += relDist
 
 				if cntr%2 == 0 || cntr > 20 {
 					pf("\n")

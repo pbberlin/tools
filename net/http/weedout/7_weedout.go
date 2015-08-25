@@ -2,15 +2,16 @@ package weedout
 
 import "golang.org/x/net/html"
 
-func weedoutApply(weedouts map[string]bool, n *html.Node) {
+func weedoutApply(n *html.Node, weedouts map[string]bool) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		weedoutApply(weedouts, c)
+		weedoutApply(c, weedouts)
 	}
 
 	if n.Type == html.ElementNode {
-		outline := attrX(n.Attr, "ol")
+		outline := attrX(n.Attr, "ol") + "."
+
 		if weedouts[outline] {
 			n.Type = html.CommentNode
 			n.Data = n.Data + " replaced"

@@ -12,7 +12,9 @@ type TextifiedTree struct {
 	NumTokens int
 	Text      []byte
 
-	Similars []Similar
+	Similars          []Similar
+	SumAbsLevenshtein int
+	SumRelLevenshtein float64
 }
 
 // Similarity relationship towards another TextifiedTree

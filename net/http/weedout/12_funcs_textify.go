@@ -106,6 +106,7 @@ var sortCompactReplace = map[rune]rune{
 	'.': ' ',
 	',': ',',
 	'-': ' ',
+	':': ' ',
 	'/': ' ',
 	'0': ' ',
 	'1': ' ',
@@ -142,8 +143,12 @@ func sortCompact(text []byte) (buf []byte, numTokens int) {
 		sword := string(word)
 		sword = strings.TrimSpace(sword)
 		sword = strings.ToLower(sword)
-		if len(sword) > 3 {
-			mp[sword]++
+		if len(words) > 3 {
+			if len(sword) > 3 {
+				mp[sword]++
+			}
+		} else {
+			mp[sword]++ // no minimum length for tiny texts
 		}
 	}
 	numTokens = len(mp)

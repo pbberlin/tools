@@ -1,8 +1,6 @@
 package weedout
 
 import (
-	"bytes"
-	"sort"
 	"strings"
 
 	"github.com/pbberlin/tools/stringspb"
@@ -33,8 +31,8 @@ func rangeOverTexts(mp map[string][]SortEl) []TextifiedTree {
 			if !levelsToProcess[lvl] {
 				continue
 			}
-			text := cleanseTextForComparisonOnly(se.Text)
-			fr := TextifiedTree{fnKey, lvl, se.Outl, text, []Similar{}}
+
+			fr := TextifiedTree{fnKey, lvl, se.Outl, se.Text, []Similar{}}
 			pf("  cmp %5v lvl%v - len%v   %v \n",
 				strings.TrimSpace(fr.Outline), fr.Lvl, len(fr.Text),
 				string(fr.Text[:util.Min(len(fr.Text)-1, 3*excerptLen)]))
@@ -68,9 +66,9 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 
 		cntr, br := 0, true
 		for _, se := range atexts {
-			outl, text := se.Outl, se.Text
+			// outl, text := se.Outl, se.Text
 
-			lvl := strings.Count(outl, ".") + 1
+			lvl := strings.Count(se.Outl, ".") + 1
 
 			if lvl > src.Lvl+levelsTolerance {
 				break // since we are now sorted by lvl, we can this is safe
@@ -83,13 +81,12 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 				continue
 			}
 
-			text = cleanseTextForComparisonOnly(text)
-			relSize := srcLen / float64(util.Max(1, len(text)))
+			relSize := srcLen / float64(util.Max(1, len(se.Text)))
 			if relSize < 0.33 || relSize > 3 {
 				continue
 			}
 
-			dstE := wordb.WrapAsEqualer(text, true) // destinations as Equaler
+			dstE := wordb.WrapAsEqualer(se.Text, true) // destinations as Equaler
 			m := levenshtein.New(srcE, dstE, opt)
 			absDist, relDist := m.Distance()
 
@@ -98,10 +95,10 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 				if br {
 					pf("\t")
 				}
-				sd := string(text[:util.Min(2*excerptLen, len(text)-1)])
+				sd := string(se.Text[:util.Min(2*excerptLen, len(se.Text)-1)])
 				sd = stringspb.ToLen(sd, 2*excerptLen+1)
 				_ = sd
-				pf("%12v %v %4v %5.2v   ", outl, sd, absDist, relDist)
+				pf("%12v %v %4v %5.2v   ", se.Outl, sd, absDist, relDist)
 
 				cntr++
 				br = false
@@ -109,10 +106,10 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 				sim := Similar{}
 				sim.ArticleUrl = fnKey
 				sim.Lvl = lvl
-				sim.Outline = outl
+				sim.Outline = se.Outl
 				sim.AbsLevenshtein = absDist
 				sim.RelLevenshtein = relDist
-				sim.Text = text
+				sim.Text = se.Text
 				src.Similars = append(src.Similars, sim)
 
 				if cntr%2 == 0 || cntr > 20 {
@@ -130,39 +127,4 @@ func rangeOverTexts2(src *TextifiedTree, mp map[string][]SortEl) {
 		}
 	}
 
-}
-
-func cleanseTextForComparisonOnly(text []byte) []byte {
-	// text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
-	// text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
-	// text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
-	// text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
-
-	text = bytes.Replace(text, []byte{46}, []byte{32}, -1) // dot
-	text = bytes.Replace(text, []byte{44}, []byte{}, -1)   // comma
-	text = bytes.Replace(text, []byte{45}, []byte{32}, -1) // hyphen
-	text = bytes.Replace(text, []byte{47}, []byte{32}, -1) // forward slash
-
-	words := bytes.Split(text, []byte{byte(32)})
-
-	mp := map[string]int{}
-	for _, word := range words {
-		mp[string(word)]++
-	}
-
-	keys := make([]string, 0, len(mp))
-	for k, _ := range mp {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	buf := []byte{32}
-	for _, key := range keys {
-		if len(key) > 1 {
-			buf = append(buf, []byte(key)...)
-			buf = append(buf, byte(32))
-		}
-	}
-
-	return buf
 }

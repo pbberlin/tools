@@ -45,7 +45,6 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		var cChX []byte // content child X
 		cChX = textExtract(c, lvl+1, mp)
-		cChX = bytes.TrimSpace(cChX)
 		if len(cChX) > 0 {
 			cChX = append(cChX, byte(' '))
 			cc = append(cc, cChX...)
@@ -55,7 +54,7 @@ func textExtract(n *html.Node, lvl int, mp map[string][]byte) []byte {
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
 		ol := attrX(n.Attr, "ol")
-		mp[ol] = csCc
+		mp[ol] = sortCompact(csCc)
 	}
 
 	b := new(bytes.Buffer)

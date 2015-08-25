@@ -1,6 +1,10 @@
 package weedout
 
 import (
+	"bytes"
+	"sort"
+	"strings"
+
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
@@ -96,4 +100,69 @@ func addHardBreaks(n *html.Node) (s string) {
 	}
 	return
 
+}
+
+var sortCompactReplace = map[rune]rune{
+	'.': ' ',
+	',': ',',
+	'-': ' ',
+	'/': ' ',
+	'0': ' ',
+	'1': ' ',
+	'2': ' ',
+	'3': ' ',
+	'4': ' ',
+	'5': ' ',
+	'6': ' ',
+	'7': ' ',
+	'8': ' ',
+	'9': ' ',
+}
+
+func sortCompact(text []byte) []byte {
+
+	// text = bytes.Replace(text, []byte(" hbr"), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(" sbr"), []byte{}, -1)
+	text = bytes.Replace(text, []byte(`[img] `), []byte{}, -1)
+	// text = bytes.Replace(text, []byte(`[a] `), []byte{}, -1)
+
+	mapping := func(r rune) rune {
+		if ret, ok := sortCompactReplace[r]; ok {
+			return ret
+		}
+		return r
+	}
+
+	text = bytes.Map(mapping, text)
+
+	words := bytes.Fields(text)
+
+	mp := map[string]int{}
+	for _, word := range words {
+		sword := string(word)
+		sword = strings.TrimSpace(sword)
+		sword = strings.ToLower(sword)
+		if len(sword) > 3 {
+			mp[sword]++
+		}
+	}
+
+	keys := make([]string, 0, len(mp))
+	for k, _ := range mp {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	buf := []byte{32}
+	for _, key := range keys {
+		if len(key) > 1 {
+			buf = append(buf, []byte(key)...)
+			buf = append(buf, byte(32))
+			// num := fmt.Sprintf("%v", mp[key])
+			// buf = append(buf, []byte(num)...)
+			// buf = append(buf, byte(32))
+		}
+	}
+
+	return buf
 }

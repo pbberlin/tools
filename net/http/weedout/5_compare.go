@@ -2,7 +2,6 @@ package weedout
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/text/levenshtein"
@@ -105,12 +104,14 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree) 
 				appliedLevenshtein++
 			}
 
-			if relDist < 0.3 && relDist > 0.0 {
-				fmt.Printf("%v %14v %4v %5.2v %s %s\n", src.SourceID, tt.Outline, absDist, relDist,
-					stringspb.ToLen(string(src.Text), 30),
-					stringspb.ToLen(string(tt.Text), 30),
-				)
-			}
+			// if relDist < 0.4 && relDist > 0.0 {
+			// 	s1 := string(src.Text)
+			// 	s2 := string(tt.Text)
+			// 	fmt.Printf("%v %14v %4v %5.2v %s %s\n", src.SourceID, tt.Outline, absDist, relDist,
+			// 		stringspb.ToLen(s1, 34),
+			// 		stringspb.ToLen(s2, 34),
+			// 	)
+			// }
 
 			//
 			if relDist < 0.26 && absDist < 10 {

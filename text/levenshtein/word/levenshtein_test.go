@@ -51,20 +51,28 @@ var testCasesMoved = []TestCase{
 
 	{"Ich ging im Walde so vor mich hin",
 		"so vor mich hin im Walde Ich ging", []int{8, 8}},
+
+	{"Ich ging im Walde so vor mich hin",
+		"Ich ging im Forst so vor mich her", []int{4, 228}},
+
+	{"Ich ging im Walde so vor mich hin",
+		"Ich ging im Walde so vor mich her hin", []int{1, 228}},
 }
 
 func TestLevenshteinA(t *testing.T) {
 
-	cases := &testCasesBasic
-	cases = &testCasesAdv1
-	cases = &testCasesMoved
+	cases := testCasesBasic
+	cases = append(cases, testCasesAdv1...)
+	cases = append(cases, testCasesMoved...)
+	// cases = testCasesMoved[3:4]
 
 	{
-		inner(t, cases, 0, ls_core.DefaultOptions, false)
-		opt2 := ls_core.DefaultOptions
-		opt2.SubCost = 1
-		inner(t, cases, 1, opt2, false)
-		inner(t, cases, 1, opt2, true)
+		inner(t, &cases, 0, ls_core.DefaultOptions, false)
+
+		// opt2 := ls_core.DefaultOptions
+		// opt2.SubCost = 1
+		// inner(t, &cases, 1, opt2, false)
+		// inner(t, &cases, 1, opt2, true)
 	}
 
 }
@@ -74,14 +82,16 @@ func inner(t *testing.T, cases *[]TestCase, wantIdx int, opt ls_core.Options, so
 	for i, tc := range *cases {
 
 		m := ls_core.New(WrapAsEqualer(tc.src, sortIt), WrapAsEqualer(tc.dst, sortIt), opt)
-		got := m.Distance()
+		got, relDist := m.Distance()
+		_ = relDist
+		// fmt.Printf("%v %v\n", got, relDist)
 
 		ssrc := fmt.Sprintf("%v", tc.src)
 		sdst := fmt.Sprintf("%v", tc.dst)
 		if got != tc.distances[wantIdx] {
 			t.Logf(
-				"%2v: Distance between %20v and %20v should be %v - but got %v ",
-				i, stringspb.Ellipsoider(ssrc, 8), stringspb.Ellipsoider(sdst, 8), tc.distances[wantIdx], got)
+				"%2v: Distance between %20v and %20v should be %v - but got %v (sorted %v)",
+				i, stringspb.Ellipsoider(ssrc, 8), stringspb.Ellipsoider(sdst, 8), tc.distances[wantIdx], got, sortIt)
 			t.Fail()
 		}
 

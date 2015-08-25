@@ -166,5 +166,7 @@ func sortCompact(text []byte) (buf []byte, numTokens int) {
 		}
 	}
 
+	buf = bytes.TrimSpace(buf)
+
 	return
 }

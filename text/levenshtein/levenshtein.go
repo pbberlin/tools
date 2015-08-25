@@ -104,17 +104,39 @@ func min(a int, b int) int {
 
 // Distance returns levenshtein edit distance for the two slices of tokens of m.
 func (m *Matrix) Distance() (int, float64) {
+
 	dist := m.mx[len(m.mx)-1][len(m.mx[0])-1]
 
 	relDist := 0.0
 
 	ls1, ls2 := len(m.mx), len(m.mx[0])
+
+	// First relDist computation:
+	// 		1.) compensated for the size
+	// 		2.) related to the smaller slice
+	// Can lead to Zero, when diff == dist
 	diff := util.Abs(ls1 - ls2)
 	if ls1 >= ls2 { // row > col
 		relDist = float64(dist-diff) / float64(ls2)
 	} else {
 		relDist = float64(dist-diff) / float64(ls1)
 	}
+
+	// Second relDist: Simply related to the larger slice.
+	// Also account for ls1 and ls2 being one larger than the practical number of tokens.
+	divisor := float64(ls1)
+	if ls2 > ls1 { // row > col
+		divisor = float64(ls2)
+	}
+	divisor--
+	if divisor == 0.0 {
+		divisor = 1.0
+	}
+	relDist = float64(dist) / divisor
+	if relDist == 0.25 {
+		fmt.Printf("dist %v - ls1 %v - relDist %5.2v\n", dist, divisor, relDist)
+	}
+
 	return dist, relDist
 }
 

@@ -10,6 +10,7 @@ type TextifiedTree struct {
 	Lvl       int
 	Outline   string
 	NumTokens int
+	Histo     map[string]int
 	Text      []byte
 
 	Similars          []Similar

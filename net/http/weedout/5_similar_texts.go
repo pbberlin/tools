@@ -2,8 +2,10 @@ package weedout
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 
+	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/text/levenshtein"
 	"github.com/pbberlin/tools/text/levenshtein/wordb"
@@ -19,6 +21,7 @@ const excerptLen = 20
 
 var appliedLevenshtein = 0
 var appliedCompare = 0
+var breakMapsTooDistinct = 0
 
 func similarTextifiedTrees(mp map[string][]*TextifiedTree, skipPrefix map[string]bool, onlyKeys map[string]bool) []TextifiedTree {
 
@@ -100,6 +103,11 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree, 
 				continue
 			}
 
+			if HistoBasedDistance(src, tt) > 0.51 {
+				breakMapsTooDistinct++
+				continue
+			}
+
 			relSize := srcLen / float64(util.Max(1, len(tt.Text)))
 			if relSize < 0.33 || relSize > 3 {
 				continue
@@ -118,15 +126,6 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree, 
 				absDist, relDist = m.Distance()
 				appliedLevenshtein++
 			}
-
-			// if relDist < 0.4 && relDist > 0.0 {
-			// 	s1 := string(src.Text)
-			// 	s2 := string(tt.Text)
-			// 	fmt.Printf("%v %14v %4v %5.2v %s %s\n", src.SourceID, tt.Outline, absDist, relDist,
-			// 		stringspb.ToLen(s1, 34),
-			// 		stringspb.ToLen(s2, 34),
-			// 	)
-			// }
 
 			//
 			if relDist < 0.26 && absDist < 10 {
@@ -168,4 +167,80 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree, 
 		}
 	}
 
+}
+
+func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
+
+	// bfrags := stringspb.IndentedDumpBytes(frags)
+	b := new(bytes.Buffer)
+	for _, v := range frags {
+		b.WriteString(fmt.Sprintf("%v %2v ", v.SourceID, v.Lvl))
+		b.WriteString(fmt.Sprintf("%-8v             ", v.Outline))
+		b.Write(v.Text)
+		b.WriteString("\n")
+		for _, v1 := range v.Similars {
+			b.WriteString(fmt.Sprintf("%v %2v ", v1.SourceID, v1.Lvl))
+			b.WriteString(fmt.Sprintf("%-8v    ", string(v1.Outline)))
+			b.WriteString(spf("%2v ", v1.AbsLevenshtein))
+			b.WriteString(spf("%-5.2v ", v1.RelLevenshtein))
+			b.Write(v1.Text)
+			b.WriteByte(10)
+		}
+		b.WriteByte(10)
+	}
+	osutilpb.Bytes2File(spf("%v/outp_frags_st%v.txt", logdir, stage), b.Bytes())
+
+}
+
+// HistoBasedDistance isa cheap alternative to Levenshtein.distance.
+// Particularly, since we compute the histogram anyway.
+// Tests show, that LevenshteinDistance > HistoBasedDistance
+// i.e.             0.36                  0.31
+// i.e.             0.6                   0.4
+// Thus we can break early if i.e. HistoBasedDistance > 0.5
+// implying that LevenshteinDistance is at least >= 0.5
+func HistoBasedDistance(src, dst *TextifiedTree) float64 {
+
+	largerOuter := src
+	inner := dst
+	if src.NumTokens < dst.NumTokens {
+		largerOuter = dst
+		inner = src
+	}
+
+	// Handle division by zero
+	if largerOuter.NumTokens == 0 {
+		return 0.0
+	}
+
+	// inner overlap
+	same := 0
+	for k, _ := range largerOuter.Histo {
+		if _, ok := inner.Histo[k]; ok {
+			same++
+		}
+	}
+
+	distinctBySheerSize := largerOuter.NumTokens - inner.NumTokens
+	distinctInner := inner.NumTokens - same
+
+	ret := float64(distinctBySheerSize+distinctInner) / float64(largerOuter.NumTokens)
+
+	// crit1 := inner.NumTokens > 5 && distinctBySheerSize < 5 && distinctInner < 5
+	// _ = crit1
+	// if ret > 0 && ret < 0.51 {
+	// 	fmt.Printf("%3v %3v ; sizediff %3v worddiff %3v =>  %4.2v\n", largerOuter.NumTokens, inner.NumTokens,
+	// 		distinctBySheerSize, distinctInner, ret)
+	// }
+
+	return ret
+}
+
+// slow - only for debug
+func mpKeys(mp map[string]int) string {
+	ret := ""
+	for k, _ := range mp {
+		ret += k + " "
+	}
+	return ret
 }

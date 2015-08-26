@@ -54,12 +54,13 @@ func textExtract(n *html.Node, fnKey string, lvl int, mp []*TextifiedTree) ([]by
 	if lvl > cScaffoldLvls && (len(cs) > 0 || len(cc) > 0) && n.Type != html.TextNode {
 		csCc := append(cs, cc...)
 		ol := attrX(n.Attr, "ol")
-		compacted, numTokens := sortCompact(csCc)
+		compacted, histo, numTokens := sortCompact(csCc)
 		tt := &TextifiedTree{}
 		tt.SourceID = fnKey
 		tt.Lvl = lvl - cScaffoldLvls
 		tt.Outline = ol
 		tt.NumTokens = numTokens
+		tt.Histo = histo
 		tt.Text = compacted
 		mp = append(mp, tt)
 	}

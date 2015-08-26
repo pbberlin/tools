@@ -5,7 +5,6 @@ package weedout
 
 import (
 	"bytes"
-	"fmt"
 	"os"
 	"path"
 	"testing"
@@ -238,13 +237,13 @@ func Test1(t *testing.T) {
 
 	osutilpb.Dom2File(fNamer()+".html", doc)
 
-	pf("Applied Levensthein %v - SimpleCompare %v\n", appliedLevenshtein, appliedCompare)
+	pf("MapSimiliarCompares: %v SimpleCompares: %v LevenstheinComp: %v\n", breakMapsTooDistinct, appliedLevenshtein, appliedCompare)
 	pf("correct finish\n")
 
 }
 
-func weedoutFilename(articleId, weedoutStage int) (string, string) {
-	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
-	prefix := fmt.Sprintf("outp_%03v", articleId)
-	return stagedFn, prefix
-}
+// func weedoutFilename(articleId, weedoutStage int) (string, string) {
+// 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
+// 	prefix := fmt.Sprintf("outp_%03v", articleId)
+// 	return stagedFn, prefix
+// }

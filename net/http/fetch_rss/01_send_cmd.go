@@ -16,9 +16,10 @@ import (
 // FetchCommand contains a RSS location
 // and details which items we want to fetch from it.
 type FetchCommand struct {
-	Host                 string   // www.handelsblatt.com,
-	RssXMLURI            string   // /contentexport/feed/schlagzeilen,
-	SearchPrefixs        []string // /politik/international/aa/bb,
+	Host          string   // www.handelsblatt.com,
+	SearchPrefixs []string // /politik/international/aa/bb,
+
+	RssXMLURI            map[string]string // SearchPrefix => RSS-URLs
 	DesiredNumber        int
 	CondenseTrailingDirs int // The last one or two directories might be article titles or ids
 	DepthTolerance       int
@@ -27,15 +28,68 @@ type FetchCommand struct {
 var testCommands = []FetchCommand{
 	FetchCommand{
 		Host:          "www.handelsblatt.com",
-		RssXMLURI:     "/contentexport/feed/schlagzeilen",
 		SearchPrefixs: []string{"/politik/international/aa/bb", "/politik/deutschland/aa/bb"},
 	},
 	FetchCommand{
 		Host:          "www.economist.com",
-		RssXMLURI:     "/sections/europe/rss.xml",
 		SearchPrefixs: []string{"/news/europe/aa"},
 	},
 }
+
+// ConfigDefaults are default values for FetchCommands
+var ConfigDefaults = map[string]FetchCommand{
+	"unspecified": FetchCommand{
+		RssXMLURI:            map[string]string{},
+		CondenseTrailingDirs: 0,
+		DepthTolerance:       0,
+		DesiredNumber:        5,
+	},
+	"www.handelsblatt.com": FetchCommand{
+		RssXMLURI: map[string]string{
+			"":                       "/contentexport/feed/schlagzeilen",
+			"/politik":               "/contentexport/feed/schlagzeilen",
+			"/politik/international": "/contentexport/feed/schlagzeilen",
+			"/politik/deutschland":   "/contentexport/feed/schlagzeilen",
+		},
+		CondenseTrailingDirs: 2,
+		DepthTolerance:       1,
+		DesiredNumber:        5,
+	},
+	"www.economist.com": FetchCommand{
+		RssXMLURI: map[string]string{
+			"/news/europe":               "/sections/europe/rss.xml",
+			"/news/business-and-finance": "/sections/business-finance/rss.xml",
+		},
+		CondenseTrailingDirs: 0,
+		DepthTolerance:       2,
+		DesiredNumber:        5,
+	},
+	"www.welt.de": FetchCommand{
+		RssXMLURI: map[string]string{
+			"/wirtschaft/deutschland":   "/wirtschaft/?service=Rss",
+			"/wirtschaft/international": "/wirtschaft/?service=Rss",
+		},
+
+		CondenseTrailingDirs: 2,
+		DepthTolerance:       0,
+		DesiredNumber:        5,
+	},
+}
+
+/*
+
+[{ 	'Host':           'www.handelsblatt.com',
+ 	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
+ 	'SearchPrefixs':  [ '/politik/international', '/politik/deutschland' ]
+}]
+
+
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
+
+
+*/
 
 // Submit test commands internally, without http request.
 func staticFetchDirect(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

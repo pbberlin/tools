@@ -5,6 +5,7 @@ package fetch_rss
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -52,7 +53,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	// We do it before the timouts of the pipeline stages are set off.
 	lg(" ")
 	lg(config.Host)
-	rssUrl := path.Join(config.Host, config.RssXMLURI)
+	rssUrl := path.Join(config.Host, selectRSS(config))
 	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 
 	//
@@ -284,6 +285,44 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 		if nFound >= nWant {
 			break
 		}
+	}
+
+	return
+}
+
+func selectRSS(c FetchCommand) (ret string) {
+
+	for k, v := range c.RssXMLURI {
+		fmt.Printf("   rss:  %20v %20v \n", k, v)
+
+	}
+
+	cntr := 0
+MarkX:
+	for _, sp := range c.SearchPrefixs {
+		for {
+
+			fmt.Printf("search pref %v \n", sp)
+
+			if rss, ok := c.RssXMLURI[sp]; ok {
+				ret = rss
+				fmt.Printf("found ret %v for %v\n", ret, rss)
+				break MarkX
+
+			}
+
+			spPrev := sp
+			sp = path.Dir(sp)
+			if sp == "/" && spPrev == "/" {
+				break
+			}
+			cntr++
+			if cntr > 10 {
+				break
+			}
+
+		}
+
 	}
 
 	return

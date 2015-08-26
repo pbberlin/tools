@@ -14,45 +14,6 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-// ConfigDefaults are default values for FetchCommands
-var ConfigDefaults = map[string]FetchCommand{
-	"unspecified": FetchCommand{
-		CondenseTrailingDirs: 0,
-		DepthTolerance:       0,
-		DesiredNumber:        5,
-	},
-	"www.handelsblatt.com": FetchCommand{
-		CondenseTrailingDirs: 2,
-		DepthTolerance:       1,
-		DesiredNumber:        5,
-	},
-	"www.economist.com": FetchCommand{
-		CondenseTrailingDirs: 0,
-		DepthTolerance:       2,
-		DesiredNumber:        5,
-	},
-	"www.welt.de": FetchCommand{
-		CondenseTrailingDirs: 2,
-		DepthTolerance:       0,
-		DesiredNumber:        5,
-	},
-}
-
-/*
-
-[{ 	'Host':           'www.handelsblatt.com',
- 	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
- 	'SearchPrefixs':  [ '/politik/international', '/politik/deutschland' ]
-}]
-
-
-curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
-
-
-*/
-
 // fetchCommandReceiver takes http post requests, extracts the JSON commands
 // and submits them to FetchHTML
 func fetchCommandReceiver(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -152,6 +113,10 @@ func addDefaults(in FetchCommand) FetchCommand {
 	in.CondenseTrailingDirs = preset.CondenseTrailingDirs
 	if in.DesiredNumber == 0 {
 		in.DesiredNumber = preset.DesiredNumber
+	}
+
+	if in.RssXMLURI == nil || len(in.RssXMLURI) == 0 {
+		in.RssXMLURI = preset.RssXMLURI
 	}
 
 	return in

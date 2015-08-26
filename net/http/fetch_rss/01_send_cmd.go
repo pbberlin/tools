@@ -16,8 +16,8 @@ import (
 // FetchCommand contains a RSS location
 // and details which items we want to fetch from it.
 type FetchCommand struct {
-	Host          string   // www.handelsblatt.com,
-	SearchPrefixs []string // /politik/international/aa/bb,
+	Host         string // www.handelsblatt.com,
+	SearchPrefix string // /politik/international/aa/bb,
 
 	RssXMLURI            map[string]string // SearchPrefix => RSS-URLs
 	DesiredNumber        int
@@ -27,12 +27,16 @@ type FetchCommand struct {
 
 var testCommands = []FetchCommand{
 	FetchCommand{
-		Host:          "www.handelsblatt.com",
-		SearchPrefixs: []string{"/politik/international/aa/bb", "/politik/deutschland/aa/bb"},
+		Host:         "www.handelsblatt.com",
+		SearchPrefix: "/politik/deutschland/aa/bb",
 	},
 	FetchCommand{
-		Host:          "www.economist.com",
-		SearchPrefixs: []string{"/news/europe/aa"},
+		Host:         "www.handelsblatt.com",
+		SearchPrefix: "/politik/international/aa/bb",
+	},
+	FetchCommand{
+		Host:         "www.economist.com",
+		SearchPrefix: "/news/europe/aa",
 	},
 }
 
@@ -80,13 +84,16 @@ var ConfigDefaults = map[string]FetchCommand{
 
 [{ 	'Host':           'www.handelsblatt.com',
  	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
- 	'SearchPrefixs':  [ '/politik/international', '/politik/deutschland' ]
+ 	'SearchPrefix':   '/politik/international',
 }]
 
 
-curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\" }] "  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\", 	\"RssXMLURI\": \"/contentexport/feed/schlagzeilen\", \"SearchPrefixs\": [ \"/politik/international\", \"/politik/deutschland\" ] }]"  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefixs\": [ \"/wirtschaft/deutschland\", \"/wirtschaft/international\" ] }]" localhost:8085/fetch/command-receive
+
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\",  \"SearchPrefix\":  \"/politik/deutschland\"     }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.welt.de\"         ,  \"SearchPrefix\":  \"/wirtschaft/deutschland\"  }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.economist.com\"   ,  \"SearchPrefix\":  \"/news/business-and-finance\"    }]"  localhost:8085/fetch/command-receive
+
+        curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefix\": \"/wirtschaft/deutschland\"  }]" localhost:8085/fetch/command-receive
 
 
 */

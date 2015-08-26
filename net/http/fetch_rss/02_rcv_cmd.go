@@ -90,34 +90,9 @@ func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 	lge(err)
 
 	for _, config := range fcs {
-		config = addDefaults(config)
 		Fetch(w, r, fs, config)
 	}
 
 	lg("fetching complete")
 
-}
-
-func addDefaults(in FetchCommand) FetchCommand {
-
-	var preset FetchCommand
-
-	h := in.Host
-	if exactPreset, ok := ConfigDefaults[h]; ok {
-		preset = exactPreset
-	} else {
-		preset = ConfigDefaults["unspecified"]
-	}
-
-	in.DepthTolerance = preset.DepthTolerance
-	in.CondenseTrailingDirs = preset.CondenseTrailingDirs
-	if in.DesiredNumber == 0 {
-		in.DesiredNumber = preset.DesiredNumber
-	}
-
-	if in.RssXMLURI == nil || len(in.RssXMLURI) == 0 {
-		in.RssXMLURI = preset.RssXMLURI
-	}
-
-	return in
 }

@@ -5,7 +5,6 @@ package fetch_rss
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -49,11 +48,14 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	config = addDefaults(w, r, config)
+
 	// Fetching the rssXML takes time.
 	// We do it before the timouts of the pipeline stages are set off.
 	lg(" ")
 	lg(config.Host)
-	rssUrl := path.Join(config.Host, selectRSS(config))
+	// lg(stringspb.IndentedDump(config))
+	rssUrl := path.Join(config.Host, selectRSS(w, r, config))
 	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 
 	//
@@ -135,30 +137,30 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	//
 	//
 	// loading stage 1
-	for _, uriPrefix := range config.SearchPrefixs {
-		found := 0
-		uriPrefixExcl := "impossible"
-		for i := 0; i < 15; i++ {
-			lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, config.DesiredNumber)
-			found += stuffStage1(w, r, config, inn, fin, &rssDoc,
-				uriPrefix, uriPrefixExcl, config.DesiredNumber-found)
+	uriPrefix := config.SearchPrefix
+	found := 0
+	uriPrefixExcl := "impossible"
+	for i := 0; i < 15; i++ {
+		lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, config.DesiredNumber)
+		found += stuffStage1(w, r, config, inn, fin, &rssDoc,
+			uriPrefix, uriPrefixExcl, config.DesiredNumber-found)
 
-			if found >= config.DesiredNumber {
-				break
-			}
-
-			if uriPrefix == "/" {
-				lg("  root exhausted")
-				break
-			}
-
-			newPrefix := path.Dir(uriPrefix)
-			uriPrefixExcl = uriPrefix
-			uriPrefix = newPrefix
+		if found >= config.DesiredNumber {
+			break
 		}
-		lg("  found %v of %v", found, config.DesiredNumber)
-	}
 
+		if uriPrefix == "/" {
+			lg("  root exhausted")
+			break
+		}
+
+		newPrefix := path.Dir(uriPrefix)
+		uriPrefixExcl = uriPrefix
+		uriPrefix = newPrefix
+	}
+	lg("  found %v of %v", found, config.DesiredNumber)
+
+	//
 	lg("stage3Wait.Wait() before")
 	stage3Wait.Wait()
 	lg("stage3Wait.Wait() after")
@@ -290,39 +292,66 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	return
 }
 
-func selectRSS(c FetchCommand) (ret string) {
+func addDefaults(w http.ResponseWriter, r *http.Request, in FetchCommand) FetchCommand {
 
-	for k, v := range c.RssXMLURI {
-		fmt.Printf("   rss:  %20v %20v \n", k, v)
+	lg, lge := loghttp.Logger(w, r)
+	_, _ = lg, lge
 
+	var preset FetchCommand
+
+	h := in.Host
+	if exactPreset, ok := ConfigDefaults[h]; ok {
+		preset = exactPreset
+	} else {
+		preset = ConfigDefaults["unspecified"]
 	}
 
+	in.DepthTolerance = preset.DepthTolerance
+	in.CondenseTrailingDirs = preset.CondenseTrailingDirs
+	if in.DesiredNumber == 0 {
+		in.DesiredNumber = preset.DesiredNumber
+	}
+
+	if in.RssXMLURI == nil || len(in.RssXMLURI) == 0 {
+		in.RssXMLURI = preset.RssXMLURI
+	}
+
+	return in
+}
+
+func selectRSS(w http.ResponseWriter, r *http.Request, c FetchCommand) (ret string) {
+
+	lg, lge := loghttp.Logger(w, r)
+	_, _ = lg, lge
+
 	cntr := 0
+	sp := c.SearchPrefix
+
 MarkX:
-	for _, sp := range c.SearchPrefixs {
-		for {
+	for {
 
-			fmt.Printf("search pref %v \n", sp)
+		// lg("search pref %v", sp)
 
-			if rss, ok := c.RssXMLURI[sp]; ok {
-				ret = rss
-				fmt.Printf("found ret %v for %v\n", ret, rss)
-				break MarkX
-
-			}
-
-			spPrev := sp
-			sp = path.Dir(sp)
-			if sp == "/" && spPrev == "/" {
-				break
-			}
-			cntr++
-			if cntr > 10 {
-				break
-			}
+		if rss, ok := c.RssXMLURI[sp]; ok {
+			ret = rss
+			lg("found rss url %v for %v", ret, sp)
+			break MarkX
 
 		}
 
+		spPrev := sp
+		sp = path.Dir(sp)
+		if sp == "/" && spPrev == "/" ||
+			sp == "." && spPrev == "." {
+			lg("Did not find a RSS URL for %v", c.SearchPrefix)
+			break
+		}
+
+		cntr++
+		if cntr > 20 {
+			lg("Select RSS Loop did not terminate. %v", c.SearchPrefix)
+			break
+		}
 	}
 
 	return

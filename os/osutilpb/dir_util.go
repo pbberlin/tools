@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 )
 
 //  for tests, this is something like
@@ -59,4 +61,30 @@ func GetFilesByExtension(dir, dotExtension string, verbose bool) []string {
 	}
 
 	return ret
+}
+
+// PathDirReverse is the opposite of path.Dir(filepath)
+// It returns the *first* dir of filepath; not the last
+func PathDirReverse(filepath string) (dir, remainder string) {
+
+	filepath = strings.Replace(filepath, "\\", "/", -1)
+
+	filepath = path.Join(filepath, "")
+
+	if filepath == "/" || filepath == "" {
+		return "/", ""
+	}
+
+	filepath = strings.TrimPrefix(filepath, "/")
+
+	dirs := strings.Split(filepath, "/")
+
+	if len(dirs) == 1 {
+		return "/" + dirs[0], ""
+	} else {
+		return "/" + dirs[0], "/" + strings.Join(dirs[1:], "/")
+	}
+
+	return
+
 }

@@ -55,7 +55,15 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	lg(" ")
 	lg(config.Host)
 	// lg(stringspb.IndentedDump(config))
-	rssUrl := path.Join(config.Host, selectRSS(w, r, config))
+	rssUrl := selectRSS(w, r, config)
+
+	if rssUrl == "" {
+		crawl(w, r, config)
+		return
+	}
+
+	rssUrl = path.Join(config.Host, rssUrl)
+
 	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
 
 	//
@@ -285,71 +293,6 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 
 		nFound++
 		if nFound >= nWant {
-			break
-		}
-	}
-
-	return
-}
-
-func addDefaults(w http.ResponseWriter, r *http.Request, in FetchCommand) FetchCommand {
-
-	lg, lge := loghttp.Logger(w, r)
-	_, _ = lg, lge
-
-	var preset FetchCommand
-
-	h := in.Host
-	if exactPreset, ok := ConfigDefaults[h]; ok {
-		preset = exactPreset
-	} else {
-		preset = ConfigDefaults["unspecified"]
-	}
-
-	in.DepthTolerance = preset.DepthTolerance
-	in.CondenseTrailingDirs = preset.CondenseTrailingDirs
-	if in.DesiredNumber == 0 {
-		in.DesiredNumber = preset.DesiredNumber
-	}
-
-	if in.RssXMLURI == nil || len(in.RssXMLURI) == 0 {
-		in.RssXMLURI = preset.RssXMLURI
-	}
-
-	return in
-}
-
-func selectRSS(w http.ResponseWriter, r *http.Request, c FetchCommand) (ret string) {
-
-	lg, lge := loghttp.Logger(w, r)
-	_, _ = lg, lge
-
-	cntr := 0
-	sp := c.SearchPrefix
-
-MarkX:
-	for {
-
-		// lg("search pref %v", sp)
-
-		if rss, ok := c.RssXMLURI[sp]; ok {
-			ret = rss
-			lg("found rss url %v for %v", ret, sp)
-			break MarkX
-
-		}
-
-		spPrev := sp
-		sp = path.Dir(sp)
-		if sp == "/" && spPrev == "/" ||
-			sp == "." && spPrev == "." {
-			lg("Did not find a RSS URL for %v", c.SearchPrefix)
-			break
-		}
-
-		cntr++
-		if cntr > 20 {
-			lg("Select RSS Loop did not terminate. %v", c.SearchPrefix)
 			break
 		}
 	}

@@ -32,7 +32,7 @@ func Test(t *testing.T) {
 				// fmt.Printf("fine - found %q as expected\n", got)
 			} else {
 				fmt.Println("ERROR", msg)
-				t.Error("got %q - want %q", got, v.Want[i1])
+				t.Errorf("got %q - want %q", got, v.Want[i1])
 			}
 
 		}

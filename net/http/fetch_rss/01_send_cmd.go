@@ -50,7 +50,7 @@ var ConfigDefaults = map[string]FetchCommand{
 	},
 	"www.handelsblatt.com": FetchCommand{
 		RssXMLURI: map[string]string{
-			"":                       "/contentexport/feed/schlagzeilen",
+			"/":                      "/contentexport/feed/schlagzeilen",
 			"/politik":               "/contentexport/feed/schlagzeilen",
 			"/politik/international": "/contentexport/feed/schlagzeilen",
 			"/politik/deutschland":   "/contentexport/feed/schlagzeilen",

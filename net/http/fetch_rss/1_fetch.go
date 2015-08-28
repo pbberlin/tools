@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -59,31 +61,32 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	}
 
 	// lg(stringspb.IndentedDump(config))
-
-	dirTree := &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+	var tzero time.Time
+	dirTree := &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: tzero}
 
 	fnDigest := path.Join(docRoot, config.Host, "digest2.json")
-	loadDigest(w, r, fs, fnDigest, dirTree)
+	loadDigest(w, r, fs, fnDigest, dirTree) // previous
 
-	rssUrl := matchingRSSURI(w, r, config)
-	if rssUrl == "" {
-		err := crawl(w, r, dirTree, fs, config)
-		lge(err)
-		if err != nil {
-			return
+	age := time.Now().Sub(dirTree.LastFound)
+	lg("DirTree is %5.2v hours old (%v)", age.Hours(), dirTree.LastFound.Format(time.ANSIC))
+	if age.Hours() > 0.001 {
+
+		rssUrl := matchingRSSURI(w, r, config)
+		if rssUrl == "" {
+			err := crawl(w, r, dirTree, fs, config)
+			lge(err)
+			if err != nil {
+				return
+			}
+		} else {
+			rssUrl = path.Join(config.Host, rssUrl)
+			rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
+			_ = rssUrlObj
+			rssDoc2DirTree(w, r, dirTree, rssDoc, config.Host)
 		}
+
+		saveDigest(w, r, fs, fnDigest, dirTree)
 	}
-
-	rssUrl = path.Join(config.Host, rssUrl)
-
-	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
-
-	rssDoc2DirTree(w, r, dirTree, rssDoc, config.Host)
-	// lg("dump %v", dirTree)
-
-	saveDigest(w, r, fs, fnDigest, dirTree)
-
-	return
 
 	//
 	//
@@ -169,8 +172,8 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	uriPrefixExcl := "impossible"
 	for i := 0; i < 15; i++ {
 		lg("  searching for prefix   %v    - excl %q    - %v of %v", uriPrefix, uriPrefixExcl, found, config.DesiredNumber)
-		found += stuffStage1(w, r, config, inn, fin, &rssDoc,
-			uriPrefix, uriPrefixExcl, config.DesiredNumber-found)
+		found += stuffStage1(w, r, config, inn, fin, dirTree,
+			uriPrefixExcl, uriPrefix, config.DesiredNumber-found)
 
 		if found >= config.DesiredNumber {
 			break
@@ -211,7 +214,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 	// Create dirs
 	for k, _ := range histoDir {
-		dir := path.Join(docRoot, rssUrlObj.Host, k)
+		dir := path.Join(docRoot, config.Host, k)
 		err := fs.MkdirAll(dir, 0755)
 		lge(err)
 		err = fs.Chtimes(dir, time.Now(), time.Now())
@@ -235,7 +238,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
 		lge(err)
-		fnDigest := path.Join(docRoot, rssUrlObj.Host, "digest.json")
+		fnDigest := path.Join(docRoot, config.Host, "digest.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
 		lge(err)
 	}
@@ -250,62 +253,172 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 // stuffStage1 ranges over the RSS entries and filters out unwanted directories.
 // Wanted urls are sent to the stage one channel.
 func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
-	inn chan *FullArticle, fin chan struct{}, rssDoc *RSS,
-	uriPrefixIncl, uriPrefixExcl string, nWant int) (nFound int) {
+	inn chan *FullArticle, fin chan struct{}, dirTree *DirTree,
+	uriPrefixExcl, uriPrefixIncl string, nWant int) (nFound int) {
 
 	lg, lge := loghttp.Logger(w, r)
+	_ = lge
 
 	depthPrefix := strings.Count(uriPrefixIncl, "/")
 	if uriPrefixIncl == "/" {
 		depthPrefix = 0
 	}
 
-	for i, lpItem := range rssDoc.Items.ItemList {
+	var rec1 func(rump string, d *DirTree)
 
-		u, err := url.Parse(lpItem.Link)
-		lge(err)
-		short := stringspb.Ellipsoider(u.Path, 50)
+	rec1 = func(rump string, d *DirTree) {
+		keys := make([]string, 0, len(d.Dirs))
+		for k, _ := range d.Dirs {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
+			indir := d.Dirs[key]
+			lpRump := rump + indir.Name
+			if len(indir.Dirs) == 0 {
 
-		t, err := time.Parse(time.RFC1123Z, lpItem.Published)
-		//     := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700", lpItem.Published)
-		lge(err)
+				if !checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
+					return
+				}
+				lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.ToLen(lpRump, 50))
+				art := FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound}
 
-		if strings.HasPrefix(u.RequestURI(), uriPrefixExcl) {
-			// lg("\t\tskipping %20v", short)
-			continue
+				select {
+				case inn <- &art:
+					// stage 1 loading
+				case <-fin:
+					lg("downstream stage has shut down, stop stuffing stage1")
+					return
+				}
+
+				nFound++
+				if nFound >= nWant {
+					return
+				}
+
+				// articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
+			} else {
+				rec1(lpRump, &indir)
+			}
+		}
+	}
+
+	var subtree *DirTree
+	subtree = dirTree
+	dir, remainder := uriPrefixIncl, ""
+	for {
+		dir, remainder = osutilpb.PathDirReverse(dir)
+		if newSubtr, ok := subtree.Dirs[dir]; ok {
+			subtree = &newSubtr
+		} else {
+			lg("    recursion for %v stopped at %v", uriPrefixIncl, subtree.Name)
+			subtree = nil
+			break
 		}
 
-		if !strings.HasPrefix(u.RequestURI(), uriPrefixIncl) {
-			// lg("\t\tskipping %20v", short)
-			continue
-		}
-
-		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
-		depthUri := strings.Count(semanticUri, "/")
-		if depthUri > depthPrefix+1+config.DepthTolerance {
-			lg("\t\tskipping too deep    %v of %v - %20v", depthUri, depthPrefix, semanticUri)
-			continue
-		}
-		if depthUri <= depthPrefix {
-			lg("\t\tskipping too shallow %v of %v - %20v", depthUri, depthPrefix, semanticUri)
-			continue
-		}
-
-		lg("    feed #%02v: %v - %v", i, t.Format("15:04:05"), short)
-
-		select {
-		case inn <- &FullArticle{Url: lpItem.Link, Mod: t}:
-			// stage 1 loading
-		case <-fin:
-			lg("downstream stage has shut down, stop stuffing stage1")
-			return
-		}
-
-		nFound++
-		if nFound >= nWant {
+		if remainder == "" {
 			break
 		}
 	}
 
+	if subtree != nil {
+		lg("    starting recursion for %v at %v", uriPrefixIncl, subtree.Name)
+		rec1("", subtree)
+	}
+
 	return
+
+	/*
+		//
+		//
+		//
+		//
+		articles := []FullArticle{}
+
+		var rec func(rump string, d *DirTree)
+
+		rec = func(rump string, d *DirTree) {
+			keys := make([]string, 0, len(d.Dirs))
+			for k, _ := range d.Dirs {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+			for _, key := range keys {
+				indir := d.Dirs[key]
+				// if !strings.HasPrefix(indir.Name, "/") {
+				// 	indir.Name = "/" + indir.Name
+				// }
+				lpRump := rump + indir.Name
+				if len(indir.Dirs) == 0 {
+					articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
+				} else {
+					rec(lpRump, &indir)
+				}
+			}
+		}
+		rec("", dirTree)
+
+		// for _, v := range articles {
+		// 	lg("%-55v %v", v.Url, v.Mod.Format(time.ANSIC))
+		// }
+
+		for i, art := range articles {
+
+			if !checkURL(w, r, art.Url, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
+				return
+			}
+
+			lg("    feed #%02v: %v - %v", i, art.Mod.Format("15:04:05"), stringspb.ToLen(art.Url, 50))
+
+			select {
+			case inn <- &art:
+				// stage 1 loading
+			case <-fin:
+				lg("downstream stage has shut down, stop stuffing stage1")
+				return
+			}
+
+			nFound++
+			if nFound >= nWant {
+				break
+			}
+		}
+
+		return
+
+	*/
+}
+
+func checkURL(w http.ResponseWriter, r *http.Request,
+	surl, uriPrefixExcl, uriPrefixIncl string, depthPrefix int, config FetchCommand) bool {
+
+	lg, lge := loghttp.Logger(w, r)
+	_ = lg
+
+	u, err := url.Parse(surl)
+	lge(err)
+	// short := stringspb.Ellipsoider(u.Path, 50)
+
+	if strings.HasPrefix(u.Path, uriPrefixExcl) {
+		// lg("\t\tskipping %20v", short)
+		return false
+	}
+
+	if !strings.HasPrefix(u.Path, uriPrefixIncl) {
+		// lg("\t\tskipping %20v", short)
+		return false
+	}
+
+	semanticUri := condenseTrailingDir(u.Path, config.CondenseTrailingDirs)
+	depthUri := strings.Count(semanticUri, "/")
+	if depthUri > depthPrefix+1+config.DepthTolerance {
+		// lg("\t\tskipping too deep    %v of %v - %20v", depthUri, depthPrefix, semanticUri)
+		return false
+	}
+	if depthUri <= depthPrefix {
+		// lg("\t\tskipping too shallow %v of %v - %20v", depthUri, depthPrefix, semanticUri)
+		return false
+	}
+
+	return true
 }

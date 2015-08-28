@@ -24,7 +24,7 @@ type DirTree struct {
 	// Fils []string
 }
 
-func DirTreeStr(buf *bytes.Buffer, d *DirTree, lvl int) {
+func dirTreeStrRec(buf *bytes.Buffer, d *DirTree, lvl int) {
 	ind2 := strings.Repeat("    ", lvl+1)
 	keys := make([]string, 0, len(d.Dirs))
 	for k, _ := range d.Dirs {
@@ -36,7 +36,7 @@ func DirTreeStr(buf *bytes.Buffer, d *DirTree, lvl int) {
 		indir := d.Dirs[key]
 		buf.WriteString(indir.Name)
 		buf.WriteByte(10)
-		DirTreeStr(buf, &indir, lvl+1)
+		dirTreeStrRec(buf, &indir, lvl+1)
 	}
 }
 
@@ -48,7 +48,7 @@ func (d DirTree) String() string {
 		buf.WriteString(" (nil)")
 	}
 	buf.WriteByte(10)
-	DirTreeStr(buf, &d, 0)
+	dirTreeStrRec(buf, &d, 0)
 	return buf.String()
 }
 
@@ -86,11 +86,14 @@ func loadDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 	_ = lg
 
 	bts, err := fs.ReadFile(fnDigest)
+
 	lge(err)
 	if err == nil {
 		err = json.Unmarshal(bts, &treeX)
 		lge(err)
 	}
+
+	lg("DirTree   %5.2vkB loaded for %v", len(bts)/1024, fnDigest)
 
 }
 
@@ -98,6 +101,8 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 
 	lg, lge := loghttp.Logger(w, r)
 	_ = lg
+
+	treeX.LastFound = time.Now()
 
 	b, err := json.MarshalIndent(treeX, "", "\t")
 	lge(err)

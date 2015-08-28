@@ -117,7 +117,7 @@ func rssXMLFile(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, rssUr
 	lge(err)
 	err = fs.WriteFile(path.Join(docRoot, rssUrlObj.Host, "outp_rss.xml"), bdmp, 0755)
 	lge(err)
-	lg("RSS resp size, outp_rss.xml, : %v", len(bdmp))
+	lg("RSS resp size %5.2vkB, saved to %v", len(bdmp)/1024, rssUrlObj.Host+"/outp_rss.xml")
 
 	return
 }

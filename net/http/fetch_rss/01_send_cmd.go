@@ -97,9 +97,12 @@ var ConfigDefaults = map[string]FetchCommand{
 
 
 
-curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\",  \"SearchPrefix\":  \"/politik/deutschland\"     }]"  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.welt.de\"         ,  \"SearchPrefix\":  \"/wirtschaft/deutschland\"  }]"  localhost:8085/fetch/command-receive
-curl -X POST -d "[{ \"Host\": \"www.economist.com\"   ,  \"SearchPrefix\":  \"/news/business-and-finance\"    }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.handelsblatt.com\",  \"SearchPrefix\":  \"/politik/deutschland\"         }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.welt.de\"         ,  \"SearchPrefix\":  \"/wirtschaft/deutschland\"      }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.economist.com\"   ,  \"SearchPrefix\":  \"/news/business-and-finance\"   }]"  localhost:8085/fetch/command-receive
+
+curl -X POST -d "[{ \"Host\": \"test.economist.com\"  ,  \"SearchPrefix\":  \"/news/business-and-finance\"   }]"  localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"test.economist.com\"  ,  \"SearchPrefix\":  \"/\"                            }]"  localhost:8085/fetch/command-receive
 
         curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefix\": \"/wirtschaft/deutschland\"  }]" localhost:8085/fetch/command-receive
 

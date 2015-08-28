@@ -54,22 +54,36 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	// We do it before the timouts of the pipeline stages are set off.
 	lg(" ")
 	lg(config.Host)
-	// lg(stringspb.IndentedDump(config))
-	rssUrl := matchingRSSURI(w, r, config)
+	if config.Host == "test.economist.com" {
+		switchTData(w, r)
+	}
 
+	// lg(stringspb.IndentedDump(config))
+
+	dirTree := &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+
+	fnDigest := path.Join(docRoot, config.Host, "digest2.json")
+	loadDigest(w, r, fs, fnDigest, dirTree)
+
+	rssUrl := matchingRSSURI(w, r, config)
 	if rssUrl == "" {
-		dwf, err := crawl(w, r, fs, config)
+		err := crawl(w, r, dirTree, fs, config)
 		lge(err)
 		if err != nil {
 			return
 		}
-		_ = dwf
-		return
 	}
 
 	rssUrl = path.Join(config.Host, rssUrl)
 
 	rssDoc, rssUrlObj := rssXMLFile(w, r, fs, rssUrl)
+
+	rssDoc2DirTree(w, r, dirTree, rssDoc, config.Host)
+	// lg("dump %v", dirTree)
+
+	saveDigest(w, r, fs, fnDigest, dirTree)
+
+	return
 
 	//
 	//

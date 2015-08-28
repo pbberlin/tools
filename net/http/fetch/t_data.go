@@ -2,6 +2,155 @@ package fetch
 
 var TestData = map[string][]byte{
 	"test.economist.com/someurl": []byte("requesting test.economist.com/someurl will yield this content"),
+
+	"test.economist.com/sections/business-finance/rss.xml": []byte(`<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xml:base="http://test.economist.com/sections/business-finance/rss.xml"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+ <title>Business and finance</title>
+ <link>http://test.economist.com/sections/business-finance/rss.xml</link>
+ <description></description>
+ <language>en</language>
+ <image> <url>http://cdn.static-economist.com/sites/default/files/economist_logo_gn.png</url>
+ <title>The Economist online</title>
+ <link>http://test.economist.com</link>
+</image>
+<item>
+ <title><![CDATA[Tinkering around the edges]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662584-ukraines-deal-its-creditors-less-impressive-it-appears-tinkering?fsrc=rss</link>
+ <description><![CDATA[<div class="esi-generated pullquote"><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p></div><p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/2015/08/articles/main/20150829_fnp501.jpg" alt="" title=""  width="595" height="335" /></div></p><p>AT FIRST sight, it was a triumph. After months of negotiations Ukraine and a committee of its creditors (which include Franklin Templeton, an American investment house and BTG Pactual, a Brazilian one) reached a deal this week to restructure the country’s international bonds, as well as a smattering of other sorts of debt, worth about $18 billion. Payments have been pushed back, meaning that the government will not need to cough up any principal or interest on the debts in question until 2019. The principal on the bonds will also be cut by 20% on average.</p><p><div class="content-image-float-290 retina-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/original-size/images/print-edition/20150829_FNC579.png" alt="" title=""  width="580" height="634" /></div></p><p>This is a better deal for Ukraine than many were expecting. It is rare for a country to get a haircut on its debts without also defaulting (one exception is Greece). When the negotiations began, the creditors had refused even to consider writing off any of the country’s...<a href="http://test.economist.com/news/finance-and-economics/21662584-ukraines-deal-its-creditors-less-impressive-it-appears-tinkering?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662584-ukraines-deal-its-creditors-less-impressive-it-appears-tinkering#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 10:49:10 +0000</pubDate>
+ <guid isPermaLink="false">21662584 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Controversial hybrids]]></title>
+ <link>http://test.economist.com/news/business-and-finance/21662355-monsanto-reportedly-raises-its-bid-syngenta-antitrust-regulators-may-take-some?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/2015/08/articles/main/20150829_wbp003.jpg" alt="" title=""  width="595" height="335" /><span class="caption">Roundup Ready—but so are some weeds</span></div></p><p>SIX companies dominate the business of farm supplies. The interest of Monsanto, the world’s biggest seed producer, in buying Syngenta, the largest agrochemicals firm, had threatened to whittle them down to five. That raised worries about whether the reduction in competition would mean less innovation—and thus slower improvements in crop yields—as well as higher costs for farmers.</p><p>However, Syngenta played hard to get. It rebuffed a bid of $45 billion in June. And another, made on August 18th, worth around $47 billion. So, on August 26th, Monsanto walked away. But consolidation of the industry may be in prospect anyway. The takeover battle stimulated the interest of other big agricultural suppliers: BASF, another of the big six, had reportedly sought financing to make a rival offer for Syngenta. And Monsanto itself may not be done. Next year the firm may set its sights on another target, reckons John Klein, an analyst at Berenberg, a bank.</p><p></p><p>Two decades ago the industry was far more fragmented. In 1994 the top four companies in the worldwide market for seeds and crop...<a href="http://test.economist.com/news/business-and-finance/21662355-monsanto-reportedly-raises-its-bid-syngenta-antitrust-regulators-may-take-some?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/business-and-finance/21662355-monsanto-reportedly-raises-its-bid-syngenta-antitrust-regulators-may-take-some#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/web-sections/business">Business</category>
+ <category domain="http://test.economist.com/category/print-sections/business">Business</category>
+ <pubDate>Tue, 25 Aug 2015 15:30:35 +0000</pubDate>
+ <guid isPermaLink="false">21662355 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[What the super-rich expect on holiday]]></title>
+ <link>http://test.economist.com/blogs/oliver/2015/08/luxury-travel?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/2015/08/blogs/oliver/20150829_wbp503.jpg" alt="" title=""  width="595" height="335" /></div></p><p>GULLIVER interviewed Kevin Johnson as research for a <a href="http://test.economist.com/news/international/21662558-way-rich-travel-changing-place-lay-your-bread">piece on luxury travel</a> in the print edition this week. Mr Johnson worked as a chief-of-staff and a palace manager for various heads of state, Russian billionaires and royal families. Part of his job was to oversee the travel arrangements of his super-wealthy employers. There wasn’t space to include many of his anecdotes in the print article, but it was a fun chat.</p><p>What was fascinating was, for people for whom money really is no object, just how prosaic some of their needs were. It was not unusual for them to send an employee ahead to some remote island to install their own IT infrastructure, for example, at fantastic cost. Mr Johnson said that this was often done under the guise of cyber-security. Sometimes it was: even on beach holidays they would often bring in their own guy to work with hotel staff to make e-mail and the like completely secure. But often, he suspected, it was more to do with a fear of missing something on the box. “You could be on the most remote island possible...<a href="http://test.economist.com/blogs/oliver/2015/08/luxury-travel?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/blogs/oliver/2015/08/luxury-travel#comments</comments>
+ <pubDate>Fri, 28 Aug 2015 13:19:41 +0000</pubDate>
+ <guid isPermaLink="false">21662616 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Was the crash that big?]]></title>
+ <link>http://test.economist.com/blogs/freeexchange/2015/08/chinas-stockmarket-0?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/2015/08/blogs/free-exchange/20150829_fnp505.jpg" alt="" title=""  width="595" height="335" /></div></p><p><div class="content-image-float-290 retina-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/original-size/images/2015/08/blogs/free-exchange/20150829_woc487_0.png" alt="" title=""  width="580" height="1592" /></div></p><p>HOW big was China’s stockmarket crash? Dubbed “Black Monday”, August 24th ended with Chinese equities down 8.5%, wiping out hundreds of billions of dollars in market capitalisation. Like many things about China, this sounds massive. But is a one-day drop of this magnitude that unusual?&nbsp;</p><p>Answering this question requires an understanding of China’s historical market volatility. In the last 25 years, the Shanghai Composite, China’s benchmark stock index, has closed within one percentage point of the previous day’s close on just 56% of all trading days, with an average movement of 0.09% (see chart). The standard deviation of the Shanghai Composite’s daily returns—a measure of market volatility—<span>has been&nbsp;</span>2.6 percentage points.</p><p></p><p>The stockmarkets of rich countries during this period have been considerably less volatile. In the last 25 years, the S&amp;P...<a href="http://test.economist.com/blogs/freeexchange/2015/08/chinas-stockmarket-0?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/blogs/freeexchange/2015/08/chinas-stockmarket-0#comments</comments>
+ <pubDate>Fri, 28 Aug 2015 12:41:28 +0000</pubDate>
+ <guid isPermaLink="false">21662633 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[The Bank of England will follow the Federal Reserve]]></title>
+ <link>http://test.economist.com/blogs/freeexchange/2015/08/interest-rates?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/2015/08/blogs/free-exchange/20150829_fnp504.jpg" alt="" title=""  width="595" height="335" /></div></p><p>THE UPWARD revision to American GDP on August 27th provided a shot in the arm to global stockmarkets, which have endured their most volatile week of trading in years. The American economy is now thought to have grown by 3.7% at an annual rate in the second quarter, a much higher estimate than the 2.3% that was given in an initial evaluation of the quarter. After so much bad news about the Chinese economy, which has been a factor behind the meltdown of Chinese share indices, the US figure came as a relief to markets. Commodities also rallied: Brent crude soared by 10%, its biggest one-day gain in over six years, to settle above $47.50 a barrel. On August 28th Britain's statistics office left unchanged its estimate of second-quarter GDP growth in the UK economy at 2.6%.</p><p>With the American economy racing ahead, investors wondered whether the Federal Reserve might indeed raise interest rates in September, a move that the central bank had been preparing markets for but which looked increasingly unlikely given the turmoil of the past week or so. The case for a rate increase next month remains <a...<a href="http://test.economist.com/blogs/freeexchange/2015/08/interest-rates?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/blogs/freeexchange/2015/08/interest-rates#comments</comments>
+ <pubDate>Fri, 28 Aug 2015 12:22:23 +0000</pubDate>
+ <guid isPermaLink="false">21662631 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Core concern]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662606-life-keeps-getting-harder-japans-central-bankers-core-concern?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-float-290 retina-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/original-size/images/print-edition/20150829_FNC538.png" alt="" title=""  width="580" height="598" /></div></p><p>AFTER two years of remission, Japan seems likely to sink back into the “chronic disease” of deflation, as Haruhiko Kuroda, the governor of the Bank of Japan (BoJ), calls it. New data are expected to show on August 28th that core CPI, the central bank’s preferred indicator of inflation, turned negative in July for the first time since the bank launched a big programme of quantitative easing (printing money to buy bonds) in April 2013 (see chart). At the time, it pledged to lift inflation to 2% in two years.</p><p>The news will heap further pressure on the BoJ to ease monetary policy yet more this year, as will worries about Chinese growth. The fact that Japan’s economy shrank by 1.6% in the second quarter on an annualised basis adds to the concerns. The central bank is currently buying about ¥80 trillion ($670 billion) of long-term Japanese government bonds (JGBs) a year, or twice the annual issuance. It now holds over ¥300 trillion of JGBs, or nearly a third of all outstanding bonds.</p><p></p><p>Mr Kuroda’s excuse for deflation’s apparent return is that the falling oil price has pushed down core CPI, which excludes fresh food but...<a href="http://test.economist.com/news/finance-and-economics/21662606-life-keeps-getting-harder-japans-central-bankers-core-concern?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662606-life-keeps-getting-harder-japans-central-bankers-core-concern#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:29 +0000</pubDate>
+ <guid isPermaLink="false">21662606 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Non-profit paradise]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662604-low-prices-attract-new-type-customer-non-profit-paradise?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-float-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/290-width/images/print-edition/20150829_FNP003_0.jpg" alt="" title=""  width="290" height="435" /><span class="caption">Frond management</span></div></p><p>JUST off the west coast of Florida lies the sun-drenched island of Little Bokeelia. It is blessed with cascading waterfalls, tennis courts, pools and a Spanish-style villa. Despite such enticing features, the island languished on the market for three years, before selling in July for a mere $14.5m—half the original asking price.</p><p>Little Bokeelia is not the only island that is proving hard to shift. In the Bahamas, where prices per acre are among the world’s highest, hundreds of atolls lie unbought. The price of undeveloped islands, which make up around 80% of the market, has dropped roughly by half since the financial crisis, says Farhad Vladi, a private-island broker.</p><p></p><p>In the early 2000s private islands were the trophy of choice for millionaires but the recession sapped demand. Building on an island is much pricier than on a mainland plot, and there are many potential pitfalls. It is not for the faint-hearted, says Edward Childs of Smiths Gore, an estate agent in the British Virgin Islands. Mega-yachts and private jets are seen as more predictable investments. As a result private islands can...<a href="http://test.economist.com/news/finance-and-economics/21662604-low-prices-attract-new-type-customer-non-profit-paradise?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662604-low-prices-attract-new-type-customer-non-profit-paradise#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:29 +0000</pubDate>
+ <guid isPermaLink="false">21662604 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Wheelbarrows to the rescue]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662603-nigerias-central-bank-pioneers-new-method-shore-up-local?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/print-edition/20150829_FNP004_1.jpg" alt="" title=""  width="595" height="335" /></div></p><p>YOU might think Godwin Emefiele, the governor of Nigeria’s central bank, had problems enough. The collapsing oil price has slashed Nigeria’s export earnings. Foreign reserves have fallen from more than $40 billion early last year to just over $30 billion now. In response Mr Emefiele (pictured) devalued the local currency, the naira, in November and again in February. The devaluations are stoking inflation. Like many other central bankers in commodity-exporting countries, he is faced with the unenviable choice of raising rates despite the damage to an already faltering economy, or leaving them be despite rising inflation and a swooning currency. Unlike other central bankers, however, Mr Emefiele has decided to compound the awkwardness of his position by getting involved in industrial policy as well.</p><p>In June the central bank said it would not provide foreign exchange for 41 categories of imports, ranging from wheelbarrows to private jets. The idea, Mr Emefiele says, is both to conserve dollars and to stimulate local manufacturing. “Central banks in developing countries like ours cannot sit idly by and concentrate only on price and monetary...<a href="http://test.economist.com/news/finance-and-economics/21662603-nigerias-central-bank-pioneers-new-method-shore-up-local?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662603-nigerias-central-bank-pioneers-new-method-shore-up-local#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:29 +0000</pubDate>
+ <guid isPermaLink="false">21662603 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[The kindness of neighbours]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662596-new-paper-asks-why-some-tanzanian-farmers-are-more-selfish-others?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/print-edition/20150829_FNP002_0.jpg" alt="" title=""  width="595" height="335" /><span class="caption">Turning his back</span></div></p><p>IN THE semi-arid lowlands of Mufindi, in southern Tanzania, water is hard to come by. Villagers rely on irrigation to grow maize, potatoes and spinach. Informal and often woolly codes govern how much water each farmer diverts to their own fields, and how much they leave for their neighbours downstream. Some farmers, naturally, turn out to be more grasping than others. Economists typically see such decisions as irreducible: there is no accounting for individuals’ values and preferences. But a new study* investigates why there is such variation in generosity among Mufindi’s farmers.</p><p>The researchers asked other villagers to rank each farmer’s social status on a scale of one to four. Then they invited the farmers to take part in a game in which participants had to decide how much water they would take under different scenarios. Participants were paid small sums, which varied according to how well they did in the game. They received more money if they reaped a bigger harvest by taking more than their share of water, for instance, but less if the other villagers fined them for violating water-sharing...<a href="http://test.economist.com/news/finance-and-economics/21662596-new-paper-asks-why-some-tanzanian-farmers-are-more-selfish-others?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662596-new-paper-asks-why-some-tanzanian-farmers-are-more-selfish-others#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:29 +0000</pubDate>
+ <guid isPermaLink="false">21662596 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Off the block]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662595-economists-may-idolise-auctions-most-people-do-not-block?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-float-290 retina-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/original-size/images/print-edition/20150829_FNC545.png" alt="" title=""  width="580" height="634" /></div></p><p>THE first item sold on eBay, an online marketplace, was a broken laser pointer, which was snapped up for $14.83 in September 1995. By 2002 eBay had hosted nearly $15 billion of transactions and had more registered users than Britain had people. Yet the fad for online auctions faded almost as quickly as it appeared. Only 20% of sales on eBay, which turns 20 on September 3rd, now involve auctions.</p><p>At eBay’s inception, users could sell things only by auction. This was tremendously exciting for economists, who love the things for their ability to magic prices out of thin air and to allocate goods efficiently by determining who values them most highly. The main obstacle to holding auctions is the cost of bringing together enough interested buyers and sellers. But eBay made connecting buyers and sellers cheap. Without it, that broken laser pointer may well have languished unsold.</p><p></p><p>EBay also benefited from a first-mover advantage. Buyers want to go where there are lots of competing sellers, and sellers will flock to wherever they can find the most eager customers. The size of eBay’s network was its own, self-perpetuating engine of...<a href="http://test.economist.com/news/finance-and-economics/21662595-economists-may-idolise-auctions-most-people-do-not-block?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662595-economists-may-idolise-auctions-most-people-do-not-block#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:29 +0000</pubDate>
+ <guid isPermaLink="false">21662595 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Building works]]></title>
+ <link>http://test.economist.com/news/finance-and-economics/21662593-historic-opportunity-improve-infrastructure-cheap-danger?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-full"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/full-width/images/print-edition/20150829_FNP001_0.jpg" alt="" title=""  width="595" height="335" /></div></p><p>IT IS hard to exaggerate the decrepitude of infrastructure in much of the rich world. One in three railway bridges in Germany is over 100 years old, as are half of London’s water mains. In America the average bridge is 42 years old and the average dam 52. The American Society of Civil Engineers rates around 14,000 of the country’s dams as “high hazard” and 151,238 of its bridges as “deficient”. This crumbling infrastructure is both dangerous and expensive: traffic jams on urban highways cost America over $100 billion in wasted time and fuel each year; congestion at airports costs $22 billion and another $150 billion is lost to power outages.</p><p>The B20, the business arm of the G20, a club of big economies, estimates that the global backlog of spending needed to bring infrastructure up to scratch will reach $15 trillion-20 trillion by 2030. McKinsey, a consultancy, reckons that in 2007-12 investment in infrastructure in rich countries was about 2.5% of GDP a year when it should have been 3.5%. If anything, the problem is becoming more acute as some governments whose finances have been racked by the crisis cut back. In 2013 in the euro zone, general...<a href="http://test.economist.com/news/finance-and-economics/21662593-historic-opportunity-improve-infrastructure-cheap-danger?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/finance-and-economics/21662593-historic-opportunity-improve-infrastructure-cheap-danger#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/print-sections/finance-and-economics">Finance and economics</category>
+ <category domain="http://test.economist.com/category/web-sections/finance">FINANCE</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:28 +0000</pubDate>
+ <guid isPermaLink="false">21662593 at http://test.economist.com</guid>
+</item>
+<item>
+ <title><![CDATA[Patently problematic]]></title>
+ <link>http://test.economist.com/news/business/21662552-proposals-consistent-global-rules-company-tax-cause-worries-all-round-patently?fsrc=rss</link>
+ <description><![CDATA[<p><div class="content-image-float-290 retina-290"><img src="http://cdn.static-economist.com/sites/default/files/imagecache/original-size/images/print-edition/20150829_WBC521.png" alt="" title=""  width="580" height="816" /></div></p><p>CLARITY or chaos? Supporters of the Base Erosion and Profit-Shifting (BEPS) project, being worked on by the OECD, argue that it will bind multinationals to a consistent set of global tax rules, providing them with less licence than they now have to short-change governments through artful use of loopholes in national laws. Sceptics worry that it could only lead to chaos if countries adopt the new guidelines to differing degrees, or if some governments conclude they are too soft, and take unilateral action to stop tax revenue on profits being siphoned abroad.</p><p>With two months to go before the club of rich and middle-income countries presents its plan to the G20 for approval, much of its detail remains unclear. But no one doubts that, with so many clashing national interests at stake, there are limits to what can be achieved. Discord has been evident lately, even among allies: in June a US Treasury official accused Britain and Australia of undermining international agreement by “going their own way”. One beef is over Britain’s new “diverted profits” tax, which imposes a levy on profits routed to tax havens through “contrived...<a href="http://test.economist.com/news/business/21662552-proposals-consistent-global-rules-company-tax-cause-worries-all-round-patently?fsrc=rss">Continue reading</a>]]></description>
+ <author>The Economist online</author>
+ <comments>http://test.economist.com/news/business/21662552-proposals-consistent-global-rules-company-tax-cause-worries-all-round-patently#comments</comments>
+ <category domain="http://test.economist.com/topics/approved">Approved</category>
+ <category domain="http://test.economist.com/category/web-sections/business">Business</category>
+ <category domain="http://test.economist.com/category/print-sections/business">Business</category>
+ <pubDate>Thu, 27 Aug 2015 14:43:23 +0000</pubDate>
+ <guid isPermaLink="false">21662552 at http://test.economist.com</guid>
+</item>
+</channel>
+</rss>`),
 	"test.economist.com": []byte(`<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xml:lang="en" lang="en" dir="ltr"
@@ -12,7 +161,7 @@ var TestData = map[string][]byte{
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>The Economist - World News, Politics, Economics, Business & Finance</title>
 <link rel="shortcut icon" href="http://cdn.static-economist.com/sites/default/files/econfinal_favicon.ico" type="image/x-icon" />
-<link rel="canonical" href="http://www.economist.com/" />
+<link rel="canonical" href="http://test.economist.com/" />
 <meta name="description" content="The Economist offers authoritative insight and opinion on international news, politics, business, finance, science, technology and the connections between them." />
 <meta name="pubdate" content="20120516" />
 <meta name="revisit-after" content="1 day" />
@@ -130,7 +279,7 @@ ec-ads-gpt">
 <li><a href="/blogs/prospero" title="Books, arts and culture">Prospero</a></li>
 <li class="even last"><a href="/blogs/economist-explains">The Economist explains</a></li>
 </ul></li>
-<li class=""><a href="http://www.economist.com/debate" class="sub-menu-link">Debate</a><ul class="mh-subnav"><li class="first"><a href="http://www.economist.com/debate">Economist debates</a></li>
+<li class=""><a href="http://test.economist.com/debate" class="sub-menu-link">Debate</a><ul class="mh-subnav"><li class="first"><a href="http://test.economist.com/debate">Economist debates</a></li>
 <li class="even last"><a href="/content/letters-to-the-editor" title="">Letters to the editor</a></li>
 </ul></li>
 <li><a href="/multimedia" class="sub-menu-link">Multimedia</a><ul class="mh-subnav"><li class="first"><a href="/films">Economist Films</a></li>
@@ -208,7 +357,7 @@ ec-ads-gpt">
     <div class="package-more"><a href="/sections/britain" title="Britain">More in Britain &raquo;</a></div>
   </section><section class="ec-homepage-player news-package typog-package">
       <h1 class="fly-title">Latest audio and video</h1>
-    <div style="height:422px;"><object id="ec-homepage-video" class="BrightcoveExperience"><param name="bgcolor" value="#FFFFFF" /><param name="isUI" value="true" /><param name="isVid" value="true" /><param name="dynamicStreaming" value="true" /><param name="autoStart" value="false" /><param name="wmode" value="opaque" /><param name="includeAPI" value="true" /><param name="linkBaseURL" value="http://www.economist.com/multimedia" /><param name="playerID" value="1545427201001" /><param name="playerKey" value="AQ~~,AAABDH-R__E~,dB4S9tmhdOrAcjB6eqWZCo1XXp-OU2vB" /><param name="width" value="402" /><param name="height" value="422" /><param name="templateLoadHandler" value="ECOmnitureBrightCoveHandlersf2f697c8f0d23fecb2b4ce9cc3be8e5d.omnitureBCTemplateLoaded" /><param name="@videoPlayer" value="" /><param name="labels" value="http://cdn.static-economist.com/sites/all/modules/custom/ec_brightcove/EcBcLables.xml" /></object></div>
+    <div style="height:422px;"><object id="ec-homepage-video" class="BrightcoveExperience"><param name="bgcolor" value="#FFFFFF" /><param name="isUI" value="true" /><param name="isVid" value="true" /><param name="dynamicStreaming" value="true" /><param name="autoStart" value="false" /><param name="wmode" value="opaque" /><param name="includeAPI" value="true" /><param name="linkBaseURL" value="http://test.economist.com/multimedia" /><param name="playerID" value="1545427201001" /><param name="playerKey" value="AQ~~,AAABDH-R__E~,dB4S9tmhdOrAcjB6eqWZCo1XXp-OU2vB" /><param name="width" value="402" /><param name="height" value="422" /><param name="templateLoadHandler" value="ECOmnitureBrightCoveHandlersf2f697c8f0d23fecb2b4ce9cc3be8e5d.omnitureBCTemplateLoaded" /><param name="@videoPlayer" value="" /><param name="labels" value="http://cdn.static-economist.com/sites/all/modules/custom/ec_brightcove/EcBcLables.xml" /></object></div>
   <p class="package-more">
     <a href="/multimedia">More in Multimedia &raquo;</a>  </p>
 </section><section class="news-package typog-package">
@@ -369,7 +518,7 @@ ec-ads-gpt">
                 </div>
           <img src="http://cdn.static-economist.com/sites/default/files/imagecache/homepage_highlight/20150822_USD001_168.jpg" alt="" title=""  class="imagecache imagecache-homepage_highlight" width="168" height="95" />      </a>
 </article></div><div id="homepage-highlight-7"><article >
-  <a href="http://www.economist.com/sciencebriefs">
+  <a href="http://test.economist.com/sciencebriefs">
     <div>
                     <h1 class="fly-title">Science briefs</h1>
                           <p class="rubric">The missing 95% of the universe
@@ -672,14 +821,14 @@ ec-ads-gpt ec-classified-box ec-ads-classified last">
                 <li><a href="/sections/economics" data-ec-omniture="mini_map_home|economics">Economics</a></li>
                 <li><a href="/markets-data" data-ec-omniture="mini_map_home|markets_data">Markets &amp; data</a></li>
                 <li><a href="/sections/science-technology" data-ec-omniture="mini_map_home|science_technology">Science &amp; technology</a></li>
-                <li><a href="http://www.economist.com/specialreports" data-ec-omniture="mini_map_home|special_reports">Special reports</a></li>
+                <li><a href="http://test.economist.com/specialreports" data-ec-omniture="mini_map_home|special_reports">Special reports</a></li>
                 <li><a href="/sections/culture" data-ec-omniture="mini_map_home|culture">Culture</a></li>
                 <li><a href="/multimedia" data-ec-omniture="mini_map_home|multimedia_library">Multimedia library</a></li>
             </ul>
       <h6>Debate and discussion</h6>
     <ul>
-            <li><a href="http://www.economist.com/debate" data-ec-omniture="mini_map_home|the_economist_debates">The Economist debates</a></li>
-                <li><a href="http://www.economist.com/letters" data-ec-omniture="mini_map_home|letters_to_the_editor">Letters to the editor</a></li>
+            <li><a href="http://test.economist.com/debate" data-ec-omniture="mini_map_home|the_economist_debates">The Economist debates</a></li>
+                <li><a href="http://test.economist.com/letters" data-ec-omniture="mini_map_home|letters_to_the_editor">Letters to the editor</a></li>
                 <li><a href="/economist-quiz" data-ec-omniture="mini_map_home|the_economist_quiz">The Economist Quiz</a></li>
       </ul>
 </div>
@@ -709,7 +858,7 @@ ec-ads-gpt ec-classified-box ec-ads-classified last">
                                         <li><a href="https://success.economist.com/?fsrc=econfooter" data-ec-omniture="mini_map_home|mba_services">MBA Services</a></li>
                                         <li><a href="https://gmat.economist.com/?gsrc=economist_footer&amp;c3ch=Economist&amp;c3nid=site footer" data-ec-omniture="mini_map_home|the_economist_gmat_tutor">The Economist GMAT Tutor</a></li>
                                         <li><a href="https://execed.economist.com/?fsrc=econ-foot" data-ec-omniture="mini_map_home|executive_education_navigator">Executive Education Navigator</a></li>
-                                        <li><a href="http://www.economist.com/rights" data-ec-omniture="mini_map_home|reprints_and_permissions">Reprints and permissions</a></li>
+                                        <li><a href="http://test.economist.com/rights" data-ec-omniture="mini_map_home|reprints_and_permissions">Reprints and permissions</a></li>
                                         </ul>
               <h6><a href="http://www.economistgroup.com" data-ec-omniture="mini_map_home|the_economist_group">The Economist Group &raquo;</a></h6>
             <ul>
@@ -750,8 +899,8 @@ ec-ads-gpt">
         <div class="footer-stripe-top">
     <ul>
                           <li><a href="/contact-info" data-ec-omniture="footer_home|contact_us">Contact us</a></li>
-                          <li><a href="http://www.economist.com/help" data-ec-omniture="footer_home|help">Help</a></li>
-                          <li><a href="http://www.economist.com/help/about-us#About_Economistcom" data-ec-omniture="footer_home|about_us">About us</a></li>
+                          <li><a href="http://test.economist.com/help" data-ec-omniture="footer_home|help">Help</a></li>
+                          <li><a href="http://test.economist.com/help/about-us#About_Economistcom" data-ec-omniture="footer_home|about_us">About us</a></li>
                           <li><a href="http://www.economistgroupmedia.com" data-ec-omniture="footer_home|advertise_with_us">Advertise with us</a></li>
                           <li><a href="/mediadirectory" data-ec-omniture="footer_home|editorial_staff">Editorial Staff</a></li>
                           <li><a href="/mediadirectory/books" data-ec-omniture="footer_home|staff_books">Staff Books</a></li>

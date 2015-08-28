@@ -68,6 +68,14 @@ var ConfigDefaults = map[string]FetchCommand{
 		DepthTolerance:       2,
 		DesiredNumber:        5,
 	},
+	"test.economist.com": FetchCommand{
+		RssXMLURI: map[string]string{
+			"/news/business-and-finance": "/sections/business-finance/rss.xml",
+		},
+		CondenseTrailingDirs: 0,
+		DepthTolerance:       2,
+		DesiredNumber:        5,
+	},
 	"www.welt.de": FetchCommand{
 		RssXMLURI: map[string]string{
 			"/wirtschaft/deutschland":   "/wirtschaft/?service=Rss",

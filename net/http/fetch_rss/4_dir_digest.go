@@ -3,6 +3,7 @@ package fetch_rss
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -13,18 +14,17 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
-	"github.com/pbberlin/tools/os/osutilpb"
 	"golang.org/x/net/html"
 )
 
-type DirsWithFiles struct {
+type DirTree struct {
 	Name      string // Name == key of Parent.Dirs
 	LastFound time.Time
-	Dirs      map[string]DirsWithFiles
+	Dirs      map[string]DirTree
 	// Fils []string
 }
 
-func dirsWithFilesStr(buf *bytes.Buffer, d *DirsWithFiles, lvl int) {
+func DirTreeStr(buf *bytes.Buffer, d *DirTree, lvl int) {
 	ind2 := strings.Repeat("    ", lvl+1)
 	keys := make([]string, 0, len(d.Dirs))
 	for k, _ := range d.Dirs {
@@ -36,13 +36,19 @@ func dirsWithFilesStr(buf *bytes.Buffer, d *DirsWithFiles, lvl int) {
 		indir := d.Dirs[key]
 		buf.WriteString(indir.Name)
 		buf.WriteByte(10)
-		dirsWithFilesStr(buf, &indir, lvl+1)
+		DirTreeStr(buf, &indir, lvl+1)
 	}
 }
 
-func (d DirsWithFiles) String() string {
+func (d DirTree) String() string {
 	buf := new(bytes.Buffer)
-	dirsWithFilesStr(buf, &d, 0)
+	buf.WriteString(d.Name)
+	buf.WriteString(fmt.Sprintf(" %v ", len(d.Dirs)))
+	if d.Dirs == nil {
+		buf.WriteString(" (nil)")
+	}
+	buf.WriteByte(10)
+	DirTreeStr(buf, &d, 0)
 	return buf.String()
 }
 
@@ -74,34 +80,52 @@ func switchTData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func crawl(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, c FetchCommand) (DirsWithFiles, error) {
+func loadDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
+
+	lg, lge := loghttp.Logger(w, r)
+	_ = lg
+
+	bts, err := fs.ReadFile(fnDigest)
+	lge(err)
+	if err == nil {
+		err = json.Unmarshal(bts, &treeX)
+		lge(err)
+	}
+
+}
+
+func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
+
+	lg, lge := loghttp.Logger(w, r)
+	_ = lg
+
+	b, err := json.MarshalIndent(treeX, "", "\t")
+	lge(err)
+
+	err = fs.MkdirAll(path.Dir(fnDigest), 0755)
+	lge(err)
+
+	err = fs.WriteFile(fnDigest, b, 0755)
+	lge(err)
+
+}
+
+func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSystem, c FetchCommand) error {
 
 	lg, lge := loghttp.Logger(w, r)
 
+	if treeX == nil {
+		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+	}
+
 	crawl1URL := path.Join(c.Host, path.Dir(c.SearchPrefix))
 	lg("crawl %v", crawl1URL)
-
-	dwf := DirsWithFiles{Name: "root1", Dirs: map[string]DirsWithFiles{}, LastFound: time.Now()}
-	dwfLoop := dwf
-
-	fnDigest := path.Join(docRoot, c.Host, "digest2.json")
-
-	if c.Host == "test.economist.com" {
-		switchTData(w, r)
-	}
-
-	bdwf, err := fs.ReadFile(fnDigest)
-	lge(err)
-	if err == nil {
-		err = json.Unmarshal(bdwf, &dwf)
-		lge(err)
-	}
 
 	var crawl2URL *url.URL
 	bts, crawl2URL, err := fetch.UrlGetter(r, fetch.Options{URL: crawl1URL})
 	lge(err)
 	if err != nil {
-		return dwf, err
+		return err
 	}
 
 	lg("retrieved %v; %vkB ", crawl2URL.String(), len(bts)/1024)
@@ -109,12 +133,14 @@ func crawl(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, c FetchCom
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lge(err)
 
-	anchors := []string{}
+	anchors := []FullArticle{}
 	var fr func(*html.Node)
 	fr = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "a" {
-			href := attrX(n.Attr, "href")
-			anchors = append(anchors, href)
+			art := FullArticle{}
+			art.Url = attrX(n.Attr, "href")
+			art.Mod = time.Now()
+			anchors = append(anchors, art)
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			fr(c)
@@ -122,52 +148,8 @@ func crawl(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, c FetchCom
 	}
 	fr(doc)
 
-	pfx1 := "http://" + crawl2URL.Host
-	pfx2 := "https://" + crawl2URL.Host
-	for _, href := range anchors {
-		href = strings.TrimPrefix(href, pfx1)
-		href = strings.TrimPrefix(href, pfx2)
-		if strings.HasPrefix(href, "/") { // ignore other domains
-			parsed, err := url.Parse(href)
-			lge(err)
-			href = parsed.Path
-			// lg("%v", href)
-			dwfLoop = dwf
-			dir, remainder := "", href
-			for {
+	path2DirTree(w, r, treeX, anchors, crawl2URL.Host)
 
-				dir, remainder = osutilpb.PathDirReverse(remainder)
-				dwfLoop.Name = dir
-				dwfLoop.LastFound = time.Now()
-
-				if _, ok := dwfLoop.Dirs[dir]; !ok {
-					dwfLoop.Dirs[dir] = DirsWithFiles{Name: dir, Dirs: map[string]DirsWithFiles{}}
-				}
-
-				dwfLoop = dwfLoop.Dirs[dir]
-
-				// Since we "cannot assign" to map struct directly:
-				// dwfLoop.Dirs[dir].LastFound = time.Now()   // fails
-				dwfLoop.LastFound = time.Now()
-
-				if remainder == "" {
-					break
-				}
-			}
-
-		}
-	}
-
-	b, err := json.MarshalIndent(dwf, "", "\t")
-	lge(err)
-
-	dir := path.Join(docRoot, crawl2URL.Host)
-	err = fs.MkdirAll(dir, 0755)
-	lge(err)
-
-	err = fs.WriteFile(fnDigest, b, 0755)
-	lge(err)
-
-	return dwf, nil
+	return nil
 
 }

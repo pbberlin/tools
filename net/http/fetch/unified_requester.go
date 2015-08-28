@@ -87,6 +87,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		log.Printf("host: %v, uri: %v \n", req.URL.Host, req.URL.RequestURI())
 	}
 
+	if _, ok := TestData[req.URL.Host+req.URL.Path]; ok {
+		return TestData[req.URL.Host+req.URL.Path], req.URL, nil
+	}
+
 	resp, err := client.Do(req)
 
 	cond := false

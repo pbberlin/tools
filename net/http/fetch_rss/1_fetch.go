@@ -55,10 +55,15 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	lg(" ")
 	lg(config.Host)
 	// lg(stringspb.IndentedDump(config))
-	rssUrl := selectRSS(w, r, config)
+	rssUrl := matchingRSSURI(w, r, config)
 
 	if rssUrl == "" {
-		crawl(w, r, config)
+		dwf, err := crawl(w, r, fs, config)
+		lge(err)
+		if err != nil {
+			return
+		}
+		_ = dwf
 		return
 	}
 
@@ -183,7 +188,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
 		lge(err)
-		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
+		semanticUri := condenseTrailingDir(u.Path, config.CondenseTrailingDirs)
 		dir := path.Dir(semanticUri)
 		histoDir[dir]++
 	}
@@ -212,15 +217,6 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 		err = fs.Chtimes(p, a.Mod, a.Mod)
 		lge(err)
 	}
-
-	// Save digests
-	// {
-	// 	b, err := json.MarshalIndent(sr, "  ", "\t")
-	// 	lge(err)
-	// 	fnDigest := path.Join(docRoot, rssUrlObj.Host, "digest_detailed.json")
-	// 	err = fs.WriteFile(fnDigest, b, 0755)
-	// 	lge(err)
-	// }
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")

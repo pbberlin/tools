@@ -3,7 +3,6 @@ package fetch_rss
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -43,7 +42,7 @@ func dirTreeStrRec(buf *bytes.Buffer, d *DirTree, lvl int) {
 func (d DirTree) String() string {
 	buf := new(bytes.Buffer)
 	buf.WriteString(d.Name)
-	buf.WriteString(fmt.Sprintf(" %v ", len(d.Dirs)))
+	// buf.WriteString(fmt.Sprintf(" %v ", len(d.Dirs)))
 	if d.Dirs == nil {
 		buf.WriteString(" (nil)")
 	}

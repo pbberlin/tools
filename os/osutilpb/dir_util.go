@@ -65,6 +65,9 @@ func GetFilesByExtension(dir, dotExtension string, verbose bool) []string {
 
 // PathDirReverse is the opposite of path.Dir(filepath)
 // It returns the *first* dir of filepath; not the last
+//
+// Relative paths are converted to root
+// dir1/dir2  => /dir1, /dir2
 func PathDirReverse(filepath string) (dir, remainder string) {
 
 	filepath = strings.Replace(filepath, "\\", "/", -1)

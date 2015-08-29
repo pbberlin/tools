@@ -16,7 +16,7 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, hrefs []FullArticle, domain string) {
+func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articles []FullArticle, domain string) {
 
 	lg, lge := loghttp.Logger(w, r)
 	_ = lg
@@ -30,37 +30,55 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, hrefs 
 	pfx1 := "http://" + domain
 	pfx2 := "https://" + domain
 
-	for _, art := range hrefs {
+	for _, art := range articles {
 		href := art.Url
+		if art.Mod.IsZero() {
+			art.Mod = time.Now()
+		}
 		href = strings.TrimPrefix(href, pfx1)
 		href = strings.TrimPrefix(href, pfx2)
 		if strings.HasPrefix(href, "/") { // ignore other domains
 			parsed, err := url.Parse(href)
 			lge(err)
 			href = parsed.Path
-			// lg("href is %v", href)
+			// lg("%v", href)
 			trLp = treeX
 			// lg("trLp is %v", trLp.String())
 			dir, remainder := "", href
+			lvl := 0
 			for {
 
 				dir, remainder = osutilpb.PathDirReverse(remainder)
-				trLp.Name = dir
+
+				if dir == "/" && remainder == "" {
+					// skip root
+					break
+				}
+
+				if lvl > 0 {
+					trLp.Name = dir // lvl==0 => root
+				}
 				trLp.LastFound = art.Mod
+
+				// lg("   %v, %v", dir, remainder)
 
 				if _, ok := trLp.Dirs[dir]; !ok {
 					trLp.Dirs[dir] = DirTree{Name: dir, Dirs: map[string]DirTree{}}
 				}
 
-				addressTaker := trLp.Dirs[dir]
-				trLp = &addressTaker
-				// Since we "cannot assign" to map struct directly:
+				// We "cannot assign" to map struct directly:
 				// trLp.Dirs[dir].LastFound = art.Mod   // fails
-				// trLp.LastFound = art.Mod
+				addressable := trLp.Dirs[dir]
+				addressable.LastFound = art.Mod
+				trLp.Dirs[dir] = addressable
+				trLp = &addressable
 
 				if remainder == "" {
+					// lg("break\n")
 					break
 				}
+
+				lvl++
 			}
 
 		}
@@ -87,9 +105,9 @@ func rssDoc2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, rssD
 
 		articleList = append(articleList, FullArticle{Url: lpItem.Link, Mod: t})
 
-		path2DirTree(w, r, treeX, articleList, domain)
-
 	}
+
+	path2DirTree(w, r, treeX, articleList, domain)
 
 }
 

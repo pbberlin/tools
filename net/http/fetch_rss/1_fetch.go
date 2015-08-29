@@ -62,7 +62,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 	// lg(stringspb.IndentedDump(config))
 	var tzero time.Time
-	dirTree := &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: tzero}
+	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, LastFound: tzero}
 
 	fnDigest := path.Join(docRoot, config.Host, "digest2.json")
 	loadDigest(w, r, fs, fnDigest, dirTree) // previous
@@ -87,6 +87,8 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 		saveDigest(w, r, fs, fnDigest, dirTree)
 	}
+
+	// lg(dirTree.String())
 
 	//
 	//
@@ -214,7 +216,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 	// Create dirs
 	for k, _ := range histoDir {
-		dir := path.Join(docRoot, config.Host, k)
+		dir := path.Join(docRoot, k) // config.Host already contained in k
 		err := fs.MkdirAll(dir, 0755)
 		lge(err)
 		err = fs.Chtimes(dir, time.Now(), time.Now())
@@ -223,12 +225,15 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 	// Saving as files
 	for _, a := range fullArticles {
+		if len(a.Body) == 0 {
+			continue
+		}
 		u, err := url.Parse(a.Url)
 		u.Fragment = ""
 		u.RawQuery = ""
 		lge(err)
 		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
-		p := path.Join(docRoot, u.Host, semanticUri)
+		p := path.Join(docRoot, semanticUri)
 		err = fs.WriteFile(p, a.Body, 0644)
 		lge(err)
 		err = fs.Chtimes(p, a.Mod, a.Mod)
@@ -238,7 +243,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
 		lge(err)
-		fnDigest := path.Join(docRoot, config.Host, "digest.json")
+		fnDigest := path.Join(docRoot, config.Host, "fetchDigest.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
 		lge(err)
 	}
@@ -264,55 +269,19 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 		depthPrefix = 0
 	}
 
-	var rec1 func(rump string, d *DirTree)
-
-	rec1 = func(rump string, d *DirTree) {
-		keys := make([]string, 0, len(d.Dirs))
-		for k, _ := range d.Dirs {
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, key := range keys {
-			indir := d.Dirs[key]
-			lpRump := rump + indir.Name
-			if len(indir.Dirs) == 0 {
-
-				if !checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
-					return
-				}
-				lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.ToLen(lpRump, 50))
-				art := FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound}
-
-				select {
-				case inn <- &art:
-					// stage 1 loading
-				case <-fin:
-					lg("downstream stage has shut down, stop stuffing stage1")
-					return
-				}
-
-				nFound++
-				if nFound >= nWant {
-					return
-				}
-
-				// articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
-			} else {
-				rec1(lpRump, &indir)
-			}
-		}
-	}
-
 	var subtree *DirTree
 	subtree = dirTree
-	dir, remainder := uriPrefixIncl, ""
+	head, dir, remainder := "", "", uriPrefixIncl
 	for {
-		dir, remainder = osutilpb.PathDirReverse(dir)
+		dir, remainder = osutilpb.PathDirReverse(remainder)
+		head += dir
+		// lg("    %10v %10v - dir - rdr", dir, remainder)
 		if newSubtr, ok := subtree.Dirs[dir]; ok {
 			subtree = &newSubtr
+			// lg("    recursion found  %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
 		} else {
-			lg("    recursion for %v stopped at %v", uriPrefixIncl, subtree.Name)
-			subtree = nil
+			// lg("    recursion failed %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
+			subtree = nil // remain on this level
 			break
 		}
 
@@ -322,71 +291,53 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	}
 
 	if subtree != nil {
-		lg("    starting recursion for %v at %v", uriPrefixIncl, subtree.Name)
-		rec1("", subtree)
-	}
 
-	return
+		var rec1 func(rump string, d *DirTree)
 
-	/*
-		//
-		//
-		//
-		//
-		articles := []FullArticle{}
-
-		var rec func(rump string, d *DirTree)
-
-		rec = func(rump string, d *DirTree) {
+		rec1 = func(rump string, d *DirTree) {
 			keys := make([]string, 0, len(d.Dirs))
 			for k, _ := range d.Dirs {
 				keys = append(keys, k)
 			}
 			sort.Strings(keys)
 			for _, key := range keys {
+
 				indir := d.Dirs[key]
-				// if !strings.HasPrefix(indir.Name, "/") {
-				// 	indir.Name = "/" + indir.Name
-				// }
 				lpRump := rump + indir.Name
-				if len(indir.Dirs) == 0 {
-					articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
-				} else {
-					rec(lpRump, &indir)
+				// lg("      tryring %v", lpRump)
+
+				if checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
+
+					lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.ToLen(lpRump, 50))
+					art := FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound}
+
+					select {
+					case inn <- &art:
+						// stage 1 loading
+					case <-fin:
+						lg("downstream stage has shut down, stop stuffing stage1")
+						return
+					}
+
+					nFound++
+					if nFound >= nWant {
+						return
+					}
+				}
+
+				// articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
+				if len(indir.Dirs) > 0 {
+					rec1(lpRump, &indir)
 				}
 			}
 		}
-		rec("", dirTree)
 
-		// for _, v := range articles {
-		// 	lg("%-55v %v", v.Url, v.Mod.Format(time.ANSIC))
-		// }
+		lg("    starting recursion for %v  (%v)", head, len(subtree.Dirs))
+		rec1(head, subtree)
+	}
 
-		for i, art := range articles {
+	return
 
-			if !checkURL(w, r, art.Url, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
-				return
-			}
-
-			lg("    feed #%02v: %v - %v", i, art.Mod.Format("15:04:05"), stringspb.ToLen(art.Url, 50))
-
-			select {
-			case inn <- &art:
-				// stage 1 loading
-			case <-fin:
-				lg("downstream stage has shut down, stop stuffing stage1")
-				return
-			}
-
-			nFound++
-			if nFound >= nWant {
-				break
-			}
-		}
-
-		return
-
-	*/
 }
 
 func checkURL(w http.ResponseWriter, r *http.Request,

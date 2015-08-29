@@ -3,6 +3,7 @@ package osutilpb
 import "testing"
 
 var inputWant = [][]string{
+	[]string{"/", "/", ""},
 	[]string{"", "/", ""},
 	[]string{"/dir1", "/dir1", ""},
 	[]string{"/dir1/", "/dir1", ""},

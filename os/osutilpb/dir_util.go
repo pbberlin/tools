@@ -68,24 +68,24 @@ func GetFilesByExtension(dir, dotExtension string, verbose bool) []string {
 //
 // Relative paths are converted to root
 // dir1/dir2  => /dir1, /dir2
-func PathDirReverse(filepath string) (dir, remainder string) {
+func PathDirReverse(filepath string) (dir, remainder string, dirs []string) {
 
 	filepath = strings.Replace(filepath, "\\", "/", -1)
 
 	filepath = path.Join(filepath, "")
 
 	if filepath == "/" || filepath == "" {
-		return "/", ""
+		return "/", "", []string{}
 	}
 
 	filepath = strings.TrimPrefix(filepath, "/")
 
-	dirs := strings.Split(filepath, "/")
+	dirs = strings.Split(filepath, "/")
 
 	if len(dirs) == 1 {
-		return "/" + dirs[0], ""
+		return "/" + dirs[0], "", []string{}
 	} else {
-		return "/" + dirs[0], "/" + strings.Join(dirs[1:], "/")
+		return "/" + dirs[0], "/" + strings.Join(dirs[1:], "/"), dirs[1:]
 	}
 
 	return

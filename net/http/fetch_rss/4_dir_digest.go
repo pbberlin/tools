@@ -17,9 +17,12 @@ import (
 )
 
 type DirTree struct {
-	Name      string // Name == key of Parent.Dirs
-	LastFound time.Time
-	Dirs      map[string]DirTree
+	Name        string // Name == key of Parent.Dirs
+	LastFound   time.Time
+	SrcRSS      bool
+	RSSEndPoint bool
+
+	Dirs map[string]DirTree
 	// Fils []string
 }
 
@@ -152,7 +155,7 @@ func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSy
 	}
 	fr(doc)
 
-	path2DirTree(w, r, treeX, anchors, crawl2URL.Host)
+	path2DirTree(w, r, treeX, anchors, crawl2URL.Host, false)
 
 	return nil
 

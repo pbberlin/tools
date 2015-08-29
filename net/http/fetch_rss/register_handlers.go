@@ -16,7 +16,7 @@ const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"
 
 // InitHandlers is called from outside,
-// and makes the endpoints available.
+// and makes the EndPoints available.
 func InitHandlers() {
 	http.HandleFunc(uriSetType, loghttp.Adapter(setFSType))
 

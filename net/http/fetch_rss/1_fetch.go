@@ -273,7 +273,7 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	subtree = dirTree
 	head, dir, remainder := "", "", uriPrefixIncl
 	for {
-		dir, remainder = osutilpb.PathDirReverse(remainder)
+		dir, remainder, _ = osutilpb.PathDirReverse(remainder)
 		head += dir
 		// lg("    %10v %10v - dir - rdr", dir, remainder)
 		if newSubtr, ok := subtree.Dirs[dir]; ok {
@@ -306,7 +306,9 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 				lpRump := rump + indir.Name
 				// lg("      tryring %v", lpRump)
 
-				if checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
+				isEndpoint := !d.SrcRSS || (d.SrcRSS && d.RSSEndPoint)
+
+				if isEndpoint && checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
 
 					lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.ToLen(lpRump, 50))
 					art := FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound}

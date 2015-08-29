@@ -16,7 +16,7 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articles []FullArticle, domain string) {
+func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articles []FullArticle, domain string, IsRSS bool) {
 
 	lg, lge := loghttp.Logger(w, r)
 	_ = lg
@@ -44,11 +44,11 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 			// lg("%v", href)
 			trLp = treeX
 			// lg("trLp is %v", trLp.String())
-			dir, remainder := "", href
+			dir, remainder, remDirs := "", href, []string{}
 			lvl := 0
 			for {
 
-				dir, remainder = osutilpb.PathDirReverse(remainder)
+				dir, remainder, remDirs = osutilpb.PathDirReverse(remainder)
 
 				if dir == "/" && remainder == "" {
 					// skip root
@@ -70,6 +70,13 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 				// trLp.Dirs[dir].LastFound = art.Mod   // fails
 				addressable := trLp.Dirs[dir]
 				addressable.LastFound = art.Mod
+				if IsRSS {
+					addressable.SrcRSS = true
+				}
+				if IsRSS && len(remDirs) < 1 && addressable.SrcRSS {
+					addressable.RSSEndPoint = true
+				}
+
 				trLp.Dirs[dir] = addressable
 				trLp = &addressable
 
@@ -107,7 +114,7 @@ func rssDoc2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, rssD
 
 	}
 
-	path2DirTree(w, r, treeX, articleList, domain)
+	path2DirTree(w, r, treeX, articleList, domain, true)
 
 }
 

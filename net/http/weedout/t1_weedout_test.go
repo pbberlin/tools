@@ -1,69 +1,29 @@
-// +build weed
-// go test -tags=weed
+// +build weed1
+// go test -tags=weed1
 
 package weedout
 
 import (
 	"bytes"
-	"os"
 	"path"
 	"testing"
-	"time"
 
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
 
-const numTotal = 3 // comparable html docs
-const stageMax = 3 // weedstages
-
-const cTestHostDev = "localhost:8085"
-
-var hostWithPref = cTestHostDev + repo.UriMountNameY
-
-func prepareLogDir() string {
-
-	lg, lge := loghttp.Logger(nil, nil)
-
-	logdir := "outp"
-	lg("logdir is %v ", logdir)
-
-	// sweep previous
-	rmPath := spf("./%v/", logdir)
-	err := os.RemoveAll(rmPath)
-	if err != nil {
-		lge(err)
-		os.Exit(1)
-	}
-	lg("removed %q", rmPath)
-
-	// create anew
-	err = os.Mkdir(logdir, 0755)
-	if err != nil && !os.IsExist(err) {
-		lge(err)
-		os.Exit(1)
-	}
-
-	return logdir
-
-}
-
 func Test1(t *testing.T) {
 
 	lg, lge := loghttp.Logger(nil, nil)
 
-	lg("waiting for webserver")
-	time.Sleep(2 * time.Millisecond)
-
 	remoteHostname := "www.welt.de"
 
-	dirs1, _, msg, err := fileserver.GetDirContents(hostWithPref, remoteHostname)
+	dirs1, _, msg, err := fileserver.GetDirContents(repoURL, remoteHostname)
 	if err != nil {
 		lge(err)
 		lg("%s", msg)
@@ -77,7 +37,7 @@ func Test1(t *testing.T) {
 	least3Files := []string{}
 	for _, v1 := range dirs1 {
 
-		dirs2, fils2, msg, err := fileserver.GetDirContents(hostWithPref, path.Join(remoteHostname, v1))
+		dirs2, fils2, msg, err := fileserver.GetDirContents(repoURL, path.Join(remoteHostname, v1))
 		_ = dirs2
 		if err != nil {
 			lge(err)
@@ -115,17 +75,17 @@ func Test1(t *testing.T) {
 	// domclean
 	for i, _ := range iter {
 
-		surl := spf("%v/%v", hostWithPref, least3Files[i])
+		surl := spf("%v/%v", repoURL, least3Files[i])
 
 		fNamer := domclean2.FileNamer(logdir, i)
 		fNamer() // first call yields key
 
-		resBytes, effUrl, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
+		resBytes, inf, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
 		if err != nil {
 			lge(err)
 			return
 		}
-		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(effUrl.String(), 60))
+		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(inf.URL.String(), 60))
 		opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
 		// opts.FNamer = fNamer
 		opts.AddOutline = true

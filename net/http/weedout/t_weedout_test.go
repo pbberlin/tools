@@ -12,9 +12,9 @@ import (
 
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
-	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
@@ -25,7 +25,7 @@ const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"
 
-var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
+var hostWithPref = cTestHostDev + repo.UriMountNameY
 
 func prepareLogDir() string {
 

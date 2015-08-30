@@ -9,9 +9,9 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
-	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/net/http/upload"
@@ -29,7 +29,7 @@ var wpf func(w io.Writer, format string, a ...interface{}) (int, error) = fmt.Fp
 func init() {
 	upload.InitHandlers()
 	webapi.InitHandlers()
-	fetch_rss.InitHandlers()
+	repo.InitHandlers()
 
 }
 
@@ -102,7 +102,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	uiUpload := upload.BackendUIRendered()
 	b1.Write(uiUpload.Bytes())
 
-	uiFetch := fetch_rss.BackendUIRendered()
+	uiFetch := repo.BackendUIRendered()
 	b1.Write(uiFetch.Bytes())
 
 	b1.WriteString("<br>\n")

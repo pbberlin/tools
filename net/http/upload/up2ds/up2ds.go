@@ -76,7 +76,7 @@ func main() {
 			fmt.Printf("  uploading to live %v\n", fn)
 		}
 
-		mount := "mnt01"
+		mount := "mnt02"
 		if c.String("mount") != "" {
 			mount = c.String("mount")
 		}

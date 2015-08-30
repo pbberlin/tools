@@ -1,4 +1,4 @@
-package fetch_rss
+package repo
 
 import (
 	"bytes"
@@ -91,8 +91,8 @@ var ConfigDefaults = map[string]FetchCommand{
 /*
 
 [{ 	'Host':           'www.handelsblatt.com',
- 	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
  	'SearchPrefix':   '/politik/international',
+ 	'RssXMLURI':      '/contentexport/feed/schlagzeilen',
 }]
 
 
@@ -104,7 +104,7 @@ curl -X POST -d "[{ \"Host\": \"www.economist.com\"   ,  \"SearchPrefix\":  \"/n
 curl -X POST -d "[{ \"Host\": \"test.economist.com\"  ,  \"SearchPrefix\":  \"/news/business-and-finance\"   }]"  localhost:8085/fetch/command-receive
 curl -X POST -d "[{ \"Host\": \"test.economist.com\"  ,  \"SearchPrefix\":  \"/\"                            }]"  localhost:8085/fetch/command-receive
 
-        curl -X POST -d "[{ \"Host\": \"www.welt.de\",  \"RssXMLURI\": \"/wirtschaft/?service=Rss\", \"SearchPrefix\": \"/wirtschaft/deutschland\"  }]" localhost:8085/fetch/command-receive
+curl -X POST -d "[{ \"Host\": \"www.welt.de\",           \"SearchPrefix\": \"/wirtschaft/deutschland\" ,  \"RssXMLURI\": \"/wirtschaft/?service=Rss\" }]" localhost:8085/fetch/command-receive
 
 
 */

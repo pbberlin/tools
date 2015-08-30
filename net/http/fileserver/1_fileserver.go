@@ -192,15 +192,19 @@ func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
 		}
 		for _, d := range dirs {
 			name := d.Name()
+
+			suffix := ""
 			if d.IsDir() {
-				name += "/"
+				suffix = "/"
 			}
+
 			linktitle := htmlReplacer.Replace(name)
 			linktitle = stringspb.Ellipsoider(linktitle, 40)
+			linktitle += suffix
 
-			url := url.URL{Path: path.Join(r.URL.Path, name), RawQuery: "fmt=html"}
+			surl := path.Join(r.URL.Path, name) + suffix + "?fmt=html"
 
-			oneLine := spf("<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", url.String(), linktitle)
+			oneLine := spf("<a  style='display:inline-block;min-width:600px;' href=\"%s\">%s</a>", surl, linktitle)
 			// wpf(w, " %v", d.ModTime().Format("2006-01-02 15:04:05 MST"))
 			oneLine += spf(" %v<br>", d.ModTime().Format(time.RFC1123Z))
 			wpf(w, oneLine)

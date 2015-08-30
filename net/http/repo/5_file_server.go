@@ -1,4 +1,4 @@
-package fetch_rss
+package repo
 
 import (
 	"net/http"

@@ -15,9 +15,9 @@ import (
 	"appengine/aetest"
 
 	"github.com/pbberlin/tools/net/http/fetch"
-	"github.com/pbberlin/tools/net/http/fetch_rss"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -28,7 +28,7 @@ const stageMax = 3 // weedstages
 const cTestHostDev = "localhost:8085"
 const cTestHostOwn = "localhost:63222"
 
-var hostWithPref = cTestHostDev + fetch_rss.UriMountNameY
+var hostWithPref = cTestHostDev + repo.UriMountNameY
 
 func prepare(t *testing.T) aetest.Context {
 
@@ -42,10 +42,10 @@ func prepare(t *testing.T) aetest.Context {
 	}
 
 	serveFile := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-		fs1 := fetch_rss.GetFS(c)
-		fileserver.FsiFileServer(fs1, fetch_rss.UriMountNameY, w, r)
+		fs1 := repo.GetFS(c)
+		fileserver.FsiFileServer(fs1, repo.UriMountNameY, w, r)
 	}
-	http.HandleFunc(fetch_rss.UriMountNameY, loghttp.Adapter(serveFile))
+	http.HandleFunc(repo.UriMountNameY, loghttp.Adapter(serveFile))
 
 	go func() {
 		log.Fatal(

@@ -42,7 +42,7 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		rURL = fmt.Sprintf("%v&%v=%v", rURL, key, val)
 	}
 
-	bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
+	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
 	lge(err)
 
 	cntnt = string(bts)
@@ -50,7 +50,7 @@ func formRedirector(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	cntnt = insertNewlines.Replace(cntnt)
 	cntnt = undouble.Replace(cntnt)
 
-	cntnt = domclean1.ModifyHTML(r, u, cntnt)
+	cntnt = domclean1.ModifyHTML(r, inf.URL, cntnt)
 
 	fmt.Fprintf(w, "%s \n\n", cntnt)
 	fmt.Fprintf(w, "%s \n\n", msg)

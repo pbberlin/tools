@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -129,6 +130,15 @@ func (fs *dsFileSys) MkdirAll(path string, perm os.FileMode) error {
 // conflicts with  vfs.Open() signature
 // conflicts with file.Open() interface of Afero
 func (fs *dsFileSys) Open(name string) (fsi.File, error) {
+
+	// explicitly requesting  directory?
+	if strings.HasSuffix(name, "/") {
+		dir, err := fs.dirByPath(name)
+		if err == nil {
+			ff := fsi.File(&dir)
+			return ff, nil
+		}
+	}
 
 	f, err := fs.fileByPath(name)
 

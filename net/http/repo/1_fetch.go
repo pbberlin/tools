@@ -1,7 +1,7 @@
-// Package fetch_rss takes http JSON commands;
+// Package repo takes http JSON commands;
 // downloading html files in parallel from the designated source;
-// making them available via static http fileserver.
-package fetch_rss
+// making them available via quasi-static http fileserver.
+package repo
 
 import (
 	"encoding/json"
@@ -61,8 +61,7 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	}
 
 	// lg(stringspb.IndentedDump(config))
-	var tzero time.Time
-	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, LastFound: tzero}
+	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
 
 	fnDigest := path.Join(docRoot, config.Host, "digest2.json")
 	loadDigest(w, r, fs, fnDigest, dirTree) // previous
@@ -89,7 +88,6 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 	}
 
 	// lg(dirTree.String())
-
 	//
 	//
 	// setting up a 3 staged pipeline from bottom up
@@ -115,8 +113,8 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 
 			case fa := <-out:
 				fullArticles = append(fullArticles, *fa)
-				u, _ := url.Parse(fa.Url)
-				lg("    fetched              %v ", stringspb.Ellipsoider(u.Path, 50))
+				pth := fetch.PathFromStringUrl(fa.Url)
+				lg("    fetched   %v - %v ", fa.Mod.Format("15:04:05"), stringspb.Ellipsoider(pth, 50))
 				cout = time.After(time.Millisecond * delayRefresh) // refresh timeout
 			case <-cout:
 				lg("timeout after %v articles", len(fullArticles))
@@ -143,8 +141,12 @@ func Fetch(w http.ResponseWriter, r *http.Request,
 				select {
 				case a = <-inn:
 					var err error
-					a.Body, _, err = fetch.UrlGetter(r, fetch.Options{URL: a.Url})
+					var inf fetch.Info
+					a.Body, inf, err = fetch.UrlGetter(r, fetch.Options{URL: a.Url})
 					lge(err)
+					if a.Mod.IsZero() {
+						a.Mod = inf.Mod
+					}
 					select {
 					case out <- a:
 					case <-fin:
@@ -272,21 +274,34 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	var subtree *DirTree
 	subtree = dirTree
 	head, dir, remainder := "", "", uriPrefixIncl
-	for {
-		dir, remainder, _ = osutilpb.PathDirReverse(remainder)
-		head += dir
-		// lg("    %10v %10v - dir - rdr", dir, remainder)
-		if newSubtr, ok := subtree.Dirs[dir]; ok {
-			subtree = &newSubtr
-			// lg("    recursion found  %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
-		} else {
-			// lg("    recursion failed %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
-			subtree = nil // remain on this level
-			break
-		}
 
-		if remainder == "" {
-			break
+	if subtree.Name == uriPrefixIncl {
+		// exception for root
+	} else {
+		// recur deeper
+		for {
+			dir, remainder, _ = osutilpb.PathDirReverse(remainder)
+			head += dir
+			// lg("    %-10q %-10q %-10q - head - dir - remainder", head, dir, remainder)
+			if newSubtr, ok := subtree.Dirs[dir]; ok {
+				subtree = &newSubtr
+				// lg("    recursion found  %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
+			} else {
+				// lg("    recursion failed %-10v %-10v for %v (%v)", dir, subtree.Name, uriPrefixIncl, subtree.Name)
+
+				// Calling off searching on this level
+				// StuffStage() itsself can step up if it wants to
+				//
+				// *not* setting subtree = nil
+				// would keep us one level higher than this level.
+				subtree = nil
+
+				break
+			}
+
+			if remainder == "" {
+				break
+			}
 		}
 	}
 
@@ -306,12 +321,13 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 				lpRump := rump + indir.Name
 				// lg("      tryring %v", lpRump)
 
-				isEndpoint := !d.SrcRSS || (d.SrcRSS && d.RSSEndPoint)
+				if indir.EndPoint && checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
 
-				if isEndpoint && checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
-
-					lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.ToLen(lpRump, 50))
-					art := FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound}
+					lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.Ellipsoider(lpRump, 50))
+					art := FullArticle{Url: config.Host + lpRump}
+					if indir.SrcRSS {
+						art.Mod = indir.LastFound
+					}
 
 					select {
 					case inn <- &art:
@@ -334,7 +350,7 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 			}
 		}
 
-		lg("    starting recursion for %v  (%v)", head, len(subtree.Dirs))
+		// lg("    starting recursion for %v  (%v)", head, len(subtree.Dirs))
 		rec1(head, subtree)
 	}
 
@@ -353,12 +369,12 @@ func checkURL(w http.ResponseWriter, r *http.Request,
 	// short := stringspb.Ellipsoider(u.Path, 50)
 
 	if strings.HasPrefix(u.Path, uriPrefixExcl) {
-		// lg("\t\tskipping %20v", short)
+		// lg("\t\tskipping %20v - excl", u.Path)
 		return false
 	}
 
 	if !strings.HasPrefix(u.Path, uriPrefixIncl) {
-		// lg("\t\tskipping %20v", short)
+		// lg("\t\tskipping %20v - not incl", u.Path)
 		return false
 	}
 

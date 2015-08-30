@@ -1,8 +1,9 @@
-package fetch_rss
+package repo
 
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"path"
@@ -13,14 +14,17 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/osutilpb"
+	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
 )
 
 type DirTree struct {
-	Name        string // Name == key of Parent.Dirs
-	LastFound   time.Time
-	SrcRSS      bool
-	RSSEndPoint bool
+	Name      string // Name == key of Parent.Dirs
+	LastFound time.Time
+
+	SrcRSS   bool // dir came first from RSS
+	EndPoint bool // dir came first from RSS - and is at the end of the path
 
 	Dirs map[string]DirTree
 	// Fils []string
@@ -36,7 +40,10 @@ func dirTreeStrRec(buf *bytes.Buffer, d *DirTree, lvl int) {
 	for _, key := range keys {
 		buf.WriteString(ind2)
 		indir := d.Dirs[key]
-		buf.WriteString(indir.Name)
+		buf.WriteString(stringspb.ToLen(indir.Name, 44-len(ind2)))
+		if indir.EndPoint {
+			buf.WriteString(fmt.Sprintf(" EP"))
+		}
 		buf.WriteByte(10)
 		dirTreeStrRec(buf, &indir, lvl+1)
 	}
@@ -79,6 +86,89 @@ func switchTData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fetch.TestData["test.economist.com"] = b
+
+}
+
+func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articles []FullArticle, domain string, IsRSS bool) {
+
+	lg, lge := loghttp.Logger(w, r)
+	_ = lg
+
+	if treeX == nil {
+		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+	}
+	var trLp *DirTree
+	trLp = treeX
+
+	pfx1 := "http://" + domain
+	pfx2 := "https://" + domain
+
+	for _, art := range articles {
+		href := art.Url
+		if art.Mod.IsZero() {
+			art.Mod = time.Now()
+		}
+		href = strings.TrimPrefix(href, pfx1)
+		href = strings.TrimPrefix(href, pfx2)
+		if strings.HasPrefix(href, "/") { // ignore other domains
+			parsed, err := url.Parse(href)
+			lge(err)
+			href = parsed.Path
+			// lg("%v", href)
+			trLp = treeX
+			// lg("trLp is %v", trLp.String())
+			dir, remainder, remDirs := "", href, []string{}
+			lvl := 0
+			for {
+
+				dir, remainder, remDirs = osutilpb.PathDirReverse(remainder)
+
+				if dir == "/" && remainder == "" {
+					// skip root
+					break
+				}
+
+				if lvl > 0 {
+					trLp.Name = dir // lvl==0 => root
+				}
+				trLp.LastFound = art.Mod
+
+				// lg("   %v, %v", dir, remainder)
+
+				// New creation
+				if _, ok := trLp.Dirs[dir]; !ok {
+					if IsRSS {
+						trLp.Dirs[dir] = DirTree{Name: dir, Dirs: map[string]DirTree{}, SrcRSS: true}
+					} else {
+						trLp.Dirs[dir] = DirTree{Name: dir, Dirs: map[string]DirTree{}}
+					}
+				}
+
+				// We "cannot assign" to map struct directly:
+				// trLp.Dirs[dir].LastFound = art.Mod   // fails with "cannot assign"
+				addressable := trLp.Dirs[dir]
+				addressable.LastFound = art.Mod
+
+				// We can rely that the *last* dir or html is an endpoint.
+				// We cannot tell about higher paths, unless explicitly linked somewhere
+				// Previous distinction between RSS URLs and crawl URLs dropped
+				if len(remDirs) < 1 {
+					addressable.EndPoint = true
+				}
+
+				trLp.Dirs[dir] = addressable
+				trLp = &addressable
+
+				if remainder == "" {
+					// lg("break\n")
+					break
+				}
+
+				lvl++
+			}
+
+		}
+	}
 
 }
 
@@ -128,14 +218,13 @@ func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSy
 	crawl1URL := path.Join(c.Host, path.Dir(c.SearchPrefix))
 	lg("crawl %v", crawl1URL)
 
-	var crawl2URL *url.URL
 	bts, crawl2URL, err := fetch.UrlGetter(r, fetch.Options{URL: crawl1URL})
 	lge(err)
 	if err != nil {
 		return err
 	}
 
-	lg("retrieved %v; %vkB ", crawl2URL.String(), len(bts)/1024)
+	lg("retrieved %v; %vkB ", crawl2URL.URL.String(), len(bts)/1024)
 
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lge(err)
@@ -155,7 +244,7 @@ func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSy
 	}
 	fr(doc)
 
-	path2DirTree(w, r, treeX, anchors, crawl2URL.Host, false)
+	path2DirTree(w, r, treeX, anchors, crawl2URL.URL.Host, false)
 
 	return nil
 

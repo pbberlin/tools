@@ -27,18 +27,25 @@ type Options struct {
 	HttpsOnly bool
 }
 
+// Response info
+type Info struct {
+	URL *url.URL
+	Mod time.Time
+}
+
 // UrlGetter universal http getter for app engine and standalone go programs.
 // Previously response was returned. Forgot why. Dropped it.
 func UrlGetter(gaeReq *http.Request, options Options) (
-	[]byte, *url.URL, error,
+	[]byte, Info, error,
 ) {
 
 	var err error
+	var inf Info = Info{}
 
 	if options.Req == nil {
 		options.Req, err = http.NewRequest("GET", options.URL, nil)
 		if err != nil {
-			return nil, nil, err
+			return nil, inf, err
 		}
 	}
 	req := options.Req
@@ -51,7 +58,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 	req.URL, err = url.Parse(surl)
 	if err != nil {
-		return nil, nil, err
+		return nil, inf, err
 	}
 
 	// Optional: force https
@@ -88,7 +95,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 
 	if _, ok := TestData[req.URL.Host+req.URL.Path]; ok {
-		return TestData[req.URL.Host+req.URL.Path], req.URL, nil
+		return TestData[req.URL.Host+req.URL.Path], Info{URL: req.URL}, nil
 	}
 
 	resp, err := client.Do(req)
@@ -106,7 +113,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			var err2nd error
 			resp, err2nd = client.Do(req)
 			if err2nd != nil {
-				return nil, req.URL, fmt.Errorf("cannot do https requests on dev server, fallback to http: %v",
+				return nil, Info{URL: req.URL}, fmt.Errorf("cannot do https requests on dev server, fallback to http: %v",
 					err2nd)
 			}
 			err = nil // CLEAR error
@@ -119,27 +126,37 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			// We cannot repeat a post request - the r.Body.Reader is consumed
 			// options.Req.URL.Scheme = "http"
 			// resp, err = client.Do(options.Req)
-			return nil, req.URL, fmt.Errorf("cannot do https requests on dev server: %v", err)
+			return nil, Info{URL: req.URL}, fmt.Errorf("cannot do https requests on dev server: %v", err)
 		} else if strings.Contains(err.Error(), "net/http: Client Transport of type init.failingTransport doesn't support CancelRequest; Timeout not supported") {
 			hint = "\n\n Did you forget to submit the AE Request?\n"
 		}
-		return nil, req.URL, fmt.Errorf("request failed: %v - %v", err, hint)
+		return nil, Info{URL: req.URL}, fmt.Errorf("request failed: %v - %v", err, hint)
 	}
 
 	//
 	if resp.StatusCode != http.StatusOK {
-		return nil, req.URL, fmt.Errorf("bad http resp code: %v - %v", resp.StatusCode, req.URL.String())
+		return nil, Info{URL: req.URL}, fmt.Errorf("bad http resp code: %v - %v", resp.StatusCode, req.URL.String())
 	}
 
 	defer resp.Body.Close()
 	bts, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, req.URL, fmt.Errorf("cannot read resp body: %v", err)
+		return nil, Info{URL: req.URL}, fmt.Errorf("cannot read resp body: %v", err)
 	}
 
-	// log.Printf("len %v bytes\n", len(bts))
+	// time stamp
+	var tlm time.Time // time last modified
+	lm := resp.Header.Get("Last-Modified")
+	if lm != "" {
+		tlm, err = time.Parse(time.RFC1123, lm) // Last-Modified: Sat, 29 Aug 2015 21:15:39 GMT
+		if err != nil {
+			tlm, err = time.Parse(time.RFC1123Z, lm) // with numeric time zone
+			_ = err
+		}
+	}
+	// log.Printf("    hdr  %v %v\n", lm, tlm.Format(time.ANSIC))
 
-	return bts, req.URL, nil
+	return bts, Info{URL: req.URL, Mod: tlm}, nil
 
 }

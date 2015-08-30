@@ -109,16 +109,16 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 		r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
-		bts, u, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
+		bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
 		lge(err)
 
-		tp := mime.TypeByExtension(path.Ext(u.Path))
+		tp := mime.TypeByExtension(path.Ext(inf.URL.Path))
 		w.Header().Set("Content-Type", tp)
 		// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
 		if r.FormValue("dbg") != "" {
 			w.Header().Set("Content-type", "text/html; charset=utf-8")
-			fmt.Fprintf(w, "%s<br>\n  %s<br>\n %v", u.Path, tp, u.String())
+			fmt.Fprintf(w, "%s<br>\n  %s<br>\n %v", inf.URL.Path, tp, inf.URL.String())
 			return
 		}
 
@@ -127,7 +127,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 			cntnt := string(bts)
 			cntnt = insertNewlines.Replace(cntnt)
 			cntnt = undouble.Replace(cntnt)
-			cntnt = domclean1.ModifyHTML(r, u, cntnt)
+			cntnt = domclean1.ModifyHTML(r, inf.URL, cntnt)
 			fmt.Fprintf(w, cntnt)
 		}
 

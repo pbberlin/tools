@@ -24,6 +24,17 @@ func HostFromStringUrl(surl string) string {
 	return splitPort(url2.Host)
 }
 
+func PathFromStringUrl(surl string) string {
+
+	// Prevent "google.com" => u.Host == "" when scheme == ""
+	if !strings.HasPrefix(surl, "http://") && !strings.HasPrefix(surl, "https://") {
+		surl = "https://" + surl
+	}
+	url2, _ := url.Parse(surl)
+
+	return splitPort(url2.Path)
+}
+
 func HostFromUrl(u *url.URL) string {
 
 	// Prevent "google.com" => u.Host == "" when scheme == ""

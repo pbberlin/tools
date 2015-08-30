@@ -266,10 +266,43 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 	lg, lge := loghttp.Logger(w, r)
 	_ = lge
 
-	depthPrefix := strings.Count(uriPrefixIncl, "/")
-	if uriPrefixIncl == "/" {
-		depthPrefix = 0
+	subtree, head := DiveToDeepestMatch(dirTree, uriPrefixIncl)
+
+	if subtree == nil {
+		lg("      does not exist in dirtree: %q", uriPrefixIncl)
+	} else {
+
+		articles := LevelWiseDeeper(w, r, head, subtree, uriPrefixExcl, config.DepthTolerance, config.CondenseTrailingDirs, nWant)
+		// lg("      levelwise deeper found %v articles", len(articles))
+
+		for _, art := range articles {
+
+			lg("    feed #%02v: %v - %v", nFound, art.Mod.Format("15:04:05"), stringspb.Ellipsoider(art.Url, 50))
+
+			art.Url = config.Host + art.Url
+
+			select {
+			case inn <- &art:
+				// stage 1 loading
+			case <-fin:
+				lg("downstream stage has shut down, stop stuffing stage1")
+				return
+			}
+
+			nFound++
+			if nFound > nWant-1 {
+				return
+			}
+
+		}
+
 	}
+
+	return
+
+}
+
+func DiveToDeepestMatch(dirTree *DirTree, uriPrefixIncl string) (*DirTree, string) {
 
 	var subtree *DirTree
 	subtree = dirTree
@@ -277,6 +310,7 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 
 	if subtree.Name == uriPrefixIncl {
 		// exception for root
+		head = "" // not "/"
 	} else {
 		// recur deeper
 		for {
@@ -305,89 +339,74 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 		}
 	}
 
-	if subtree != nil {
-
-		var rec1 func(rump string, d *DirTree)
-
-		rec1 = func(rump string, d *DirTree) {
-			keys := make([]string, 0, len(d.Dirs))
-			for k, _ := range d.Dirs {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
-			for _, key := range keys {
-
-				indir := d.Dirs[key]
-				lpRump := rump + indir.Name
-				// lg("      tryring %v", lpRump)
-
-				if indir.EndPoint && checkURL(w, r, lpRump, uriPrefixExcl, uriPrefixIncl, depthPrefix, config) {
-
-					lg("    feed #%02v: %v - %v", nFound, indir.LastFound.Format("15:04:05"), stringspb.Ellipsoider(lpRump, 50))
-					art := FullArticle{Url: config.Host + lpRump}
-					if indir.SrcRSS {
-						art.Mod = indir.LastFound
-					}
-
-					select {
-					case inn <- &art:
-						// stage 1 loading
-					case <-fin:
-						lg("downstream stage has shut down, stop stuffing stage1")
-						return
-					}
-
-					nFound++
-					if nFound >= nWant {
-						return
-					}
-				}
-
-				// articles = append(articles, FullArticle{Url: config.Host + lpRump, Mod: indir.LastFound})
-				if len(indir.Dirs) > 0 {
-					rec1(lpRump, &indir)
-				}
-			}
-		}
-
-		// lg("    starting recursion for %v  (%v)", head, len(subtree.Dirs))
-		rec1(head, subtree)
-	}
-
-	return
-
+	return subtree, head
 }
 
-func checkURL(w http.ResponseWriter, r *http.Request,
-	surl, uriPrefixExcl, uriPrefixIncl string, depthPrefix int, config FetchCommand) bool {
+func LevelWiseDeeper(w http.ResponseWriter, r *http.Request, rump string, dtree *DirTree, excludeDir string,
+	maxDepthDiff, CondenseTrailingDirs, maxNumber int) []FullArticle {
 
 	lg, lge := loghttp.Logger(w, r)
-	_ = lg
+	_ = lge
 
-	u, err := url.Parse(surl)
-	lge(err)
-	// short := stringspb.Ellipsoider(u.Path, 50)
+	depthRump := strings.Count(rump, "/")
 
-	if strings.HasPrefix(u.Path, uriPrefixExcl) {
-		// lg("\t\tskipping %20v - excl", u.Path)
-		return false
+	arts := []FullArticle{}
+
+	var fc func(rmp1 string, dr1 *DirTree, lvl int)
+	fc = func(rmp1 string, dr1 *DirTree, lvl int) {
+
+		// lg("      lvl %2v %v", lvl, dr1.Name)
+		if lvl == 1 && excludeDir == dr1.Name {
+			lg("    excl %v", excludeDir)
+			return
+		}
+
+		keys := make([]string, 0, len(dr1.Dirs))
+		for k, _ := range dr1.Dirs {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, key := range keys {
+			dr2 := dr1.Dirs[key]
+			rmp2 := rmp1 + dr2.Name
+
+			// lg("        %v", rmp2)
+
+			//
+			// rmp2 a candidate?
+			if dr2.EndPoint {
+				semanticUri := condenseTrailingDir(rmp2, CondenseTrailingDirs)
+				depthUri := strings.Count(semanticUri, "/")
+
+				if depthUri-depthRump <= maxDepthDiff {
+
+					// lg("        %v %v ; %v     %v", depthRump, depthUri, maxDepthDiff, semanticUri)
+
+					art := FullArticle{Url: rmp2}
+					if dr2.SrcRSS {
+						art.Mod = dr2.LastFound
+					}
+					if len(arts) > maxNumber-1 {
+						return
+					}
+					arts = append(arts, art)
+
+				}
+			}
+
+			//
+			// recurse deeper?
+			if len(dr2.Dirs) == 0 {
+				// lg("      LevelWiseDeeper - no children")
+				continue
+			}
+			fc(rmp2, &dr2, lvl+1)
+
+		}
 	}
 
-	if !strings.HasPrefix(u.Path, uriPrefixIncl) {
-		// lg("\t\tskipping %20v - not incl", u.Path)
-		return false
-	}
+	fc(rump, dtree, 0)
 
-	semanticUri := condenseTrailingDir(u.Path, config.CondenseTrailingDirs)
-	depthUri := strings.Count(semanticUri, "/")
-	if depthUri > depthPrefix+1+config.DepthTolerance {
-		// lg("\t\tskipping too deep    %v of %v - %20v", depthUri, depthPrefix, semanticUri)
-		return false
-	}
-	if depthUri <= depthPrefix {
-		// lg("\t\tskipping too shallow %v of %v - %20v", depthUri, depthPrefix, semanticUri)
-		return false
-	}
+	return arts
 
-	return true
 }

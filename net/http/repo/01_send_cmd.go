@@ -45,7 +45,7 @@ var ConfigDefaults = map[string]FetchCommand{
 	"unspecified": FetchCommand{
 		RssXMLURI:            map[string]string{},
 		CondenseTrailingDirs: 0,
-		DepthTolerance:       0,
+		DepthTolerance:       1,
 		DesiredNumber:        5,
 	},
 	"www.handelsblatt.com": FetchCommand{
@@ -83,7 +83,7 @@ var ConfigDefaults = map[string]FetchCommand{
 		},
 
 		CondenseTrailingDirs: 2,
-		DepthTolerance:       0,
+		DepthTolerance:       1,
 		DesiredNumber:        5,
 	},
 }

@@ -272,7 +272,13 @@ func stuffStage1(w http.ResponseWriter, r *http.Request, config FetchCommand,
 		lg("      does not exist in dirtree: %q", uriPrefixIncl)
 	} else {
 
-		articles := LevelWiseDeeper(w, r, head, subtree, uriPrefixExcl, config.DepthTolerance, config.CondenseTrailingDirs, nWant)
+		opt := LevelWiseDeeperOptions{}
+		opt.Rump = head
+		opt.ExcludeDir = uriPrefixExcl
+		opt.MaxDepthDiff = config.DepthTolerance
+		opt.CondenseTrailingDirs = config.CondenseTrailingDirs
+		opt.MaxNumber = nWant
+		articles := LevelWiseDeeper(w, r, subtree, opt)
 		// lg("      levelwise deeper found %v articles", len(articles))
 
 		for _, art := range articles {
@@ -342,25 +348,31 @@ func DiveToDeepestMatch(dirTree *DirTree, uriPrefixIncl string) (*DirTree, strin
 	return subtree, head
 }
 
-func LevelWiseDeeper(w http.ResponseWriter, r *http.Request, rump string, dtree *DirTree, excludeDir string,
-	maxDepthDiff, CondenseTrailingDirs, maxNumber int) []FullArticle {
+type LevelWiseDeeperOptions struct {
+	Rump       string // for instance /blogs/buttonwood
+	ExcludeDir string // for instance /blogs/buttonwood/2014
+
+	MinDepthDiff int // Relative to the depth of rump!; 0 equals Rump-Depth; thus 2 is the first restricting setting; set to 4 to exclude /blogs/buttonwood/2015/08/article1
+	MaxDepthDiff int // To include /blogs/buttonwood/2015/08/article1 from /blogs/buttonwood => set to 3
+
+	CondenseTrailingDirs int // See FetchCommand - equal member
+	MaxNumber            int //
+}
+
+func LevelWiseDeeper(w http.ResponseWriter, r *http.Request, dtree *DirTree, opt LevelWiseDeeperOptions) []FullArticle {
 
 	lg, lge := loghttp.Logger(w, r)
 	_ = lge
 
-	depthRump := strings.Count(rump, "/")
+	depthRump := strings.Count(opt.Rump, "/")
 
 	arts := []FullArticle{}
 
-	var fc func(rmp1 string, dr1 *DirTree, lvl int)
+	var fc func(string, *DirTree, int)
+
 	fc = func(rmp1 string, dr1 *DirTree, lvl int) {
 
 		// lg("      lvl %2v %v", lvl, dr1.Name)
-		if lvl == 1 && excludeDir == dr1.Name {
-			lg("    excl %v", excludeDir)
-			return
-		}
-
 		keys := make([]string, 0, len(dr1.Dirs))
 		for k, _ := range dr1.Dirs {
 			keys = append(keys, k)
@@ -374,38 +386,51 @@ func LevelWiseDeeper(w http.ResponseWriter, r *http.Request, rump string, dtree 
 
 			//
 			// rmp2 a candidate?
-			if dr2.EndPoint {
-				semanticUri := condenseTrailingDir(rmp2, CondenseTrailingDirs)
-				depthUri := strings.Count(semanticUri, "/")
-
-				if depthUri-depthRump <= maxDepthDiff {
-
-					// lg("        %v %v ; %v     %v", depthRump, depthUri, maxDepthDiff, semanticUri)
-
-					art := FullArticle{Url: rmp2}
-					if dr2.SrcRSS {
-						art.Mod = dr2.LastFound
-					}
-					if len(arts) > maxNumber-1 {
-						return
-					}
-					arts = append(arts, art)
-
-				}
+			if len(arts) > opt.MaxNumber-1 {
+				return
 			}
 
-			//
-			// recurse deeper?
+			if !dr2.EndPoint {
+				continue
+			}
+
+			semanticUri := condenseTrailingDir(rmp2, opt.CondenseTrailingDirs)
+			depthUri := strings.Count(semanticUri, "/")
+			if depthUri-depthRump <= opt.MaxDepthDiff &&
+				depthUri-depthRump >= opt.MinDepthDiff {
+			} else {
+				continue // we could also "break"
+			}
+
+			if opt.ExcludeDir == rmp2 {
+				lg("    exclude dir %v", opt.ExcludeDir)
+				continue
+			}
+
+			// lg("        including %v", semanticUri)
+			art := FullArticle{Url: rmp2}
+			if dr2.SrcRSS {
+				art.Mod = dr2.LastFound
+			}
+			arts = append(arts, art)
+
+		}
+
+		//
+		// recurse horizontally
+		for _, key := range keys {
+			dr2 := dr1.Dirs[key]
+			rmp2 := rmp1 + dr2.Name
 			if len(dr2.Dirs) == 0 {
 				// lg("      LevelWiseDeeper - no children")
 				continue
 			}
 			fc(rmp2, &dr2, lvl+1)
-
 		}
+
 	}
 
-	fc(rump, dtree, 0)
+	fc(opt.Rump, dtree, 0)
 
 	return arts
 

@@ -1,3 +1,6 @@
+// +build fetch1
+// go test -tags=fetch1
+
 package repo
 
 import (
@@ -8,7 +11,7 @@ import (
 	"appengine/aetest"
 )
 
-func Test2(t *testing.T) {
+func Test1(t *testing.T) {
 
 	lg, lge := loghttp.Logger(nil, nil)
 

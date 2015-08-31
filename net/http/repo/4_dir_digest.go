@@ -189,6 +189,39 @@ func loadDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 
 }
 
+// requesting via http; not from filesystem
+func FetchDigest(hostWithPrefix, domain string) (*DirTree, error) {
+
+	lg, lge := loghttp.Logger(nil, nil)
+	_ = lg
+
+	surl := path.Join(hostWithPrefix, domain, "digest2.json")
+	bts, _, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
+	lge(err)
+	if err != nil {
+		return nil, err
+	}
+
+	// lg("%s", bts)
+	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
+
+	if err == nil {
+		err = json.Unmarshal(bts, dirTree)
+		lge(err)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	lg("DirTree   %5.2vkB loaded for %v", len(bts)/1024, surl)
+
+	age := time.Now().Sub(dirTree.LastFound)
+	lg("DirTree is %5.2v hours old (%v)", age.Hours(), dirTree.LastFound.Format(time.ANSIC))
+
+	return dirTree, nil
+
+}
+
 func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
 
 	lg, lge := loghttp.Logger(w, r)

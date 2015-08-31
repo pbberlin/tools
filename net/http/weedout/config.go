@@ -1,9 +1,6 @@
 package weedout
 
-import (
-	"github.com/pbberlin/tools/net/http/repo"
-	"golang.org/x/net/html"
-)
+import "golang.org/x/net/html"
 
 // !DOCTYPE html head
 // !DOCTYPE html body
@@ -14,8 +11,6 @@ const numTotal = 3 // comparable html docs
 const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"
-
-var repoURL = cTestHostDev + repo.UriMountNameY
 
 func attrX(attributes []html.Attribute, key string) (s string) {
 	for _, a := range attributes {

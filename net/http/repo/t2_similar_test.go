@@ -4,6 +4,7 @@
 package repo
 
 import (
+	"path"
 	"testing"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -22,32 +23,51 @@ func Test2(t *testing.T) {
 	}
 	lg("dirtree 400 chars is %v \nend of dirtree", stringspb.ToLen(dirTree.String(), 400))
 
-	path2 := "/news"
-	path2 = "/news/europe"
-	path2 = "/news"
-	path2 = "/blogs"
-	path2 = "/blogs/graphicdetail"
-	subtree, streePath := DiveToDeepestMatch(dirTree, path2)
+	treePath := "/news"
+	treePath = "/news/europe"
+	treePath = "/news"
+	treePath = "/blogs"
+	treePath = "/blogs/graphicdetail"
 
-	lg("subtreePath is %v", streePath)
+	opt := LevelWiseDeeperOptions{}
+	opt.Rump = treePath
+	opt.ExcludeDir = "/news/americas"
+	opt.ExcludeDir = "/blogs/buttonwood"
+	opt.MinDepthDiff = 3
+	opt.MaxDepthDiff = 5
+	opt.CondenseTrailingDirs = 0
+	opt.MaxNumber = 16
 
-	if subtree == nil {
-		lg("subtree is nil")
-	} else {
+	var subtree *DirTree
 
-		opt := LevelWiseDeeperOptions{}
-		opt.Rump = streePath
-		opt.ExcludeDir = "/news/americas"
-		opt.ExcludeDir = "/blogs/buttonwood"
-		opt.MinDepthDiff = 3
-		opt.MaxDepthDiff = 5
-		opt.CondenseTrailingDirs = 0
-		opt.MaxNumber = 16
+	for i := 0; i < 3; i++ {
 
-		articles := LevelWiseDeeper(nil, nil, subtree, opt)
-		for _, art := range articles {
-			lg("found %v", art.Url)
+		subtree, treePath = DiveToDeepestMatch(dirTree, treePath)
+
+		if subtree == nil {
+			lg("#%v treePath %v ; subtree is nil", i, treePath)
+		} else {
+			lg("#%v treePath %v ; subtree exists", i, treePath)
+
+			articles := LevelWiseDeeper(nil, nil, subtree, opt)
+			for _, art := range articles {
+				lg("#%v fnd %v", i, art.Url)
+			}
+
+			if len(articles) >= opt.MaxNumber {
+				break
+			}
+
+			pathPrev := treePath
+			treePath = path.Dir(treePath)
+			lg("#%v  bef %v - aft %v", i, pathPrev, treePath)
+
+			if pathPrev == "." && treePath == "." ||
+				pathPrev == "/" && treePath == "/" {
+				break
+			}
 		}
+
 	}
 
 	// lg("subtr 400 chars is %v \nend of subtr", stringspb.ToLen(subtree.String(), 400))

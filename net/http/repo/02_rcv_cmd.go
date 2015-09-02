@@ -90,7 +90,7 @@ func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 	lge(err)
 
 	for _, config := range fcs {
-		Fetch(w, r, fs, config)
+		FetchUsingRSS(w, r, fs, config)
 	}
 
 	lg("fetching complete")

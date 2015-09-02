@@ -16,6 +16,12 @@ func StackTrace(max int) {
 	}
 }
 
+func ThisFile() string {
+	_, thisFile, _, _ := runtime.Caller(1)
+	thisFile = filepath.Base(thisFile)
+	return thisFile
+}
+
 func LineFileXUp(levelsUp int) (int, string) {
 	_, file, line, _ := runtime.Caller(levelsUp + 1) // plus one for myself-func
 

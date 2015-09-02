@@ -156,6 +156,10 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 					addressable.EndPoint = true
 				}
 
+				if dir == "/2015" || dir == "/08" || dir == "/09" {
+					addressable.EndPoint = true
+				}
+
 				trLp.Dirs[dir] = addressable
 				trLp = &addressable
 
@@ -190,7 +194,8 @@ func loadDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 }
 
 // requesting via http; not from filesystem
-func FetchDigest(hostWithPrefix, domain string) (*DirTree, error) {
+// unused
+func fetchDigest(hostWithPrefix, domain string) (*DirTree, error) {
 
 	lg, lge := loghttp.Logger(nil, nil)
 	_ = lg
@@ -240,28 +245,59 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 
 }
 
-func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSystem, c FetchCommand) error {
+// Fetches URL if local file is outdated.
+// Extracts links
+// adds  links to param treeX
+// saves treeX
+// saves fetched file
+func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSystem, surl string) error {
 
 	lg, lge := loghttp.Logger(w, r)
 
 	if treeX == nil {
-		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+		return fmt.Errorf("tree is nil")
 	}
 
-	crawl1URL := path.Join(c.Host, path.Dir(c.SearchPrefix))
-	lg("crawl %v", crawl1URL)
+	lg("crawling            %v", surl)
 
-	bts, crawl2URL, err := fetch.UrlGetter(r, fetch.Options{URL: crawl1URL})
+	// Determine FileName
+	ourl, err := fetch.URLFromString(surl)
+	fc := FetchCommand{}
+	fc.Host = ourl.Host
+	fc = addDefaults(w, r, fc)
+	semanticUri := condenseTrailingDir(surl, fc.CondenseTrailingDirs)
+	fn := path.Join(docRoot, semanticUri)
+
+	//
+	// Open file for age check
+	file1, err := fs.Open(fn)
+	if err == nil {
+		fi, err := file1.Stat()
+		if err == nil {
+			age := time.Now().Sub(fi.ModTime())
+			if age.Hours() < 2 {
+				lg("    file is only  %4.2v hours old, skipping", age.Hours())
+				return nil
+			}
+		}
+	}
+
+	//
+	// Fetch
+	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
 	lge(err)
 	if err != nil {
 		return err
 	}
+	lg("retrieved           %v; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
-	lg("retrieved %v; %vkB ", crawl2URL.URL.String(), len(bts)/1024)
-
+	//
+	// Extract links
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lge(err)
-
+	if err != nil {
+		return err
+	}
 	anchors := []FullArticle{}
 	var fr func(*html.Node)
 	fr = func(n *html.Node) {
@@ -276,8 +312,23 @@ func crawl(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSy
 		}
 	}
 	fr(doc)
+	lg("saving (new) links to digest")
+	path2DirTree(w, r, treeX, anchors, inf.URL.Host, false)
+	fnDigest := path.Join(docRoot, ourl.Host, "digest2.json")
+	saveDigest(w, r, fs, fnDigest, treeX)
 
-	path2DirTree(w, r, treeX, anchors, crawl2URL.URL.Host, false)
+	//
+	//
+	lg("saving crawled file %v", fn)
+	dir := path.Dir(fn)
+	err = fs.MkdirAll(dir, 0755)
+	lge(err)
+	err = fs.Chtimes(dir, time.Now(), time.Now())
+	lge(err)
+	err = fs.WriteFile(fn, bts, 0644)
+	lge(err)
+	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
+	lge(err)
 
 	return nil
 

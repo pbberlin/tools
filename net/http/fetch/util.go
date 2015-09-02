@@ -13,6 +13,19 @@ func HostFromReq(r *http.Request) string {
 	return splitPort(r.Host)
 }
 
+// A better url.Parse
+func URLFromString(surl string) (*url.URL, error) {
+
+	// Prevent "google.com" => u.Host == "" when scheme == ""
+	if !strings.HasPrefix(surl, "http://") && !strings.HasPrefix(surl, "https://") {
+		surl = "https://" + surl
+	}
+	ourl, err := url.Parse(surl)
+
+	return ourl, err
+
+}
+
 func HostFromStringUrl(surl string) string {
 
 	// Prevent "google.com" => u.Host == "" when scheme == ""

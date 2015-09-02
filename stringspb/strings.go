@@ -92,12 +92,12 @@ func ToLen(s string, nx int) string {
 	for idx, cp := range s {
 		ret = append(ret, cp)
 		cntr++
-		if idx > nx {
+		if idx > nx-2 {
 			break
 		}
 	}
 
-	for cntr <= nx {
+	for cntr < nx {
 		ret = append(ret, ' ')
 		cntr++
 	}

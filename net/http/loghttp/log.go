@@ -110,8 +110,10 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 
 	// Write to log/gae-log
 	// Adding src code info
+
 	line, file := runtimepb.LineFileXUp(1)
-	if strings.HasSuffix(file, "err-http.go") {
+	// if strings.HasSuffix(file, "log.go")
+	if strings.HasSuffix(file, runtimepb.ThisFile()) { // change
 		line, file = runtimepb.LineFileXUp(2)
 	}
 

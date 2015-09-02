@@ -19,12 +19,16 @@ import (
 
 var LogLevel = 0
 
+var ErrNoRedirects = fmt.Errorf("redirect called off")
+var sNoRedirects = ErrNoRedirects.Error()
+
 type Options struct {
 	URL string
 
 	Req *http.Request
 
-	HttpsOnly bool
+	HttpsOnly        bool
+	RedirectHandling int // 1 => call off upon redirects
 }
 
 // Response info
@@ -87,7 +91,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		if c != nil && appengine.IsDevAppServer() {
 			req.URL.Scheme = "http"
 		}
+	}
 
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return ErrNoRedirects
 	}
 
 	if LogLevel > 0 {
@@ -99,6 +106,17 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 
 	resp, err := client.Do(req)
+
+	// Swallow redirect errors
+	if err != nil {
+		if options.RedirectHandling == 1 {
+			serr := err.Error()
+			if strings.Contains(serr, sNoRedirects) {
+				bts := []byte(serr)
+				return bts, Info{URL: req.URL, Mod: time.Now().Add(-10 * time.Minute)}, nil
+			}
+		}
+	}
 
 	cond := false
 	if err != nil {
@@ -152,7 +170,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		tlm, err = time.Parse(time.RFC1123, lm) // Last-Modified: Sat, 29 Aug 2015 21:15:39 GMT
 		if err != nil {
 			tlm, err = time.Parse(time.RFC1123Z, lm) // with numeric time zone
-			_ = err
+			if err != nil {
+				var zeroTime time.Time
+				tlm = zeroTime
+			}
 		}
 	}
 	// log.Printf("    hdr  %v %v\n", lm, tlm.Format(time.ANSIC))

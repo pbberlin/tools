@@ -180,7 +180,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 			break
 		}
 
-		if uriPrefix == "/" {
+		if uriPrefix == "/" || uriPrefix == "." {
 			lg("  root exhausted")
 			break
 		}

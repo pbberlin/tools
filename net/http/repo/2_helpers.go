@@ -95,8 +95,9 @@ MarkX:
 
 		spPrev := sp
 		sp = path.Dir(sp)
-		if sp == "/" && spPrev == "/" ||
-			sp == "." && spPrev == "." {
+		if spPrev == "." && sp == "." ||
+			spPrev == "/" && sp == "/" ||
+			spPrev == "" && sp == "." {
 			lg("Did not find a RSS URL for %v %q", c.SearchPrefix, ret)
 			break
 		}

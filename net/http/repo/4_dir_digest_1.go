@@ -275,9 +275,11 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs f
 		fi, err := file1.Stat()
 		if err == nil {
 			age := time.Now().Sub(fi.ModTime())
-			if age.Hours() < 2 {
-				lg("    file is only  %4.2v hours old, skipping", age.Hours())
+			if age.Hours() < 10 {
+				lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
 				return nil
+			} else {
+				lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
 			}
 		}
 	}
@@ -312,7 +314,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs f
 		}
 	}
 	fr(doc)
-	lg("saving (new) links to digest")
+	lg("\t\tsaving (new) links to digest")
 	path2DirTree(w, r, treeX, anchors, inf.URL.Host, false)
 	fnDigest := path.Join(docRoot, ourl.Host, "digest2.json")
 	saveDigest(w, r, fs, fnDigest, treeX)

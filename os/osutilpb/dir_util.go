@@ -74,7 +74,7 @@ func PathDirReverse(filepath string) (dir, remainder string, dirs []string) {
 
 	filepath = path.Join(filepath, "")
 
-	if filepath == "/" || filepath == "" {
+	if filepath == "/" || filepath == "" || filepath == "." {
 		return "/", "", []string{}
 	}
 

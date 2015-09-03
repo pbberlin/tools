@@ -93,8 +93,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		}
 	}
 
-	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		return ErrNoRedirects
+	if options.RedirectHandling == 1 {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return ErrNoRedirects
+		}
 	}
 
 	if LogLevel > 0 {

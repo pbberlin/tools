@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/stringspb"
@@ -55,7 +56,8 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	p := r.URL.Path
 
 	if strings.HasPrefix(p, prefix) {
-		p = p[len(prefix):]
+		// p = p[len(prefix):]
+		p = strings.TrimPrefix(p, prefix)
 	} else {
 		wpf(b1, "route must start with prefix %v - but is %v", prefix, p)
 	}
@@ -119,9 +121,20 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 		return
 	}
 
-	tp := mime.TypeByExtension(path.Ext(fullP))
+	ext := path.Ext(fullP)
+	ext = strings.ToLower(ext)
+	tp := mime.TypeByExtension(ext)
 
 	w.Header().Set("Content-Type", tp)
+	if false ||
+		ext == ".css" || ext == ".js" ||
+		ext == ".jpg" || ext == ".gif" ||
+		ext == "css" || ext == "js" ||
+		ext == "jpg" || ext == "gif" ||
+		false {
+		htmlfrag.CacheHeaders(w)
+	}
+
 	w.Write(bts1)
 
 	b1 = new(bytes.Buffer) // success => reset the message log => dumps an empty buffer

@@ -17,18 +17,28 @@
 //
 // All internal usage of Name() had to be rewritten.
 //
-// The locking approach remains a mystery to me.
-// There are multiple locks and mutexes in Remove/Rename/Open and Close.
-// I kept them in place.
-// Strangely, the InMemoryFile.memDir map is *not* synced at all,
-// though I think it should.
-// Strangely, Remove() did not unregister with parent.
+// There is one mutex for the central map.
+// There is one mutex for each file.
+//
+// Strangely, Remove() did not unregister with parent. I fixed that.
+//
+// registerDirs(), registerWithParent() and unRegisterWithParent()
+//   all occur *outside* the locking block.
+// This is probably because they use Open... which in itself
+// requires a lock - leadig to deadlock.
+//
+// In general, changes to the parent's InMemoryFile.memDir map are *not* synced at all!
+// Also creating/deleting a file and removing it from it's parent directory
+// should be one atomic transaction.
+// I believe the original architect of the filesys left some architectural work todo.
+// Would it not be clearer to have one goroutine with a for-select manage all directory changes?
+// We would send creates, renames and removes on a channel then...
+//
 //
 package memfs
 
 import (
 	"os"
-	"sync"
 
 	"github.com/pbberlin/tools/os/fsi"
 )
@@ -36,8 +46,6 @@ import (
 const (
 	sep = "/" // No support for windows
 )
-
-var mux = &sync.Mutex{}
 
 func init() {
 

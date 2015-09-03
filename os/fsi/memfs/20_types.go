@@ -15,14 +15,16 @@ import (
 type memMapFs struct {
 	// fos - file objects - a map containing all files and directories.
 	// It must be keyed by the full path, otherwise uniqueness suffers
-	fos   map[string]fsi.File
-	mutex *sync.RWMutex
+	fos map[string]fsi.File
+
+	mtx *sync.RWMutex // syncing fos
 
 	// Could be expanded into a kind of "currentDir"
 	// for compatibility with osfs.
 	// Currently only used as instance name
 	ident         string
 	readdirsorter func([]os.FileInfo)
+	shadow        fsi.FileSystem
 }
 
 // Ident is an option func, adding a specific identification to the filesystem
@@ -30,6 +32,14 @@ func Ident(mnt string) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*memMapFs)
 		fst.ident = mnt
+	}
+}
+
+// Ident is an option func, adding a specific identification to the filesystem
+func ShadowFS(fs fsi.FileSystem) func(fsi.FileSystem) {
+	return func(fs fsi.FileSystem) {
+		fst := fs.(*memMapFs)
+		fst.shadow = fs
 	}
 }
 

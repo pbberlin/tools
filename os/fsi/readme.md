@@ -76,9 +76,8 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 
 #### Locking
 
-- Can the locking approach of memfs be simplified?
-
-- Can the locking approach of memfs at least be explained in comments?
+- The locking approach of memfs is incomplete.<br>
+memfs/0_init.go has details and solutions.
 
 - memfs registerWithParent locking seems neglected.
 

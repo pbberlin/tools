@@ -3,6 +3,7 @@ package memfs
 import (
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -98,9 +99,9 @@ func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 	if ok {
 		return fsi.ErrFileExists
 	} else {
-		m.lock()
 		fo := m.createHelper(name)
 		fo.dir = true
+		m.lock()
 		m.fos[name] = fo
 		m.unlock()
 		m.registerDirs(name)
@@ -119,17 +120,66 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 
 	m.rlock()
 	f, ok := m.fos[name]
-	ff, ok := f.(*InMemoryFile)
-	if ok {
-		ff.Open()
-	}
 	m.runlock()
+	if ok {
+		ff, _ := f.(*InMemoryFile)
+		ff.Open()
+	} else {
+		f, err := m.underlyingCreate(name)
+		if err != nil {
+			log.Printf("underlying says %v\n", err)
+		} else {
+			log.Printf("retuning underlying %v\n", name)
+			return f, nil
+		}
+	}
 
 	if ok {
 		return f, nil
 	} else {
 		return nil, fsi.ErrFileNotFound
 	}
+}
+
+func (m *memMapFs) underlyingCreate(name string) (fsi.File, error) {
+
+	if m.shadow == nil {
+		return nil, fsi.ErrFileNotFound
+	}
+
+	fshad, err := m.shadow.Open(name)
+	if err != nil {
+		return nil, fsi.ErrFileNotFound
+	}
+
+	err = m.MkdirAll(path.Dir(name), 0755)
+	if err != nil {
+		return nil, err
+	}
+
+	dst, err := m.Create(name)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(dst, fshad)
+	if err != nil {
+		return nil, err
+	}
+
+	err = dst.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	// reopen
+	ff, ok := dst.(*InMemoryFile)
+	if ok {
+		ff.Open()
+	}
+
+	return dst, nil
+
 }
 
 func (m *memMapFs) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
@@ -161,7 +211,7 @@ func (m *memMapFs) Remove(name string) error {
 		m.lock()
 		delete(m.fos, name)
 		m.unlock()
-		m.unRegisterWithParent(name)
+		m.unRegisterWithParent(name) // should be inside lock-unlock - but causes deadlock
 	}
 	return nil
 }
@@ -183,7 +233,7 @@ func (m *memMapFs) RemoveAll(name string) error {
 			delete(m.fos, p)
 			m.unlock()
 			m.rlock()
-			m.unRegisterWithParent(name)
+			m.unRegisterWithParent(name) // should be inside lock-unlock - but causes deadlock
 		}
 	}
 	return nil

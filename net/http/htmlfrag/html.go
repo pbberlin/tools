@@ -168,3 +168,15 @@ func SetNocacheHeaders(w http.ResponseWriter, plainOrHtml bool) {
 	}
 
 }
+func CacheHeaders(w http.ResponseWriter) {
+
+	w.Header().Set("Cache-control", "max-age=2592000") //30days (60sec * 60min * 24hours * 30days)
+	w.Header().Set("Cache-control", "public")
+
+	tn := time.Now()
+	tn = tn.Add(-1 * 24 * 365 * time.Hour)
+	tns := tn.Format(http.TimeFormat)
+	w.Header().Set("Last-Modified", tns)
+	// w.Header().Set("Date", tns)
+
+}

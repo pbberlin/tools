@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"appengine"
+
 	// sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 
 	"github.com/pbberlin/tools/appengine/instance_mgt"
@@ -21,6 +23,7 @@ func view(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	tplAdder("n_cont_1", "<pre>{{.}}</pre>", instance_mgt.GetStatic().String())
 	tplAdder("n_cont_2", "<p>{{.}} views</p>", cntr)
 	tplAdder("n_cont_0", `
+		<p>AppID is `+appengine.AppID(appengine.NewContext(r))+`</p>
 		<p>On the development server, call 
 		<a href='/instance-info/collect' 
 		target='collect' >collect</a> first.</p>

@@ -2,18 +2,18 @@ package memfs
 
 import "sync"
 
+var muxMux = &sync.Mutex{}
+
 func (m *memMapFs) getMutex() *sync.RWMutex {
-	mux.Lock()
-	if m.mutex == nil {
-		m.mutex = &sync.RWMutex{}
+	muxMux.Lock()
+	if m.mtx == nil {
+		m.mtx = &sync.RWMutex{}
 	}
-	mux.Unlock()
-	return m.mutex
+	muxMux.Unlock()
+	return m.mtx
 }
-func (m *memMapFs) lock() {
-	mx := m.getMutex()
-	mx.Lock()
-}
+
+func (m *memMapFs) lock()    { m.getMutex().Lock() }
 func (m *memMapFs) unlock()  { m.getMutex().Unlock() }
 func (m *memMapFs) rlock()   { m.getMutex().RLock() }
 func (m *memMapFs) runlock() { m.getMutex().RUnlock() }

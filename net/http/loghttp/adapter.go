@@ -157,20 +157,30 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 
 				given(w, r, mp)
 
+				// automatically set on appengine live, but not on appengine dev
 				if r.Header.Get("Content-Type") == "" {
 					w.Header().Set("Content-Type", "text/html; charset=utf-8")
-					// automatically set on appengine live, but not on appengine dev
 				}
 
 				if r.Header.Get("X-Custom-Header-Counter") != "nocounter" {
-					distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
-					cntr, _ := distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
+					cntr := 0
+					if true {
+						// This seems to cause problems with new applications
+						// possible because of missing indize
+						distributed_unancestored.Increment(c, mp["dir"].(string)+mp["base"].(string))
+						cntr, _ = distributed_unancestored.Count(c, mp["dir"].(string)+mp["base"].(string))
+					}
 					fmt.Fprintf(w, "<br>\n%v Views<br>\n", cntr)
 				}
 			}
-			// given1(c, w, r)
-			wrapped := appstats.NewHandler(given1)
-			wrapped.ServeHTTP(w, r)
+
+			if false {
+				given1(c, w, r)
+			} else {
+				wrapped := appstats.NewHandler(given1)
+				wrapped.ServeHTTP(w, r)
+			}
+
 		}
 
 	}

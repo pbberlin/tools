@@ -115,21 +115,32 @@ func (m *memMapFs) MkdirAll(name string, perm os.FileMode) error {
 
 func (m *memMapFs) Open(name string) (fsi.File, error) {
 
+	origName := name
+
 	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
+	// log.Printf("underlying locks %q \n", name)
 	m.rlock()
 	f, ok := m.fos[name]
-	m.runlock()
 	if ok {
-		ff, _ := f.(*InMemoryFile)
-		ff.Open()
-	} else {
-		f, err := m.underlyingCreate(name)
-		if err != nil {
-			log.Printf("underlying says %v\n", err)
+		ff, okConv := f.(*InMemoryFile)
+		if okConv {
+			ff.Open()
 		} else {
-			log.Printf("retuning underlying %v\n", name)
+			return nil, fmt.Errorf("could not convert f to InMemoryFile")
+		}
+	}
+	m.runlock()
+	// log.Printf("underlying UNlck %q \n", name)
+	if !ok {
+		var err error
+		f, err = m.underlyingCreate(name, origName)
+		if err != nil {
+			log.Printf("underlying says  %q => %v\n", name, err)
+		} else {
+			log.Printf("underlying succ %q\n", name)
+			m.Dump()
 			return f, nil
 		}
 	}
@@ -141,7 +152,7 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 	}
 }
 
-func (m *memMapFs) underlyingCreate(name string) (fsi.File, error) {
+func (m *memMapFs) underlyingCreate(name, origName string) (fsi.File, error) {
 
 	if m.shadow == nil {
 		return nil, fsi.ErrFileNotFound
@@ -151,20 +162,41 @@ func (m *memMapFs) underlyingCreate(name string) (fsi.File, error) {
 	if err != nil {
 		return nil, fsi.ErrFileNotFound
 	}
+	defer fshad.Close()
 
-	err = m.MkdirAll(path.Dir(name), 0755)
+	inf, err := fshad.Stat()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("fileinfo from shadow failed: %v", err)
 	}
 
-	dst, err := m.Create(name)
-	if err != nil {
-		return nil, err
+	if inf.IsDir() {
+		return nil, fmt.Errorf("is dir")
 	}
 
-	_, err = io.Copy(dst, fshad)
-	if err != nil {
-		return nil, err
+	name = origName
+
+	dir := path.Dir(name)
+	var dst fsi.File
+
+	if true || dir != "." && dir != "" {
+		err = m.MkdirAll(path.Dir(name), 0755)
+		if err != nil {
+			return nil, err
+		}
+		log.Printf("created front dir %q \n", path.Dir(name))
+
+		dst, err = m.Create(name)
+		if err != nil {
+			return nil, err
+		}
+		log.Printf("created front file %q \n", name)
+
+		n, err := io.Copy(dst, fshad)
+		if err != nil {
+			return nil, err
+		}
+		// dst.Write([]byte("some more bytes"))
+		log.Printf("copied %v for %v\n", n, name)
 	}
 
 	err = dst.Close()
@@ -173,9 +205,15 @@ func (m *memMapFs) underlyingCreate(name string) (fsi.File, error) {
 	}
 
 	// reopen
-	ff, ok := dst.(*InMemoryFile)
-	if ok {
+	// ff, _ := dst.(*InMemoryFile)
+	// ff.closed = false
+	// atomic.StoreInt64(&ff.at, 0)
+
+	ff, okConv := dst.(*InMemoryFile)
+	if okConv {
 		ff.Open()
+	} else {
+		return nil, fmt.Errorf("could not convert dst to InMemoryFile")
 	}
 
 	return dst, nil

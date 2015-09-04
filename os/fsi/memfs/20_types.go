@@ -36,10 +36,10 @@ func Ident(mnt string) func(fsi.FileSystem) {
 }
 
 // Ident is an option func, adding a specific identification to the filesystem
-func ShadowFS(fs fsi.FileSystem) func(fsi.FileSystem) {
+func ShadowFS(behindFS fsi.FileSystem) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*memMapFs)
-		fst.shadow = fs
+		fst.shadow = behindFS
 	}
 }
 
@@ -75,6 +75,12 @@ func New(options ...func(fsi.FileSystem)) *memMapFs {
 		option(m)
 	}
 	return m
+}
+
+func (m *memMapFs) AddOpt(options ...func(fsi.FileSystem)) {
+	for _, option := range options {
+		option(m)
+	}
 }
 
 func (m *memMapFs) RootDir() string {

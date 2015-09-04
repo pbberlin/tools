@@ -15,7 +15,7 @@ func InitHandlers() {
 	http.HandleFunc(UrlUploadReceive, loghttp.Adapter(receiveUpload))
 	http.HandleFunc("/mnt00/", loghttp.Adapter(ServeDsFsFile))
 	http.HandleFunc("/mnt01/", loghttp.Adapter(ServeDsFsFile))
-	http.HandleFunc("/mnt02/", loghttp.Adapter(ServeDsFsFile))
+	// http.HandleFunc("/mnt02/", loghttp.Adapter(ServeDsFsFile))
 }
 
 // userinterface rendered to HTML - not only the strings for title and url

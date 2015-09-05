@@ -7,15 +7,15 @@ The interface, http-fs and the memory-fs were taken
 from [Steve Francia](https://twitter.com/spf13)'s afero:
 Afero can be found [here](https:github.com/spf13/afero).
 
-I had these ideas in mind:
+I had these purposes in mind:
 
-- Content management systems on app engine.<br>
+- Deploying content management systems on app engine.<br>
 Combining any apps with static pages and static HTML UI wrappers.
 
 - Any HTTP services on app engine, managing static resources.
 
 
-There is a similar effort going on by [rainycape](https://github.com/rainycape/vfs).
+A similar effort was made by [rainycape](https://github.com/rainycape/vfs).
 
 Deployments can be made to local machines.
 Files are editable with all editors.
@@ -28,24 +28,34 @@ The required interface did not remain ultra slim,
 since apps need accessing all functions *via interface*.
 They cannot access conditional methods easily.
 
-All Fileystems provide an pck.Unrwap(fsi)(fsImpl,bool) to get access to
+All Fileystems provide a pck.Unrwap(fsi)(fsImpl,bool) to get access to
 the underlying fileystem. But we dont want to unwrap, only to access fsImpl.Chmod(...).
-We need fsiX.Chomod() directly.
+We need fsiX.Chmod() directly.
 
 
 #### Subpackage common
 Holds common extensions to all filesystems.
 It contains an implementation of filepath.walk,
 that can be used for all contained filesystems.
+
 dsfs.RemoveAll is built on this walk.
+
+Contains standardization logic for paths.
+
 
 #### Subpackage tests 
 Contains tests for all filesystems.
-Tests on file level are taken from [afero](https:github.com/spf13/afero).
-I added a directory-tree-walk test suite and an httpfs-wrapper test.
+
+File level tests are taken from [afero](https:github.com/spf13/afero).
+
+I added a directory-tree test suite, with lots of subdirectories and files, and file-retrieval and removal.
+
+I also added a httpfs-wrapper test (incomplete).
+
+Tests for path standardization logic.
 
 #### osfs 
-Osfs is the operating system fs. Replace 
+Osfs is the wrapped operating system. Replace 
 	
 	os.Open() and ioutil.WriteFile()
 by 
@@ -55,9 +65,13 @@ by
 Then you can switch between hard disk and memory filesystem
 by changing the instantiation.
 
+osfs expects unix style paths, even under windows.
+Give it c:/dir/file.
+
+
 #### memfs
 Keeps directories and files completely in RAM.
-Good for quick testing. Cleanup is included.
+Good for quick testing and fast cleanup.
 
 You can change the MountPoint of a memfs after its creation,
 thus storing multiple trees consecutively, but not concurrently.
@@ -72,7 +86,7 @@ See doc.go for details.
 
 
 #### s3fs
-Not yet adapted: A filesystem layer for amazon s3 and ceph
+Not yet adapted: A filesystem layer for amazon s3 or ceph
 
 
 #### httpfs
@@ -122,6 +136,7 @@ To access implementation specific functionality, use
 
 	subpck.Unwrap(fsi.FileSystem) SpecificFileSys
 
+
 Terminology
 --------------------
 "name" or "filename" can mean either the basename or the full path of the file,
@@ -144,3 +159,17 @@ Exception:
 
 
 Compare [discussion on stackoverflow](http:stackoverflow.com/questions/2235173/file-name-path-name-base-name-naming-standard-for-pieces-of-a-path)
+
+
+Fat architectural distinction to Afero
+--------------------
+fileinfo.Name() should return the filename without path.
+
+I think this keeps the file independent from its current location in a directory tree.
+
+It also means, the file has no method to access its current folder.
+We have to know its location, in order to open it.
+
+This is in striking contrast to the Afero implementation, where fileinfo.Name() returns the *full* path.
+But the documentation for os.FileInfo.Name() is on my side.
+Even Microsoft C# and C++ implementation [agree](https://msdn.microsoft.com/de-de/library/system.io.fileinfo.name(v=vs.110).aspx) and provide a separate FullName method.

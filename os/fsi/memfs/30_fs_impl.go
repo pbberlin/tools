@@ -280,19 +280,20 @@ func (m *memMapFs) RemoveAll(name string) error {
 	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
-	// log.Printf("starting removeall %v", name)
+	log.Printf("starting memfs removeall %v", name)
 
 	m.rlock()
 	defer m.runlock()
 	for p, _ := range m.fos {
-		// log.Printf("    removeall check %v", p)
+		// log.Printf("    removeall checking %v", p)
 		if strings.HasPrefix(p, name) {
+			log.Printf("    removeall deleting %v", p)
 			m.runlock()
 			m.lock()
 			delete(m.fos, p)
 			m.unlock()
 			m.rlock()
-			m.unRegisterWithParent(name) // should be inside lock-unlock - but causes deadlock
+			m.unRegisterWithParent(name) // now readlocked, therefore ok
 		}
 	}
 	return nil

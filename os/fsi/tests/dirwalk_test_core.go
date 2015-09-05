@@ -212,7 +212,7 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 			mode = "all"
 		}
 		wpf(bb, "searching %-6v  %q\n", mode, path)
-		children, err := fsConcrete.SubdirsByPath(path, direct)
+		children, err := fsConcrete.SubtreeByPath(path, direct)
 		if err != nil {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {

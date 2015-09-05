@@ -2,10 +2,10 @@ package memfs
 
 import (
 	"log"
-	"path"
 	// "path/filepath"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 )
 
 // try to find parent in main map-of-files
@@ -37,13 +37,13 @@ func (m *memMapFs) registerWithParent(name string) string {
 	// first try
 	pDir, err := m.findParent(name)
 	if err != nil {
-		// first try -dont care
+		// first try - dont care
 	}
 	if pDir == nil {
 		newPar, _ := m.SplitX(name)
 		if len(newPar) > 0 {
 			// log.Printf("  create parent %-32q for %v\n", newPar, name)
-			err := m.MkdirAll(newPar, 0777)
+			err := m.MkdirAll(newPar, 0755)
 			if err != nil && err != fsi.ErrFileExists {
 				log.Printf("Mkdir for %v failed %v", newPar, err)
 			}
@@ -53,7 +53,7 @@ func (m *memMapFs) registerWithParent(name string) string {
 	// trying again after creation
 	pDir, err = m.findParent(name)
 	if err != nil {
-		log.Printf("  parent for %v should now be there \n", name)
+		// log.Printf("  parent for %v should now be there \n", name)
 		return ""
 	}
 	if pDir != nil {
@@ -77,7 +77,7 @@ func (m *memMapFs) registerWithParent(name string) string {
 func (m *memMapFs) registerDirs(name string) {
 
 	parent, bname := m.SplitX(name)
-	name = path.Join(parent, bname)
+	name = parent + bname
 
 	// register upwardly
 	cntr := 0
@@ -102,7 +102,7 @@ func (m *memMapFs) registerDirs(name string) {
 func (m *memMapFs) unRegisterWithParent(name string) error {
 
 	parent, bname := m.SplitX(name)
-	name = path.Join(parent, bname)
+	name = parent + bname
 
 	pDir, err := m.findParent(name)
 	if err != nil {
@@ -110,8 +110,9 @@ func (m *memMapFs) unRegisterWithParent(name string) error {
 	}
 
 	pDirC := pDir.(*InMemoryFile)
-	delete(pDirC.memDir, name)
-	// log.Printf("unregistered %-22q in %q \n", name, pDirC.name)
+	// log.Printf("trying to unregister %-22q in %q - \n\t%+v\n", name, pDirC.name, pDirC.memDir)
+	delete(pDirC.memDir, common.Directorify(name))
+	delete(pDirC.memDir, common.Filify(name))
 
 	return nil
 }

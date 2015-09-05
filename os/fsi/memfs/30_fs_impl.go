@@ -1,6 +1,7 @@
 package memfs
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 )
 
 func (memMapFs) Name() string { return "memfs" } // type
@@ -33,7 +35,7 @@ func (m *memMapFs) createHelper(name string) *InMemoryFile {
 func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	f, ok := m.fos[name]
 	if !ok {
@@ -54,7 +56,7 @@ func (m *memMapFs) Chmod(name string, mode os.FileMode) error {
 func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	f, ok := m.fos[name]
 	if !ok {
@@ -75,7 +77,7 @@ func (m *memMapFs) Chtimes(name string, atime time.Time, mtime time.Time) error 
 func (m *memMapFs) Create(name string) (fsi.File, error) {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	m.lock()
 	m.fos[name] = m.createHelper(name)
@@ -91,7 +93,8 @@ func (fs *memMapFs) Lstat(path string) (os.FileInfo, error) {
 func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+
+	name = dir + common.Directorify(bname) // not join, since it removes trailing slash
 
 	m.rlock()
 	_, ok := m.fos[name]
@@ -110,7 +113,7 @@ func (m *memMapFs) Mkdir(name string, perm os.FileMode) error {
 }
 
 func (m *memMapFs) MkdirAll(name string, perm os.FileMode) error {
-	return m.Mkdir(name, 0777)
+	return m.Mkdir(name, perm)
 }
 
 func (m *memMapFs) Open(name string) (fsi.File, error) {
@@ -118,10 +121,23 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 	origName := name
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
+
+	name1 := name
+	name2 := name
+	if strings.HasSuffix(name, "/") {
+		// explicitly asked for dir
+		name2 = common.Filify(name)
+	} else {
+		// try file first, then try the directory
+		name2 = common.Directorify(name)
+	}
 
 	m.rlock()
-	f, ok := m.fos[name]
+	f, ok := m.fos[name1]
+	if !ok {
+		f, ok = m.fos[name2]
+	}
 	if ok {
 		ff, okConv := f.(*InMemoryFile)
 		if okConv {
@@ -167,9 +183,7 @@ func (m *memMapFs) lookupUnderlyingFS(
 		return nil, fsi.ErrFileNotFound
 	}
 
-	// mshadt := m.shadow.(*)
-
-	fshad, err := m.shadow.Open(nameMemFS)
+	fshad, err := m.shadow.Open(origName)
 	if err != nil {
 		return nil, fsi.ErrFileNotFound
 	}
@@ -186,18 +200,32 @@ func (m *memMapFs) lookupUnderlyingFS(
 	if inf.IsDir() {
 		// return nil, fmt.Errorf("is dir")
 		err = m.MkdirAll(origName, 0755)
-		if err != nil {
+		if err != nil && err != fsi.ErrFileExists {
 			return nil, err
 		}
 		m.rlock()
-		dir, ok := m.fos[nameMemFS]
+		dir, ok := m.fos[common.Directorify(path.Dir(nameMemFS))]
 		m.runlock()
 		if !ok {
-			m.Dump()
 			return nil, fmt.Errorf("dir created with MkDir, but not in fos map %q %q", nameMemFS, origName)
 		}
-		return dir, nil
+
+		// Now we try to cache the index-file.
+		// Yes. I tried to keep it simple!
+		idx, err := m.shadow.Open(path.Join(origName, "index.html"))
+		if err != fsi.ErrFileNotFound {
+			return dir, nil
+		}
+		if err != nil {
+			return dir, nil
+		}
+		defer idx.Close()
+		fshad = idx
+
 	}
+
+	//
+	//
 
 	nameMemFS = origName
 
@@ -205,7 +233,7 @@ func (m *memMapFs) lookupUnderlyingFS(
 
 	// regular file
 	err = m.MkdirAll(path.Dir(nameMemFS), 0755)
-	if err != nil {
+	if err != nil && err != fsi.ErrFileExists {
 		return nil, err
 	}
 	log.Printf("  from underlying: created front dir  %q \n", path.Dir(nameMemFS))
@@ -261,7 +289,7 @@ func (fs *memMapFs) ReadDir(name string) ([]os.FileInfo, error) {
 func (m *memMapFs) Remove(name string) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	m.rlock()
 	defer m.runlock()
@@ -278,7 +306,7 @@ func (m *memMapFs) Remove(name string) error {
 func (m *memMapFs) RemoveAll(name string) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	log.Printf("starting memfs removeall %v", name)
 
@@ -296,17 +324,20 @@ func (m *memMapFs) RemoveAll(name string) error {
 			m.unRegisterWithParent(name) // now readlocked, therefore ok
 		}
 	}
+
+	// m.Dump()
+
 	return nil
 }
 
 func (m *memMapFs) Rename(name, newname string) error {
 
 	dir, bname := m.SplitX(name)
-	name = path.Join(dir, bname)
+	name = dir + bname // not join, since it removes trailing slash
 
 	{
 		dir, bname := m.SplitX(newname)
-		newname = path.Join(dir, bname)
+		newname = dir + bname // not join, since it removes trailing slash
 	}
 
 	m.rlock()
@@ -369,13 +400,15 @@ func (m *memMapFs) List() {
 	}
 }
 
-func (m *memMapFs) Dump() {
+func (m *memMapFs) Dump() []byte {
 
 	keys := make([]string, 0, len(m.fos))
 	for key, _ := range m.fos {
 		keys = append(keys, key)
 	}
 	sort.Strings(keys)
+
+	b := new(bytes.Buffer)
 
 	for _, k := range keys {
 		f := m.fos[k]
@@ -387,7 +420,10 @@ func (m *memMapFs) Dump() {
 				vf, _ := v.(*InMemoryFile)
 				names += vf.name + "  "
 			}
-			log.Printf("%-38q %5v %4v %-20v\n", ff.name, y.IsDir(), y.Size(), names)
+			b.WriteString(fmt.Sprintf("%-38q %5v %4v %-20v\n", ff.name, y.IsDir(), y.Size(), names))
 		}
 	}
+
+	log.Printf("%s\n", b.Bytes())
+	return b.Bytes()
 }

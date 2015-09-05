@@ -4,15 +4,16 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 
 	"appengine/datastore"
 )
 
-// SubdirsByPath retrieves a subdirectories of a given directory.
+// subtreeByPath retrieves a subdirectories of a given directory.
 // It is relying on an indexed string property "Dir"
 // containing a string representation of the full path.
 //
-// It might be fast for deep, uncached directory subtrees,
+// It might be fast for deep, uncached directory subtree,
 // that have been saved in nested manner.
 //
 // However, it might not find recently added directories.
@@ -20,10 +21,13 @@ import (
 // "warning" fsi.EmptyQueryResult
 //
 // The func could easily be enhanced chunked scanning.
-func (fs *dsFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]DsDir, error) {
+//
+// It is currently used by ReadDir and by the test package.
+// It is public for the test package.
+func (fs *dsFileSys) SubtreeByPath(name string, onlyDirectChildren bool) ([]DsDir, error) {
 
 	dir, bname := fs.SplitX(name)
-	name = dir + filyfyBName(bname)
+	name = dir + common.Filify(bname)
 	if !strings.HasSuffix(name, sep) {
 		name += sep
 	}

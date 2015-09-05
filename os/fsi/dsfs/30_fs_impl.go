@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -38,7 +37,7 @@ func (fs *dsFileSys) Chmod(name string, mode os.FileMode) error {
 			return err
 		}
 		dir.MMode = mode
-		_, err = fs.saveDirByPathExt(dir, path.Join(dir.Dir, dir.BName))
+		_, err = fs.saveDirByPathExt(dir, dir.Dir+dir.BName)
 		if err != nil {
 			return err
 		}
@@ -64,7 +63,7 @@ func (fs *dsFileSys) Chtimes(name string, atime time.Time, mtime time.Time) erro
 			return err
 		}
 		dir.MModTime = atime
-		_, err = fs.saveDirByPathExt(dir, path.Join(dir.Dir, dir.BName))
+		_, err = fs.saveDirByPathExt(dir, dir.Dir+dir.BName)
 		if err != nil {
 			return err
 		}
@@ -83,7 +82,7 @@ func (fs *dsFileSys) Create(name string) (fsi.File, error) {
 
 	f := DsFile{}
 	f.fSys = fs
-	f.BName = filyfyBName(bname)
+	f.BName = common.Filify(bname)
 	f.Dir = dir
 	f.MModTime = time.Now()
 	f.MMode = 0644
@@ -180,6 +179,9 @@ func (fs *dsFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 }
 
 // See fsi.FileSystem interface.
+
+//
+// ReadDir might not find recently added directories.
 func (fs *dsFileSys) ReadDir(name string) ([]os.FileInfo, error) {
 
 	dirs, err := fs.dirsByPath(name)
@@ -309,7 +311,7 @@ func (fs *dsFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 	dir, bname := fs.SplitX(name)
 	f := DsFile{}
 	f.Dir = dir
-	f.BName = filyfyBName(bname)
+	f.BName = common.Filify(bname)
 	f.fSys = fs
 	f.MModTime = time.Now()
 

@@ -31,7 +31,7 @@
 // Again: Traversal - meaning ReadDir() - is done
 // using one global index of the Dir property.
 // This index can be queried for equality (direct children),
-// or for retrieval of entire subtrees.
+// or for retrieval of entire subtree.
 //
 //
 // Todo/Consider:

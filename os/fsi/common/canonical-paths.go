@@ -77,3 +77,39 @@ func UnixPather(name, rootDir string) (dir, bname string) {
 	return
 
 }
+
+// Remove trailing slash.
+// Except from Root.
+// We need this when we want Dir-Objects to have a basename
+// without trailing slash.
+// We also need it, to modify search path towards no-trailing slash.
+// In all other cases, SplitX yields exactly the naming we want.
+func Filify(bname string) string {
+	if len(bname) > 1 {
+		return strings.TrimSuffix(bname, "/")
+	}
+	if bname == "/" {
+		return ""
+	}
+	if bname == "." {
+		return ""
+	}
+	if bname == "" {
+		return ""
+	}
+	return bname
+}
+
+// Basically, add trailing slash
+func Directorify(name string) string {
+
+	if name == "/" || name == "" || name == "." {
+		return name
+	}
+
+	if strings.HasSuffix(name, "/") {
+		return name
+	}
+
+	return name + "/"
+}

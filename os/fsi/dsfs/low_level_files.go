@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 	"github.com/pbberlin/tools/runtimepb"
 
 	"appengine/datastore"
@@ -51,7 +52,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 
 	var files []DsFile
 
-	foDir, err := fs.dirByPath(dir + filyfyBName(bname))
+	foDir, err := fs.dirByPath(dir + common.Filify(bname))
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {
@@ -97,7 +98,7 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 		bname = f.BName
 		f.Dir = dir
 	}
-	f.BName = filyfyBName(bname)
+	f.BName = common.Filify(bname)
 
 	// f.MModTime = time.Now()
 	f.fSys = fs

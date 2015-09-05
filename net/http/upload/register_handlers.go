@@ -47,7 +47,13 @@ func InitHandlers() {
 			w.Write([]byte("chalamacuca"))
 		}
 	}
+	dmpMemfs := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+		htmlfrag.SetNocacheHeaders(w, false)
+		w.Write([]byte("<pre>"))
+		w.Write(fs1.Dump())
+	}
 	http.HandleFunc("/mnt02/", loghttp.Adapter(dynSrv))
+	http.HandleFunc("/memfsdmp", loghttp.Adapter(dmpMemfs))
 	// http.HandleFunc("/", loghttp.Adapter(dynSrv))
 
 }

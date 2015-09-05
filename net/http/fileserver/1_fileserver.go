@@ -17,6 +17,7 @@ import (
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 	"github.com/pbberlin/tools/stringspb"
 )
 
@@ -170,7 +171,7 @@ func dirListJson(w http.ResponseWriter, r *http.Request, f fsi.File) {
 		for _, d := range dirs {
 			name := d.Name()
 			if d.IsDir() {
-				name += "/"
+				name = common.Directorify(name)
 			}
 			name = htmlReplacer.Replace(name)
 
@@ -213,7 +214,9 @@ func dirListHtml(w http.ResponseWriter, r *http.Request, f fsi.File) {
 
 			linktitle := htmlReplacer.Replace(name)
 			linktitle = stringspb.Ellipsoider(linktitle, 40)
-			linktitle += suffix
+			if d.IsDir() {
+				linktitle = common.Directorify(linktitle)
+			}
 
 			surl := path.Join(r.URL.Path, name) + suffix + "?fmt=html"
 

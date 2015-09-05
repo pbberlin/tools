@@ -7,13 +7,15 @@ The interface, http-fs and the memory-fs were taken
 from [Steve Francia](https://twitter.com/spf13)'s afero:
 Afero can be found [here](https:github.com/spf13/afero).
 
-I had three cases in mind:
+I had these ideas in mind:
 
-- Http services on app engine, who manage static resources.
+- Content management systems on app engine.<br>
+Combining any apps with static pages and static HTML UI wrappers.
 
-- Image repositories on app engine.
+- Any HTTP services on app engine, managing static resources.
 
-- Content management systems.
+
+There is a similar effort going on by [rainycape](https://github.com/rainycape/vfs).
 
 Deployments can be made to local machines.
 Files are editable with all editors.
@@ -22,10 +24,14 @@ Files are editable with all editors.
 Contains the minimal
 requirements for exchangeable filesystems.
 
-The required interface is intentionally ultra slim.
-Contact me, if you think, the interface needs 
-additional *mandatory* methods.
-Then create a pull-request and add your method to the interface and to all filesystems.
+The required interface did not remain ultra slim,
+since apps need accessing all functions *via interface*.
+They cannot access conditional methods easily.
+
+All Fileystems provide an pck.Unrwap(fsi)(fsImpl,bool) to get access to
+the underlying fileystem. But we dont want to unwrap, only to access fsImpl.Chmod(...).
+We need fsiX.Chomod() directly.
+
 
 #### Subpackage common
 Holds common extensions to all filesystems.
@@ -53,6 +59,13 @@ by changing the instantiation.
 Keeps directories and files completely in RAM.
 Good for quick testing. Cleanup is included.
 
+You can change the MountPoint of a memfs after its creation,
+thus storing multiple trees consecutively, but not concurrently.
+
+You can add a "shadow" filesystem to memfs.
+Memfs will now act as cache for the shadow filesystem.
+
+
 #### dsfs
 With dsfs you can write on google's datastore like onto a local hard disk.
 See doc.go for details.
@@ -61,8 +74,9 @@ See doc.go for details.
 #### s3fs
 Not yet adapted: A filesystem layer for amazon s3 and ceph
 
+
 #### httpfs
-This fs can wrap any previous filesystems and makes them serveable by a go http fileserver.
+httpfs can wrap any previous filesystem and make it serveable by a go http fileserver.
 
 ## Improvements
 
@@ -77,9 +91,12 @@ This fs can wrap any previous filesystems and makes them serveable by a go http 
 #### Locking
 
 - The locking approach of memfs is incomplete.<br>
-memfs/0_init.go has details and solutions.
+memfs/0_init.go has details and solutions.<br>
+It is also impossible to improve, since you constantly run into deadlocks, when calling Open, Close, Create ... since they often nest.
 
 - memfs registerWithParent locking seems neglected.
+
+- I probably sync all directory tree structures with a go-routine-for-select.
 
 - dsfs needs a locking consideration for RemoveAll and Rename. 
 Behold the asynchroneus nature of dsfs directories.
@@ -96,9 +113,9 @@ to relative paths of osfs; that is to current working directory prefixing.
 Therefore all filesystems must support "." for current working dir.
 Currently - in memfs and dsfs - working dir always refers to fs.RootDir().
 
-memfs and dsfs interpret / or nothing as starting with root.
+memfs and dsfs interpret "", "/" and "." as starting with root.
 
-To access files directly under root, memfs and dsfs must use ./filename
+To access files directly under root, memfs and dsfs one must use ./filename
 
 The filesystem types are no longer exported.
 To access implementation specific functionality, use

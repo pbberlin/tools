@@ -4,8 +4,13 @@ import (
 	"bytes"
 	"net/http"
 
+	"appengine"
+
+	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
+	"github.com/pbberlin/tools/os/fsi/memfs"
 )
 
 const UrlUploadReceive = "/blob2/post-receive"
@@ -16,6 +21,35 @@ func InitHandlers() {
 	http.HandleFunc("/mnt00/", loghttp.Adapter(ServeDsFsFile))
 	http.HandleFunc("/mnt01/", loghttp.Adapter(ServeDsFsFile))
 	// http.HandleFunc("/mnt02/", loghttp.Adapter(ServeDsFsFile))
+
+	var fs1 = memfs.New(
+		memfs.Ident("mnt02"),
+	)
+	dynSrv := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+		appID := appengine.AppID(appengine.NewContext(r))
+		if appID == "credit-expansion" {
+
+			prefix := "/mnt02"
+			// prefix = "/xxx"
+
+			fs2 := dsfs.New(
+				dsfs.MountName(prefix[1:]),
+				dsfs.AeContext(appengine.NewContext(r)),
+			)
+
+			fs1.SetOption(
+				memfs.ShadowFS(fs2),
+			)
+
+			fileserver.FsiFileServer(fs1, prefix+"/", w, r)
+		} else {
+			ServeDsFsFile(w, r, m)
+			w.Write([]byte("chalamacuca"))
+		}
+	}
+	http.HandleFunc("/mnt02/", loghttp.Adapter(dynSrv))
+	// http.HandleFunc("/", loghttp.Adapter(dynSrv))
+
 }
 
 // userinterface rendered to HTML - not only the strings for title and url

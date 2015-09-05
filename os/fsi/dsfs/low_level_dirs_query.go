@@ -23,7 +23,7 @@ import (
 func (fs *dsFileSys) SubdirsByPath(name string, onlyDirectChildren bool) ([]DsDir, error) {
 
 	dir, bname := fs.SplitX(name)
-	name = dir + bname
+	name = dir + filyfyBName(bname)
 	if !strings.HasSuffix(name, sep) {
 		name += sep
 	}

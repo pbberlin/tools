@@ -19,7 +19,7 @@ func (fs osFileSys) String() string {
 	return hn
 }
 
-func (fs *osFileSys) Repl(name string) string {
+func (fs *osFileSys) WinGoofify(name string) string {
 	if fs.replacePath {
 		return strings.Replace(name, "/", "\\", -1)
 	}
@@ -29,32 +29,32 @@ func (fs *osFileSys) Repl(name string) string {
 //---------------------------------------
 
 func (fs *osFileSys) Chmod(name string, mode os.FileMode) error {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Chmod(name, mode)
 }
 
 func (fs *osFileSys) Chtimes(name string, atime time.Time, mtime time.Time) error {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Chtimes(name, atime, mtime)
 }
 
 func (fs *osFileSys) Create(name string) (fsi.File, error) {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Create(name)
 }
 
 func (fs *osFileSys) Lstat(path string) (os.FileInfo, error) {
-	path = fs.Repl(path)
+	path = fs.WinGoofify(path)
 	return os.Lstat(path)
 }
 
 func (fs *osFileSys) Mkdir(name string, perm os.FileMode) error {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Mkdir(name, perm)
 }
 
 func (fs *osFileSys) MkdirAll(path string, perm os.FileMode) error {
-	path = fs.Repl(path)
+	path = fs.WinGoofify(path)
 	return os.MkdirAll(path, perm)
 }
 
@@ -74,14 +74,14 @@ func (f fileWithCustomReaddir) Readdir(n int) ([]os.FileInfo, error) {
 }
 
 func (fs *osFileSys) Open(name string) (fsi.File, error) {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	osfile, err := os.Open(name)
 	wrappedOsFile := fileWithCustomReaddir{osfile, osfile, fs} // wrap it into
 	return wrappedOsFile, err
 }
 
 func (fs *osFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File, error) {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.OpenFile(name, flag, perm)
 }
 
@@ -92,32 +92,32 @@ func (fs *osFileSys) ReadDir(dirname string) ([]os.FileInfo, error) {
 }
 
 func (fs *osFileSys) Remove(name string) error {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Remove(name)
 }
 
 func (fs *osFileSys) RemoveAll(path string) error {
-	path = fs.Repl(path)
+	path = fs.WinGoofify(path)
 	return os.RemoveAll(path)
 }
 
 func (fs *osFileSys) Rename(oldname, newname string) error {
-	oldname = fs.Repl(oldname)
-	newname = fs.Repl(newname)
+	oldname = fs.WinGoofify(oldname)
+	newname = fs.WinGoofify(newname)
 	return os.Rename(oldname, newname)
 }
 
 func (fs *osFileSys) Stat(name string) (os.FileInfo, error) {
-	name = fs.Repl(name)
+	name = fs.WinGoofify(name)
 	return os.Stat(name)
 }
 
 func (fs *osFileSys) ReadFile(filename string) ([]byte, error) {
-	filename = fs.Repl(filename)
+	filename = fs.WinGoofify(filename)
 	return ioutil.ReadFile(filename)
 }
 
 func (fs *osFileSys) WriteFile(filename string, data []byte, perm os.FileMode) error {
-	filename = fs.Repl(filename)
+	filename = fs.WinGoofify(filename)
 	return ioutil.WriteFile(filename, data, perm)
 }

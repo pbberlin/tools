@@ -7,7 +7,6 @@ import (
 )
 
 func (d *DsDir) MemCacheSet() {
-
 	miPut := &memcache.Item{
 		Key:        d.Dir + d.BName,
 		Value:      []byte("anything"), // sadly - value is ignored

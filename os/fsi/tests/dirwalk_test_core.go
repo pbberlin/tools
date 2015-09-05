@@ -34,9 +34,9 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	fc1([]string{"ch1"})
 	fc1([]string{"ch1", "ch2"})
-	fc1([]string{"ch1", "ch2a"})
 	fc1([]string{"ch1", "ch2", "ch3"})
 	fc1([]string{"ch1", "ch2", "ch3", "ch4"})
+	fc1([]string{"ch1", "ch2a"})
 	fc1([]string{"ch1A"})
 	fc1([]string{"ch1B"})
 	fc1([]string{"d1", "d2", "d3_secretdir", "neverwalked"})
@@ -112,14 +112,15 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 	wntSizeFiles := 9 + 9 + 15 + 13
 
 	fc5 := func(path string) {
-		wpf(bb, " srch %q  \n", relOpt+path)
 		files, err := fs.ReadDir(relOpt + path)
 		if err != nil {
 			wpf(bb, "filesByPath %v failed %v\n", path, err)
 		}
+		wpf(bb, " srch %-20q yielded %v dirs+files\n", relOpt+path, len(files))
 
 		for k, v := range files {
 			if v.IsDir() {
+				wpf(bb, "   skip dir %v \n", v.Name())
 				continue
 			}
 			data, err := fs.ReadFile(pth.Join(path, v.Name()))
@@ -144,10 +145,10 @@ func CreateSys(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	testRes := ""
 	if gotNumFiles != wntNumFiles {
-		testRes += spf("Create:   wnt %2v - got %v\n", wntNumFiles, gotNumFiles)
+		testRes += spf("Create files num :   wnt %2v - got %v\n", wntNumFiles, gotNumFiles)
 	}
 	if gotSizeFiles != wntSizeFiles {
-		testRes += spf("Create:   wnt %2v - got %v\n", wntSizeFiles, gotSizeFiles)
+		testRes += spf("Create files size:   wnt %2v - got %v\n", wntSizeFiles, gotSizeFiles)
 	}
 	return bb, testRes
 }
@@ -216,7 +217,7 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 			wpf(bb, "   nothing retrieved - err %v\n", err)
 		} else {
 			for k, v := range children {
-				wpf(bb, "  child #%-2v        %-24v\n", k, pth.Join(path, v.Name()))
+				wpf(bb, "  child #%-2v        %-5v ... %-24v\n", k, path, v.Name())
 			}
 			got = append(got, len(children))
 		}
@@ -225,10 +226,13 @@ func RetrieveByQuery(fs fsi.FileSystem) (*bytes.Buffer, string) {
 
 	fc3(`ch1/ch2/ch3`, false)
 	fc3(`ch1/ch2/ch3`, true)
+
 	fc3(`ch1/ch2`, false)
 	fc3(`ch1/ch2`, true)
+
 	fc3(`ch1`, false)
 	fc3(`ch1`, true)
+
 	fc3(``, true)
 	fc3(``, false)
 

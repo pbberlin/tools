@@ -25,9 +25,10 @@ func InitHandlers() {
 	http.HandleFunc("/fsi/walk", loghttp.Adapter(walkH))
 	http.HandleFunc("/fsi/remove", loghttp.Adapter(removeSubtree))
 
-	http.HandleFunc("/fsi/delete-all", loghttp.Adapter(deleteAll))
+	// http.HandleFunc("/fsi/delete-all", loghttp.Adapter(deleteAll))
 	http.HandleFunc(UriDeleteSubtree, loghttp.Adapter(deleteSubtree))
 
+	http.HandleFunc("/fsi/cntr/last", loghttp.Adapter(lastMountPoint))
 	http.HandleFunc("/fsi/cntr/reset", loghttp.Adapter(resetMountPoint))
 	http.HandleFunc("/fsi/cntr/incr", loghttp.Adapter(incrMountPoint))
 	http.HandleFunc("/fsi/cntr/decr", loghttp.Adapter(decrMountPoint))
@@ -46,13 +47,14 @@ func BackendUIRendered() *bytes.Buffer {
 	htmlfrag.Wb(b1, "query", "/fsi/retrieve-by-query")
 	htmlfrag.Wb(b1, "readdir", "/fsi/retrieve-by-read-dir")
 	htmlfrag.Wb(b1, "walk", "/fsi/walk")
-	htmlfrag.Wb(b1, "remove", "/fsi/remove")
+	htmlfrag.Wb(b1, "remove subset", "/fsi/remove")
 
-	htmlfrag.Wb(b1, "delete all", "/fsi/delete-all", "all fs types")
+	// htmlfrag.Wb(b1, "delete all", "/fsi/delete-all", "all fs types")
 	htmlfrag.Wb(b1, "delete tree", UriDeleteSubtree, "of selected fs")
 
 	// htmlfrag.Wb(b1, , "")
 	htmlfrag.Wb(b1, "dsfs mount", "nobr")
+	htmlfrag.Wb(b1, "last", "/fsi/cntr/last")
 	htmlfrag.Wb(b1, "decr", "/fsi/cntr/decr")
 	htmlfrag.Wb(b1, "incr", "/fsi/cntr/incr")
 	htmlfrag.Wb(b1, "reset", "/fsi/cntr/reset")
@@ -61,6 +63,17 @@ func BackendUIRendered() *bytes.Buffer {
 
 }
 
+func lastMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "last Mountpoint"}))
+	defer wpf(w, tplx.Foot)
+
+	wpf(w, "<pre>\n")
+	defer wpf(w, "\n</pre>")
+
+	wpf(w, "reset %v\n", dsfs.MountPointLast())
+
+}
 func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint reset"}))

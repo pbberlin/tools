@@ -51,7 +51,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 
 	var files []DsFile
 
-	foDir, err := fs.dirByPath(dir + bname)
+	foDir, err := fs.dirByPath(dir + filyfyBName(bname))
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {
@@ -59,12 +59,16 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 		return files, err
 	}
 
+	// fs.Ctx().Infof("  Files by Path %-20v - got dir %-10v - %v", dir+bname, foDir.Name(), foDir.Key)
+
 	q := datastore.NewQuery(tfil).Ancestor(foDir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
 	if err != nil {
 		fs.Ctx().Errorf("Error fetching files children of %v => %v", foDir.Key, err)
 		return files, err
 	}
+
+	// fs.Ctx().Infof("  Files by Path %-20v - got files %v", dir+bname, len(files))
 
 	for i := 0; i < len(files); i++ {
 		files[i].Key = keys[i]
@@ -93,7 +97,7 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 		bname = f.BName
 		f.Dir = dir
 	}
-	f.BName = bname
+	f.BName = filyfyBName(bname)
 
 	// f.MModTime = time.Now()
 	f.fSys = fs

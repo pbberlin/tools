@@ -16,10 +16,10 @@ func (fs *dsFileSys) dirByPath(name string) (DsDir, error) {
 	fo := DsDir{}
 	fo.fSys = fs
 
-	preciseK := ds.NewKey(fs.c, tdir, dir+bname, 0, nil)
+	preciseK := ds.NewKey(fs.c, tdir, dir+filyfyBName(bname), 0, nil)
 	fo.Key = preciseK
 
-	err := fo.MemCacheGet(dir + bname)
+	err := fo.MemCacheGet(dir + filyfyBName(bname))
 	if err == nil {
 		fo.fSys = fs
 		fo.Key = preciseK
@@ -34,7 +34,7 @@ func (fs *dsFileSys) dirByPath(name string) (DsDir, error) {
 		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error getting dir %v => %v", dir+bname, err)
+		fs.Ctx().Errorf("Error getting dir %v => %v", dir+filyfyBName(bname), err)
 	}
 
 	fo.MemCacheSet()
@@ -90,10 +90,12 @@ func (fs *dsFileSys) saveDirByPathExt(dirObj DsDir, name string) (DsDir, error) 
 
 	dir, bname := fs.SplitX(name)
 	fo.Dir = dir
-	fo.BName = bname
+	fo.BName = filyfyBName(bname)
 
-	preciseK := ds.NewKey(fs.c, tdir, dir+bname, 0, nil)
+	preciseK := ds.NewKey(fs.c, tdir, dir+filyfyBName(bname), 0, nil)
 	fo.Key = preciseK
+
+	// fs.Ctx().Infof("Saving dir %-14q  %q  %v ", fo.Dir, fo.BName, fo.Key)
 
 	effKey, err := ds.Put(fs.c, preciseK, &fo)
 	if err != nil {

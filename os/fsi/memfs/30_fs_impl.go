@@ -120,7 +120,6 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 	dir, bname := m.SplitX(name)
 	name = path.Join(dir, bname)
 
-	// log.Printf("underlying locks %q \n", name)
 	m.rlock()
 	f, ok := m.fos[name]
 	if ok {
@@ -128,23 +127,29 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 		if okConv {
 			ff.Open()
 		} else {
-			return nil, fmt.Errorf("could not convert f to InMemoryFile")
+			return nil, fmt.Errorf("could not convert opened file into InMemoryFile 1")
 		}
 	}
 	m.runlock()
-	// log.Printf("underlying UNlck %q \n", name)
+
+	//
+	//
+	// Fallback to underlying fs
 	if !ok {
 		var err error
-		f, err = m.underlyingCreate(name, origName)
+		f, err = m.lookupUnderlyingFS(name, origName)
 		if err != nil {
-			log.Printf("underlying says  %q => %v\n", name, err)
-		} else {
-			log.Printf("underlying succ %q\n", name)
-			m.Dump()
-			return f, nil
+			// log.Printf("underlying says  %q => %v\n", name, err)
+			return nil, err
+			return nil, fsi.ErrFileNotFound
 		}
+		// log.Printf("underlying succ %q\n", name)
+		m.Dump()
+		return f, nil
 	}
 
+	//
+	// Regular return
 	if ok {
 		return f, nil
 	} else {
@@ -152,13 +157,19 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 	}
 }
 
-func (m *memMapFs) underlyingCreate(name, origName string) (fsi.File, error) {
+//
+func (m *memMapFs) lookupUnderlyingFS(
+	nameMemFS string,
+	origName string, // orig name has no mountname prefix á la mnt02
+) (fsi.File, error) {
 
-	if m.shadow == nil {
+	if m.shadow == nil { // no underlying filesystem
 		return nil, fsi.ErrFileNotFound
 	}
 
-	fshad, err := m.shadow.Open(name)
+	// mshadt := m.shadow.(*)
+
+	fshad, err := m.shadow.Open(nameMemFS)
 	if err != nil {
 		return nil, fsi.ErrFileNotFound
 	}
@@ -169,51 +180,61 @@ func (m *memMapFs) underlyingCreate(name, origName string) (fsi.File, error) {
 		return nil, fmt.Errorf("fileinfo from shadow failed: %v", err)
 	}
 
+	//
+	// special case
+	// resource is a directory
 	if inf.IsDir() {
-		return nil, fmt.Errorf("is dir")
+		// return nil, fmt.Errorf("is dir")
+		err = m.MkdirAll(origName, 0755)
+		if err != nil {
+			return nil, err
+		}
+		m.rlock()
+		dir, ok := m.fos[nameMemFS]
+		m.runlock()
+		if !ok {
+			m.Dump()
+			return nil, fmt.Errorf("dir created with MkDir, but not in fos map %q %q", nameMemFS, origName)
+		}
+		return dir, nil
 	}
 
-	name = origName
+	nameMemFS = origName
 
-	dir := path.Dir(name)
 	var dst fsi.File
 
-	if true || dir != "." && dir != "" {
-		err = m.MkdirAll(path.Dir(name), 0755)
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("created front dir %q \n", path.Dir(name))
-
-		dst, err = m.Create(name)
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("created front file %q \n", name)
-
-		n, err := io.Copy(dst, fshad)
-		if err != nil {
-			return nil, err
-		}
-		// dst.Write([]byte("some more bytes"))
-		log.Printf("copied %v for %v\n", n, name)
+	// regular file
+	err = m.MkdirAll(path.Dir(nameMemFS), 0755)
+	if err != nil {
+		return nil, err
 	}
+	log.Printf("  from underlying: created front dir  %q \n", path.Dir(nameMemFS))
+
+	dst, err = m.Create(nameMemFS)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("  from underlying: created front file %q \n", nameMemFS)
+
+	n, err := io.Copy(dst, fshad)
+	_ = n
+	if err != nil {
+		return nil, err
+	}
+	// log.Printf("copied %v for %v\n", n, name)
 
 	err = dst.Close()
 	if err != nil {
 		return nil, err
 	}
 
+	//
 	// reopen
-	// ff, _ := dst.(*InMemoryFile)
-	// ff.closed = false
-	// atomic.StoreInt64(&ff.at, 0)
-
 	ff, okConv := dst.(*InMemoryFile)
 	if okConv {
 		ff.Open()
 	} else {
-		return nil, fmt.Errorf("could not convert dst to InMemoryFile")
+		return nil, fmt.Errorf("could not convert opened file into InMemoryFile 2")
 	}
 
 	return dst, nil

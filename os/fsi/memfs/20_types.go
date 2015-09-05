@@ -77,7 +77,7 @@ func New(options ...func(fsi.FileSystem)) *memMapFs {
 	return m
 }
 
-func (m *memMapFs) AddOpt(options ...func(fsi.FileSystem)) {
+func (m *memMapFs) SetOption(options ...func(fsi.FileSystem)) {
 	for _, option := range options {
 		option(m)
 	}

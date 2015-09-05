@@ -71,13 +71,17 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 	rt, err := fs.dirByPath(fs.mount)
 	_ = rt
 	if err == datastore.ErrNoSuchEntity {
-		// log.Printf("need to creat root %v", fs.mount)
-		_, err := fs.saveDirByPath(fs.mount) // fine
+		// fs.Ctx().Infof("need to creat root %v", fs.mount)
+		rt, err = fs.saveDirByPath(fs.mount) // fine
 		if err != nil {
 			fs.c.Errorf("could not create mount %v => %v", fs.mount, err)
+		} else {
+			// fs.Ctx().Infof("Creat rtdr %v  %v  %v ", rt.Dir, rt.BName, rt.Key)
 		}
 	} else if err != nil {
 		fs.c.Errorf("could read mount dir %v => %v", fs.mount, err)
+	} else {
+		// fs.Ctx().Infof("Found rtdr %v  %v  %v ", rt.Dir, rt.BName, rt.Key)
 	}
 
 	return &fs

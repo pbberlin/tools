@@ -106,7 +106,8 @@ func runTestX(
 }
 
 func createSys(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	runTestX(w, r, dsfs.MountPointIncr, tests.CreateSys)
+	runTestX(w, r, nil, tests.CreateSys)
+	// runTestX(w, r, dsfs.MountPointIncr, tests.CreateSys)
 }
 
 func retrieveByQuery(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

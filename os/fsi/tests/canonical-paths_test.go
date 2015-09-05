@@ -29,6 +29,8 @@ func splitIsWhatWeWant() {
 
 func TestPathCleanage(t *testing.T) {
 
+	log.SetFlags(0)
+
 	_, c := initFileSystems()
 	defer c.Close()
 
@@ -36,20 +38,29 @@ func TestPathCleanage(t *testing.T) {
 		[]string{"", "mntX/", ""},
 		[]string{"/", "mntX/", ""},
 		[]string{".", "mntX/", ""},
+		[]string{"./", "mntX/", ""},
 		[]string{"mntX", "mntX/", ""},
 		[]string{"mntX/", "mntX/", ""},
+		// 5...
+		[]string{"file", "mntX/", "file"},
+		[]string{"dir/", "mntX/", "dir/"},
+		[]string{"./dir1/", "mntX/", "dir1/"},
 		[]string{"mntX/dir1", "mntX/", "dir1"},
 		[]string{"mntX/dir1/file2", "mntX/dir1/", "file2"},
-		[]string{"///mntX/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
-		[]string{"mntX/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
-		[]string{"/dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
-		[]string{"dir1/dir1///file3/", "mntX/dir1/dir2", "file3"},
-		[]string{"./dir1/", "mntX/", "dir1"},
-		[]string{"c:\\dir1\\dir2", "mntX/", "mntX/c:/dir1/dir2"},
+		// 10
+		[]string{"mntY/dir1/file2", "mntX/mntY/dir1/", "file2"},
+		[]string{"///mntX/dir1/dir2///dir3/", "mntX/dir1/dir2/", "dir3/"},
+		[]string{"mntX/dir1/dir2///file3", "mntX/dir1/dir2/", "file3"},
+		[]string{"/dir1/dir2///file3", "mntX/dir1/dir2/", "file3"},
+		[]string{"dir1/dir2///dir3/", "mntX/dir1/dir2/", "dir3/"},
+		// 15
+		[]string{"c:\\dir1\\dir2", "mntX/c:/dir1/", "dir2"},
 	}
 
-	fs := memfs.New(memfs.MountName("mntX"))
-	for _, v := range cases {
+	fs := memfs.New(
+		memfs.Ident("mntX"),
+	)
+	for i, v := range cases {
 		inpt := v[0]
 		_ = inpt
 		wnt1 := v[1]
@@ -57,16 +68,16 @@ func TestPathCleanage(t *testing.T) {
 		dir, bname := common.UnixPather(v[0], fs.RootDir())
 		fullpath := dir + bname
 
-		log.Printf("%-28v %-24v => %-16q %-12q ", inpt, dir, bname, fullpath)
+		log.Printf("#%2v %-30q %-24q => %-16q %-12q ", i, inpt, dir, bname, fullpath)
 
 		if wnt1 != dir {
-			t.Logf("got %-13v - wnt %v\n", dir, wnt1)
+			t.Errorf("dir   #%2v got %-24v - wnt %-16v\n", i, dir, wnt1)
 		}
 		if wnt2 != bname {
-			t.Logf("got %-13v - wnt %v\n", bname, wnt2)
+			t.Errorf("bname #%2v got %-24v - wnt %-16v\n", i, bname, wnt2)
 		}
 		if wnt1+wnt2 != fullpath {
-			t.Logf("got %-13v - wnt %v\n", fullpath, wnt1+wnt2)
+			t.Errorf("fullp #%2v got %-24v - wnt %-16v\n", i, fullpath, wnt1+wnt2)
 		}
 	}
 

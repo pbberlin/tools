@@ -12,7 +12,7 @@ const sep = "/"
 // "/" 	=> ""
 // "/aa/bb/" 	=> "aa/bb"
 // "aa/bb/" 	=> "aa/bb"
-func cleanseLeadingSlash(p string) string {
+func cleanseLeadingAndDoublySlashes(p string) string {
 
 	// path.Join does not clean spaces
 	p = strings.TrimSpace(p)
@@ -40,7 +40,13 @@ func UnixPather(name, rootDir string) (dir, bname string) {
 	}
 
 	name = strings.Replace(name, "\\", "/", -1) // windows to unix; drive letters become directories
-	name = cleanseLeadingSlash(name)
+
+	isDirSuffix := ""
+	if len(name) > 1 && strings.HasSuffix(name, "/") {
+		isDirSuffix = "/"
+	}
+
+	name = cleanseLeadingAndDoublySlashes(name)
 
 	// exchange current dir "." for root
 	if strings.HasPrefix(name, ".") {
@@ -62,6 +68,10 @@ func UnixPather(name, rootDir string) (dir, bname string) {
 
 	if !strings.HasSuffix(dir, sep) {
 		dir += sep
+	}
+
+	if len(bname) > 1 {
+		bname += isDirSuffix
 	}
 
 	return

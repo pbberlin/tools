@@ -33,7 +33,7 @@ var str = `
 		<input name='mountname' type='text' value='mntftch' length=5 /><br>
 
 		<span class='b' >Path Prefix </span> 
-		<input name='pathprefix' type='text' value='/dir1/dir2' length=25 /><br>
+		<input name='pathprefix' type='text' value='/dir1/dir2' length=25 /> '/' removes everything in the mountpoint<br>
 
 		<span class='b' > </span> 
 		<input type='submit' value='submit1' accesskey='s' /><br>
@@ -73,7 +73,7 @@ func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		fs := getFS(appengine.NewContext(r), mountPoint)
 		lg("created fs %v-%v ", fs.Name(), fs.String())
 
-		lg("removing %v/*... ", pathPrefix)
+		lg("removing %q - and its subtree  ...", pathPrefix)
 		err := fs.RemoveAll(pathPrefix)
 		lge(err)
 

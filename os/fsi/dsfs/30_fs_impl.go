@@ -83,7 +83,7 @@ func (fs *dsFileSys) Create(name string) (fsi.File, error) {
 
 	f := DsFile{}
 	f.fSys = fs
-	f.BName = bname
+	f.BName = filyfyBName(bname)
 	f.Dir = dir
 	f.MModTime = time.Now()
 	f.MMode = 0644
@@ -131,8 +131,9 @@ func (fs *dsFileSys) MkdirAll(path string, perm os.FileMode) error {
 // conflicts with file.Open() interface of Afero
 func (fs *dsFileSys) Open(name string) (fsi.File, error) {
 
-	// explicitly requesting  directory?
-	if strings.HasSuffix(name, "/") {
+	// explicitly requesting directory?
+	_, bname := fs.SplitX(name)
+	if strings.HasSuffix(bname, "/") {
 		dir, err := fs.dirByPath(name)
 		if err == nil {
 			ff := fsi.File(&dir)
@@ -140,6 +141,7 @@ func (fs *dsFileSys) Open(name string) (fsi.File, error) {
 		}
 	}
 
+	// otherwise: try file, then directory
 	f, err := fs.fileByPath(name)
 
 	if err != nil && err != datastore.ErrNoSuchEntity && err != fsi.ErrRootDirNoFile {
@@ -179,13 +181,16 @@ func (fs *dsFileSys) OpenFile(name string, flag int, perm os.FileMode) (fsi.File
 
 // See fsi.FileSystem interface.
 func (fs *dsFileSys) ReadDir(name string) ([]os.FileInfo, error) {
+
 	dirs, err := fs.dirsByPath(name)
+	// fs.Ctx().Infof("dsfs readdir %-20v dirs %v", name, len(dirs))
 	if err != nil && err != fsi.EmptyQueryResult {
 		return nil, err
 	}
 	fs.dirsorter(dirs)
 
 	files, err := fs.filesByPath(name)
+	// fs.Ctx().Infof("dsfs readdir %-20v fils %v %v", name, len(files), err)
 	if err != nil {
 		return nil, err
 	}
@@ -230,6 +235,7 @@ func (fs *dsFileSys) RemoveAll(path string) error {
 	walkRemove := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			// do nothing; don't break the walk
+			fs.Ctx().Errorf("Error walking %v => %v", path, err)
 		} else {
 			if f != nil { // && f.IsDir() to constrain
 				paths = append(paths, path)
@@ -249,8 +255,10 @@ func (fs *dsFileSys) RemoveAll(path string) error {
 		iRev := len(paths) - 1 - i
 		err := fs.Remove(paths[iRev])
 		if err != nil {
+			fs.Ctx().Errorf("Error removing %v => %v", paths[iRev], err)
 			return err
 		}
+		fs.Ctx().Infof("removed path %v", paths[iRev])
 	}
 
 	return nil
@@ -301,7 +309,7 @@ func (fs *dsFileSys) WriteFile(name string, data []byte, perm os.FileMode) error
 	dir, bname := fs.SplitX(name)
 	f := DsFile{}
 	f.Dir = dir
-	f.BName = bname
+	f.BName = filyfyBName(bname)
 	f.fSys = fs
 	f.MModTime = time.Now()
 

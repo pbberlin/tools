@@ -174,7 +174,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 				}
 			}
 
-			if false {
+			if false || appengine.IsDevAppServer() {
 				given1(c, w, r)
 			} else {
 				wrapped := appstats.NewHandler(given1)
@@ -192,5 +192,9 @@ func authenticate(w http.ResponseWriter, r *http.Request) bool {
 
 func logServerTime(c appengine.Context, start time.Time) {
 	age := time.Now().Sub(start)
-	c.Infof("  request took %v", age)
+	if age.Seconds() < 0.01 {
+		c.Infof("  request took %v nano secs", age.Nanoseconds())
+	} else {
+		c.Infof("  request took %2.2v secs", age.Seconds())
+	}
 }

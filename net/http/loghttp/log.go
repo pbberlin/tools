@@ -1,8 +1,10 @@
 package loghttp
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -92,7 +94,7 @@ func E(w http.ResponseWriter, r *http.Request,
 
 }
 
-func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
+func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 
 	// Prepare the string
 	var s string
@@ -100,6 +102,10 @@ func Pf(w http.ResponseWriter, r *http.Request, f string, vs ...interface{}) {
 		s = fmt.Sprintf(f, vs...)
 	} else {
 		s = f
+	}
+
+	if s == "" {
+		return
 	}
 
 	// Write it to http response - unless prefix 'lo ' - log only
@@ -150,5 +156,44 @@ func Logger(w http.ResponseWriter, r *http.Request) (tLogFunc, tErrFunc) {
 		}
 	}
 	return fLog, fErr
+
+}
+
+// universal logger func, for log(err) and log("format", ...)
+type FuncBufUniv func(...interface{})
+
+func BuffLoggerUniversal(w http.ResponseWriter, r *http.Request) (FuncBufUniv, *bytes.Buffer) {
+
+	b := new(bytes.Buffer)
+
+	fLog1 := func(a ...interface{}) {
+
+		if len(a) > 0 {
+			switch t := a[0].(type) {
+
+			case string:
+				if len(a) == 1 {
+					Pf(b, r, t)
+				} else {
+					Pf(b, r, t, a[1:]...)
+				}
+
+			case interface{}:
+				if err, ok := t.(error); ok {
+					if err != nil {
+						Pf(b, r, "Err %v", err)
+					}
+				} else {
+					log.Printf("first argument must be string or error occ1; is %T\n", t)
+				}
+
+			default:
+				log.Printf("first argument must be string or error occ2; is %T\n", t)
+			}
+
+		}
+
+	}
+	return fLog1, b
 
 }

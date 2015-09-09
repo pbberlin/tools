@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/url"
@@ -37,7 +38,11 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 	fs fsi.FileSystem, config FetchCommand,
 ) {
 
-	lg, lge := loghttp.Logger(w, r)
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	closureOverBuf := func(bUnused *bytes.Buffer) {
+		loghttp.Pf(w, r, b.String())
+	}
+	defer closureOverBuf(b) // the argument is ignored,
 
 	if config.Host == "" {
 		lg(" empty host; returning")
@@ -58,7 +63,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
 
 	fnDigest := path.Join(docRoot, config.Host, "digest2.json")
-	loadDigest(w, r, fs, fnDigest, dirTree) // previous
+	loadDigest(w, r, lg, fs, fnDigest, dirTree) // previous
 
 	age := time.Now().Sub(dirTree.LastFound)
 	lg("DirTree is %5.2v hours old (%v)", age.Hours(), dirTree.LastFound.Format(time.ANSIC))
@@ -66,8 +71,8 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 
 		rssUrl := matchingRSSURI(w, r, config)
 		if rssUrl == "" {
-			err := fetchCrawlSave(w, r, dirTree, fs, path.Join(config.Host, config.SearchPrefix))
-			lge(err)
+			err := fetchCrawlSave(w, r, lg, dirTree, fs, path.Join(config.Host, config.SearchPrefix))
+			lg(err)
 			if err != nil {
 				return
 			}
@@ -137,7 +142,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 					var err error
 					var inf fetch.Info
 					a.Body, inf, err = fetch.UrlGetter(r, fetch.Options{URL: a.Url})
-					lge(err)
+					lg(err)
 					if a.Mod.IsZero() {
 						a.Mod = inf.Mod
 					}
@@ -202,7 +207,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 	histoDir := map[string]int{}
 	for _, a := range fullArticles {
 		u, err := url.Parse(a.Url)
-		lge(err)
+		lg(err)
 		semanticUri := condenseTrailingDir(u.Path, config.CondenseTrailingDirs)
 		dir := path.Dir(semanticUri)
 		histoDir[dir]++
@@ -214,9 +219,9 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 	for k, _ := range histoDir {
 		dir := path.Join(docRoot, k) // config.Host already contained in k
 		err := fs.MkdirAll(dir, 0755)
-		lge(err)
+		lg(err)
 		err = fs.Chtimes(dir, time.Now(), time.Now())
-		lge(err)
+		lg(err)
 	}
 
 	// Saving as files
@@ -227,21 +232,21 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 		u, err := url.Parse(a.Url)
 		u.Fragment = ""
 		u.RawQuery = ""
-		lge(err)
+		lg(err)
 		semanticUri := condenseTrailingDir(u.RequestURI(), config.CondenseTrailingDirs)
 		p := path.Join(docRoot, semanticUri)
 		err = fs.WriteFile(p, a.Body, 0644)
-		lge(err)
+		lg(err)
 		err = fs.Chtimes(p, a.Mod, a.Mod)
-		lge(err)
+		lg(err)
 	}
 
 	{
 		b, err := json.MarshalIndent(histoDir, "  ", "\t")
-		lge(err)
+		lg(err)
 		fnDigest := path.Join(docRoot, config.Host, "fetchDigest.json")
 		err = fs.WriteFile(fnDigest, b, 0755)
-		lge(err)
+		lg(err)
 	}
 
 	// fsm, ok := memfs.Unwrap(fs)

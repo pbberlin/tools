@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"path"
 	"strings"
@@ -28,29 +30,33 @@ import (
 //    /\
 func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	lg, lge := loghttp.Logger(w, r)
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	closureOverBuf := func(bUnused *bytes.Buffer) {
+		loghttp.Pf(w, r, b.String())
+	}
+	defer closureOverBuf(b) // the argument is ignored,
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Find similar HTML URLs"}))
-	defer wpf(w, tplx.Foot)
+	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Find similar HTML URLs"}))
+	defer wpf(b, tplx.Foot)
 
-	wpf(w, "<pre>")
-	defer wpf(w, "</pre>")
+	wpf(b, "<pre>")
+	defer wpf(b, "</pre>")
 
 	fs1 := GetFS(appengine.NewContext(r))
 
 	err := r.ParseForm()
-	lge(err)
+	lg(err)
 
 	surl := r.FormValue(routes.URLParamKey)
 	ourl, err := fetch.URLFromString(surl)
-	lge(err)
+	lg(err)
 	if err != nil {
 		return
 	}
 	if ourl.Host == "" {
-		lg("host is empty")
+		lg("host is empty (%v)", surl)
 		return
 	}
 
@@ -63,11 +69,11 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
 	fnDigest := path.Join(docRoot, cmd.Host, "digest2.json")
-	loadDigest(w, r, fs1, fnDigest, dirTree) // previous
+	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
 	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
 
-	err = fetchCrawlSave(w, r, dirTree, fs1, path.Join(cmd.Host, ourl.Path))
-	lge(err)
+	err = fetchCrawlSave(w, r, lg, dirTree, fs1, path.Join(cmd.Host, ourl.Path))
+	lg(err)
 	if err != nil {
 		return
 	}
@@ -104,8 +110,8 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
-			err = fetchCrawlSave(w, r, dirTree, fs1, path.Join(cmd.Host, treePath))
-			lge(err)
+			err = fetchCrawlSave(w, r, lg, dirTree, fs1, path.Join(cmd.Host, treePath))
+			lg(err)
 			if err != nil {
 				return
 			}
@@ -180,18 +186,18 @@ MarkOuter:
 			surl := path.Join(cmd.Host, art.Url)
 			lg("fetching %v", surl)
 			bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
-			lge(err)
+			lg(err)
 
 			lg("saving   %v", p)
 			dir := path.Dir(p)
 			err = fs1.MkdirAll(dir, 0755)
-			lge(err)
+			lg(err)
 			err = fs1.Chtimes(dir, time.Now(), time.Now())
-			lge(err)
+			lg(err)
 			err = fs1.WriteFile(p, bts, 0644)
-			lge(err)
+			lg(err)
 			err = fs1.Chtimes(p, inf.Mod, inf.Mod)
-			lge(err)
+			lg(err)
 
 			if inf.Mod.After(time.Now().Add(-10 * time.Hour)) {
 				lg(" using fetched")
@@ -211,5 +217,22 @@ MarkOuter:
 	}
 
 	lg("tried %v to find %v new similars", tried, len(selecteds))
+
+	mp := map[string]string{}
+	mp["msg"] = b.String()
+	smp, err := json.MarshalIndent(mp, "", "\t")
+	if err != nil {
+		lg(b, "marshalling mp to []byte failed\n")
+		return
+	}
+
+	r.Header.Set("X-Custom-Header-Counter", "nocounter")
+	r.Header.Set("Content-Type", "application/json")
+	w.Write(smp)
+
+	b.Reset()             // this keeps the  buf pointer intact; outgoing defers are still heeded
+	b = new(bytes.Buffer) // creates a *new* buf pointer; outgoing defers write into the *old* buf
+
+	return
 
 }

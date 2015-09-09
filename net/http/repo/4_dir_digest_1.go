@@ -176,17 +176,14 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 
 }
 
-func loadDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
-
-	lg, lge := loghttp.Logger(w, r)
-	_ = lg
+func loadDigest(w http.ResponseWriter, r *http.Request, lg loghttp.FuncBufUniv, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
 
 	bts, err := fs.ReadFile(fnDigest)
 
-	lge(err)
+	lg(err)
 	if err == nil {
 		err = json.Unmarshal(bts, &treeX)
-		lge(err)
+		lg(err)
 	}
 
 	lg("DirTree   %5.2vkB loaded for %v", len(bts)/1024, fnDigest)
@@ -250,9 +247,8 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 // adds  links to param treeX
 // saves treeX
 // saves fetched file
-func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs fsi.FileSystem, surl string) error {
-
-	lg, lge := loghttp.Logger(w, r)
+func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
+	lg loghttp.FuncBufUniv, treeX *DirTree, fs fsi.FileSystem, surl string) error {
 
 	if treeX == nil {
 		return fmt.Errorf("tree is nil")
@@ -287,7 +283,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs f
 	//
 	// Fetch
 	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
-	lge(err)
+	lg(err)
 	if err != nil {
 		return err
 	}
@@ -296,7 +292,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs f
 	//
 	// Extract links
 	doc, err := html.Parse(bytes.NewReader(bts))
-	lge(err)
+	lg(err)
 	if err != nil {
 		return err
 	}
@@ -324,13 +320,13 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request, treeX *DirTree, fs f
 	lg("saving crawled file %v", fn)
 	dir := path.Dir(fn)
 	err = fs.MkdirAll(dir, 0755)
-	lge(err)
+	lg(err)
 	err = fs.Chtimes(dir, time.Now(), time.Now())
-	lge(err)
+	lg(err)
 	err = fs.WriteFile(fn, bts, 0644)
-	lge(err)
+	lg(err)
 	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
-	lge(err)
+	lg(err)
 
 	return nil
 

@@ -1,15 +1,6 @@
 package repo
 
-import (
-	"encoding/xml"
-	"fmt"
-)
-
-var pf = fmt.Printf
-var pfRestore = fmt.Printf
-
-var spf = fmt.Sprintf
-var wpf = fmt.Fprintf
+import "encoding/xml"
 
 // RSS directory
 type RSS struct {

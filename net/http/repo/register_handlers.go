@@ -9,18 +9,6 @@ import (
 	"github.com/pbberlin/tools/net/http/routes"
 )
 
-const uriSetType = "/fetch/set-fs-type"
-const mountName = "mntftch"
-const UriMountNameY = "/" + mountName + "/serve-file/"
-
-const cTestHostDev = "localhost:8085"
-
-var repoURL = cTestHostDev + UriMountNameY
-
-const uriFetchCommandReceiver = "/fetch/command-receive"
-const uriFetchCommandSender = "/fetch/command-send"
-const UriFetchSimilar = "/fetch/similar"
-
 // InitHandlers is called from outside,
 // and makes the EndPoints available.
 func InitHandlers() {
@@ -37,6 +25,7 @@ func InitHandlers() {
 	http.Handle("/fetch/reservoire/static/", http.StripPrefix("/fetch/reservoire/static/", fileserver1))
 
 	http.Handle(UriFetchSimilar, loghttp.Adapter(FetchSimilar))
+	http.Handle("/fetch/similiar/form/", loghttp.Adapter(fetchSimForm))
 
 }
 
@@ -52,6 +41,7 @@ func BackendUIRendered() *bytes.Buffer {
 
 	sample := "www.economist.com/news/europe/21661810-journey-capital-hinterland-shows-how-grim-life-has-become-and-how-russians"
 	htmlfrag.Wb(b1, "get similar", UriFetchSimilar+"?"+routes.URLParamKey+"="+sample, "similar to url x")
+	htmlfrag.Wb(b1, "  form", "/fetch/similiar/form/")
 
 	htmlfrag.Wb(b1, "recv", uriFetchCommandReceiver, "receive fetch command, takes commands by curl")
 

@@ -16,17 +16,6 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
-// FullArticle is the main struct passed
-// between the pipeline stages
-type FullArticle struct {
-	Url  string
-	Mod  time.Time
-	Body []byte
-}
-
-// parallel fetchers routines
-const numWorkers = 3
-
 // Fetch takes a RSS XML uri and fetches some of its documents.
 // It uses a three staged pipeline for parallel fetching.
 // Results are stored into the given filesystem fs.

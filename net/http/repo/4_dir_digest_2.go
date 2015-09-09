@@ -49,17 +49,6 @@ func DiveToDeepestMatch(dirTree *DirTree, uriPrefixIncl string) (*DirTree, strin
 	return subtree, head
 }
 
-type LevelWiseDeeperOptions struct {
-	Rump       string // for instance /blogs/buttonwood
-	ExcludeDir string // for instance /blogs/buttonwood/2014
-
-	MinDepthDiff int // Relative to the depth of rump!; 0 equals Rump-Depth; thus 2 is the first restricting setting; set to 4 to exclude /blogs/buttonwood/2015/08/article1
-	MaxDepthDiff int // To include /blogs/buttonwood/2015/08/article1 from /blogs/buttonwood => set to 3
-
-	CondenseTrailingDirs int // See FetchCommand - equal member
-	MaxNumber            int //
-}
-
 func LevelWiseDeeper(w http.ResponseWriter, r *http.Request, dtree *DirTree, opt LevelWiseDeeperOptions) []FullArticle {
 
 	lg, lge := loghttp.Logger(w, r)

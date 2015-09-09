@@ -9,30 +9,10 @@ import (
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
-	"github.com/pbberlin/tools/os/fsi/httpfs"
-	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 
 	"appengine"
 )
-
-var docRoot = ""                                           // no relative path, 'cause working dir too flippant
-var whichType = 0                                          // which type of filesystem, default is memfs
-var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
-
-//
-var httpFSys = &httpfs.HttpFs{SourceFs: fsi.FileSystem(memMapFileSys)} // memMap is always ready
-var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
-
-var msg []byte
-
-func init() {
-	msg = []byte(`<p>This is an embedded static http server.</p>
-<p>
-It serves previously downloaded pages<br>
- i.e. from handelsblatt or economist.
-</p>`)
-}
 
 // GetFS instantiates a filesystem, depending on whichtype
 func GetFS(c appengine.Context) (fs fsi.FileSystem) {

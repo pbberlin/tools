@@ -3,6 +3,7 @@ package repo
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -98,7 +99,7 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	opt.MaxNumber = cmd.DesiredNumber + 10 // collect more, 'cause we filter out those too old later
 
 	var subtree *DirTree
-	articles := []FullArticle{}
+	links := []FullArticle{}
 
 MarkOuter:
 	for j := 0; j < srcDepth; j++ {
@@ -124,13 +125,13 @@ MarkOuter:
 				opt.Rump = treePath
 				opt.MinDepthDiff = i - j
 				opt.MaxDepthDiff = i - j
-				lpArticles := LevelWiseDeeper(nil, nil, subtree, opt)
-				articles = append(articles, lpArticles...)
-				for _, art := range lpArticles {
+				lvlLinks := LevelWiseDeeper(nil, nil, subtree, opt)
+				links = append(links, lvlLinks...)
+				for _, art := range lvlLinks {
 					lg("#%v     fnd %v", i, stringspb.ToLen(art.Url, 100))
 				}
 
-				if len(articles) >= opt.MaxNumber {
+				if len(links) >= opt.MaxNumber {
 					lg("found enough")
 					break MarkOuter
 				}
@@ -155,7 +156,7 @@ MarkOuter:
 	tried := 0
 	selecteds := []FullArticle{}
 
-	for i, art := range articles {
+	for i, art := range links {
 
 		tried = i + 1
 
@@ -171,10 +172,15 @@ MarkOuter:
 		lg("reading  %v", p)
 		f, err := fs1.Open(p)
 		if err == nil {
+			defer f.Close()
 			fi, err := f.Stat()
 			if err == nil {
 				if fi.ModTime().After(time.Now().Add(-10 * time.Hour)) {
 					lg(" using file")
+					art.Mod = fi.ModTime()
+					bts, err := ioutil.ReadAll(f)
+					lg(err)
+					art.Body = bts
 					selecteds = append(selecteds, art)
 					useExisting = true
 				}
@@ -201,6 +207,8 @@ MarkOuter:
 
 			if inf.Mod.After(time.Now().Add(-10 * time.Hour)) {
 				lg(" using fetched")
+				art.Mod = inf.Mod
+				art.Body = bts
 				selecteds = append(selecteds, art)
 			}
 
@@ -218,8 +226,17 @@ MarkOuter:
 
 	lg("tried %v to find %v new similars", tried, len(selecteds))
 
-	mp := map[string]string{}
-	mp["msg"] = b.String()
+	mp := map[string][]byte{}
+	mp["msg"] = b.Bytes()
+	mp["semanticSelf"] = []byte(condenseTrailingDir(ourl.Path, cmd.CondenseTrailingDirs))
+
+	for i, v := range selecteds {
+		mp["url__"+spf("%02v", i)] = []byte(v.Url)
+		mp["mod__"+spf("%02v", i)] = []byte(v.Mod.Format(http.TimeFormat))
+		mp["bod__"+spf("%02v", i)] = v.Body
+	}
+
+	//
 	smp, err := json.MarshalIndent(mp, "", "\t")
 	if err != nil {
 		lg(b, "marshalling mp to []byte failed\n")

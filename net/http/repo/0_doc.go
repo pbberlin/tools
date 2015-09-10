@@ -4,6 +4,12 @@
 //
 // Further inspiration could be taken from github.com/lox/httpcache
 //
+//  Todo:
+//		Integrate multithreaded fetching into the last version
+//		Use fetchCrawlSave for the last loop of FetchSimilar (!useExisting)
+//		Integrate RSS feeds into the crawling
+//
+//
 package repo
 
 /*
@@ -32,5 +38,6 @@ curl --data url-x=https://www.welt.de/politik/ausland/article146154432/Tuerkisch
 curl --data url-x=http://www.economist.com/news/britain/21663648-hard-times-hard-hats-making-britain-make-things-again-proving-difficult  localhost:8085/fetch/similar
 curl --data url-x=http://www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power  localhost:8085/fetch/similar
 
+curl --data "cnt=1&url-x=http://www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power"  localhost:8085/fetch/similar
 
 */

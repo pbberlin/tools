@@ -7,7 +7,6 @@ import (
 	"html"
 	"net/http"
 
-	"github.com/pbberlin/tools/appengine/instance_mgt"
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -24,8 +23,11 @@ const form = `
 
 	<form>
 		<div style='margin:8px;'>
+			<span class='ib' style='width:40px'>Count </span>
+			<input id='inp1' name="cnt"                      size="3"  value="2"><br/>
+
 			<span class='ib' style='width:40px'>URL </span>
-			<input id='inp1' name="{{.fieldname}}"           size="120"  value="{{.val}}"><br/>
+			<input id='inp2' name="{{.fieldname}}"           size="120"  value="{{.val}}"><br/>
 			
 			<span class='ib' style='width:40px' ></span> 
 			<span class='ib' tabindex='11'> 
@@ -60,8 +62,8 @@ const form = `
 		//focusout
 		$( "span" ).focusin(function() {
 			focus++;
-			//$( "#inp1" ).text( "focusout fired: " + focus + "x" );
-			$( "#inp1" ).val(  $.trim( $(this).text() )   );
+			//$( "#inp2" ).text( "focusout fired: " + focus + "x" );
+			$( "#inp2" ).val(  $.trim( $(this).text() )   );
 			console.log("fired")
 		});
 	</script>	
@@ -109,8 +111,8 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	} else {
 
-		ii := instance_mgt.Get(r)
-		fullURL := fmt.Sprintf("https://%s%s?%s=%s", ii.PureHostname, UriFetchSimilar, routes.URLParamKey, rURL)
+		// ii := instance_mgt.Get(r)
+		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s", r.Host, UriFetchSimilar, routes.URLParamKey, rURL, r.FormValue("cnt"))
 		lg("lo - sending to URL:    %v\n", fullURL)
 
 		fo := fetch.Options{}

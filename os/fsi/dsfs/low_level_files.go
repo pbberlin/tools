@@ -88,7 +88,7 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 
 	dir, bname := fs.SplitX(name)
 	f.Dir = dir
-	// bname was only submitted in the fileobject only
+	// bname was only submitted in the fileobject
 	// correct previous
 	if f.BName != "" && f.BName != bname {
 		dir = dir + bname // re-append

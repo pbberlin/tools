@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -49,6 +50,15 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	err := r.ParseForm()
 	lg(err)
+
+	countSimilar := 3
+	sCountSimilar := r.FormValue("cnt")
+	if sCountSimilar != "" {
+		i, err := strconv.Atoi(strings.TrimSpace(sCountSimilar))
+		if err == nil {
+			countSimilar = i
+		}
+	}
 
 	surl := r.FormValue(routes.URLParamKey)
 	ourl, err := fetch.URLFromString(surl)
@@ -175,24 +185,31 @@ MarkOuter:
 		if err != nil {
 			// its no error if file does not exist
 		} else {
-			defer f.Close()
-			fi, err := f.Stat()
-			lg(err)
-			if err != nil {
 
-			} else {
-				age := time.Now().Sub(fi.ModTime())
-				if age.Hours() < 10 {
-					lg(" using file with age %4.2v", age.Hours())
-					art.Mod = fi.ModTime()
-					bts, err := ioutil.ReadAll(f)
-					lg(err)
-					art.Body = bts
-					selecteds = append(selecteds, art)
-					useExisting = true
+			// lets put this into a func, so that f.close it called at the end of this func
+			// otherwise defer f.close() spans the entire func and prevents
+			// overwrites chmods further down
+			f := func() {
+				defer f.Close()
+				fi, err := f.Stat()
+				lg(err)
+				if err != nil {
+
+				} else {
+					age := time.Now().Sub(fi.ModTime())
+					if age.Hours() < 10 {
+						lg(" using file with age %4.2v hrs", age.Hours())
+						art.Mod = fi.ModTime()
+						bts, err := ioutil.ReadAll(f)
+						lg(err)
+						art.Body = bts
+						selecteds = append(selecteds, art)
+						useExisting = true
+					}
 				}
-
 			}
+			f()
+
 		}
 
 		if !useExisting {
@@ -226,17 +243,17 @@ MarkOuter:
 
 		}
 
-		if len(selecteds) > 3 {
+		if len(selecteds) >= countSimilar {
 			break
 		}
 
-		if tried > 4 {
+		if tried > countSimilar+4 {
 			break
 		}
 
 	}
 
-	lg("tried %v to find %v new similars", tried, len(selecteds))
+	lg("tried %v to find %v new similars; requested: %v", tried, len(selecteds), countSimilar)
 
 	mp := map[string][]byte{}
 	mp["msg"] = b.Bytes()

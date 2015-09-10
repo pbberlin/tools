@@ -60,7 +60,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 
 		rssUrl := matchingRSSURI(w, r, config)
 		if rssUrl == "" {
-			err := fetchCrawlSave(w, r, lg, dirTree, fs, path.Join(config.Host, config.SearchPrefix))
+			_, _, err := fetchCrawlSave(w, r, lg, dirTree, fs, path.Join(config.Host, config.SearchPrefix))
 			lg(err)
 			if err != nil {
 				return

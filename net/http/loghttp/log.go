@@ -169,6 +169,11 @@ func BuffLoggerUniversal(w http.ResponseWriter, r *http.Request) (FuncBufUniv, *
 	fLog1 := func(a ...interface{}) {
 
 		if len(a) > 0 {
+
+			if a[0] == nil {
+				return
+			}
+
 			switch t := a[0].(type) {
 
 			case string:

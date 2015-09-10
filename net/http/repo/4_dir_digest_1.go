@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -259,13 +260,11 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 // saves treeX
 // saves fetched file
 func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
-	lg loghttp.FuncBufUniv, treeX *DirTree, fs fsi.FileSystem, surl string) error {
+	lg loghttp.FuncBufUniv, treeX *DirTree, fs fsi.FileSystem, surl string) ([]byte, time.Time, error) {
 
 	if treeX == nil {
-		return fmt.Errorf("tree is nil")
+		return []byte{}, time.Now(), fmt.Errorf("tree is nil")
 	}
-
-	lg("crawling            %v", surl)
 
 	// Determine FileName
 	ourl, err := fetch.URLFromString(surl)
@@ -275,20 +274,41 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	semanticUri := condenseTrailingDir(surl, fc.CondenseTrailingDirs)
 	fn := path.Join(docRoot, semanticUri)
 
+	lg("crawling            %v", fn)
+
 	//
 	// Open file for age check
 	file1, err := fs.Open(fn)
-	if err == nil {
+	lg(err)
+	if err != nil {
+		// its no error if file does not exist
+	} else {
+		defer file1.Close()
+
 		fi, err := file1.Stat()
-		if err == nil {
-			age := time.Now().Sub(fi.ModTime())
-			if age.Hours() < 10 {
-				lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
-				return nil
+		lg(err)
+		if err != nil {
+			return []byte{}, time.Now(), err
+		} else {
+
+			if fi.IsDir() {
+				lg("\t\tfile is a directory, skipping")
 			} else {
-				lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
+				age := time.Now().Sub(fi.ModTime())
+				if age.Hours() < 10 {
+					lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
+					bts, err := ioutil.ReadAll(file1)
+					if err != nil {
+						return []byte{}, time.Now(), err
+					}
+					return bts, fi.ModTime(), nil
+				} else {
+					lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
+				}
 			}
+
 		}
+
 	}
 
 	//
@@ -296,7 +316,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
 	lg(err)
 	if err != nil {
-		return err
+		return []byte{}, inf.Mod, err
 	}
 	lg("retrieved           %v; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
@@ -305,7 +325,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lg(err)
 	if err != nil {
-		return err
+		return []byte{}, time.Now(), err
 	}
 	anchors := []FullArticle{}
 	var fr func(*html.Node)
@@ -339,6 +359,6 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
 	lg(err)
 
-	return nil
+	return bts, inf.Mod, nil
 
 }

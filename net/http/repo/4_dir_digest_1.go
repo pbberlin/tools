@@ -276,39 +276,47 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 
 	lg("crawling            %v", fn)
 
-	//
+	// File already exists?
 	// Open file for age check
-	file1, err := fs.Open(fn)
-	lg(err)
-	if err != nil {
-		// its no error if file does not exist
-	} else {
-		defer file1.Close()
+	var bts []byte
+	var mod time.Time
+	f := func() error {
+		file1, err := fs.Open(fn)
+		lg(err)
+		if err != nil {
+			return err // file may simly not exist
+		}
+		defer file1.Close() // file close *fast* at the end of *this* anonymous func
 
 		fi, err := file1.Stat()
 		lg(err)
 		if err != nil {
-			return []byte{}, time.Now(), err
-		} else {
-
-			if fi.IsDir() {
-				lg("\t\tfile is a directory, skipping")
-			} else {
-				age := time.Now().Sub(fi.ModTime())
-				if age.Hours() < 10 {
-					lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
-					bts, err := ioutil.ReadAll(file1)
-					if err != nil {
-						return []byte{}, time.Now(), err
-					}
-					return bts, fi.ModTime(), nil
-				} else {
-					lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
-				}
-			}
-
+			return err
 		}
 
+		if fi.IsDir() {
+			lg("\t\tfile is a directory, skipping")
+			return fmt.Errorf("is directory: %v", fn)
+		}
+
+		mod = fi.ModTime()
+		age := time.Now().Sub(mod)
+		if age.Hours() > 10 {
+			lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
+			return fmt.Errorf("too old: %v", fn)
+		}
+
+		lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
+		bts, err = ioutil.ReadAll(file1)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = f()
+	if err == nil {
+		return bts, mod, err
 	}
 
 	//
@@ -317,6 +325,9 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	lg(err)
 	if err != nil {
 		return []byte{}, inf.Mod, err
+	}
+	if inf.Mod.IsZero() {
+		inf.Mod = time.Now().Add(-75 * time.Minute)
 	}
 	lg("retrieved           %v; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 

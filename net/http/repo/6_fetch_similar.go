@@ -218,8 +218,7 @@ MarkOuter:
 			bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
 			lg(err)
 
-			age := time.Now().Sub(inf.Mod)
-			if inf.Mod.IsZero() || age.Hours() > 3600*24 {
+			if inf.Mod.IsZero() {
 				inf.Mod = time.Now().Add(-75 * time.Minute)
 			}
 

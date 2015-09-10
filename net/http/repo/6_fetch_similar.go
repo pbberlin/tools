@@ -171,7 +171,7 @@ MarkOuter:
 		tried = i + 1
 
 		if art.Url == ourl.Path {
-			lg("skipping self")
+			lg("skipping self   - %v", art.Url)
 			continue
 		}
 
@@ -181,9 +181,9 @@ MarkOuter:
 		p := path.Join(docRoot, cmd.Host, semanticUri)
 		lg("reading  %v", p)
 		f, err := fs1.Open(p)
-		lg(err)
+		// lg(err) // its no error if file does not exist
 		if err != nil {
-			// its no error if file does not exist
+
 		} else {
 
 			// lets put this into a func, so that f.close it called at the end of this func
@@ -213,29 +213,14 @@ MarkOuter:
 		}
 
 		if !useExisting {
+
 			surl := path.Join(cmd.Host, art.Url)
-			lg("fetching %v", surl)
-			bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
+			bts, mod, err := fetchCrawlSave(w, r, lg, dirTree, fs1, surl)
 			lg(err)
 
-			if inf.Mod.IsZero() {
-				inf.Mod = time.Now().Add(-75 * time.Minute)
-			}
-
-			lg("saving   %v - with time %v", p, inf.Mod.Format(http.TimeFormat))
-			dir := path.Dir(p)
-			err = fs1.MkdirAll(dir, 0755)
-			lg(err)
-			err = fs1.Chtimes(dir, time.Now(), time.Now())
-			lg(err)
-			err = fs1.WriteFile(p, bts, 0644)
-			lg(err)
-			err = fs1.Chtimes(p, inf.Mod, inf.Mod)
-			lg(err)
-
-			if inf.Mod.After(time.Now().Add(-10 * time.Hour)) {
+			if mod.After(time.Now().Add(-10 * time.Hour)) {
 				lg(" using fetched")
-				art.Mod = inf.Mod
+				art.Mod = mod
 				art.Body = bts
 				selecteds = append(selecteds, art)
 			}
@@ -251,8 +236,13 @@ MarkOuter:
 		}
 
 	}
-
 	lg("tried %v to find %v new similars; requested: %v", tried, len(selecteds), countSimilar)
+
+	//
+	if time.Now().Sub(dirTree.LastFound).Seconds() < 10 {
+		lg("saving accumulated (new) links to digest")
+		saveDigest(w, r, fs1, fnDigest, dirTree)
+	}
 
 	mp := map[string][]byte{}
 	mp["msg"] = b.Bytes()

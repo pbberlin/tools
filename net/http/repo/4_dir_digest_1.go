@@ -282,9 +282,9 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	var mod time.Time
 	f := func() error {
 		file1, err := fs.Open(fn)
-		lg(err)
+		// lg(err) // file may simply not exist
 		if err != nil {
-			return err // file may simly not exist
+			return err // file may simply not exist
 		}
 		defer file1.Close() // file close *fast* at the end of *this* anonymous func
 
@@ -352,10 +352,9 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	fr(doc)
-	lg("\t\tsaving (new) links to digest")
+	lg("links -> memory dirtree")
 	path2DirTree(w, r, treeX, anchors, inf.URL.Host, false)
-	fnDigest := path.Join(docRoot, ourl.Host, "digest2.json")
-	saveDigest(w, r, fs, fnDigest, treeX)
+	treeX.LastFound = time.Now() // Marker for later accumulated saving
 
 	//
 	//

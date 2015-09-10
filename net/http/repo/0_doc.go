@@ -6,7 +6,6 @@
 //
 //  Todo:
 //		Integrate multithreaded fetching into the last version
-//		Use fetchCrawlSave for the last loop of FetchSimilar (!useExisting)
 //		Integrate RSS feeds into the crawling
 //
 //

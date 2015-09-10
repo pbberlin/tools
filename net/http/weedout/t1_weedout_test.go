@@ -12,6 +12,7 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/os/osutilpb"
 	"github.com/pbberlin/tools/stringspb"
 	"golang.org/x/net/html"
@@ -22,8 +23,9 @@ func Test1(t *testing.T) {
 	lg, lge := loghttp.Logger(nil, nil)
 
 	remoteHostname := "www.welt.de"
+	remoteHostname = "www.welt.de/politik/ausland"
 
-	dirs1, _, msg, err := fileserver.GetDirContents(repoURL, remoteHostname)
+	dirs1, _, msg, err := fileserver.GetDirContents(repo.RepoURL, remoteHostname)
 	if err != nil {
 		lge(err)
 		lg("%s", msg)
@@ -37,7 +39,8 @@ func Test1(t *testing.T) {
 	least3Files := []string{}
 	for _, v1 := range dirs1 {
 
-		dirs2, fils2, msg, err := fileserver.GetDirContents(repoURL, path.Join(remoteHostname, v1))
+		p := path.Join(remoteHostname, v1)
+		dirs2, fils2, msg, err := fileserver.GetDirContents(repo.RepoURL, p)
 		_ = dirs2
 		if err != nil {
 			lge(err)
@@ -46,14 +49,8 @@ func Test1(t *testing.T) {
 		// lg("  dirs2 %v", stringspb.IndentedDump(dirs2))
 		// lg("  fils2 %v", stringspb.IndentedDump(fils2))
 
-		if len(fils2) > numTotal-1 {
-			for i2, v2 := range fils2 {
-				least3Files = append(least3Files, path.Join(remoteHostname, v1, v2))
-				if i2 == numTotal-1 {
-					break
-				}
-			}
-			break
+		for _, v2 := range fils2 {
+			least3Files = append(least3Files, path.Join(remoteHostname, v1, v2))
 		}
 	}
 
@@ -67,7 +64,7 @@ func Test1(t *testing.T) {
 		lg("    %v", v)
 	}
 
-	logdir := prepareLogDir()
+	logdir := osutilpb.PrepareLogDir()
 
 	iter := make([]int, numTotal)
 
@@ -75,7 +72,7 @@ func Test1(t *testing.T) {
 	// domclean
 	for i, _ := range iter {
 
-		surl := spf("%v/%v", repoURL, least3Files[i])
+		surl := spf("%v/%v", repo.RepoURL, least3Files[i])
 
 		fNamer := domclean2.FileNamer(logdir, i)
 		fNamer() // first call yields key

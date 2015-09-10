@@ -18,7 +18,7 @@ const UriMountNameY = "/" + mountName + "/serve-file/"
 
 const cTestHostDev = "localhost:8085"
 
-var repoURL = cTestHostDev + UriMountNameY
+var RepoURL = cTestHostDev + UriMountNameY
 
 const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"

@@ -10,6 +10,7 @@ import (
 
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/os/fsi/common"
 	"github.com/pbberlin/tools/stringspb"
 )
 
@@ -29,10 +30,12 @@ func GetDirContents(hostWithPrefix, dir string) ([]string, []string, *bytes.Buff
 	if err != nil {
 		return dirs, fils, b, err
 	}
-	wpf(b, "requ subdirs from  %v", urlSubDirs)
+	sd := urlSubDirs.String()
+	sd = common.Directorify(sd)
+	wpf(b, "requ subdirs from  %v", sd)
 
 	// make req
-	bsubdirs, effU, err := fetch.UrlGetter(nil, fetch.Options{URL: urlSubDirs.String()})
+	bsubdirs, effU, err := fetch.UrlGetter(nil, fetch.Options{URL: sd})
 	lge(err)
 	if err != nil {
 		return dirs, fils, b, err
@@ -44,6 +47,7 @@ func GetDirContents(hostWithPrefix, dir string) ([]string, []string, *bytes.Buff
 	err = json.Unmarshal(bsubdirs, &mpSubDir)
 	lge(err)
 	if err != nil {
+		// lg("%s", bsubdirs)
 		return dirs, fils, b, err
 	}
 	wpf(b, "json of subdir is %s", stringspb.IndentedDump(mpSubDir))

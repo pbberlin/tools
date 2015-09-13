@@ -4,7 +4,7 @@
 package test
 
 import (
-	"log"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -22,23 +22,47 @@ func (m *MyWorker) Work() {
 }
 
 func Test4(t *testing.T) {
+	distrib.DefaultOptions.CollectRemainder = true
+	do(t, 3)
 
-	// Precreate some distrib.WLoad packets.
-	// Create more than we want.
+}
 
-	precreatedPackets := 33
-	packets := make([]distrib.WLoad, 0, precreatedPackets)
+func Test5(t *testing.T) {
+	distrib.DefaultOptions.CollectRemainder = false
+	do(t, 3)
+}
+
+func ATest6(t *testing.T) {
+	distrib.DefaultOptions.CollectRemainder = true
+	do(t, 33)
+}
+
+func ATest7(t *testing.T) {
+	distrib.DefaultOptions.CollectRemainder = false
+	do(t, 33)
+}
+
+func do(t *testing.T, precreatedPackets int) {
+
+	jobs := make([]distrib.Worker, 0, precreatedPackets)
 	for i := 0; i < precreatedPackets; i++ {
-		pack := distrib.WLoad{}
-		pack.Workload = &MyWorker{Inp: i}
-
-		packets = append(packets, pack)
+		job := distrib.Worker(&MyWorker{Inp: i})
+		jobs = append(jobs, job)
 	}
 
-	ret := distrib.Distrib(packets, distrib.DefaultOptions)
+	ret := distrib.Distrib(jobs, distrib.DefaultOptions)
+
+	if len(ret) != precreatedPackets {
+		// t.Errorf("wnt %v got %v", precreatedPackets, len(ret))
+	}
 
 	for k, v := range ret {
-		log.Printf("%2v  %v ", k, v.Workload)
+		v1, _ := v.Worker.(*MyWorker)
+		fmt.Printf("   %2v  %2v  => %v\n", k, v1.Inp, v1.Res)
+		if v1.Inp != v1.Res-500 {
+			t.Errorf("%v %v", v1.Inp, v1.Res)
+		}
 	}
+	fmt.Printf("\n\n")
 
 }

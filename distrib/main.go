@@ -12,11 +12,16 @@ import (
 var lnp = log.New(os.Stdout, "", 0) // logger no prefix
 var lpf = lnp.Printf
 
+type Worker interface {
+	Work()
+}
+
 type WLoad struct {
 	TaskID   int
-	Result   int
 	WorkerID int
-	Func     func(WLoad) WLoad
+	Workload Worker
+	// Result   int
+	// Func     func(WLoad) WLoad
 }
 
 type Options struct {
@@ -36,7 +41,7 @@ var DefaultOptions = Options{
 }
 
 func (w WLoad) String() string {
-	return fmt.Sprintf(" packet#%-2v  Wkr%v  Res%4v", w.TaskID, w.WorkerID, w.Result)
+	return fmt.Sprintf(" packet#%-2v  Wkr%v", w.TaskID, w.WorkerID)
 }
 
 func init() {
@@ -85,7 +90,8 @@ func init() {
 // Both need to be synchronized.
 //
 //
-func Distrib(packets []WLoad, opt Options) {
+// Todo: Change all channels and the slices to *pointers* of WLoad, reducing memory copy
+func Distrib(packets []WLoad, opt Options) []WLoad {
 
 	inn := make(chan WLoad) // stage1 => stage2
 	out := make(chan WLoad) // stage2 => stage3
@@ -98,6 +104,14 @@ func Distrib(packets []WLoad, opt Options) {
 
 	ticker := time.NewTicker(10 * time.Millisecond)
 	tick := ticker.C // channel from ticker
+
+	var ret = make([]WLoad, 0, int(opt.Want)+5)
+
+	for i, _ := range packets {
+		if packets[i].TaskID == 0 {
+			packets[i].TaskID = i
+		}
+	}
 
 	//
 	// stage 1
@@ -139,9 +153,8 @@ func Distrib(packets []WLoad, opt Options) {
 					// It puts the result into chan res.
 					res := make(chan WLoad)
 					workWrap := func(pck WLoad) { // packet as argument to prevent race cond race_1_b
-						pck.WorkerID = wkrID
-						pck.Result += pck.TaskID + 1000
-						pck = pck.Func(packet)
+						pck.WorkerID = wkrID // signature
+						pck.Workload.Work()
 						select {
 						case res <- pck:
 						case <-fin:
@@ -195,6 +208,11 @@ func Distrib(packets []WLoad, opt Options) {
 				recv++
 
 				lpf("rcv%-2v snt%-2v  %v", recv, atomic.LoadInt32(&sent), packet)
+				// lpf("  %v", stringspb.IndentedDump(packet.Workload))
+				if recv <= atomic.LoadInt32(&opt.Want) {
+					ret = append(ret, packet)
+				}
+
 				if recv >= atomic.LoadInt32(&opt.Want) {
 
 					if recv == atomic.LoadInt32(&opt.Want) {
@@ -233,5 +251,7 @@ func Distrib(packets []WLoad, opt Options) {
 			time.Sleep(60 * time.Millisecond) // 1 or 2 messages from timed out workWrap might occur
 		}
 	}
+
+	return ret
 
 }

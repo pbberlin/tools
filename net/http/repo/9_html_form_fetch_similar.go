@@ -129,8 +129,9 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 		} else {
 			var mp map[string][]byte
 			err = json.Unmarshal(bts, &mp)
-			lg(err)
 			if err != nil {
+				lg("%s", bts)
+				lg(err)
 				return
 			}
 

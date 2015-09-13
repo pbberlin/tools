@@ -20,28 +20,6 @@ import (
 	"golang.org/x/net/html"
 )
 
-type DirTree struct {
-	Name      string // Name == key of Parent.Dirs
-	LastFound time.Time
-
-	SrcRSS   bool // dir came first from RSS
-	EndPoint bool // dir came first from RSS - and is at the end of the path
-
-	Dirs map[string]DirTree
-	// Fils []string
-}
-
-type LevelWiseDeeperOptions struct {
-	Rump       string // for instance /blogs/buttonwood
-	ExcludeDir string // for instance /blogs/buttonwood/2014
-
-	MinDepthDiff int // Relative to the depth of rump!; 0 equals Rump-Depth; thus 2 is the first restricting setting; set to 4 to exclude /blogs/buttonwood/2015/08/article1
-	MaxDepthDiff int // To include /blogs/buttonwood/2015/08/article1 from /blogs/buttonwood => set to 3
-
-	CondenseTrailingDirs int // See FetchCommand - equal member
-	MaxNumber            int //
-}
-
 func dirTreeStrRec(buf *bytes.Buffer, d *DirTree, lvl int) {
 	ind2 := strings.Repeat("    ", lvl+1)
 	keys := make([]string, 0, len(d.Dirs))
@@ -274,7 +252,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	semanticUri := condenseTrailingDir(surl, fc.CondenseTrailingDirs)
 	fn := path.Join(docRoot, semanticUri)
 
-	lg("crawling            %v", fn)
+	lg("crawling\t%q", surl)
 
 	// File already exists?
 	// Open file for age check
@@ -295,18 +273,18 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 		}
 
 		if fi.IsDir() {
-			lg("\t\tfile is a directory, skipping")
+			lg("\t\t file is a directory, skipping - %v", fn)
 			return fmt.Errorf("is directory: %v", fn)
 		}
 
 		mod = fi.ModTime()
 		age := time.Now().Sub(mod)
 		if age.Hours() > 10 {
-			lg("\t\tfile      %4.2v hours old, refetch ", age.Hours())
+			lg("\t\t file %4.2v hours old, refetch ", age.Hours())
 			return fmt.Errorf("too old: %v", fn)
 		}
 
-		lg("\t\tfile only %4.2v hours old, skipping", age.Hours())
+		lg("\t\t file only %4.2v hours old, skipping", age.Hours())
 		bts, err = ioutil.ReadAll(file1)
 		if err != nil {
 			return err
@@ -324,13 +302,28 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
 	lg(err)
 	if err != nil {
+		lg("tried to fetch %v, %v", surl, inf.URL)
 		return []byte{}, inf.Mod, err
 	}
 	if inf.Mod.IsZero() {
 		inf.Mod = time.Now().Add(-75 * time.Minute)
 	}
-	lg("retrieved           %v; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
+	lg("retrieved\t%q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
+	//
+	//
+	lg("saved\t\t%q crawled file", fn)
+	dir := path.Dir(fn)
+	err = fs.MkdirAll(dir, 0755)
+	lg(err)
+	err = fs.Chtimes(dir, time.Now(), time.Now())
+	lg(err)
+	err = fs.WriteFile(fn, bts, 0644)
+	lg(err)
+	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
+	lg(err)
+
+	//
 	//
 	// Extract links
 	doc, err := html.Parse(bytes.NewReader(bts))
@@ -352,22 +345,9 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 		}
 	}
 	fr(doc)
-	lg("links -> memory dirtree")
+	lg("\t\tlinks -> memory dirtree")
 	path2DirTree(w, r, treeX, anchors, inf.URL.Host, false)
 	treeX.LastFound = time.Now() // Marker for later accumulated saving
-
-	//
-	//
-	lg("saving crawled file %v", fn)
-	dir := path.Dir(fn)
-	err = fs.MkdirAll(dir, 0755)
-	lg(err)
-	err = fs.Chtimes(dir, time.Now(), time.Now())
-	lg(err)
-	err = fs.WriteFile(fn, bts, 0644)
-	lg(err)
-	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
-	lg(err)
 
 	return bts, inf.Mod, nil
 

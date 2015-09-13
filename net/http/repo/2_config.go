@@ -8,31 +8,49 @@ import (
 	"github.com/pbberlin/tools/os/fsi/memfs"
 )
 
-var docRoot = ""                                           // no relative path, 'cause working dir too flippant
-var whichType = 0                                          // which type of filesystem, default is memfs
-var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
+// parallel fetchers routines
+const numWorkers = 3
 
-const uriSetType = "/fetch/set-fs-type"
+var docRoot = ""  // no relative path, 'cause working dir too flippant
+var whichType = 0 // which type of filesystem, default is dsfs
+
+var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc"))             // package variable required as "persistence"
+var httpFSys = &httpfs.HttpFs{SourceFs: fsi.FileSystem(memMapFileSys)} // memMap is always ready
+var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
+
 const mountName = "mntftch"
-const UriMountNameY = "/" + mountName + "/serve-file/"
 
 const cTestHostDev = "localhost:8085"
 
-var RepoURL = cTestHostDev + UriMountNameY
+const uriSetType = "/fetch/set-fs-type"
+const UriMountNameY = "/" + mountName + "/serve-file/"
 
 const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"
 const UriFetchSimilar = "/fetch/similar"
 
-//
-var httpFSys = &httpfs.HttpFs{SourceFs: fsi.FileSystem(memMapFileSys)} // memMap is always ready
-var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
+var RepoURL = cTestHostDev + UriMountNameY
 
 var msg = []byte(`<p>This is an embedded static http server.</p>
 <p>
 It serves previously downloaded pages<br>
  i.e. from handelsblatt or economist.
 </p>`)
+
+var testCommands = []FetchCommand{
+	FetchCommand{
+		Host:         "www.handelsblatt.com",
+		SearchPrefix: "/politik/deutschland/aa/bb",
+	},
+	FetchCommand{
+		Host:         "www.handelsblatt.com",
+		SearchPrefix: "/politik/international/aa/bb",
+	},
+	FetchCommand{
+		Host:         "www.economist.com",
+		SearchPrefix: "/news/europe/aa",
+	},
+}
 
 // ConfigDefaults are default values for FetchCommands
 var ConfigDefaults = map[string]FetchCommand{

@@ -145,7 +145,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 				case <-fin:
 					if a != nil && a.Url != "" {
 						u, _ := url.Parse(a.Url)
-						lg("    abandoned %v", u.RequestURI())
+						lg("    abandoned %v", u.Path)
 					} else {
 						lg("    worker spinning down; branch 2")
 					}

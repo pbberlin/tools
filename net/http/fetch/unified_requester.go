@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
+	"github.com/pbberlin/tools/stringspb"
 
 	"appengine"
 	"appengine/urlfetch"
@@ -103,6 +104,9 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		log.Printf("host: %v, uri: %v \n", req.URL.Host, req.URL.RequestURI())
 	}
 
+	//
+	//
+	// Respond to test.economist.com directly from memory
 	if _, ok := TestData[req.URL.Host+req.URL.Path]; ok {
 		return TestData[req.URL.Host+req.URL.Path], Info{URL: req.URL}, nil
 	}
@@ -133,9 +137,9 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			var err2nd error
 			resp, err2nd = client.Do(req)
 			if err2nd != nil {
-				return nil, Info{URL: req.URL}, fmt.Errorf("cannot do https requests on dev server, fallback to http: %v",
-					err2nd)
+				return nil, Info{URL: req.URL}, fmt.Errorf("GET fallback to http failed with %v", err2nd)
 			}
+			log.Printf("successful fallback to http %v after %v\n", req.URL.String(), err)
 			err = nil // CLEAR error
 		}
 	}
@@ -154,8 +158,39 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 
 	//
+	//
+	// Explicit bad response from server
 	if resp.StatusCode != http.StatusOK {
-		return nil, Info{URL: req.URL}, fmt.Errorf("bad http resp code: %v - %v", resp.StatusCode, req.URL.String())
+
+		if resp.StatusCode == http.StatusBadRequest {
+			dmp := ""
+			for k, v := range resp.Header {
+				dmp += fmt.Sprintf("key: %v - val %v\n", k, v)
+			}
+			dmp = ""
+			dmp += stringspb.IndentedDump(req.URL)
+
+			defer resp.Body.Close()
+			bts, _ := ioutil.ReadAll(resp.Body)
+
+			err2 := fmt.Errorf("repsonse 400: %v \n%v \n<pre>%s</pre>", req.URL.String(), dmp, bts)
+
+			if req.URL.Path == "" {
+				req.URL.Path = "/"
+			}
+			var err2nd error
+			resp, err2nd = client.Do(req)
+			if err2nd != nil || resp.StatusCode != http.StatusOK {
+				return nil, Info{URL: req.URL}, fmt.Errorf("failed again %v %v \n%v", err2nd, resp.StatusCode, err2)
+			}
+			log.Printf("successful retry with '/' to %v after %v\n", req.URL.String(), err)
+			err = nil // CLEAR error
+
+			// return nil, Info{URL: req.URL}, err2
+
+		} else {
+			return nil, Info{URL: req.URL}, fmt.Errorf("bad http resp code: %v - %v", resp.StatusCode, req.URL.String())
+		}
 	}
 
 	defer resp.Body.Close()

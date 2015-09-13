@@ -104,9 +104,8 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	opt.MinDepthDiff = 1
 	opt.MaxDepthDiff = 1
 	opt.CondenseTrailingDirs = cmd.CondenseTrailingDirs
-	opt.MaxNumber = 2266
 	opt.MaxNumber = cmd.DesiredNumber + 1  // one more for "self"
-	opt.MaxNumber = cmd.DesiredNumber + 10 // collect more, 'cause we filter out those too old later
+	opt.MaxNumber = cmd.DesiredNumber + 40 // collect more, 'cause we filter out those too old later
 
 	var subtree *DirTree
 	links := []FullArticle{}
@@ -161,7 +160,34 @@ MarkOuter:
 		}
 	}
 
-	lg("\nNow reading/fetching actual similar files - not just the links")
+	//
+	//
+	//
+	// max := 5
+	// exch := make(chan int)
+	// go func() {
+	// 	cnt := 0
+	// 	for {
+	// 		select {
+	// 		case i := <-exch:
+	// 			log.Printf("recv %v\n", cnt)
+	// 			cnt--
+	// 			time.Sleep(400 * time.Millisecond)
+
+	// 		case exch <- cnt:
+	// 			log.Printf("sent %v\n", cnt)
+	// 			cnt++
+	// 			if cnt > max {
+	// 				continue
+	// 			}
+	// 			time.Sleep(400 * time.Millisecond)
+	// 		}
+	// 	}
+	// }()
+	//
+	//
+
+	lg("\nNow reading/fetching actual similar files - not just the links\n")
 	//
 	tried := 0
 	selecteds := []FullArticle{}
@@ -171,7 +197,7 @@ MarkOuter:
 		tried = i + 1
 
 		if art.Url == ourl.Path {
-			lg("skipping self   - %v", art.Url)
+			lg("skipping self\t%v", art.Url)
 			continue
 		}
 
@@ -179,7 +205,7 @@ MarkOuter:
 
 		semanticUri := condenseTrailingDir(art.Url, cmd.CondenseTrailingDirs)
 		p := path.Join(docRoot, cmd.Host, semanticUri)
-		lg("reading  %v", p)
+		lg("reading\t\t%q", p)
 		f, err := fs1.Open(p)
 		// lg(err) // its no error if file does not exist
 		if err != nil {
@@ -231,9 +257,9 @@ MarkOuter:
 			break
 		}
 
-		if tried > countSimilar+4 {
-			break
-		}
+		// if tried > countSimilar+4 {
+		// 	break
+		// }
 
 	}
 	lg("tried %v to find %v new similars; requested: %v", tried, len(selecteds), countSimilar)

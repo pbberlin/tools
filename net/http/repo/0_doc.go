@@ -11,6 +11,11 @@
 //
 package repo
 
+import (
+	"fmt"
+	"log"
+)
+
 /*
 
 [{ 	'Host':           'www.handelsblatt.com',
@@ -40,3 +45,11 @@ curl --data url-x=http://www.economist.com/news/americas/21661804-gender-equalit
 curl --data "cnt=1&url-x=http://www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power"  localhost:8085/fetch/similar
 
 */
+
+var pf = fmt.Printf
+var pfRestore = fmt.Printf
+
+var spf = fmt.Sprintf
+var wpf = fmt.Fprintf
+
+var lpf = log.Printf

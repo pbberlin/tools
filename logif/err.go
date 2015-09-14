@@ -21,6 +21,8 @@ func restoreLogFlags() {
 	log.SetFlags(0)
 }
 
+var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
+
 // E (Err) mostly saves the if err != nil
 //
 func E(e error, msg ...string) bool {
@@ -58,11 +60,8 @@ func inner(e error, msg ...string) {
 
 	// Since codeline points to *this* helper-func
 	// we would like to logger with time only.
-	//   lg1 = log.New(os.Stdout, "#", 0)
-	// but it would not be  written under appengine, because of os.Stdout
-	log.SetFlags(0)
 	if loghttp.C == nil {
-		log.Printf(s)
+		lnp.Printf(s)
 	} else {
 		// This is of course criminal,
 		// since loghttp.C is not syncronized.
@@ -71,7 +70,6 @@ func inner(e error, msg ...string) {
 		// ordinary log messages available.
 		loghttp.C.Infof(fmt.Sprintf("%s - volat req assign", s))
 	}
-	restoreLogFlags() // restore
 
 }
 
@@ -79,11 +77,9 @@ func Pf(format string, a ...interface{}) {
 	s := fmt.Sprintf(format, a...)
 	line, file := runtimepb.LineFileXUp(1)
 	s = fmt.Sprintf("%v - %v:%v", s, file, line)
-	log.SetFlags(0)
 	if loghttp.C == nil {
-		log.Printf(s)
+		lnp.Printf(s)
 	} else {
 		loghttp.C.Infof(fmt.Sprintf("%s - volat req assign", s))
 	}
-	restoreLogFlags() // restore
 }

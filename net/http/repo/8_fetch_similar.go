@@ -12,12 +12,46 @@ import (
 
 	"appengine"
 
+	"github.com/pbberlin/tools/distrib"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/stringspb"
 )
+
+type MyWorker struct {
+	SURL string
+
+	w http.ResponseWriter
+	r *http.Request
+
+	lg loghttp.FuncBufUniv
+
+	fs1 fsi.FileSystem
+
+	err error
+	FA  *FullArticle
+}
+
+func (m *MyWorker) Work() {
+
+	// m.Bts, m.FI, m.Err = fetch.UrlGetter(nil, fetch.Options{URL: m.URL})
+
+	bts, mod, err := fetchCrawlSave(m.w, m.r, m.lg, m.fs1, m.SURL)
+
+	if err != nil {
+		m.err = err
+		return
+	}
+
+	m.FA = &FullArticle{}
+	m.FA.Mod = mod
+	m.FA.Body = bts
+	m.FA.Url = m.SURL
+
+}
 
 // FetchSimilar is an extended version of Fetch
 // It is uses a DirTree of crawled *links*, not actual files.
@@ -83,7 +117,8 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
 	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
 
-	btsSrc, modSrc, err := fetchCrawlSave(w, r, lg, dirTree, fs1, path.Join(cmd.Host, ourl.Path))
+	btsSrc, modSrc, err := fetchCrawlSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
+	addAnchors(lg, cmd.Host, btsSrc, dirTree)
 	lg(err)
 	if err != nil {
 		return
@@ -120,7 +155,8 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
-			_, _, err = fetchCrawlSave(w, r, lg, dirTree, fs1, path.Join(cmd.Host, treePath))
+			btsPar, _, err := fetchCrawlSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
+			addAnchors(lg, cmd.Host, btsPar, dirTree)
 			lg(err)
 			if err != nil {
 				return
@@ -137,11 +173,11 @@ MarkOuter:
 				lvlLinks := LevelWiseDeeper(nil, nil, subtree, opt)
 				links = append(links, lvlLinks...)
 				for _, art := range lvlLinks {
-					lg("#%v     fnd %v", i, stringspb.ToLen(art.Url, 100))
+					lg("#%v fnd    %v", i, stringspb.ToLen(art.Url, 100))
 				}
 
 				if len(links) >= opt.MaxNumber {
-					lg("found enough")
+					lg("found enough links")
 					break MarkOuter
 				}
 
@@ -163,28 +199,6 @@ MarkOuter:
 	//
 	//
 	//
-	// max := 5
-	// exch := make(chan int)
-	// go func() {
-	// 	cnt := 0
-	// 	for {
-	// 		select {
-	// 		case i := <-exch:
-	// 			log.Printf("recv %v\n", cnt)
-	// 			cnt--
-	// 			time.Sleep(400 * time.Millisecond)
-
-	// 		case exch <- cnt:
-	// 			log.Printf("sent %v\n", cnt)
-	// 			cnt++
-	// 			if cnt > max {
-	// 				continue
-	// 			}
-	// 			time.Sleep(400 * time.Millisecond)
-	// 		}
-	// 	}
-	// }()
-	//
 	//
 
 	lg("\nNow reading/fetching actual similar files - not just the links\n")
@@ -192,20 +206,23 @@ MarkOuter:
 	tried := 0
 	selecteds := []FullArticle{}
 
-	for i, art := range links {
+	nonExisting := []FullArticle{}
+	nonExistFetched := []FullArticle{}
 
-		tried = i + 1
+	for _, art := range links {
 
 		if art.Url == ourl.Path {
 			lg("skipping self\t%v", art.Url)
 			continue
 		}
 
+		tried++
+
 		useExisting := false
 
 		semanticUri := condenseTrailingDir(art.Url, cmd.CondenseTrailingDirs)
 		p := path.Join(docRoot, cmd.Host, semanticUri)
-		lg("reading\t\t%q", p)
+		lg("reading %q", p)
 		f, err := fs1.Open(p)
 		// lg(err) // its no error if file does not exist
 		if err != nil {
@@ -224,7 +241,7 @@ MarkOuter:
 				} else {
 					age := time.Now().Sub(fi.ModTime())
 					if age.Hours() < 10 {
-						lg(" using file with age %4.2v hrs", age.Hours())
+						lg("\t\tusing exiting file with age %4.2v hrs", age.Hours())
 						art.Mod = fi.ModTime()
 						bts, err := ioutil.ReadAll(f)
 						lg(err)
@@ -239,30 +256,59 @@ MarkOuter:
 		}
 
 		if !useExisting {
-
-			surl := path.Join(cmd.Host, art.Url)
-			bts, mod, err := fetchCrawlSave(w, r, lg, dirTree, fs1, surl)
-			lg(err)
-
-			if mod.After(time.Now().Add(-10 * time.Hour)) {
-				lg(" using fetched")
-				art.Mod = mod
-				art.Body = bts
-				selecteds = append(selecteds, art)
-			}
-
+			nonExisting = append(nonExisting, art)
 		}
 
 		if len(selecteds) >= countSimilar {
 			break
 		}
 
-		// if tried > countSimilar+4 {
-		// 	break
-		// }
+	}
+	lg("tried %v links - yielding %v existing similars; %v were requested.\n",
+		tried, len(selecteds), countSimilar)
+
+	if len(selecteds) < countSimilar {
+		jobs := make([]distrib.Worker, 0, len(nonExisting))
+		for _, art := range nonExisting {
+			surl := path.Join(cmd.Host, art.Url)
+			wrkr := MyWorker{SURL: surl}
+			wrkr.w = w
+			wrkr.r = r
+			wrkr.lg = lg
+			wrkr.fs1 = fs1
+			job := distrib.Worker(&wrkr)
+			jobs = append(jobs, job)
+		}
+
+		opt := distrib.NewDefaultOptions()
+		opt.TimeOutDur = 3500 * time.Millisecond
+		opt.Want = int32(countSimilar - len(selecteds) + 1)
+		opt.CollectRemainder = false
+
+		ret := distrib.Distrib(jobs, opt)
+		for _, v := range ret {
+			v1, _ := v.Worker.(*MyWorker)
+			if v1.FA != nil {
+				age := time.Now().Sub(v1.FA.Mod)
+				if age.Hours() < 10 {
+					lg("\t\tusing fetched file with age %4.2v hrs", age.Hours())
+					nonExistFetched = append(nonExistFetched, *v1.FA)
+				}
+			}
+		}
+
+		lg("tried %v links - yielding %v fetched\n", len(nonExisting), len(nonExistFetched))
+		selecteds = append(selecteds, nonExistFetched...)
+
+		//
+		//
+		// Extract links
+		for _, v := range nonExistFetched {
+			lg("links -> memory dirtree for %q", v.Url)
+			addAnchors(lg, cmd.Host, v.Body, dirTree)
+		}
 
 	}
-	lg("tried %v to find %v new similars; requested: %v", tried, len(selecteds), countSimilar)
 
 	//
 	if time.Now().Sub(dirTree.LastFound).Seconds() < 10 {

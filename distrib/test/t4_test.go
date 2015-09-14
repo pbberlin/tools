@@ -12,6 +12,8 @@ import (
 	"github.com/pbberlin/tools/distrib"
 )
 
+var opt = distrib.NewDefaultOptions()
+
 type MyWorker struct {
 	Inp, Res int
 }
@@ -22,27 +24,33 @@ func (m *MyWorker) Work() {
 }
 
 func Test4(t *testing.T) {
-	distrib.DefaultOptions.CollectRemainder = true
+	opt.CollectRemainder = true
 	do(t, 3)
 
 }
 
 func Test5(t *testing.T) {
-	distrib.DefaultOptions.CollectRemainder = false
-	do(t, 3)
+	// opt.CollectRemainder = false
+	// do(t, 3)
 }
 
-func ATest6(t *testing.T) {
-	distrib.DefaultOptions.CollectRemainder = true
-	do(t, 33)
+func Test6(t *testing.T) {
+	opt.CollectRemainder = true
+	opt.Want = 4
+	do(t, 20)
 }
 
-func ATest7(t *testing.T) {
-	distrib.DefaultOptions.CollectRemainder = false
-	do(t, 33)
+func Test7(t *testing.T) {
+	opt.CollectRemainder = false
+	opt.Want = 4
+	do(t, 20)
 }
 
 func do(t *testing.T, precreatedPackets int) {
+
+	rand.Seed(time.Now().UnixNano())
+
+	fmt.Printf("\n--------------------\n")
 
 	jobs := make([]distrib.Worker, 0, precreatedPackets)
 	for i := 0; i < precreatedPackets; i++ {
@@ -50,7 +58,7 @@ func do(t *testing.T, precreatedPackets int) {
 		jobs = append(jobs, job)
 	}
 
-	ret := distrib.Distrib(jobs, distrib.DefaultOptions)
+	ret := distrib.Distrib(jobs, opt)
 
 	if len(ret) != precreatedPackets {
 		// t.Errorf("wnt %v got %v", precreatedPackets, len(ret))
@@ -63,6 +71,5 @@ func do(t *testing.T, precreatedPackets int) {
 			t.Errorf("%v %v", v1.Inp, v1.Res)
 		}
 	}
-	fmt.Printf("\n\n")
 
 }

@@ -141,7 +141,7 @@ func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 type tLogFunc func(format string, is ...interface{})
 type tErrFunc func(error)
 
-var lnp = log.New(os.Stdout, "", 0) // logger no prefix
+var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
 
 const maxPref = 32
 

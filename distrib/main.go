@@ -1,20 +1,70 @@
 // Package distrib enables distributed processing of
 // any slice of structs implementing the Worker
 // interface.
+//
+// Distrib contains the simplest pipeline with three stages.
+// Stage 2 is fanned out, executing Work().
+//
+// All send and receive operations are clad in
+// select statements with a <-fin branch,
+// ensuring clear exit of all goroutines.
+//
+// Distrib processes packages of type Packet.
+// The actual work is always contained in Packet.Work().
+//
+// Distrib has two exit modes.
+// CollectRemainder or inversely "FlushAndAbandon".
+//
+// FlushAndAbandon was supposed to set inn and out to nil,
+// blocking every further communication.
+// It then closes fin, causing all goroutines to exit.
+// Setting inn and out to nil alarmed the race detector.
+// Instead we signal stage1 to stop with "lcnt = -10".
+//
+// CollectRemainder equally prevents further feeding of the pipeline.
+// It then waits until all sent packets
+// have been received at stage3,
+// relying on the synchronized sent counter.
+//
+// Distrib provides a timeout for Packet.Work().
+// Timing out of Work() requires spawning a goroutine
+// and an individual receiver channel for each packet.
+// Upon timeout the channel receiving the work is
+// closed.
+// The timed out workers will hang around in blocked mode
+// until they are flushed with close(fin) at exit.
+//
+// Stage3 of Distrib is a *synchroneous* for-select loop,
+// redeeming us from waitgroup.Wait...
+//
+// Signalling stage1 to stage3 that packets are exhausted
+// happens by setting Options.Want to zero.
+// Options.Want is therefore not usable as cutoff
+// for the returns slice.
+//
+// Signalling stage3 to stage1 that loading should be
+// stopped, happens by setting lcnt to -10.
+// Both need to be synchronized.
+//
+// Todo/Caveat: CollectRemainder==false && len(jobs) << Want
+// leads to premature flushing
+// Better use CollectRemainder==true
+//
 package distrib
 
 import (
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"sync/atomic"
 	"time"
 )
 
-var lnp = log.New(os.Stdout, "", 0) // logger no prefix
+var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
 var lpf = lnp.Printf                // shortcut
 
+// Worker interface is a narrow interface
+// executing the work, that is to be distributed.
 type Worker interface {
 	Work()
 }
@@ -39,62 +89,19 @@ type Options struct {
 	TailingSleep     bool          // Upon exit: Wait a short while, checking the return of all goroutines.
 }
 
-var DefaultOptions = Options{
+var defaultOptions = Options{
 	NumWorkers:       6,
 	Want:             int32(10),
-	TimeOutDur:       time.Millisecond * 15,
+	TimeOutDur:       time.Millisecond * 14,
 	CollectRemainder: true,
 	TailingSleep:     false,
 }
 
-func init() {
-	rand.Seed(time.Now().UnixNano())
+func NewDefaultOptions() Options {
+	return defaultOptions
 }
 
-// Distrib contains the simplest pipeline with three stages.
-//
-// All send and receive operations are clad in
-// select statements with a <-fin branch,
-// ensuring clear exit of all goroutines.
-//
-// Distrib processes packages of type WLoad.
-// The actual work is always contained in Packet.Work().
-//
-// Distrib has two exit modes.
-// CollectRemainder or inversely "FlushAndAbandon".
-//
-// FlushAndAbandon was supposed to set inn and out to nil,
-// blocking every further communication.
-// It then closes fin, causing all goroutines to exit.
-// Setting inn and out to nil alarmed the race detector.
-// Instead we signal stage1 to stop with "lcnt = -10"
-//
-// CollectRemainder equally prevents further feeding of the pipeline.
-// It then waits until all sent packets
-// have been received at stage3,
-// relying on the synchronized sent counter.
-//
-// Distrib provides a timeout for Packet.Work().
-// Timeout for workWrap requires spawning of a goroutine
-// and an individual receiver channel for each packet.
-// Upon timeout the channel receiving the work is
-// closed.
-// The timed out workers will hang around in blocked mode
-// until they are flushed with close(fin) at exit.
-//
-// Stage3 of Distrib is a *synchroneous* loop,
-// delivering us from waitgroup.Wait...
-//
-// Signalling stage1 to stage3 that packets are exhausted
-// happens by setting Options.Want to zero.
-//
-// Signalling stage3 to stage1 that loading should be
-// stopped, happens by setting lcnt to -10.
-// Both need to be synchronized.
-//
-// Todo/Caveat: CollectRemainder==false && len(jobs) << Want
-// leads to premature flushing
-//
+// Distrib builds the pipleline and processes the packets.
 func Distrib(jobs []Worker, opt Options) []*Packet {
 
 	inn := make(chan *Packet) // stage1 => stage2
@@ -102,8 +109,8 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 
 	fin := make(chan struct{}) // flush all
 
-	lcnt := int32(0) // load counter; always incrementing; except: to signal stop loading from downstream
-	sent := int32(0) // sent packages - might get decremented for timed out work
+	lcnt := int32(0) // load counter; always incrementing; except: to signal stop loading from stage3 to stage1
+	sent := int32(0) // sent packages - might get decremented for timed out packets
 	recv := int32(0) // received packages - converges against sent packages - unless in flushing mode
 
 	ticker := time.NewTicker(10 * time.Millisecond)
@@ -126,12 +133,12 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 
 			idx := int(atomic.LoadInt32(&lcnt))
 
-			if idx > len(packets)-1 {
+			if idx > len(packets)-1 { // signal to stage3
 				lpf("=== input packets exhausted ===")
 				atomic.StoreInt32(&opt.Want, int32(0))
 				return
 			}
-			if idx < 0 { // signal from downstream
+			if idx < 0 { // signal from stage3
 				lpf("=== loading stage 1 terminated ===")
 				return
 			}
@@ -149,9 +156,9 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 	// stage 2
 	for i := 0; i < opt.NumWorkers; i++ {
 		go func(wkrID int) {
+		NextPacket:
 			for {
 				timeout := time.After(opt.TimeOutDur)
-			MarkX:
 				select {
 				case packet := <-inn:
 
@@ -182,7 +189,7 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 						lpf("TOUT  snt%2v  %v", atomic.LoadInt32(&sent), *packet) // race_1_b
 						// => stage 3 has to check recv >= sent in separate select-tick branch
 						//    because no WLoad packet is sent-received upon this timeout.
-						break MarkX // skipping this packet
+						break NextPacket // skipping this packet
 					}
 
 				case <-fin:
@@ -225,7 +232,7 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 					}
 
 					// inn = nil  // race detector objected to this line
-					atomic.StoreInt32(&lcnt, -10) // signalling stop loading to stage 1
+					atomic.StoreInt32(&lcnt, -10) // signalling stop loading to stage1
 
 					// Exit immediately
 					if !opt.CollectRemainder {

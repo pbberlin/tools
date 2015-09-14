@@ -35,7 +35,9 @@ func rssDoc2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, rssD
 
 	}
 
-	path2DirTree(w, r, treeX, articleList, domain, true)
+	lg1, _ := loghttp.BuffLoggerUniversal(w, r)
+
+	path2DirTree(lg1, treeX, articleList, domain, true)
 
 }
 

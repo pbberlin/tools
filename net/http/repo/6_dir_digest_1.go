@@ -79,10 +79,7 @@ func switchTData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articles []FullArticle, domain string, IsRSS bool) {
-
-	lg, lge := loghttp.Logger(w, r)
-	_ = lg
+func path2DirTree(lg loghttp.FuncBufUniv, treeX *DirTree, articles []FullArticle, domain string, IsRSS bool) {
 
 	if treeX == nil {
 		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
@@ -102,7 +99,7 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 		href = strings.TrimPrefix(href, pfx2)
 		if strings.HasPrefix(href, "/") { // ignore other domains
 			parsed, err := url.Parse(href)
-			lge(err)
+			lg(err)
 			href = parsed.Path
 			// lg("%v", href)
 			trLp = treeX
@@ -163,6 +160,33 @@ func path2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, articl
 
 		}
 	}
+
+}
+
+// Append of all links of a DOM to an in-memory dirtree
+func addAnchors(lg loghttp.FuncBufUniv, host string, bts []byte, dirTree *DirTree) {
+
+	doc, err := html.Parse(bytes.NewReader(bts))
+	lg(err)
+	if err != nil {
+		return
+	}
+	anchors := []FullArticle{}
+	var fr func(*html.Node)
+	fr = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			art := FullArticle{}
+			art.Url = attrX(n.Attr, "href")
+			art.Mod = time.Now()
+			anchors = append(anchors, art)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			fr(c)
+		}
+	}
+	fr(doc)
+	path2DirTree(lg, dirTree, anchors, host, false)
+	dirTree.LastFound = time.Now() // Marker for later accumulated saving
 
 }
 
@@ -233,16 +257,11 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 }
 
 // Fetches URL if local file is outdated.
-// Extracts links
-// adds  links to param treeX
-// saves treeX
 // saves fetched file
+//
+// link extraction, link addition to treeX now accumulated one level higher
 func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
-	lg loghttp.FuncBufUniv, treeX *DirTree, fs fsi.FileSystem, surl string) ([]byte, time.Time, error) {
-
-	if treeX == nil {
-		return []byte{}, time.Now(), fmt.Errorf("tree is nil")
-	}
+	lg loghttp.FuncBufUniv, fs fsi.FileSystem, surl string) ([]byte, time.Time, error) {
 
 	// Determine FileName
 	ourl, err := fetch.URLFromString(surl)
@@ -252,7 +271,7 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	semanticUri := condenseTrailingDir(surl, fc.CondenseTrailingDirs)
 	fn := path.Join(docRoot, semanticUri)
 
-	lg("crawling\t%q", surl)
+	lg("crawlin %q", surl)
 
 	// File already exists?
 	// Open file for age check
@@ -308,11 +327,11 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	if inf.Mod.IsZero() {
 		inf.Mod = time.Now().Add(-75 * time.Minute)
 	}
-	lg("retrieved\t%q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
+	lg("retrivd %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
 	//
 	//
-	lg("saved\t\t%q crawled file", fn)
+	lg("saved   %q crawled file", fn)
 	dir := path.Dir(fn)
 	err = fs.MkdirAll(dir, 0755)
 	lg(err)
@@ -322,32 +341,6 @@ func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
 	lg(err)
 	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
 	lg(err)
-
-	//
-	//
-	// Extract links
-	doc, err := html.Parse(bytes.NewReader(bts))
-	lg(err)
-	if err != nil {
-		return []byte{}, time.Now(), err
-	}
-	anchors := []FullArticle{}
-	var fr func(*html.Node)
-	fr = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "a" {
-			art := FullArticle{}
-			art.Url = attrX(n.Attr, "href")
-			art.Mod = time.Now()
-			anchors = append(anchors, art)
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			fr(c)
-		}
-	}
-	fr(doc)
-	lg("\t\tlinks -> memory dirtree")
-	path2DirTree(w, r, treeX, anchors, inf.URL.Host, false)
-	treeX.LastFound = time.Now() // Marker for later accumulated saving
 
 	return bts, inf.Mod, nil
 

@@ -108,7 +108,9 @@ func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 		return
 	}
 
-	// Write it to http response - unless prefix 'lo ' - log only
+	// Write it to http response or bytes.Buffer
+	// unless prefixed with 'lo ' - log only.
+	// Thread-safety could be introduced by syncing/locking w.
 	if w != nil && !strings.HasPrefix(s, "lo ") {
 		w.Write([]byte(s))
 		w.Write([]byte{'\n'})

@@ -285,7 +285,8 @@ MarkOuter:
 		opt.Want = int32(countSimilar - len(selecteds) + 1)
 		opt.CollectRemainder = false
 
-		ret := distrib.Distrib(jobs, opt)
+		ret, msg := distrib.Distrib(jobs, opt)
+		lg(msg.String())
 		for _, v := range ret {
 			v1, _ := v.Worker.(*MyWorker)
 			if v1.FA != nil {
@@ -294,6 +295,9 @@ MarkOuter:
 					lg("\t\tusing fetched file with age %4.2v hrs", age.Hours())
 					nonExistFetched = append(nonExistFetched, *v1.FA)
 				}
+			}
+			if v1.err != nil {
+				lg(err)
 			}
 		}
 

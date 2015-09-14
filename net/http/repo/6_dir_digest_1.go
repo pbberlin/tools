@@ -82,7 +82,7 @@ func switchTData(w http.ResponseWriter, r *http.Request) {
 func path2DirTree(lg loghttp.FuncBufUniv, treeX *DirTree, articles []FullArticle, domain string, IsRSS bool) {
 
 	if treeX == nil {
-		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+		return
 	}
 	var trLp *DirTree
 	trLp = treeX

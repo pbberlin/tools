@@ -50,18 +50,16 @@
 // leads to premature flushing
 // Better use CollectRemainder==true
 //
+// Log is written into a byte buffer and returned to caller.
 package distrib
 
 import (
+	"bytes"
 	"fmt"
 	"log"
-	"os"
 	"sync/atomic"
 	"time"
 )
-
-var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
-var lpf = lnp.Printf                // shortcut
 
 // Worker interface is a narrow interface
 // executing the work, that is to be distributed.
@@ -102,7 +100,12 @@ func NewDefaultOptions() Options {
 }
 
 // Distrib builds the pipleline and processes the packets.
-func Distrib(jobs []Worker, opt Options) []*Packet {
+func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
+
+	var b = new(bytes.Buffer)
+	// var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
+	var lnp = log.New(b, "", 0)
+	var lpf = lnp.Printf // shortcut
 
 	inn := make(chan *Packet) // stage1 => stage2
 	out := make(chan *Packet) // stage2 => stage3
@@ -264,6 +267,6 @@ func Distrib(jobs []Worker, opt Options) []*Packet {
 		}
 	}
 
-	return returns
+	return returns, b
 
 }

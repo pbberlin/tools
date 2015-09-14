@@ -1,4 +1,4 @@
-// Package instance_info contains provides html views; the core is in instance_mgt.
+// Package instance_info provides html views; the core is in instance_mgt.
 package instance_info
 
 import (

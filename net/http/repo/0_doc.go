@@ -5,8 +5,8 @@
 // Further inspiration could be taken from github.com/lox/httpcache
 //
 //  Todo:
-//		Integrate multithreaded fetching into the last version
-//		Integrate RSS feeds into the crawling
+//		Re-integrate RSS feeds into the crawling
+//		Exlude redirect-responses
 //
 //
 package repo

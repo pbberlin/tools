@@ -58,7 +58,8 @@ func do(t *testing.T, precreatedPackets int) {
 		jobs = append(jobs, job)
 	}
 
-	ret := distrib.Distrib(jobs, opt)
+	ret, msg := distrib.Distrib(jobs, opt)
+	fmt.Print(msg.String())
 
 	if len(ret) != precreatedPackets {
 		// t.Errorf("wnt %v got %v", precreatedPackets, len(ret))

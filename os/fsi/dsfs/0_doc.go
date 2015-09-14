@@ -3,7 +3,7 @@
 //
 // Architecture
 // ==============================
-
+//
 // According to http://www.cidrdb.org/cidr2011/Papers/CIDR11_Paper32.pdf
 // we must choose the granularity of our entity groups.
 //

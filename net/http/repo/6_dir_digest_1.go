@@ -260,7 +260,7 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 // saves fetched file
 //
 // link extraction, link addition to treeX now accumulated one level higher
-func fetchCrawlSave(w http.ResponseWriter, r *http.Request,
+func fetchSave(w http.ResponseWriter, r *http.Request,
 	lg loghttp.FuncBufUniv, fs fsi.FileSystem, surl string) ([]byte, time.Time, error) {
 
 	// Determine FileName

@@ -50,7 +50,10 @@
 // leads to premature flushing
 // Better use CollectRemainder==true
 //
-// Log is written into a byte buffer and returned to caller.
+// We do not use loghttp.FuncBufUniv,
+// since it is not threadseave.
+// Instead we us log.Printf to write into a byte buffer,
+// which is returned to caller.
 package distrib
 
 import (

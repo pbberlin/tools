@@ -39,7 +39,7 @@ func (m *MyWorker) Work() {
 
 	// m.Bts, m.FI, m.Err = fetch.UrlGetter(nil, fetch.Options{URL: m.URL})
 
-	bts, mod, err := fetchCrawlSave(m.w, m.r, m.lg, m.fs1, m.SURL)
+	bts, mod, err := fetchSave(m.w, m.r, m.lg, m.fs1, m.SURL)
 
 	if err != nil {
 		m.err = err
@@ -117,7 +117,7 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
 	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
 
-	btsSrc, modSrc, err := fetchCrawlSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
+	btsSrc, modSrc, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
 	addAnchors(lg, cmd.Host, btsSrc, dirTree)
 	lg(err)
 	if err != nil {
@@ -155,7 +155,7 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
-			btsPar, _, err := fetchCrawlSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
+			btsPar, _, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
 			addAnchors(lg, cmd.Host, btsPar, dirTree)
 			lg(err)
 			if err != nil {
@@ -286,7 +286,7 @@ MarkOuter:
 		opt.CollectRemainder = false
 
 		ret, msg := distrib.Distrib(jobs, opt)
-		lg(msg.String())
+		lg("\n" + msg.String())
 		for _, v := range ret {
 			v1, _ := v.Worker.(*MyWorker)
 			if v1.FA != nil {

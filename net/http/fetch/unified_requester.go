@@ -139,7 +139,8 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			if err2nd != nil {
 				return nil, Info{URL: req.URL}, fmt.Errorf("GET fallback to http failed with %v", err2nd)
 			}
-			log.Printf("successful fallback to http %v after %v\n", req.URL.String(), err)
+			log.Printf("\tsuccessful fallback to http %v", req.URL.String())
+			log.Printf("\tafter %v\n", err)
 			err = nil // CLEAR error
 		}
 	}

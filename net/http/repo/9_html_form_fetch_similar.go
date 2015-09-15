@@ -111,7 +111,6 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	} else {
 
-		// ii := instance_mgt.Get(r)
 		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s", r.Host, UriFetchSimilar, routes.URLParamKey, rURL, r.FormValue("cnt"))
 		lg("lo - sending to URL:    %v\n", fullURL)
 
@@ -126,31 +125,31 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 		if len(bts) == 0 {
 			lg("empty bts")
-		} else {
-			var mp map[string][]byte
-			err = json.Unmarshal(bts, &mp)
-			if err != nil {
-				lg("%s", bts)
-				lg(err)
-				return
-			}
+			return
+		}
 
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-			if _, ok := mp["msg"]; ok {
-				w.Write(mp["msg"])
-			}
+		var mp map[string][]byte
+		err = json.Unmarshal(bts, &mp)
+		lg(err)
+		if err != nil {
+			lg("%s", bts)
+			return
+		}
 
-			for k, v := range mp {
-				if k != "msg" {
-					wpf(w, "<br><br>%s:\n", k)
-					if true {
-						wpf(w, "len %v", len(v))
-					} else {
-						wpf(w, "%s", html.EscapeString(string(v)))
-					}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if _, ok := mp["msg"]; ok {
+			w.Write(mp["msg"])
+		}
+
+		for k, v := range mp {
+			if k != "msg" {
+				wpf(w, "<br><br>%s:\n", k)
+				if true {
+					wpf(w, "len %v", len(v))
+				} else {
+					wpf(w, "%s", html.EscapeString(string(v)))
 				}
 			}
-
 		}
 
 	}

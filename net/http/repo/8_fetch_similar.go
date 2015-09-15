@@ -283,7 +283,8 @@ MarkOuter:
 		opt := distrib.NewDefaultOptions()
 		opt.TimeOutDur = 3500 * time.Millisecond
 		opt.Want = int32(countSimilar - len(selecteds) + 1)
-		opt.CollectRemainder = false
+		opt.NumWorkers = 3
+		// opt.CollectRemainder = false
 
 		ret, msg := distrib.Distrib(jobs, opt)
 		lg("\n" + msg.String())
@@ -331,6 +332,8 @@ MarkOuter:
 		mp["mod__"+spf("%02v", i)] = []byte(v.Mod.Format(http.TimeFormat))
 		mp["bod__"+spf("%02v", i)] = v.Body
 	}
+
+	mp["lensimilar"] = []byte(spf("%02v", len(selecteds)))
 
 	//
 	smp, err := json.MarshalIndent(mp, "", "\t")

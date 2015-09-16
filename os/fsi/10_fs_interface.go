@@ -62,6 +62,8 @@ type FileSystem interface {
 	Rename(oldname, newname string) error
 	Stat(path string) (os.FileInfo, error)
 
+	SplitX(name string) (dir, bname string) // mostly but not entirely equivalent to path.Split()
+
 	// Two convenience methods taken from io.ioutil.
 	// They are mandatory, because you will need them sooner or later anyway.
 	// Thus we require them right from the start and with *standard* signatures.

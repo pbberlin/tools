@@ -8,20 +8,53 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"appengine"
+	"appengine/aetest"
 
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/net/http/routes"
-	"github.com/pbberlin/tools/os/osutilpb"
+	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
+	"github.com/pbberlin/tools/os/fsi/dsfs"
+	"github.com/pbberlin/tools/os/fsi/memfs"
+	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 	"golang.org/x/net/html"
 )
+
+var logDir = "c:/tmp/weedout2/"
+
+var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
+
+func GetFS(c appengine.Context, whichType int) (fs fsi.FileSystem) {
+	switch whichType {
+	case 0:
+		// re-instantiation would delete contents
+		fs = fsi.FileSystem(memMapFileSys)
+	case 1:
+		// must be re-instantiated for each request
+		dsFileSys := dsfs.New(dsfs.DirSort("byDateDesc"), dsfs.MountName("mntTest"), dsfs.AeContext(c))
+		fs = fsi.FileSystem(dsFileSys)
+	case 2:
+
+		osFileSys := osfs.New(osfs.DirSort("byDateDesc"))
+		fs = fsi.FileSystem(osFileSys)
+		os.Chdir(logDir)
+	default:
+		panic("invalid whichType ")
+	}
+
+	return
+}
 
 func Test2(t *testing.T) {
 
@@ -33,6 +66,15 @@ func Test2(t *testing.T) {
 	// defer closureOverBuf(b) // the argument is ignored,
 
 	remoteHostname := "www.welt.de"
+
+	c, err := aetest.NewContext(nil)
+	lg(err)
+	if err != nil {
+		return
+	}
+	defer c.Close()
+
+	fs := GetFS(c, 2)
 
 	var urls = []string{
 		"www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
@@ -131,13 +173,11 @@ func Test2(t *testing.T) {
 		lg("%v %v", v.Url, len(v.Body))
 	}
 
-	logdir := osutilpb.PrepareLogDir()
-
 	//
 	// domclean
 	for i := 0; i < numTotal; i++ {
 
-		fNamer := domclean2.FileNamer(logdir, i)
+		fNamer := domclean2.FileNamer(logDir, i)
 		fNamer() // first call yields key
 
 		lg("cleaning %4.1fkB from %v", float64(len(least3Files[i].Body))/1024,
@@ -150,7 +190,7 @@ func Test2(t *testing.T) {
 		doc, err := domclean2.DomClean(least3Files[i].Body, opts)
 		lg(err)
 
-		fileDump(doc, fNamer, ".html")
+		fileDump(lg, fs, doc, fNamer, ".html")
 
 	}
 
@@ -158,10 +198,11 @@ func Test2(t *testing.T) {
 	// Textify with brute force
 	for i := 0; i < numTotal; i++ {
 
-		fNamer := domclean2.FileNamer(logdir, i)
+		fNamer := domclean2.FileNamer(logDir, i)
 		fNamer() // first call yields key
 
-		bts := osutilpb.BytesFromFile(fNamer() + ".html")
+		bts, err := common.ReadFile(fs, fNamer()+".html")
+		lg(err)
 		doc, err := html.Parse(bytes.NewReader(bts))
 		lg(err)
 
@@ -174,7 +215,7 @@ func Test2(t *testing.T) {
 		b := buf.Bytes()
 		b = bytes.Replace(b, []byte("[br]"), []byte("\n"), -1)
 
-		fileDump(b, fNamer, "_raw.txt")
+		fileDump(lg, fs, b, fNamer, "_raw.txt")
 	}
 
 	//
@@ -183,10 +224,11 @@ func Test2(t *testing.T) {
 	textsByArticOutl := map[string][]*TextifiedTree{}
 	for i := 0; i < numTotal; i++ {
 
-		fNamer := domclean2.FileNamer(logdir, i)
+		fNamer := domclean2.FileNamer(logDir, i)
 		fnKey := fNamer() // first call yields key
 
-		bts := osutilpb.BytesFromFile(fNamer() + ".html")
+		bts, err := common.ReadFile(fs, fNamer()+".html")
+
 		doc, err := html.Parse(bytes.NewReader(bts))
 		lg(err)
 
@@ -194,10 +236,10 @@ func Test2(t *testing.T) {
 
 		//
 		mp, bts := BubbledUpTextExtraction(doc, fnKey)
-		fileDump(bts, fNamer, ".txt")
+		fileDump(lg, fs, bts, fNamer, ".txt")
 
 		mpSorted, dump := orderByOutline(mp)
-		fileDump(dump, fNamer, ".txt")
+		fileDump(lg, fs, dump, fNamer, ".txt")
 		textsByArticOutl[fnKey] = mpSorted
 
 		// for k, v := range mpSorted {
@@ -217,13 +259,13 @@ func Test2(t *testing.T) {
 	var skipPrefixes = map[string]bool{}
 	for weedStage := 1; weedStage <= stageMax; weedStage++ {
 
-		fNamer := domclean2.FileNamer(logdir, 0)
+		fNamer := domclean2.FileNamer(logDir, 0)
 		fnKey := fNamer() // first call yields key
 
 		levelsToProcess = map[int]bool{weedStage: true}
 		frags := similarTextifiedTrees(textsByArticOutl, skipPrefixes, map[string]bool{fnKey: true})
 
-		similaritiesToFile(logdir, frags, weedStage)
+		similaritiesToFile(logDir, frags, weedStage)
 
 		for _, frag := range frags {
 			if len(frag.Similars) >= numTotal-1 &&
@@ -242,10 +284,11 @@ func Test2(t *testing.T) {
 
 	//
 	// Apply weedout
-	fNamer := domclean2.FileNamer(logdir, 0)
+	fNamer := domclean2.FileNamer(logDir, 0)
 	fNamer() // first call yields key
 
-	bts := osutilpb.BytesFromFile(fNamer() + ".html")
+	bts, err := common.ReadFile(fs, fNamer()+".html")
+	lg(err)
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lg(err)
 
@@ -253,22 +296,29 @@ func Test2(t *testing.T) {
 
 	domclean2.DomFormat(doc)
 
-	fileDump(doc, fNamer, ".html")
+	fileDump(lg, fs, doc, fNamer, ".html")
 
 	pf("MapSimiliarCompares: %v SimpleCompares: %v LevenstheinComp: %v\n", breakMapsTooDistinct, appliedLevenshtein, appliedCompare)
 	pf("correct finish\n")
 
 }
 
-func fileDump(content interface{}, fNamer func() string, secondPart string) {
+func fileDump(lg loghttp.FuncBufUniv, fs fsi.FileSystem,
+	content interface{}, fNamer func() string, secondPart string) {
 
 	if fNamer != nil {
-
+		fn := fNamer() + secondPart
 		switch casted := content.(type) {
 		case *html.Node:
-			osutilpb.Dom2File(fNamer()+secondPart, casted)
+			var b bytes.Buffer
+			err := html.Render(&b, casted)
+			lg(err)
+			if err != nil {
+				return
+			}
+			common.WriteFile(fs, fn, b.Bytes())
 		case []byte:
-			osutilpb.Bytes2File(fNamer()+secondPart, casted)
+			common.WriteFile(fs, fn, casted)
 		}
 
 	}

@@ -76,8 +76,12 @@ Good for quick testing and fast cleanup.
 You can change the MountPoint of a memfs after its creation,
 thus storing multiple trees consecutively, but not concurrently.
 
+
+#### stacking filesystems
 You can add a "shadow" filesystem to memfs.
 Memfs will now act as cache for the shadow filesystem.
+
+Its underimplemented though. Only Open() is looking.
 
 
 #### dsfs

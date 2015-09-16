@@ -35,7 +35,9 @@ func Ident(mnt string) func(fsi.FileSystem) {
 	}
 }
 
-// Ident is an option func, adding a specific identification to the filesystem
+// Ident is an option func,
+// making memfs the cache for an underlying filesystem.
+// behindFS becomes a stacked filesystem.
 func ShadowFS(behindFS fsi.FileSystem) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*memMapFs)

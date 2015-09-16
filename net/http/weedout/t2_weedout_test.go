@@ -26,64 +26,74 @@ import (
 func Test2(t *testing.T) {
 
 	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
-	closureOverBuf := func(bUnused *bytes.Buffer) {
-		loghttp.Pf(nil, nil, b.String())
-	}
-	defer closureOverBuf(b) // the argument is ignored,
+	_ = b
+	// closureOverBuf := func(bUnused *bytes.Buffer) {
+	// 	loghttp.Pf(nil, nil, b.String())
+	// }
+	// defer closureOverBuf(b) // the argument is ignored,
 
 	remoteHostname := "www.welt.de"
-	remoteHostname = "www.welt.de/politik/ausland"
 
 	var urls = []string{
-		"http://www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
+		"www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
 		"www.economist.com/news/britain/21663648-hard-times-hard-hats-making-britain-make-things-again-proving-difficult",
 		"www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power",
 	}
 
 	fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%v", cTestHostDev, repo.UriFetchSimilar,
-		routes.URLParamKey, urls[0], 2)
+		routes.URLParamKey, urls[0], numTotal-1)
 	lg("lo sending to URL:")
 	lg("lo %v", fullURL)
 
 	fo := fetch.Options{}
 	fo.URL = fullURL
-	btsSimlar, inf, err := fetch.UrlGetter(nil, fo)
+	bResp, inf, err := fetch.UrlGetter(nil, fo)
 	_ = inf
 	lg(err)
 	if err != nil {
 		return
 	}
-
-	if len(btsSimlar) == 0 {
-		lg("empty btsSimlar")
+	if len(bResp) == 0 {
+		lg("empty bResp")
 		return
 	}
 
 	var mp map[string][]byte
-	err = json.Unmarshal(btsSimlar, &mp)
+	err = json.Unmarshal(bResp, &mp)
 	lg(err)
 	if err != nil {
 		if _, ok := mp["msg"]; ok {
 			lg("%s", mp["msg"])
 		} else {
-			lg("%s", btsSimlar)
+			lg("%s", bResp)
 		}
 		return
 	}
 
 	smaxFound := string(mp["lensimilar"])
 	maxFound := util.Stoi(smaxFound)
-	if maxFound < 2 {
-		lg("mp[lensimilar] is too small: %s", mp["lensimilar"])
+	if maxFound < numTotal-1 {
+		lg("not enough files returned by FetchSimilar 1 - mp[lensimilar] too small: %s", mp["lensimilar"])
 		return
 	}
-
 	least3Files := make([]repo.FullArticle, maxFound+1)
 
-	least3Files[0].Url = string(mp["url_self"])
-	least3Files[0].Mod, err = time.Parse(http.TimeFormat, string(mp["mod_self"]))
-	lg(err)
-	least3Files[0].Body = mp["bod_self"]
+	_, ok1 := mp["url_self"]
+	_, ok2 := mp["mod_self"]
+	_, ok3 := mp["bod_self"]
+	if ok1 && ok2 && ok3 {
+		least3Files[0].Url = string(mp["url_self"])
+		least3Files[0].Mod, err = time.Parse(http.TimeFormat, string(mp["mod_self"]))
+		lg(err)
+		least3Files[0].Body = mp["bod_self"]
+		if len(least3Files[0].Body) < 200 {
+			if !bytes.Contains(least3Files[0].Body, []byte(fetch.MsgNoRdirects)) {
+				lg("found base but its a redirect")
+				return
+			}
+		}
+	}
+	lg("found base")
 
 	for k, v := range mp {
 		if k == "msg" {
@@ -115,60 +125,38 @@ func Test2(t *testing.T) {
 
 	}
 
-	lg("found %v\n\n", maxFound)
-	b = new(bytes.Buffer)
-
-	// for _, v1 := range dirs1 {
-	// 	for _, v2 := range fils2 {
-	// 		least3Files = append(least3Files, path.Join(remoteHostname, v1, v2))
-	// 	}
-	// }
-
-	if maxFound < numTotal {
-		lg("not enough files in rss fetcher cache")
-		// return
-	}
-
-	least3Files = least3Files[:maxFound+1]
+	lg("found %v similar", maxFound)
 
 	for _, v := range least3Files {
 		lg("%v %v", v.Url, len(v.Body))
 	}
 
-	return
-
 	logdir := osutilpb.PrepareLogDir()
-
-	iter := make([]int, numTotal)
 
 	//
 	// domclean
-	for i, _ := range iter {
-
-		surl := spf("%v/%v", repo.RepoURL, least3Files[i])
+	for i := 0; i < numTotal; i++ {
 
 		fNamer := domclean2.FileNamer(logdir, i)
 		fNamer() // first call yields key
 
-		resBytes, inf, err := fetch.UrlGetter(nil, fetch.Options{URL: surl})
-		if err != nil {
-			lg(err)
-			return
-		}
-		lg("fetched %4.1fkB from %v", float64(len(resBytes))/1024, stringspb.ToLenR(inf.URL.String(), 60))
+		lg("cleaning %4.1fkB from %v", float64(len(least3Files[i].Body))/1024,
+			stringspb.ToLenR(least3Files[i].Url, 60))
+
 		opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
 		// opts.FNamer = fNamer
 		opts.AddOutline = true
 		opts.RemoteHost = remoteHostname
-		doc, err := domclean2.DomClean(resBytes, opts)
+		doc, err := domclean2.DomClean(least3Files[i].Body, opts)
+		lg(err)
 
-		osutilpb.Dom2File(fNamer()+".html", doc)
+		fileDump(doc, fNamer, ".html")
 
 	}
 
 	//
 	// Textify with brute force
-	for i, _ := range iter {
+	for i := 0; i < numTotal; i++ {
 
 		fNamer := domclean2.FileNamer(logdir, i)
 		fNamer() // first call yields key
@@ -186,14 +174,14 @@ func Test2(t *testing.T) {
 		b := buf.Bytes()
 		b = bytes.Replace(b, []byte("[br]"), []byte("\n"), -1)
 
-		osutilpb.Bytes2File(fNamer()+"_raw"+".txt", b)
+		fileDump(b, fNamer, "_raw.txt")
 	}
 
 	//
 	// Textify with more finetuning.
 	// Save result to memory.
 	textsByArticOutl := map[string][]*TextifiedTree{}
-	for i, _ := range iter {
+	for i := 0; i < numTotal; i++ {
 
 		fNamer := domclean2.FileNamer(logdir, i)
 		fnKey := fNamer() // first call yields key
@@ -206,10 +194,10 @@ func Test2(t *testing.T) {
 
 		//
 		mp, bts := BubbledUpTextExtraction(doc, fnKey)
-		osutilpb.Bytes2File(fNamer()+".txt", bts)
+		fileDump(bts, fNamer, ".txt")
 
 		mpSorted, dump := orderByOutline(mp)
-		osutilpb.Bytes2File(fNamer()+".txt", dump)
+		fileDump(dump, fNamer, ".txt")
 		textsByArticOutl[fnKey] = mpSorted
 
 		// for k, v := range mpSorted {
@@ -263,17 +251,26 @@ func Test2(t *testing.T) {
 
 	weedoutApply(doc, skipPrefixes)
 
-	domclean2.DomCleanSmall(doc)
+	domclean2.DomFormat(doc)
 
-	osutilpb.Dom2File(fNamer()+".html", doc)
+	fileDump(doc, fNamer, ".html")
 
 	pf("MapSimiliarCompares: %v SimpleCompares: %v LevenstheinComp: %v\n", breakMapsTooDistinct, appliedLevenshtein, appliedCompare)
 	pf("correct finish\n")
 
 }
 
-// func weedoutFilename(articleId, weedoutStage int) (string, string) {
-// 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
-// 	prefix := fmt.Sprintf("outp_%03v", articleId)
-// 	return stagedFn, prefix
-// }
+func fileDump(content interface{}, fNamer func() string, secondPart string) {
+
+	if fNamer != nil {
+
+		switch casted := content.(type) {
+		case *html.Node:
+			osutilpb.Dom2File(fNamer()+secondPart, casted)
+		case []byte:
+			osutilpb.Bytes2File(fNamer()+secondPart, casted)
+		}
+
+	}
+
+}

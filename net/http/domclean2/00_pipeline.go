@@ -20,7 +20,7 @@ type CleaningOptions struct {
 	AddOutline bool
 	AddID      bool
 
-	Beautify bool // make pretty at the end
+	Beautify bool // make pretty at the end, removes <a> linktext trailing space
 }
 
 func FileNamer(logdir string, fileNumber int) func() string {
@@ -139,10 +139,8 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 
 }
 
-func DomCleanSmall(doc *html.Node) {
-
+func DomFormat(doc *html.Node) {
 	removeEmptyNodes(doc, 0)
 	removeCommentsAndIntertagWhitespace(NdX{doc, 0})
 	reIndent(doc, 0)
-
 }

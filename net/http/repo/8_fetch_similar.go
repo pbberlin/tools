@@ -39,11 +39,17 @@ func (m *MyWorker) Work() {
 
 	// m.Bts, m.FI, m.Err = fetch.UrlGetter(nil, fetch.Options{URL: m.URL})
 
-	bts, mod, err := fetchSave(m.w, m.r, m.lg, m.fs1, m.SURL)
+	bts, mod, _, err := fetchSave(m.w, m.r, m.lg, m.fs1, m.SURL)
 
 	if err != nil {
 		m.err = err
 		return
+	}
+
+	if len(bts) < 200 {
+		if bytes.Contains(bts, []byte(fetch.MsgNoRdirects)) {
+			return
+		}
 	}
 
 	m.FA = &FullArticle{}
@@ -117,8 +123,10 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
 	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
 
-	btsSrc, modSrc, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
-	addAnchors(lg, cmd.Host, btsSrc, dirTree)
+	btsSrc, modSrc, usedExisting, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
+	if usedExisting {
+		addAnchors(lg, cmd.Host, btsSrc, dirTree)
+	}
 	lg(err)
 	if err != nil {
 		return
@@ -155,8 +163,10 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
-			btsPar, _, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
-			addAnchors(lg, cmd.Host, btsPar, dirTree)
+			btsPar, _, usedExisting, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
+			if usedExisting {
+				addAnchors(lg, cmd.Host, btsPar, dirTree)
+			}
 			lg(err)
 			if err != nil {
 				return
@@ -246,6 +256,11 @@ MarkOuter:
 						bts, err := ioutil.ReadAll(f)
 						lg(err)
 						art.Body = bts
+						if len(bts) < 200 {
+							if bytes.Contains(bts, []byte(fetch.MsgNoRdirects)) {
+								return
+							}
+						}
 						selecteds = append(selecteds, art)
 						useExisting = true
 					}
@@ -282,9 +297,9 @@ MarkOuter:
 
 		opt := distrib.NewDefaultOptions()
 		opt.TimeOutDur = 3500 * time.Millisecond
-		opt.Want = int32(countSimilar - len(selecteds) + 1)
-		opt.NumWorkers = 3
-		// opt.CollectRemainder = false
+		opt.Want = int32(countSimilar - len(selecteds) + 4) // get some more, in case we have "redirected" bodies
+		opt.NumWorkers = int(opt.Want)                      // 5s query limit; => hurry; spawn as many as we want
+		opt.CollectRemainder = false                        // 5s query limit; => hurry; dont wait for stragglers
 
 		ret, msg := distrib.Distrib(jobs, opt)
 		lg("\n" + msg.String())
@@ -295,6 +310,9 @@ MarkOuter:
 				if age.Hours() < 10 {
 					lg("\t\tusing fetched file with age %4.2v hrs", age.Hours())
 					nonExistFetched = append(nonExistFetched, *v1.FA)
+					if len(nonExistFetched) > (countSimilar - len(selecteds)) {
+						break
+					}
 				}
 			}
 			if v1.err != nil {
@@ -302,14 +320,14 @@ MarkOuter:
 			}
 		}
 
-		lg("tried %v links - yielding %v fetched\n", len(nonExisting), len(nonExistFetched))
+		lg("tried %v links - yielding %v fetched - jobs %v\n", len(nonExisting), len(nonExistFetched), len(jobs))
 		selecteds = append(selecteds, nonExistFetched...)
 
 		//
 		//
 		// Extract links
 		for _, v := range nonExistFetched {
-			lg("links -> memory dirtree for %q", v.Url)
+			// lg("links -> memory dirtree for %q", v.Url)
 			addAnchors(lg, cmd.Host, v.Body, dirTree)
 		}
 

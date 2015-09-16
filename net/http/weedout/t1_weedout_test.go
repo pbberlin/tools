@@ -190,7 +190,7 @@ func Test1(t *testing.T) {
 
 	weedoutApply(doc, skipPrefixes)
 
-	domclean2.DomCleanSmall(doc)
+	domclean2.DomFormat(doc)
 
 	osutilpb.Dom2File(fNamer()+".html", doc)
 

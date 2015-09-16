@@ -18,10 +18,8 @@ import (
 	"appengine/urlfetch"
 )
 
-var LogLevel = 0
-
-var ErrNoRedirects = fmt.Errorf("redirect called off")
-var sNoRedirects = ErrNoRedirects.Error()
+var MsgNoRdirects = "redirect cancelled"
+var ErrCancelRedirects = fmt.Errorf(MsgNoRdirects)
 
 type Options struct {
 	URL string
@@ -30,6 +28,8 @@ type Options struct {
 
 	HttpsOnly        bool
 	RedirectHandling int // 1 => call off upon redirects
+
+	LogLevel int
 }
 
 // Response info
@@ -96,11 +96,11 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	if options.RedirectHandling == 1 {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			return ErrNoRedirects
+			return ErrCancelRedirects
 		}
 	}
 
-	if LogLevel > 0 {
+	if options.LogLevel > 0 {
 		log.Printf("host: %v, uri: %v \n", req.URL.Host, req.URL.RequestURI())
 	}
 
@@ -117,7 +117,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	if err != nil {
 		if options.RedirectHandling == 1 {
 			serr := err.Error()
-			if strings.Contains(serr, sNoRedirects) {
+			if strings.Contains(serr, MsgNoRdirects) {
 				bts := []byte(serr)
 				return bts, Info{URL: req.URL, Mod: time.Now().Add(-10 * time.Minute)}, nil
 			}
@@ -139,8 +139,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			if err2nd != nil {
 				return nil, Info{URL: req.URL}, fmt.Errorf("GET fallback to http failed with %v", err2nd)
 			}
-			log.Printf("\tsuccessful fallback to http %v", req.URL.String())
-			log.Printf("\tafter %v\n", err)
+			if options.LogLevel > 0 {
+				log.Printf("\tsuccessful fallback to http %v", req.URL.String())
+				log.Printf("\tafter %v\n", err)
+			}
 			err = nil // CLEAR error
 		}
 	}

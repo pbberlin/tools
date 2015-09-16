@@ -260,8 +260,9 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 // saves fetched file
 //
 // link extraction, link addition to treeX now accumulated one level higher
+// bool return value: use existing => true
 func fetchSave(w http.ResponseWriter, r *http.Request,
-	lg loghttp.FuncBufUniv, fs fsi.FileSystem, surl string) ([]byte, time.Time, error) {
+	lg loghttp.FuncBufUniv, fs fsi.FileSystem, surl string) ([]byte, time.Time, bool, error) {
 
 	// Determine FileName
 	ourl, err := fetch.URLFromString(surl)
@@ -313,7 +314,7 @@ func fetchSave(w http.ResponseWriter, r *http.Request,
 
 	err = f()
 	if err == nil {
-		return bts, mod, err
+		return bts, mod, true, err
 	}
 
 	//
@@ -322,7 +323,7 @@ func fetchSave(w http.ResponseWriter, r *http.Request,
 	lg(err)
 	if err != nil {
 		lg("tried to fetch %v, %v", surl, inf.URL)
-		return []byte{}, inf.Mod, err
+		return []byte{}, inf.Mod, false, err
 	}
 	if inf.Mod.IsZero() {
 		inf.Mod = time.Now().Add(-75 * time.Minute)
@@ -342,6 +343,6 @@ func fetchSave(w http.ResponseWriter, r *http.Request,
 	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
 	lg(err)
 
-	return bts, inf.Mod, nil
+	return bts, inf.Mod, false, nil
 
 }

@@ -7,7 +7,7 @@ import "golang.org/x/net/html"
 //        0    1    2
 const cScaffoldLvls = 2
 
-const numTotal = 3 // comparable html docs
+const numTotal = 3 // comparable html docs, including base doc
 const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"

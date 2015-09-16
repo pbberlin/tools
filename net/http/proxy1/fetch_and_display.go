@@ -132,6 +132,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		}
 
 		opts := domclean2.CleaningOptions{Proxify: true}
+		opts.Beautify = true // "<a> Linktext without trailing space"
 		opts.RemoteHost = fetch.HostFromStringUrl(rURL)
 
 		if !util_appengine.IsLocalEnviron() {

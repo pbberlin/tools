@@ -24,7 +24,7 @@ func InitHandlers() {
 	// working only for memfs
 	http.Handle("/fetch/reservoire/static/", http.StripPrefix("/fetch/reservoire/static/", fileserver1))
 
-	http.Handle(UriFetchSimilar, loghttp.Adapter(FetchSimilar))
+	http.Handle(routes.FetchSimilarURI, loghttp.Adapter(FetchSimilar))
 	http.Handle("/fetch/similiar/form/", loghttp.Adapter(fetchSimForm))
 
 }
@@ -40,7 +40,7 @@ func BackendUIRendered() *bytes.Buffer {
 	htmlfrag.Wb(b1, "send command", uriFetchCommandSender, "dynamic")
 
 	sample := "www.economist.com/news/europe/21661810-journey-capital-hinterland-shows-how-grim-life-has-become-and-how-russians"
-	htmlfrag.Wb(b1, "get similar", UriFetchSimilar+"?"+routes.URLParamKey+"="+sample+"&cnt=2", "similar to url x")
+	htmlfrag.Wb(b1, "get similar", routes.FetchSimilarURI+"?"+routes.URLParamKey+"="+sample+"&cnt=2", "similar to url x")
 	htmlfrag.Wb(b1, "  form", "/fetch/similiar/form/")
 
 	htmlfrag.Wb(b1, "recv", uriFetchCommandReceiver, "receive fetch command, takes commands by curl")

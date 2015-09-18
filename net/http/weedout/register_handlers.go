@@ -13,14 +13,13 @@ import (
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"golang.org/x/net/html"
 )
-
-const UriWeedOut = "/weedout/main"
 
 // InitHandlers is called from outside,
 // and makes the EndPoints available.
 func InitHandlers() {
-	http.HandleFunc(UriWeedOut, loghttp.Adapter(weedOutHTTP))
+	http.HandleFunc(routes.WeedOutURI, loghttp.Adapter(weedOutHTTP))
 }
 
 // BackendUIRendered returns a userinterface rendered to HTML
@@ -28,7 +27,7 @@ func BackendUIRendered() *bytes.Buffer {
 	var b1 = new(bytes.Buffer)
 	htmlfrag.Wb(b1, "Weed Out", "")
 
-	fullURL := fmt.Sprintf("%s?%s=%s&cnt=%v", UriWeedOut, routes.URLParamKey, URLs[0], numTotal-1)
+	fullURL := fmt.Sprintf("%s?%s=%s&cnt=%v", routes.WeedOutURI, routes.URLParamKey, URLs[0], numTotal-1)
 	htmlfrag.Wb(b1, "Weed out", fullURL)
 
 	return b1
@@ -78,15 +77,32 @@ func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{
 
 	fs := GetFS(appengine.NewContext(r), 0)
 
-	least3Files := DecodeJSON(ourl.String(), lg, fs)
-	doc := WeedOut(least3Files, lg, fs)
+	least3Files := FetchAndDecodeJSON(r, ourl.String(), lg, fs)
 
-	fNamer := domclean2.FileNamer(logDir, 0)
-	fNamer() // first call yields key
-	fsPerm := GetFS(appengine.NewContext(r), 0)
-	fileDump(lg, fsPerm, doc, fNamer, "_fin.html")
+	lg("Fetched and decoded; found %v", len(least3Files))
+	if len(least3Files) > 0 {
+		doc := WeedOut(least3Files, lg, fs)
 
-	pf("MapSimiliarCompares: %v SimpleCompares: %v LevenstheinComp: %v\n", breakMapsTooDistinct, appliedLevenshtein, appliedCompare)
-	pf("Finish\n")
+		fNamer := domclean2.FileNamer(logDir, 0)
+		fNamer() // first call yields key
+		fsPerm := GetFS(appengine.NewContext(r), 0)
+		fileDump(lg, fsPerm, doc, fNamer, "_fin.html")
+
+		lg("MapSimiliarCompares: %v SimpleCompares: %v LevenstheinComp: %v\n", breakMapsTooDistinct, appliedLevenshtein, appliedCompare)
+		lg("Finish\n")
+
+		var b2 bytes.Buffer
+		err := html.Render(&b2, doc)
+		lg(err)
+		if err != nil {
+			return
+		}
+
+		b = new(bytes.Buffer)
+		// w.Write([]byte("aa"))
+		w.Header().Set("Content-type", "text/html; charset=utf-8")
+		w.Write(b2.Bytes())
+
+	}
 
 }

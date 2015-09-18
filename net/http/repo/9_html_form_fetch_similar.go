@@ -16,7 +16,7 @@ import (
 	tt "html/template"
 )
 
-const form = `
+const htmlForm = `
 	<style> .ib { display:inline-block; }</style>
 
 
@@ -106,13 +106,14 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 			"val":       "www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
 			"fieldname": routes.URLParamKey,
 		}
-		tplForm := tt.Must(tt.New("tplName01").Parse(form))
+		tplForm := tt.Must(tt.New("tplName01").Parse(htmlForm))
 		tplForm.Execute(b, tm)
 
 	} else {
 
-		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s", r.Host, UriFetchSimilar, routes.URLParamKey, rURL, r.FormValue("cnt"))
-		lg("lo - sending to URL:    %v\n", fullURL)
+		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s", r.Host, routes.FetchSimilarURI,
+			routes.URLParamKey, rURL, r.FormValue("cnt"))
+		lg("lo - sending to URL 1: %v", fullURL)
 
 		fo := fetch.Options{}
 		fo.URL = fullURL

@@ -10,8 +10,6 @@ const cScaffoldLvls = 2
 const numTotal = 3 // comparable html docs, including base doc
 const stageMax = 3 // weedstages
 
-const cTestHostDev = "localhost:8085"
-
 var URLs = []string{
 	"www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
 	"www.economist.com/news/britain/21663648-hard-times-hard-hats-making-britain-make-things-again-proving-difficult",

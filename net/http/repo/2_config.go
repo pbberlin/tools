@@ -3,6 +3,7 @@ package repo
 import (
 	"net/http"
 
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/httpfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
@@ -20,16 +21,13 @@ var fileserver1 = http.FileServer(httpFSys.Dir(docRoot))
 
 const mountName = "mntftch"
 
-const cTestHostDev = "localhost:8085"
-
 const uriSetType = "/fetch/set-fs-type"
 const UriMountNameY = "/" + mountName + "/serve-file/"
 
 const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"
-const UriFetchSimilar = "/fetch/similar"
 
-var RepoURL = cTestHostDev + UriMountNameY
+var RepoURL = routes.AppHost01 + UriMountNameY
 
 var msg = []byte(`<p>This is an embedded static http server.</p>
 <p>

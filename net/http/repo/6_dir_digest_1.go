@@ -323,6 +323,7 @@ func fetchSave(w http.ResponseWriter, r *http.Request,
 	lg(err)
 	if err != nil {
 		lg("tried to fetch %v, %v", surl, inf.URL)
+		lg("msg %v", inf.Msg)
 		return []byte{}, inf.Mod, false, err
 	}
 	if inf.Mod.IsZero() {

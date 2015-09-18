@@ -52,7 +52,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Template Demo 1", "/tpl/demo1")
 	htmlfrag.Wb(b1, "Template Demo 2", "/tpl/demo2")
 
-	htmlfrag.Wb(b1, "fetch via proxy", routes.FetchUrl)
+	htmlfrag.Wb(b1, "fetch via proxy", routes.ProxifyURI)
 	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
 	htmlfrag.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 

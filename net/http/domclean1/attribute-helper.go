@@ -29,7 +29,7 @@ func rewriteAttributes(attributes []html.Attribute, proxyHostPort, remoteHost st
 		}
 
 		if attr.Key == "href" {
-			attr.Val = fmt.Sprintf("%v?url=%v", routes.FetchUrl, attr.Val)
+			attr.Val = fmt.Sprintf("%v?url=%v", routes.ProxifyURI, attr.Val)
 		}
 
 		if attr.Key == "src" {

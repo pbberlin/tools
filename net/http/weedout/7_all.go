@@ -150,19 +150,24 @@ func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.File
 	return doc
 }
 
-func DecodeJSON(surl string, lg loghttp.FuncBufUniv, fs fsi.FileSystem) []repo.FullArticle {
+func FetchAndDecodeJSON(r *http.Request, surl string, lg loghttp.FuncBufUniv, fs fsi.FileSystem) []repo.FullArticle {
 
-	fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%v", cTestHostDev, repo.UriFetchSimilar,
+	fullURL := fmt.Sprintf("%s%s?%s=%s&cnt=%v", routes.AppHost01, routes.FetchSimilarURI,
 		routes.URLParamKey, surl, numTotal-1)
-	lg("lo sending to URL:")
+
+	// fullURL = fmt.Sprintf("%s%s?%s=%s&cnt=%v", r.URL.Host, repo.routes.FetchSimilarURI,
+	// 	routes.URLParamKey, surl, numTotal-1)
+
+	lg("lo sending to URL 2:")
 	lg("lo %v", fullURL)
 
 	fo := fetch.Options{}
 	fo.URL = fullURL
-	bJSON, inf, err := fetch.UrlGetter(nil, fo)
+	bJSON, inf, err := fetch.UrlGetter(r, fo)
 	_ = inf
 	lg(err)
 	if err != nil {
+		lg("msg %v", inf.Msg)
 		return nil
 	}
 	if len(bJSON) == 0 {

@@ -41,7 +41,7 @@ const c_formFetchUrl = `
     <form action="{{.protocol}}://{{.host}}{{.path}}" method="post" >
       <div style='margin:8px;'>
       	<span class='ib' style='width:140px'>URL </span>
-      	  <input name="url"           size="80"  value="{{.val}}"><br/>
+      	  <input name="{{.name}}"           size="80"  value="{{.val}}"><br/>
       	<span class='ib' style='width:140px'>Put into pre tags </span>
       	  <input name="renderInPre"    size="4"    value='' ><br/>
       	<span class='ib' style='width:140px'> </span>
@@ -75,15 +75,15 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	urlAs := ""
 	err := r.ParseForm()
 	logif.E(err)
-	if r.PostFormValue("url") != "" {
+	if r.PostFormValue(routes.URLParamKey) != "" {
 		urlAs += "url posted "
-		rURL = r.PostFormValue("url")
+		rURL = r.PostFormValue(routes.URLParamKey)
 	}
 
-	if r.FormValue("url") != "" {
+	if r.FormValue(routes.URLParamKey) != "" {
 		if rURL == "" {
 			urlAs += "url getted "
-			rURL = r.FormValue("url")
+			rURL = r.FormValue(routes.URLParamKey)
 		}
 	}
 	// lg("received %v:  %q", urlAs, rURL)
@@ -96,7 +96,8 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		m := map[string]string{
 			"protocol": "https",
 			"host":     r.Host, // not  fetch.HostFromReq(r)
-			"path":     routes.FetchUrl,
+			"path":     routes.ProxifyURI,
+			"name":     routes.URLParamKey,
 			"val":      "google.com",
 		}
 		if util_appengine.IsLocalEnviron() {
@@ -151,5 +152,5 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 
 func init() {
-	http.HandleFunc(routes.FetchUrl, loghttp.Adapter(handleFetchURL))
+	http.HandleFunc(routes.ProxifyURI, loghttp.Adapter(handleFetchURL))
 }

@@ -29,7 +29,7 @@ func Test2(t *testing.T) {
 	defer c.Close()
 	fs := GetFS(c, 2)
 
-	least3Files := DecodeJSON(URLs[0], lg, fs)
+	least3Files := FetchAndDecodeJSON(nil, URLs[0], lg, fs)
 	doc := WeedOut(least3Files, lg, fs)
 
 	fNamer := domclean2.FileNamer(logDir, 0)

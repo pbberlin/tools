@@ -18,6 +18,7 @@ import (
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/repo"
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/sort/sortmap"
 	"github.com/pbberlin/tools/stringspb"
 )
@@ -25,10 +26,9 @@ import (
 const numTotal = 3 // comparable html docs
 const stageMax = 3 // weedstages
 
-const cTestHostDev = "localhost:8085"
 const cTestHostOwn = "localhost:63222"
 
-var hostWithPref = cTestHostDev + repo.UriMountNameY
+var hostWithPref = routes.AppHost01 + repo.UriMountNameY
 
 func prepare(t *testing.T) aetest.Context {
 

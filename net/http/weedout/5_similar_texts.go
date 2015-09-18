@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pbberlin/tools/os/osutilpb"
+	"github.com/pbberlin/tools/os/fsi"
+	"github.com/pbberlin/tools/os/fsi/common"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/text/levenshtein"
 	"github.com/pbberlin/tools/text/levenshtein/wordb"
@@ -15,6 +16,9 @@ import (
 var opt = levenshtein.Options{1, 1, 1} // cheap substitution
 
 var levelsToProcess = map[int]bool{1: true}
+
+// var levelsToProcess = map[int]bool{1: true, 2: true, 3: true}
+
 var levelsTolerance = 0
 
 const excerptLen = 20
@@ -169,7 +173,7 @@ func similarTextifiedTrees2(src *TextifiedTree, mp map[string][]*TextifiedTree, 
 
 }
 
-func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
+func similaritiesToFile(fs fsi.FileSystem, logdir string, frags []TextifiedTree, stage int) {
 
 	// bfrags := stringspb.IndentedDumpBytes(frags)
 	b := new(bytes.Buffer)
@@ -188,7 +192,7 @@ func similaritiesToFile(logdir string, frags []TextifiedTree, stage int) {
 		}
 		b.WriteByte(10)
 	}
-	osutilpb.Bytes2File(spf("%v/outp_frags_st%v.txt", logdir, stage), b.Bytes())
+	common.WriteFile(fs, spf("%v/outp_fragments_st%v.txt", logdir, stage), b.Bytes())
 
 }
 

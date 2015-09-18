@@ -12,6 +12,12 @@ const stageMax = 3 // weedstages
 
 const cTestHostDev = "localhost:8085"
 
+var URLs = []string{
+	"www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",
+	"www.economist.com/news/britain/21663648-hard-times-hard-hats-making-britain-make-things-again-proving-difficult",
+	"www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power",
+}
+
 func attrX(attributes []html.Attribute, key string) (s string) {
 	for _, a := range attributes {
 		if key == a.Key {

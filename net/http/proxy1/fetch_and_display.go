@@ -13,7 +13,6 @@ import (
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/logif"
-	"github.com/pbberlin/tools/net/http/domclean1"
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -114,6 +113,11 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		lge(err)
 
 		tp := mime.TypeByExtension(path.Ext(inf.URL.Path))
+		if false {
+			ext := path.Ext(rURL)
+			ext = strings.ToLower(ext)
+			tp = mime.TypeByExtension(ext)
+		}
 		w.Header().Set("Content-Type", tp)
 		// w.Header().Set("Content-type", "text/html; charset=latin-1")
 
@@ -123,19 +127,12 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 			return
 		}
 
-		// using domcleaner1
-		if false {
-			cntnt := string(bts)
-			cntnt = insertNewlines.Replace(cntnt)
-			cntnt = undouble.Replace(cntnt)
-			cntnt = domclean1.ModifyHTML(r, inf.URL, cntnt)
-			fmt.Fprintf(w, cntnt)
-		}
-
 		opts := domclean2.CleaningOptions{Proxify: true}
 		opts.Beautify = true // "<a> Linktext without trailing space"
 		opts.RemoteHost = fetch.HostFromStringUrl(rURL)
 
+		// opts.ProxyHost = routes.AppHost01
+		opts.ProxyHost = fetch.HostFromReq(r)
 		if !util_appengine.IsLocalEnviron() {
 			opts.ProxyHost = fetch.HostFromReq(r)
 		}

@@ -31,11 +31,12 @@ func CreateFilePostRequest(
 	first512 := make([]byte, 512)
 	file.Read(first512)
 	file.Seek(0, 0)
+	ct := http.DetectContentType(first512)
+	log.Println("detected", ct)
 
 	// prepare request body buffer
 	body := &bytes.Buffer{}
 
-	// create a multipart file header with the given param name and file
 	wrtr := multipart.NewWriter(body)
 
 	// append extra params
@@ -46,12 +47,11 @@ func CreateFilePostRequest(
 		}
 	}
 
+	// create a multipart file header with the given param name and file
 	h := make(textproto.MIMEHeader)
 	cd := fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
 		escapeQuotes(fileParamName), escapeQuotes(filepath.Base(filePath)))
 	h.Set("Content-Disposition", cd)
-	ct := http.DetectContentType(first512)
-	log.Println("detected", ct)
 	h.Set("Content-Type", ct)
 
 	formfilePart, err := wrtr.CreatePart(h)
@@ -59,7 +59,7 @@ func CreateFilePostRequest(
 		return nil, err
 	}
 
-	// write the file to the file header
+	// write the file to the part
 	num, err := io.Copy(formfilePart, file)
 	log.Println("copied", num, "bytes")
 

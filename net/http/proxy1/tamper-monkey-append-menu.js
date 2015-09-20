@@ -4,14 +4,18 @@
 // @namespace    http://your.homepage/
 // @version      0.1
 // @author       iche
-// @match        http://www.welt.de/*
-// @match        https://www.welt.de/*
-// @match        http://www.handelsblatt.com/*
-// @match        https://www.handelsblatt.com/*
-// @match        http://www.focus.de/*
+// @updateURL    http://localhost:8085/mnt01/tamper-monkey-append-menu.js
+// // https://developer.chrome.com/extensions/match_patterns
+// @match        *://www.welt.de/*
+// @match        *://www.handelsblatt.com/*
+// @match        *://www.focus.de/*
+// // @include     /^https?:\/\/www.flickr.com\/.*/
+
 //  // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
 // @grant        none
+// @noframes
+// @run-at      document-end
 // ==/UserScript==
 
 
@@ -26,6 +30,7 @@ if (typeof jQuery === 'undefined') {
         //isolated jQuery start;
         console.log("about to add right click handler; " + $.fn.jquery + " Version");
 
+        
         var menuHtml = "<div id='menu01' style='background-color:#ccc;padding:4px;z-index:1000'>";
         menuHtml    += "  <li>item1</li>" ;
         menuHtml    += "  <li  id='menu01-item02'>item2</li>" ;
@@ -51,26 +56,28 @@ if (typeof jQuery === 'undefined') {
 
             logX( kind + " 1 - x" + evt.pageX + " - y" + evt.pageY );
 
-
-            var $lp = $(evt.target);
+            var obj = $(evt.target);
             var isAnchor = false
 
+          
+            var parAnchor = obj.closest("a");
             for (i = 0; i < 10; i++) { 
                 i++;
-                isAnchor = $lp.is("A")     // .get(0).tagName
+                isAnchor = obj.is("A")     // .get(0).tagName
                 if( isAnchor){
                     break;
                 }
-                $lp = $lp.parent(); // $( "html" ).parent() returns 
+                obj = obj.parent(); // $( "html" ).parent() returns 
             }
+
             
             if (isAnchor) {
                 var domainX = document.domain;
-                var href = $lp.attr('href');
+                var href = obj.attr('href');
                 if (href.indexOf('/') == 0) {
                     href = domainX + href
                 }
-                var text = $lp.text()
+                var text = obj.text()
                 if (text.length > 100){
                     var textSh = "";
                     textSh  = text.substr(0,50); // start, end
@@ -80,9 +87,9 @@ if (typeof jQuery === 'undefined') {
                 }
                 
                 var formHtml = "";
-                formHtml += "<form  action='https://libertarian-islands.appspot.com/fetch-url-x' method='post'  target='proxy-window' >"                
-                formHtml += "<input type='hidden'  name='url' value='"+href+"' >"
-                formHtml += "<input type='submit'             value='subm'     >"
+                formHtml += "<form  action='https://libertarian-islands.appspot.com/weedout' method='post'  target='proxy-window' >"                
+                formHtml += "<input type='hidden'  name='url-x' value='"+href+"' >"
+                formHtml += "<input type='submit'               value='subm'     >"
                 formHtml += "</form>"
 
                 $('#menu01-item02').html("<a href="+href+" >" + href +  " <br/>" + text + "</a>" + formHtml);   
@@ -99,7 +106,6 @@ if (typeof jQuery === 'undefined') {
 
             logX( kind + " 2");    
         }    
-
 
 
 

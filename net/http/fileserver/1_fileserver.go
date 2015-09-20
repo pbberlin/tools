@@ -76,6 +76,7 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 		wpf(b1, "err opening file %v - %v", fullP, err)
 		return
 	}
+	defer f.Close()
 
 	inf, err := f.Stat()
 	if err != nil {
@@ -91,6 +92,7 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 		fIndex, err := fs.Open(fullP)
 		if err == nil {
+			defer fIndex.Close()
 			inf, err = fIndex.Stat()
 			if err != nil {
 				wpf(b1, "err opening index fileinfo %v - %v", fullP, err)

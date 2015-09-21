@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<script type="text/javascript" src="jquery-min-2.1.1.js"></script>
+<style type="text/css">
+
+
+
+.hc-a{  
+    position: relative; 
+    display:inline; 
+}
+.hc-b2{
+    position:absolute;  
+    left:-10px;   top:-10px; 
+    width:150px;  height:24px;
+    
+    text-align:left; 
+    font-family:Sans-serif !important; font-size:12px !important; 
+    color:#666 !important; line-height:1.5em; 
+
+    background:url("arrow-desc.png") no-repeat scroll center 0 transparent;
+    background-color: #ddd !important;
+
+    border:solid 1px #ddd; 
+    border-radius:4px;
+    box-shadow:3px 3px 3px #888;
+        /* skipping the old stuff           -moz-border-radius:3px;-webkit-border-radius:3px;
+                            -moz-box-shadow:5px 5px 5px #888;-webkit-box-shadow:5px 5px 5px #888;       */
+
+    aamargin-right:80px;  /* alternating upon left-right*/
+    padding: 10px 10px; 
+    padding-top: 20px;   /* alternating upon top-bottom, adapt vPadOffs accordingly */
+    display:none;
+
+}
+</style>
+<body>
+
+<div class="hc-b2" style="display:none">popup</div>
+
+<span style="display:inline-block;margin-left:10px">
+    <a href="#" class="hover">hover<br>left</a>
+</span>
+
+
+<div style="position:relative;right:10px;float:right;">
+    <br> <br> <br> <br> 
+    <a href="#" class="hover">right</a>
+</div>
+<br>
+
+<span style="display:inline-block;height:600px;width:200px;background-color:#aaa;"> </span>
+
+<p>Lorem ipsum <a id='someObject' href="#" class="hover">hover2</a> bono.</p>
+
+<script type="text/javascript">
+$(function () {
+
+
+    var obj = $('#someObject');
+    var wh = $( window ).height();            // Returns height of browser viewport
+    var dh = $( document ).height();          // Returns height of HTML document
+    var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
+    var os1 = obj.offset();                   // Our object's position relative to document root
+    var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
+    
+    console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
+    // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
+
+
+    var vPadOffs = 30; // padding offset; top & bottom are 10; one is 20
+    var winBrdr = 10; // border to outer browser window
+    var vDist = 5;  // distance to popup
+
+    $('.hover').hover(function () {
+        var popup = $('.hc-b2');
+        var obj = $(this);
+        var offset = obj.offset();
+        var new_left = offset.left;
+        new_left = new_left - (popup.width() / 2);
+        new_left = new_left + (obj.width() / 2);
+        if (new_left < winBrdr){
+            new_left = winBrdr;
+        }
+        if (new_left + popup.width() > $(window).width() - winBrdr - vPadOffs){
+            new_left = $(window).width() - popup.width() - winBrdr - vPadOffs;
+        }
+
+
+
+        var offrel = obj[0].getBoundingClientRect()
+        if (offrel.top < $(window).height() / 2) {
+            popup.css({
+                'padding-top':    '20px',
+                'padding-bottom': '10px',
+                left: new_left + 'px',
+                top: offset.top + obj.height() +  vDist   + 'px',
+                'background-position': 'center top',
+                'background-image': "url(arrow-desc.png)",
+            });
+        } else {
+            console.log("ort>wh", offrel.top, $(window).height() / 2)
+            popup.css({
+                'padding-top':    '10px',
+                'padding-bottom': '20px',
+                left: new_left + 'px',
+                top: offset.top - popup.height() - vPadOffs - vDist + 'px',
+                'background-position': 'center bottom',
+                'background-image':  "url(arrow-asc.png)",
+            });
+        }
+        // popup.show();
+        popup.stop(true, true).delay(200).fadeIn(500);
+
+    }, function () {
+        //hovered away so hide popup
+        var popup = $('.hc-b2');
+        // popup.hide();
+        popup.stop(true, true).fadeOut(300, function () {
+            console.log("fadeout-callback");
+        });
+
+    });
+
+    $('.hover').focusin(function() {
+        console.log("focusin");
+        $(this).triggerHandler("mouseenter");
+    });
+    $('.hover').focusout(function() {
+        var popup = $('.hc-b2');
+        popup.stop(true, true).fadeOut(300);
+    });
+
+});    
+</script>
+</body>
+</html>

@@ -109,7 +109,7 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 				// dont proxif image links
 			} else {
 				// proxify - v1
-				attr.Val = fmt.Sprintf("%v?url=%v", routes.ProxifyURI, attr.Val)
+				attr.Val = fmt.Sprintf("%v?%v=%v", routes.ProxifyURI, routes.URLParamKey, attr.Val)
 
 				if util_appengine.IsLocalEnviron() {
 					attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, attr.Val)

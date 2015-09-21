@@ -45,30 +45,30 @@
 
 
 <span style="display:inline-block;margin-left:10px">
-    <a href="#" >hover<br>left</a><br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover<br>left</a><br>
 
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href="#" >hover left</a><br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover left</a><br>
 </span>
 
 
 <div style="position:relative;right:10px;float:right;">
     <br> <br> 
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href="#" >right</a><br>
-    <a href="#" >right</a><br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
     <span style="display:inline-block;height:500px;width:60px;background-color:#aaa;"> </span><br>
-    <a href="#" >right</a><br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href="#" >right</a> <br>
+    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a> <br>
 </div>
 <br>
 
 <span style="display:inline-block;height:500px;width:200px;background-color:#aaa;"> </span>
 
 
-<p>Lorem ipsum <a id='someObject' href="#" >hover2</a> bono.</p>
-<p>Lorem ipsum Lorem ipsum <a id='someObject' href="#" >hover2</a> bono.</p>
+<p>Lorem ipsum <a id='someObject' href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover2</a> bono.</p>
+<p>Lorem ipsum Lorem ipsum <a id='someObject' href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover2</a> bono.</p>
 
 <script type="text/javascript">
 
@@ -153,11 +153,13 @@ function showPop(obj){
     var objRelTL = obj[0].getBoundingClientRect()
 
     var new_left =  - (popup.width() / 2) + (obj.width() / 2) - hPadSimple;
+    
+    // prevent transgression to the left
     if (objRelTL.left + new_left < winBrdrLeft){
         new_left = -objRelTL.left + winBrdrLeft;
     }
+    // prevent transgression to the right
     if (objRelTL.left + new_left + popup.width() + 2*hPadSimple > $(window).width() - winBrdrRight){
-        // new_left = $(window).width() - popup.width() - winBrdrRight - vPadOffs;
         new_left = -popup.width() - 2*hPadSimple - ( objRelTL.left - $(window).width() )  - winBrdrRight;
     }
 

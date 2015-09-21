@@ -2,9 +2,10 @@
 // @name         welt-context-menu
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.1
+// @version      0.12
 // @author       iche
-// @updateURL    http://localhost:8085/mnt01/tamper-monkey-append-menu.js
+// @downloadURL  http://localhost:8085/mnt01/tamper-monkey-append-menu.js
+// @updateURL    http://localhost:8085/mnt01/tamper-monkey-append-menu.js //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
 // @match        *://www.welt.de/*
 // @match        *://www.handelsblatt.com/*
@@ -57,21 +58,21 @@ if (typeof jQuery === 'undefined') {
             logX( kind + " 1 - x" + evt.pageX + " - y" + evt.pageY );
 
             var obj = $(evt.target);
-            var isAnchor = false
 
           
-            var parAnchor = obj.closest("a");
-            for (i = 0; i < 10; i++) { 
-                i++;
-                isAnchor = obj.is("A")     // .get(0).tagName
-                if( isAnchor){
-                    break;
-                }
-                obj = obj.parent(); // $( "html" ).parent() returns 
-            }
+            var parAnchor = obj.closest("a");  // includes self
+            // var isAnchor = false
+            // for (i = 0; i < 10; i++) { 
+            //     i++;
+            //     isAnchor = obj.is("A")     // .get(0).tagName
+            //     if( isAnchor){
+            //         break;
+            //     }
+            //     obj = obj.parent(); // $( "html" ).parent() returns 
+            // }
 
             
-            if (isAnchor) {
+            if (parAnchor.length>0) {
                 var domainX = document.domain;
                 var href = obj.attr('href');
                 if (href.indexOf('/') == 0) {

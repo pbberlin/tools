@@ -3,6 +3,8 @@
 <head>
     <title></title>
 </head>
+<body>
+
 <script type="text/javascript" src="jquery-min-2.1.1.js"></script>
 <style type="text/css">
 
@@ -12,8 +14,10 @@
     position: relative; 
     display:inline; 
 }
+.hc-b1{}
 .hc-b2{
     position:absolute;  
+    z-index: 10;
     left:-10px;   top:-10px; 
     width:150px;  height:24px;
     
@@ -30,111 +34,214 @@
         /* skipping the old stuff           -moz-border-radius:3px;-webkit-border-radius:3px;
                             -moz-box-shadow:5px 5px 5px #888;-webkit-box-shadow:5px 5px 5px #888;       */
 
-    aamargin-right:80px;  /* alternating upon left-right*/
+    margin: 0px;
+
     padding: 10px 10px; 
-    padding-top: 20px;   /* alternating upon top-bottom, adapt vPadOffs accordingly */
+    aapadding-top: 20px;   /* alternating upon top-bottom, adapt vPadOffs accordingly */
     display:none;
 
 }
 </style>
-<body>
 
-<div class="hc-b2" style="display:none">popup</div>
 
 <span style="display:inline-block;margin-left:10px">
-    <a href="#" class="hover">hover<br>left</a>
+    <a href="#" >hover<br>left</a><br>
+
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+    <a href="#" >hover left</a><br>
 </span>
 
 
 <div style="position:relative;right:10px;float:right;">
-    <br> <br> <br> <br> 
-    <a href="#" class="hover">right</a>
+    <br> <br> 
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+    <a href="#" >right</a><br>
+    <a href="#" >right</a><br>
+    <span style="display:inline-block;height:500px;width:60px;background-color:#aaa;"> </span><br>
+    <a href="#" >right</a><br>
+    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+    <a href="#" >right</a> <br>
 </div>
 <br>
 
-<span style="display:inline-block;height:600px;width:200px;background-color:#aaa;"> </span>
+<span style="display:inline-block;height:500px;width:200px;background-color:#aaa;"> </span>
 
-<p>Lorem ipsum <a id='someObject' href="#" class="hover">hover2</a> bono.</p>
+
+<p>Lorem ipsum <a id='someObject' href="#" >hover2</a> bono.</p>
+<p>Lorem ipsum Lorem ipsum <a id='someObject' href="#" >hover2</a> bono.</p>
 
 <script type="text/javascript">
-$(function () {
+
+var vPadOffs = 30; // padding offset; top & bottom are 10; one is 20
+    vPadOffs += 2 // border with
+var hPadSimple = 10; // simple horizontal padding offset
+
+var winBrdrLeft = 4;                     // border to outer browser window
+var winBrdrRight = winBrdrLeft+2+2;        // popup border 2*1, shadow
+
+var vDist = 0;  // vertical distance to popup - cannot be set - any gap causes mouseleave event
 
 
-    var obj = $('#someObject');
-    var wh = $( window ).height();            // Returns height of browser viewport
-    var dh = $( document ).height();          // Returns height of HTML document
-    var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
-    var os1 = obj.offset();                   // Our object's position relative to document root
-    var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
-    
-    console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
-    // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
+function CreateAnchorWrappers(){
 
+    var start = new Date().getTime();
 
-    var vPadOffs = 30; // padding offset; top & bottom are 10; one is 20
-    var winBrdr = 10; // border to outer browser window
-    var vDist = 5;  // distance to popup
-
-    $('.hover').hover(function () {
-        var popup = $('.hc-b2');
+    // Create parent wrappers
+    // $( '.hovering-popup' ).each(function( index ) {
+    $( 'a' ).each(function( index ) {
+        // console.log( index + ": " + $( this ).text() );
         var obj = $(this);
-        var offset = obj.offset();
-        var new_left = offset.left;
-        new_left = new_left - (popup.width() / 2);
-        new_left = new_left + (obj.width() / 2);
-        if (new_left < winBrdr){
-            new_left = winBrdr;
+        if (!obj.parent().hasClass("hc-a")){
+            obj.wrap('<div class="hc-a" />');
+            obj.addClass("hc-b1");
+            var specialPop = '<div class="hc-b2" >' + 'specialpop' + '</div>'; // Potentially a lot of DOM insertions over time
+            obj.after(specialPop);  //Append after selected element
+            obj.siblings(".hc-b2").eq(0).css({ 'width': 6*obj.width() +'px' });
         }
-        if (new_left + popup.width() > $(window).width() - winBrdr - vPadOffs){
-            new_left = $(window).width() - popup.width() - winBrdr - vPadOffs;
-        }
+    });
+
+    // Remember when we finished
+    var end = new Date().getTime();
+    console.log("creating wrappers took ",end - start);
+}
+
+
+function hidePop(obj){
+    // var popup = $('.hc-b2');
+    // popup.hide();
+    obj.stop(true, true).fadeOut(300, function () {
+        console.log("fadeout-callback");
+    });
+}
+
+// A wrapping of a-tags is required,
+// to bind the a-tag and the popup 
+// into one single mouseover-mouseleave-context.
+// 
+// The wrapping makes positioning of the popup relative.
+// At left:0, top:0; the popup overlays the original anchor-tag.
+// 
+// The wrapping must be done in advance, causing a lot of DOM overhead.
+// Approx. 3 ms per link.
+// Dynamic wrapping could be done like this:
+// Reacting to a-tag-mouseover, 
+// creating wrapper,
+// calling parent.triggerHandler("mouseover"),
+// calling it only once.
+// 
+// Horizonal positioning is centered.
+// We could also make it align right-or-left   - with left: auto; right:-10px;
+// 
+// hovercard.js made the anchor overlay the popup with
+//          wrapper.css("zIndex", "200");
+//          anchor.css("zIndex", "100");
+//          popup.css("zIndex", "50");
+// And resetting the all to zero on mouseleave.
+// This would only look good with align right-or-left.
+function showPop(obj){
+
+
+    // CreateAnchorWrappers()    // must be done in advance
+
+    // var popup = $('.hc-b2');
+    var popup = obj.siblings(".hc-b2").eq(0);
+    if (popup.length<=0){
+        popup = obj.find(".hc-b2").eq(0);
+    }
+
+    var objAbsTL = obj.offset();
+    var objRelTL = obj[0].getBoundingClientRect()
+
+    var new_left =  - (popup.width() / 2) + (obj.width() / 2) - hPadSimple;
+    if (objRelTL.left + new_left < winBrdrLeft){
+        new_left = -objRelTL.left + winBrdrLeft;
+    }
+    if (objRelTL.left + new_left + popup.width() + 2*hPadSimple > $(window).width() - winBrdrRight){
+        // new_left = $(window).width() - popup.width() - winBrdrRight - vPadOffs;
+        new_left = -popup.width() - 2*hPadSimple - ( objRelTL.left - $(window).width() )  - winBrdrRight;
+    }
 
 
 
-        var offrel = obj[0].getBoundingClientRect()
-        if (offrel.top < $(window).height() / 2) {
-            popup.css({
-                'padding-top':    '20px',
-                'padding-bottom': '10px',
-                left: new_left + 'px',
-                top: offset.top + obj.height() +  vDist   + 'px',
-                'background-position': 'center top',
-                'background-image': "url(arrow-desc.png)",
-            });
-        } else {
-            console.log("ort>wh", offrel.top, $(window).height() / 2)
-            popup.css({
-                'padding-top':    '10px',
-                'padding-bottom': '20px',
-                left: new_left + 'px',
-                top: offset.top - popup.height() - vPadOffs - vDist + 'px',
-                'background-position': 'center bottom',
-                'background-image':  "url(arrow-asc.png)",
-            });
-        }
-        // popup.show();
-        popup.stop(true, true).delay(200).fadeIn(500);
-
-    }, function () {
-        //hovered away so hide popup
-        var popup = $('.hc-b2');
-        // popup.hide();
-        popup.stop(true, true).fadeOut(300, function () {
-            console.log("fadeout-callback");
+    if (objRelTL.top < $(window).height() / 2) {
+        popup.css({
+            'padding-top':    '20px',
+            'padding-bottom': '10px',
+            left: new_left + 'px',
+            top: obj.height() +  1*vDist + 'px',
+            'background-position': 'center top',
+            'background-image': "url(arrow-desc.png)",
         });
+    } else {
+        console.log("ort>wh", objRelTL.top, $(window).height() / 2)
+        popup.css({
+            'padding-top':    '10px',
+            'padding-bottom': '20px',
+            left: new_left + 'px',
+            top: - popup.height() - vPadOffs - 1*vDist + 'px',
+            'background-position': 'center bottom',
+            'background-image':  "url(arrow-asc.png)",
+        });
+    }
+    // popup.show();
+    popup.stop(true, true).delay(200).fadeIn(500);
+
+}
+
+
+    $( document ).ready(function() {
+
+            
+        var obj = $('#someObject');
+        var wh = $( window ).height();            // Returns height of browser viewport
+        var dh = $( document ).height();          // Returns height of HTML document
+        var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
+        var os1 = obj.offset();                   // Our object's position relative to document root
+        var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
+        console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
+        // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
+
+        CreateAnchorWrappers();
+
+
+        // mouseover covers childelements, 
+        // mousenter does not.
+        // We use mouseover.
+
+        // Here popup would not be clickable.
+        // It disappears as soon as obj is left
+        $( 'a' ).on( "mouseover", function() {
+        })
+
+        // We have to latch the events onto the parent wrapper node.
+        // Thus all parent nodes need to be created on documentload :(
+        $( '.hc-a' ).on( "mouseover", function() {
+            var obj = $(this);
+            showPop(obj);
+        })
+        $( '.hc-a' ).on( "mouseleave", function() {
+            var obj = $(this).find(".hc-b2").eq(0);
+            hidePop(obj)
+        })
+
+
+        $( '.hc-a' ).on( "focusin", function() {
+            var obj = $(this);
+            showPop(obj);
+        })
+
+        $( '.hc-a' ).on( "focusout", function() {
+            var obj = $(this).find(".hc-b2").eq(0);
+            hidePop(obj)
+        })
+
+        console.log( "document ready completed" );
+
 
     });
 
-    $('.hover').focusin(function() {
-        console.log("focusin");
-        $(this).triggerHandler("mouseenter");
-    });
-    $('.hover').focusout(function() {
-        var popup = $('.hc-b2');
-        popup.stop(true, true).fadeOut(300);
-    });
 
-});    
+    
 </script>
 </body>
 </html>

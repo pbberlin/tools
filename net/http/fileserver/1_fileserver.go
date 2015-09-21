@@ -129,13 +129,18 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	tp := mime.TypeByExtension(ext)
 
 	w.Header().Set("Content-Type", tp)
-	if false ||
-		ext == ".css" || ext == ".js" ||
-		ext == ".jpg" || ext == ".gif" ||
-		ext == "css" || ext == "js" ||
-		ext == "jpg" || ext == "gif" ||
-		false {
-		htmlfrag.CacheHeaders(w)
+
+	if strings.Contains(fullP, "tamper-monkey") {
+		htmlfrag.SetNocacheHeaders(w)
+	} else {
+		if false ||
+			ext == ".css" || ext == ".js" ||
+			ext == ".jpg" || ext == ".gif" ||
+			ext == "css" || ext == "js" ||
+			ext == "jpg" || ext == "gif" ||
+			false {
+			htmlfrag.CacheHeaders(w)
+		}
 	}
 
 	w.Write(bts1)

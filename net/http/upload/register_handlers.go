@@ -48,7 +48,9 @@ func InitHandlers() {
 		}
 	}
 	dmpMemfs := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-		htmlfrag.SetNocacheHeaders(w, false)
+		htmlfrag.SetNocacheHeaders(w)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 		w.Write([]byte("<pre>"))
 		w.Write(fs1.Dump())
 	}

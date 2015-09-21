@@ -149,7 +149,7 @@ func CSSRowsHeight(nRows int) string {
 	return s
 }
 
-func SetNocacheHeaders(w http.ResponseWriter, plainOrHtml bool) {
+func SetNocacheHeaders(w http.ResponseWriter) {
 
 	w.Header().Set("Expires", "Mon, 26 Jul 1990 05:00:00 GMT")
 
@@ -161,11 +161,11 @@ func SetNocacheHeaders(w http.ResponseWriter, plainOrHtml bool) {
 	w.Header().Set("Cache-Control", "post-check=0, pre-check=0")
 	w.Header().Set("Pragma", "no-cache")
 
-	if plainOrHtml {
-		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	} else {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	}
+	// if plainOrHtml {
+	// 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	// } else {
+	// 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	// }
 
 }
 func CacheHeaders(w http.ResponseWriter) {

@@ -184,7 +184,8 @@ func logRetrieve(w http.ResponseWriter, r *http.Request) {
 
 func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	htmlfrag.SetNocacheHeaders(w, false)
+	htmlfrag.SetNocacheHeaders(w)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	logRetrieve(w, r)
 
@@ -213,7 +214,8 @@ func foscamStatus(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	htmlfrag.SetNocacheHeaders(w, false)
+	htmlfrag.SetNocacheHeaders(w)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	ssecs := r.FormValue("sleep")
 	if ssecs != "" {

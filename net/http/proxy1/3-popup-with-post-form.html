@@ -244,63 +244,63 @@ function showPop(obj){
 }
 
 
-    $( document ).ready(function() {
+$( document ).ready(function() {
 
-            
-        var obj = $('#someObject');
-        var wh = $( window ).height();            // Returns height of browser viewport
-        var dh = $( document ).height();          // Returns height of HTML document
-        var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
-        var os1 = obj.offset();                   // Our object's position relative to document root
-        var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
-        console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
-        // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
+        
+    var obj = $('#someObject');
+    var wh = $( window ).height();            // Returns height of browser viewport
+    var dh = $( document ).height();          // Returns height of HTML document
+    var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
+    var os1 = obj.offset();                   // Our object's position relative to document root
+    var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
+    console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
+    // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
 
-        CreateAnchorWrappers();
-
-
-        // Here popup would not be clickable.
-        // It disappears as soon as obj is left
-        $( 'a' ).on( "mouseover", function() {
-        })
+    CreateAnchorWrappers();
 
 
-        $(document).on( "click", "a" , function(e) {
-        	console.log("click1");
-            // e.preventDefault();
-        })
-
-        // We have to latch the events onto the parent wrapper node.
-        // Thus all parent nodes need to be created on documentload :(
-
-        // mouseover fires again for child elements.
-        // it prevents click events 
-        // $( '.hc-a' ).on( "mouseover", function(e) {
-
-        $( '.hc-a' ).on( "mouseenter", function(e) {
-            var obj = $(this);
-            showPop(obj);
-        })
-        $( '.hc-a' ).on( "mouseleave", function() {
-            var obj = $(this).find(".hc-b2").eq(0);
-            hidePop(obj)
-        })
+    // Here popup would not be clickable.
+    // It disappears as soon as cursor leaves obj.
+    $( 'a' ).on( "mouseover", function() {
+    })
 
 
-        $( '.hc-a' ).on( "focusin", function() {
-            // var obj = $(this);
-            // showPop(obj);
-        })
+    $(document).on( "click", "a" , function(e) {
+    	console.log("click1");
+        // e.preventDefault();
+    })
 
-        $( '.hc-a' ).on( "focusout", function() {
-            // var obj = $(this).find(".hc-b2").eq(0);
-            // hidePop(obj)
-        })
+    // We have to latch the events onto the parent wrapper node.
+    // Thus all parent nodes need to be created on documentload :(
 
-        console.log( "document ready completed" );
+    // mouseover fires again for child elements.
+    // it prevents click events 
+    // $( '.hc-a' ).on( "mouseover", function(e) {
+
+    $( '.hc-a' ).on( "mouseenter", function(e) {
+        var obj = $(this);
+        showPop(obj);
+    })
+    $( '.hc-a' ).on( "mouseleave", function() {
+        var obj = $(this).find(".hc-b2").eq(0);
+        hidePop(obj)
+    })
 
 
-    });
+    $( '.hc-a' ).on( "focusin", function() {
+        // var obj = $(this);
+        // showPop(obj);
+    })
+
+    $( '.hc-a' ).on( "focusout", function() {
+        // var obj = $(this).find(".hc-b2").eq(0);
+        // hidePop(obj)
+    })
+
+    console.log( "document ready completed" );
+
+
+});
 
 
     

@@ -160,7 +160,7 @@ func (m *memMapFs) Open(name string) (fsi.File, error) {
 			return nil, fsi.ErrFileNotFound
 		}
 		// log.Printf("underlying succ %q\n", name)
-		m.Dump()
+		// m.Dump()
 		return f, nil
 	}
 

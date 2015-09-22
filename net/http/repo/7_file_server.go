@@ -71,7 +71,7 @@ func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 }
 
-// unused, since appengine context is required for our filesystems
+// UNUSED, since appengine context is required for our filesystems
 func serveSingleRootFile(pattern string, filename string) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, filename) // filename refers to local path; unusable for fsi

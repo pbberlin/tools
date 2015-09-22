@@ -251,7 +251,7 @@ MarkOuter:
 				} else {
 					age := time.Now().Sub(fi.ModTime())
 					if age.Hours() < 10 {
-						lg("\t\tusing exiting file with age %4.2v hrs", age.Hours())
+						lg("\t\tusing existing file with age %4.2v hrs", age.Hours())
 						art.Mod = fi.ModTime()
 						bts, err := ioutil.ReadAll(f)
 						lg(err)

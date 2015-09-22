@@ -26,7 +26,7 @@ func InitHandlers() {
 	http.HandleFunc("/fsi/remove", loghttp.Adapter(removeSubtree))
 
 	// http.HandleFunc("/fsi/delete-all", loghttp.Adapter(deleteAll))
-	http.HandleFunc(UriDeleteSubtree, loghttp.Adapter(deleteSubtree))
+	http.HandleFunc(UriDeleteSubtree, loghttp.Adapter(DeleteSubtree))
 
 	http.HandleFunc("/fsi/cntr/last", loghttp.Adapter(lastMountPoint))
 	http.HandleFunc("/fsi/cntr/reset", loghttp.Adapter(resetMountPoint))

@@ -44,7 +44,7 @@ var str = `
 
 var tplBase = tt.Must(tt.New("tplName01").Parse(str))
 
-func deleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+func DeleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, lge := loghttp.Logger(w, r)
 

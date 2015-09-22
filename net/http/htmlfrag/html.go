@@ -4,6 +4,7 @@ package htmlfrag
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -45,10 +46,14 @@ func GetSpanner() func(interface{}, int) string {
 
 // Wb is a helper to write an inline block with an link inside.
 // If url is omitted, a newline + a chapter-header is rendered.
-func Wb(buf1 *bytes.Buffer, linktext, url string, descs ...string) {
+func Wb(buf1 io.Writer, linktext, url string, descs ...string) {
+
+	wstr := func(w io.Writer, s string) {
+		w.Write([]byte(s))
+	}
 
 	if url == "" {
-		buf1.WriteString("<br>\n")
+		wstr(buf1, "<br>\n")
 	}
 
 	if url == "nobr" { // hack, indicating no break
@@ -62,19 +67,19 @@ func Wb(buf1 *bytes.Buffer, linktext, url string, descs ...string) {
 
 	const styleX = "display:inline-block; width:13%; margin: 4px 0px; margin-right:12px; vertical-align:top"
 
-	buf1.WriteString("<span style='" + styleX + "'>\n")
+	wstr(buf1, "<span style='"+styleX+"'>\n")
 	if url == "" {
-		buf1.WriteString("\t<b>" + linktext + "</b>\n")
+		wstr(buf1, "\t<b>"+linktext+"</b>\n")
 	} else {
-		buf1.WriteString("\t<a target='_app' href='" + url + "' >" + linktext + "</a>\n")
+		wstr(buf1, "\t<a target='_app' href='"+url+"' >"+linktext+"</a>\n")
 		if desc != "" {
-			buf1.WriteString("<br>\n ")
-			buf1.WriteString("<span style='" + styleX + ";width:90%;font-size:80%'>\n")
-			buf1.WriteString(desc)
-			buf1.WriteString("</span>\n")
+			wstr(buf1, "<br>\n ")
+			wstr(buf1, "<span style='"+styleX+";width:90%;font-size:80%'>\n")
+			wstr(buf1, desc)
+			wstr(buf1, "</span>\n")
 		}
 	}
-	buf1.WriteString("</span>\n")
+	wstr(buf1, "</span>\n")
 }
 
 // CSSColumnsWidth creates CSS classes with w[1...nCols]

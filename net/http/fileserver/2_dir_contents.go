@@ -14,6 +14,8 @@ import (
 	"github.com/pbberlin/tools/stringspb"
 )
 
+// GetDirContents fetches from fileserver - via http
+// Parsing the received JSON into string slices
 func GetDirContents(hostWithPrefix, dir string) ([]string, []string, *bytes.Buffer, error) {
 
 	lg, lge := loghttp.Logger(nil, nil)

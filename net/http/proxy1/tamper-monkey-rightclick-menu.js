@@ -1,15 +1,15 @@
 // ==UserScript==
-// @name         welt-context-menu
+// @name         rightclick-menu
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.12
+// @version      0.131
 // @author       iche
-// @downloadURL  http://localhost:8085/mnt01/tamper-monkey-append-menu.js
-// @updateURL    http://localhost:8085/mnt01/tamper-monkey-append-menu.js //serving the head with possibly new version
+// @downloadURL  http://localhost:8085/mnt01/tamper-monkey-rightclick-menu.js
+// @updateURL    http://localhost:8085/mnt01/tamper-monkey-rightclick-menu.js //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
-// @match        *://www.welt.de/*
-// @match        *://www.handelsblatt.com/*
-// @match        *://www.focus.de/*
+// @match        *://*.welt.de/*
+// @match        *://*.handelsblatt.com/*
+// @match        *://*.focus.de/*
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 
 //  // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
@@ -33,8 +33,8 @@ if (typeof jQuery === 'undefined') {
 
         
         var menuHtml = "<div id='menu01' style='background-color:#ccc;padding:4px;z-index:1000'>";
-        menuHtml    += "  <li>item1</li>" ;
-        menuHtml    += "  <li  id='menu01-item02'>item2</li>" ;
+        //menuHtml    += "  <li>item1</li>" ;
+        menuHtml    += "  <li  id='menu01-item02'  style='height:64px;'>item2</li>" ;
         menuHtml    += "</div>" ;
 
         $("body").append(menuHtml);
@@ -54,22 +54,9 @@ if (typeof jQuery === 'undefined') {
 
         function showContextMenu(kind, evt){
 
-
             logX( kind + " 1 - x" + evt.pageX + " - y" + evt.pageY );
-
             var obj = $(evt.target);
-
-          
             var parAnchor = obj.closest("a");  // includes self
-            // var isAnchor = false
-            // for (i = 0; i < 10; i++) { 
-            //     i++;
-            //     isAnchor = obj.is("A")     // .get(0).tagName
-            //     if( isAnchor){
-            //         break;
-            //     }
-            //     obj = obj.parent(); // $( "html" ).parent() returns 
-            // }
 
             
             if (parAnchor.length>0) {
@@ -86,14 +73,21 @@ if (typeof jQuery === 'undefined') {
                     textSh += text.substr(text.length-50,text.length-1);
                     text = textSh;
                 }
-                
-                var formHtml = "";
-                formHtml += "<form  action='https://libertarian-islands.appspot.com/weedout' method='post'  target='proxy-window' >"                
-                formHtml += "<input type='hidden'  name='url-x' value='"+href+"' >"
-                formHtml += "<input type='submit'               value='subm'     >"
-                formHtml += "</form>"
 
-                $('#menu01-item02').html("<a href="+href+" >" + href +  " <br/>" + text + "</a>" + formHtml);   
+                var formHtml = "";
+                var prox01 = "http://localhost:8085/weedout";
+                var prox02 = "https://libertarian-islands.appspot.com/weedout";
+
+                formHtml += "<form action='"+prox01+"' method='post' ";
+                formHtml += "    target='proxy-window' >";
+                formHtml += "<input type='hidden'  name='url-x' value='"+href+"' >";
+                formHtml += "<input type='submit'               value='subm'     >";
+                formHtml += "</form>";
+
+                var innerH = "";
+                innerH += "<a target='proxy-window'  href='"+prox01 + "?url-x="+ href+"' >" + text + "</a>";
+                innerH += formHtml;
+                $('#menu01-item02').html(innerH);   
             }
 
             var fromBottom =  evt.pageY - $('#menu01').height() - 8;
@@ -125,5 +119,3 @@ if (typeof jQuery === 'undefined') {
     //isolated jQuery end;
     });
 })(window.jQuery.noConflict(true));
-
-        

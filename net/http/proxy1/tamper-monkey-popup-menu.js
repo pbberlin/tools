@@ -1,41 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-
-<script type="text/javascript" src="outp-jquery-min-2.1.1.js"></script>
-
-
-
-<span style="display:inline-block;margin-left:10px">
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover<br>left</a><br>
-
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover left</a><br>
-</span>
-
-
-<div style="position:relative;right:10px;float:right;">
-    <br> <br> 
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
-    <span style="display:inline-block;height:500px;width:60px;background-color:#aaa;"> </span><br>
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a><br>
-    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-    <a href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >right</a> <br>
-</div>
-<br>
-
-<span style="display:inline-block;height:500px;width:200px;background-color:#aaa;"> </span>
+// ==UserScript==
+// @name         popup-menu
+// @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. 
+// @description  http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
+// @namespace    http://your.homepage/
+// @version      0.131
+// @author       iche
+// @downloadURL  http://localhost:8085/mnt01/tamper-monkey-popup-menu.js
+// @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
+// // https://developer.chrome.com/extensions/match_patterns
+// @match        *://www.welt.de/*
+// @match        *://www.handelsblatt.com/*
+// @match        *://www.focus.de/*
+// // @include     /^https?:\/\/www.flickr.com\/.*/
+// // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
+// @grant        none
+// @noframes
+// @run-at      document-end
+// ==/UserScript==
 
 
-<p>Lorem ipsum <a id='someObject' href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover2</a> bono.</p>
-<p>Lorem ipsum Lorem ipsum <a id='someObject' href='http://www.welt.de/politik/deutschland/article146663316/In-Berlin-versinken-Fluechtlinge-im-Behoerden-Chaos.html' target='blab'  >hover2</a> bono.</p>
+// fallback http://encosia.com/3-reasons-why-you-should-let-google-host-jquery-for-you/
+if (typeof jQuery === 'undefined') {
+    console.log("CDN blocked by Iran or China?");
+    document.write(unescape('%3Cscript%20src%3D%22/path/to/your/scripts/jquery-2.1.4.min.js%22%3E%3C/script%3E'));
+}
 
-<script type="text/javascript">
+(function ($, undefined) {
+    $(function () {
+
+        //isolated jQuery start;
+        console.log("about to add hover popups; " + $.fn.jquery + " Version");
+
 
 var vPadOffs = 30; // padding offset; top & bottom are 10; one is 20
     vPadOffs += 2; // border with
@@ -317,7 +313,12 @@ $( document ).ready(function() {
     console.log( "document ready completed" );
 });
 
-    
-</script>
-</body>
-</html>
+
+        
+
+        console.log("hover popups handler added");
+        //isolated jQuery end;
+    });
+})(window.jQuery.noConflict(true));
+
+        

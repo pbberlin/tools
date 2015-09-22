@@ -157,7 +157,7 @@ MarkOuter:
 	for j := 0; j < srcDepth; j++ {
 		treePath = path.Dir(ourl.Path)
 	MarkInner:
-		for i := 1; i < 22; i++ {
+		for i := 1; i < srcDepth; i++ {
 
 			subtree, treePath = DiveToDeepestMatch(dirTree, treePath)
 

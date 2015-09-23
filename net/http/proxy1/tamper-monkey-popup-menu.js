@@ -3,7 +3,7 @@
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. 
 // @description  http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.131
+// @version      0.12
 // @author       iche
 // @downloadURL  http://localhost:8085/mnt01/tamper-monkey-popup-menu.js
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
@@ -50,7 +50,7 @@ function PopupContent(obj){
 
     
     if (parAnchor.length<=0) {
-        return "";
+    	return "";
     }
 
     var domainX = document.domain;
@@ -91,46 +91,47 @@ function PopupContent(obj){
 
 function AddCSS(){
 
-    if ($('#css-hover-popup').length <= 0) {
+	if ($('#css-hover-popup').length <= 0) {
 
-        var s =  '';
-        s += '<style type="text/css"  id="css-hover-popup" >';
-        s += '.hc-a{';
-        s += '    position: relative; ';
-        s += '    display:inline; ';
-        s += '}';
-        s += '.hc-b1{}';
-        s += '.hc-b2{';
-        s += '    position:absolute;';
-        s += '    z-index: 10;';
-        s += '    left:-10px;   top:-10px;';
-        s += '    /* fixed height required for positioning computations */';
-        s += '    width:150px;  height:36px;';
-        s += '    text-align:left; ';
-        s += '    font-family:Sans-serif !important; font-size:12px !important; ';
-        s += '    color:#666 !important; line-height:1.5em;';
-        s += '';
-        s += '    background:url("arrow-desc.png") no-repeat scroll center 0 transparent;';
-        s += '    background-color: #ddd !important;  ';
-        s += '    border:solid 1px #ddd; ';
-        s += '    border-radius:4px;';
-        s += '    box-shadow:3px 3px 3px #888;';
-        s += '    /* skipping the old stuff';
-        s += '      -moz-border-radius:3px;-webkit-border-radius:3px;';
-        s += '      -moz-box-shadow:5px 5px 5px #888;-webkit-box-shadow:5px 5px 5px #888;  */';
-        s += '    margin: 0px !important;' ;
-        s += '    padding:  10px; ';
-        s += '    padding-left:  10px !important; ';
-        s += '    padding-right: 10px !important;' ;
-        s += '    /* alternating upon top-bottom, adapt vPadOffs accordingly */ ';
-        s += '    aapadding-top: 20px;';
-        s += '    display:none;';
-        s += '}';
-        s += '</style>';
+		var s =  '';
+	    s += '<style type="text/css"  id="css-hover-popup" >';
+	    s += '.hc-a{';
+	    s += '    position: relative; ';
+	    s += '    display:inline; ';
+	    s += '}';
+	    s += '.hc-b1{}';
+	    s += '.hc-b2{';
+	    s += '    position:absolute;';
+	    s += '    z-index: 10;';
+	    s += '    left:-10px;   top:-10px;';
+	    s += '    /* fixed height required for positioning computations */';
+	    s += '    width:150px;  height:36px;';
+	    s += '    text-align:left; ';
+	    s += '    font-family:Sans-serif !important; font-size:12px !important; ';
+	    s += '    color:#666 !important; line-height:1.5em;';
+	    s += '';
+	    s += '    background:url("arrow-desc.png") no-repeat scroll center 0 transparent;';
+	    s += '    background-image: none;';
+	    s += '    background-color: #ddd !important;  ';
+	    s += '    border:solid 1px #ddd; ';
+	    s += '    border-radius:4px;';
+	    s += '    box-shadow:3px 3px 3px #888;';
+	    s += '    /* skipping the old stuff';
+	    s += '      -moz-border-radius:3px;-webkit-border-radius:3px;';
+	    s += '      -moz-box-shadow:5px 5px 5px #888;-webkit-box-shadow:5px 5px 5px #888;  */';
+	    s += '    margin: 0px !important;' ;
+	    s += '    padding:  10px; ';
+	    s += '    padding-left:  10px !important; ';
+	    s += '    padding-right: 10px !important;' ;
+	    s += '    /* alternating upon top-bottom, adapt vPadOffs accordingly */ ';
+	    s += '    aapadding-top: 20px;';
+	    s += '    display:none;';
+	    s += '}';
+	    s += '</style>';
 
-        $(s).appendTo('head');
+	    $(s).appendTo('head');
 
-    }
+	}
 
 }
 
@@ -228,7 +229,7 @@ function ShowPop(obj){
             left: new_left + 'px',
             top: obj.height() +  1*vDist + 'px',
             'background-position': 'center top',
-            'background-image': "url(arrow-desc.png)",
+            //'background-image': "url(arrow-desc.png)",
         });
     } else {
         console.log("ort>wh", objRelTL.top, $(window).height() / 2);
@@ -238,7 +239,7 @@ function ShowPop(obj){
             left: new_left + 'px',
             top: - popup.height() - vPadOffs - 1*vDist + 'px',
             'background-position': 'center bottom',
-            'background-image':  "url(arrow-asc.png)",
+            //'background-image':  "url(arrow-asc.png)",
         });
     }
 
@@ -260,14 +261,14 @@ $( document ).ready(function() {
     var wh = $( window ).height();            // Returns height of browser viewport
     var dh = $( document ).height();          // Returns height of HTML document
     var scrollVert = $('body').scrollTop();   // How many pixel is document scrolled in the viewport
-    // var obj = $('#someObject');
-    // var os1 = obj.offset();                   // Our object's position relative to document root
-    // var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
-    // console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
+    var obj = $('body').find('*').last();
+    var os1 = obj.offset();                   // Our object's position relative to document root
+    var os2 = obj[0].getBoundingClientRect(); // Our object's position relative to document root - MINUS scroll pos
+    console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
     // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
 
 
-    AddCSS();
+	AddCSS();
 
     CreateAnchorWrappers();
 
@@ -279,7 +280,7 @@ $( document ).ready(function() {
 
 
     $(document).on( "click", "a" , function(e) {
-        console.log("click1");
+    	// console.log("click1");
         // e.preventDefault();
     });
 

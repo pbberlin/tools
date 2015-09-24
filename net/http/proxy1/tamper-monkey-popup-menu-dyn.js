@@ -3,13 +3,13 @@
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. 
 // @description  http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.12
+// @version      0.121
 // @author       iche
 // @downloadURL  http://localhost:8085/mnt01/tamper-monkey-popup-menu.js
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
 // @match        *://www.welt.de/*
-// @match        *://www.handelsblatt.com/*
+// // @match        *://www.handelsblatt.com/*  // irritates the image gallery progress arrows
 // @match        *://www.focus.de/*
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 // // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
@@ -54,7 +54,9 @@ function PopupContent(obj){
     }
 
     var domainX = document.domain;
-    console.log("domainX", domainX);
+    var domainY = location.host;
+    var protocolY = location.protocol;
+    console.log("domainXY", domainX, domainY,protocolY);
 
     var href = obj.attr('href');
     if (href.indexOf('/') === 0) {
@@ -135,6 +137,23 @@ function AddCSS(){
 
 }
 
+function CreateAnchorWrapper(obj){
+    if (!obj.parent().hasClass("hc-a")){
+        obj.wrap('<div class="hc-a" />');
+        obj.addClass("hc-b1");
+        var specialPop = '<div class="hc-b2" >' + 'specialpop' + '</div>'; // Potentially a lot of DOM insertions over time
+        obj.after(specialPop);  //Append after selected element
+        
+        var w = obj.width();
+        if (w < 320) {
+            w = 320;
+        }
+        obj.siblings(".hc-b2").eq(0).css({ 'width': w +'px' });
+        return false;
+    }
+    return true;
+}
+
 function CreateAnchorWrappers(){
 
     var start = new Date().getTime();
@@ -144,18 +163,7 @@ function CreateAnchorWrappers(){
     $( 'a' ).each(function( index ) {
         // console.log( index + ": " + $( this ).text() );
         var obj = $(this);
-        if (!obj.parent().hasClass("hc-a")){
-            obj.wrap('<div class="hc-a" />');
-            obj.addClass("hc-b1");
-            var specialPop = '<div class="hc-b2" >' + 'specialpop' + '</div>'; // Potentially a lot of DOM insertions over time
-            obj.after(specialPop);  //Append after selected element
-            
-            var w = obj.width();
-            if (w < 320) {
-                w = 320;
-            }
-            obj.siblings(".hc-b2").eq(0).css({ 'width': w +'px' });
-        }
+		CreateAnchorWrapper(obj);        
     });
 
     // Remember when we finished
@@ -174,7 +182,7 @@ function HidePop(obj){
 
 // A wrapping of a-tags is required,
 // to bind the a-tag and the popup 
-// into one single mouseover-mouseleave-context.
+// into one single mouseenter-mouseleave-context.
 // 
 // The wrapping makes positioning of the popup relative.
 // At left:0, top:0; the popup overlays the original anchor-tag.
@@ -182,9 +190,9 @@ function HidePop(obj){
 // The wrapping must be done in advance, causing a lot of DOM overhead.
 // Approx. 3 ms per link.
 // Dynamic wrapping could be done like this:
-// Reacting to a-tag-mouseover, 
+// Reacting to a-tag-mouseenter, 
 // creating wrapper,
-// calling parent.triggerHandler("mouseover"),
+// calling parent.triggerHandler("mouseenter"),
 // calling it only once.
 // 
 // Horizonal positioning is centered.
@@ -198,7 +206,7 @@ function HidePop(obj){
 // This would only look good with align right-or-left.
 function ShowPop(obj){
     
-    // CreateAnchorWrappers()    // must be done in advance
+    // CreateAnchorWrapper(obj)    // now dynamically created
 
     // var popup = $('.hc-b2');
     var popup = obj.siblings(".hc-b2").eq(0);
@@ -270,19 +278,27 @@ $( document ).ready(function() {
 
 	AddCSS();
 
-    CreateAnchorWrappers();
+    // CreateAnchorWrappers(); // now dynamically created
 
-
-    // Here popup would not be clickable.
-    // It disappears as soon as cursor leaves obj.
-    $( 'a' ).on( "mouseover", function() {
+    // Ad-hoc creation and handing off event
+    $( 'a' ).on( "mouseenter", function(evt) {
+		console.log("fired")
+        var obj = $(evt.target);
+		var alreadyExists = CreateAnchorWrapper(obj);
+	    if (!alreadyExists) {
+	    	obj.closest(".hc-a").triggerHandler("mouseenter");
+			evt.preventDefault();
+			console.log("added")
+	    } else {
+			console.log("not added")
+	    }
     });
 
 
-    $(document).on( "click", "a" , function(e) {
-    	// console.log("click1");
-        // e.preventDefault();
-    });
+    // $(document).on( "click", "a" , function(evt) {
+    // 	console.log("click1");
+    //     evt.preventDefault();
+    // });
 
     // We have to latch the events onto the parent wrapper node.
     // Thus all parent nodes need to be created on documentload :(
@@ -291,14 +307,19 @@ $( document ).ready(function() {
     // it prevents click events 
     // $( '.hc-a' ).on( "mouseover", function(e) {
 
-    $( '.hc-a' ).on( "mouseenter", function(e) {
+
+
+    $(document).on( "mouseenter", '.hc-a' , function() {
+    // $( '.hc-a' ).on( "mouseenter", function(e) {
         var obj = $(this);
         ShowPop(obj);
     });
-    $( '.hc-a' ).on( "mouseleave", function() {
+    $(document).on( "mouseleave", '.hc-a' , function() {
+    // $( '.hc-a' ).on( "mouseleave", function() {
         var obj = $(this).find(".hc-b2").eq(0);
         HidePop(obj);
     });
+
 
 
     $( '.hc-a' ).on( "focusin", function() {

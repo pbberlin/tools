@@ -59,6 +59,8 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 
 	//
+	// Either take provided request
+	// Or build one from options.URL
 	if options.Req == nil {
 		ourl, err := URLFromString(options.URL) // Normalize
 		if err != nil {
@@ -139,53 +141,61 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		}
 	}
 
-	cond := false
+	isHTTPSProblem := false
 	if err != nil {
-		cond = strings.Contains(err.Error(), "SSL_CERTIFICATE_ERROR") ||
+		isHTTPSProblem = strings.Contains(err.Error(), "SSL_CERTIFICATE_ERROR") ||
 			strings.Contains(err.Error(), "tls: oversized record received with length")
 	}
 
 	// Under narrow conditions => fallback to http
 	if err != nil {
-		if r.URL.Scheme == "https" && cond && r.Method == "GET" {
+		if isHTTPSProblem && r.URL.Scheme == "https" && r.Method == "GET" {
 			r.URL.Scheme = "http"
 			var err2nd error
 			resp, err2nd = client.Do(r)
+			// while protocol http may go through
+			// next obstacle might be - again - a redirect error:
 			if err2nd != nil {
-
 				if options.RedirectHandling == 1 {
 					serr := err2nd.Error()
 					if strings.Contains(serr, MsgNoRdirects) {
 						bts := []byte(serr)
 						inf.Mod = time.Now().Add(-10 * time.Minute)
-						addFallBackInfo(options, &inf, r, err)
+						addFallBackSuccessInfo(options, &inf, r, err)
 						return bts, inf, nil
 					}
 				}
 
 				return nil, inf, fmt.Errorf("GET fallback to http failed with %v", err2nd)
 			}
-			addFallBackInfo(options, &inf, r, err)
+			addFallBackSuccessInfo(options, &inf, r, err)
 			err = nil // CLEAR error
 		}
 	}
 
+	//
+	// Final error handler
+	//
 	if err != nil {
-		hint := ""
-		if r.URL.Scheme == "https" && cond {
-			// We cannot repeat a post request - the r.Body.Reader is consumed
+		hintAE := ""
+		if isHTTPSProblem && r.URL.Scheme == "https" {
+			// Not GET but POST:
+			// We cannot do a fallback for a post request - the r.Body.Reader is consumed
 			// options.r.URL.Scheme = "http"
 			// resp, err = client.Do(options.Req)
-			return nil, inf, fmt.Errorf("cannot do https requests on dev server: %v", err)
-		} else if strings.Contains(err.Error(), "net/http: Client Transport of type init.failingTransport doesn't support CancelRequest; Timeout not supported") {
-			hint = "\n\n Did you forget to submit the AE Request?\n"
+			return nil, inf, fmt.Errorf("Cannot do https requests. Possible reason: Dev server: %v", err)
+		} else if strings.Contains(
+			err.Error(),
+			"net/http: Client Transport of type init.failingTransport doesn't support CancelRequest; Timeout not supported",
+		) {
+			hintAE = "\nDid you forget to submit the AE Request?\n"
 		}
-		return nil, inf, fmt.Errorf("request failed: %v - %v", err, hint)
+		return nil, inf, fmt.Errorf("request failed: %v - %v", err, hintAE)
 	}
 
 	//
-	//
-	// Explicit bad response from server
+	// We got response, but
+	// explicit bad response from server
 	if resp.StatusCode != http.StatusOK {
 
 		if resp.StatusCode == http.StatusBadRequest || // 400
@@ -248,7 +258,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 }
 
-func addFallBackInfo(options Options, inf *Info, r *http.Request, err error) {
+func addFallBackSuccessInfo(options Options, inf *Info, r *http.Request, err error) {
 	if options.LogLevel > 0 {
 		inf.Msg += fmt.Sprintf("\tsuccessful fallback to http %v", r.URL.String())
 		inf.Msg += fmt.Sprintf("\tafter %v\n", err)

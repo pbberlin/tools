@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -253,97 +252,5 @@ func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDig
 
 	err = fs.WriteFile(fnDigest, b, 0755)
 	lge(err)
-
-}
-
-// Fetches URL if local file is outdated.
-// saves fetched file
-//
-// link extraction, link addition to treeX now accumulated one level higher
-// bool return value: use existing => true
-func fetchSave(w http.ResponseWriter, r *http.Request,
-	lg loghttp.FuncBufUniv, fs fsi.FileSystem, surl string) ([]byte, time.Time, bool, error) {
-
-	// Determine FileName
-	ourl, err := fetch.URLFromString(surl)
-	fc := FetchCommand{}
-	fc.Host = ourl.Host
-	fc = addDefaults(w, r, fc)
-	semanticUri := condenseTrailingDir(surl, fc.CondenseTrailingDirs)
-	fn := path.Join(docRoot, semanticUri)
-
-	lg("crawlin %q", surl)
-
-	// File already exists?
-	// Open file for age check
-	var bts []byte
-	var mod time.Time
-	f := func() error {
-		file1, err := fs.Open(fn)
-		// lg(err) // file may simply not exist
-		if err != nil {
-			return err // file may simply not exist
-		}
-		defer file1.Close() // file close *fast* at the end of *this* anonymous func
-
-		fi, err := file1.Stat()
-		lg(err)
-		if err != nil {
-			return err
-		}
-
-		if fi.IsDir() {
-			lg("\t\t file is a directory, skipping - %v", fn)
-			return fmt.Errorf("is directory: %v", fn)
-		}
-
-		mod = fi.ModTime()
-		age := time.Now().Sub(mod)
-		if age.Hours() > 10 {
-			lg("\t\t file %4.2v hours old, refetch ", age.Hours())
-			return fmt.Errorf("too old: %v", fn)
-		}
-
-		lg("\t\t file only %4.2v hours old, skipping", age.Hours())
-		bts, err = ioutil.ReadAll(file1)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
-
-	err = f()
-	if err == nil {
-		return bts, mod, true, err
-	}
-
-	//
-	// Fetch
-	bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: surl, RedirectHandling: 1})
-	lg(err)
-	if err != nil {
-		lg("tried to fetch %v, %v", surl, inf.URL)
-		lg("msg %v", inf.Msg)
-		return []byte{}, inf.Mod, false, err
-	}
-	if inf.Mod.IsZero() {
-		inf.Mod = time.Now().Add(-75 * time.Minute)
-	}
-	lg("retrivd %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
-
-	//
-	//
-	lg("saved   %q crawled file", fn)
-	dir := path.Dir(fn)
-	err = fs.MkdirAll(dir, 0755)
-	lg(err)
-	err = fs.Chtimes(dir, time.Now(), time.Now())
-	lg(err)
-	err = fs.WriteFile(fn, bts, 0644)
-	lg(err)
-	err = fs.Chtimes(fn, inf.Mod, inf.Mod)
-	lg(err)
-
-	return bts, inf.Mod, false, nil
 
 }

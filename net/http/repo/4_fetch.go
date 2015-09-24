@@ -38,7 +38,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
-	config = addDefaults(w, r, config)
+	config = addDefaults(config)
 
 	// Fetching the rssXML takes time.
 	// We do it before the timouts of the pipeline stages are set off.
@@ -60,7 +60,12 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 
 		rssUrl := matchingRSSURI(w, r, config)
 		if rssUrl == "" {
-			_, _, _, err := fetchSave(w, r, lg, fs, path.Join(config.Host, config.SearchPrefix))
+			m := new(MyWorker)
+			m.r = r
+			m.lg = lg
+			m.fs1 = fs
+			m.SURL = path.Join(config.Host, config.SearchPrefix)
+			_, _, _, err := fetchSave(m)
 			lg(err)
 			if err != nil {
 				return

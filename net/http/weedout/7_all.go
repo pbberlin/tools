@@ -150,10 +150,10 @@ func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.File
 	return doc
 }
 
-func FetchAndDecodeJSON(r *http.Request, surl string, lg loghttp.FuncBufUniv, fs fsi.FileSystem) []repo.FullArticle {
+func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.FuncBufUniv, fs fsi.FileSystem) []repo.FullArticle {
 
-	fullURL := fmt.Sprintf("%s%s?%s=%s&cnt=%v", routes.AppHost01, routes.FetchSimilarURI,
-		routes.URLParamKey, surl, numTotal-1)
+	fullURL := fmt.Sprintf("%s%s?%s=%s&cnt=%v&prot=%v", routes.AppHost01, routes.FetchSimilarURI,
+		routes.URLParamKey, surl, numTotal-1, knownProtocol)
 
 	// fullURL = fmt.Sprintf("%s%s?%s=%s&cnt=%v", r.URL.Host, repo.routes.FetchSimilarURI,
 	// 	routes.URLParamKey, surl, numTotal-1)

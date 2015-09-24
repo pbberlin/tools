@@ -22,9 +22,9 @@ import (
 )
 
 type MyWorker struct {
-	SURL string
+	SURL     string
+	Protocol string
 
-	w http.ResponseWriter
 	r *http.Request
 
 	lg loghttp.FuncBufUniv
@@ -37,9 +37,7 @@ type MyWorker struct {
 
 func (m *MyWorker) Work() {
 
-	// m.Bts, m.FI, m.Err = fetch.UrlGetter(nil, fetch.Options{URL: m.URL})
-
-	bts, mod, _, err := fetchSave(m.w, m.r, m.lg, m.fs1, m.SURL)
+	bts, mod, _, err := fetchSave(m)
 
 	if err != nil {
 		m.err = err
@@ -111,19 +109,30 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 		return
 	}
 
+	knownProtocol := ""
+	if r.FormValue("prot") != "" {
+		knownProtocol = r.FormValue("prot")
+	}
+
 	srcDepth := strings.Count(ourl.Path, "/")
 
 	cmd := FetchCommand{}
 	cmd.Host = ourl.Host
 	cmd.SearchPrefix = ourl.Path
-	cmd = addDefaults(w, r, cmd)
+	cmd = addDefaults(cmd)
 
 	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
 	fnDigest := path.Join(docRoot, cmd.Host, "digest2.json")
 	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
 	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
 
-	btsSrc, modSrc, usedExisting, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, ourl.Path))
+	m1 := new(MyWorker)
+	m1.r = r
+	m1.lg = lg
+	m1.fs1 = fs1
+	m1.SURL = path.Join(cmd.Host, ourl.Path)
+	m1.Protocol = knownProtocol
+	btsSrc, modSrc, usedExisting, err := fetchSave(m1)
 	if usedExisting {
 		addAnchors(lg, cmd.Host, btsSrc, dirTree)
 	}
@@ -163,7 +172,14 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
-			btsPar, _, usedExisting, err := fetchSave(w, r, lg, fs1, path.Join(cmd.Host, treePath))
+			m2 := new(MyWorker)
+			m2.r = r
+			m2.lg = lg
+			m2.fs1 = fs1
+			m2.SURL = path.Join(cmd.Host, treePath)
+			m2.Protocol = knownProtocol
+
+			btsPar, _, usedExisting, err := fetchSave(m2)
 			if usedExisting {
 				addAnchors(lg, cmd.Host, btsPar, dirTree)
 			}
@@ -287,7 +303,7 @@ MarkOuter:
 		for _, art := range nonExisting {
 			surl := path.Join(cmd.Host, art.Url)
 			wrkr := MyWorker{SURL: surl}
-			wrkr.w = w
+			wrkr.Protocol = knownProtocol
 			wrkr.r = r
 			wrkr.lg = lg
 			wrkr.fs1 = fs1

@@ -38,7 +38,7 @@ func Test2(t *testing.T) {
 
 	lg("took1 %4.2v secs", time.Now().Sub(start).Seconds())
 
-	least3Files := FetchAndDecodeJSON(nil, URLs[0], lg, fs)
+	least3Files := FetchAndDecodeJSON(nil, URLs[0], "", lg, fs)
 
 	lg("took2 %4.2v secs", time.Now().Sub(start).Seconds())
 

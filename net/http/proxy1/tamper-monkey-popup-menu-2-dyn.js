@@ -3,7 +3,7 @@
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. 
 // @description  http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.121
+// @version      0.122
 // @author       iche
 // @downloadURL  http://localhost:8085/mnt01/tamper-monkey-popup-menu.js
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
@@ -53,14 +53,12 @@ function PopupContent(obj){
     	return "";
     }
 
-    var domainX = document.domain;
     var domainY = location.host;
     var protocolY = location.protocol;
-    console.log("domainXY", domainX, domainY,protocolY);
 
-    var href = obj.attr('href');
+    var href = parAnchor.attr('href');
     if (href.indexOf('/') === 0) {
-        href = domainX + href;
+        href = domainY + href;
     }
 
     var text = obj.text();
@@ -276,41 +274,32 @@ $( document ).ready(function() {
     // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
 
 
+    var domainX = document.domain;
+    var domainY = location.host;
+    var protocolY = location.protocol;
+    console.log("domainXY", domainX, domainY,protocolY);
+
+
+
 	AddCSS();
 
     // CreateAnchorWrappers(); // now dynamically created
 
     // Ad-hoc creation and handing off event
     $( 'a' ).on( "mouseenter", function(evt) {
-		console.log("fired")
         var obj = $(evt.target);
 		var alreadyExists = CreateAnchorWrapper(obj);
 	    if (!alreadyExists) {
-	    	obj.closest(".hc-a").triggerHandler("mouseenter");
+	    	obj.closest(".hc-a").triggerHandler("mouseenter"); // handing off event at first time
 			evt.preventDefault();
-			console.log("added")
-	    } else {
-			console.log("not added")
 	    }
     });
 
 
-    // $(document).on( "click", "a" , function(evt) {
-    // 	console.log("click1");
-    //     evt.preventDefault();
-    // });
-
-    // We have to latch the events onto the parent wrapper node.
-    // Thus all parent nodes need to be created on documentload :(
-
     // mouseover fires again for child elements.
     // it prevents click events 
-    // $( '.hc-a' ).on( "mouseover", function(e) {
-
-
-
-    $(document).on( "mouseenter", '.hc-a' , function() {
-    // $( '.hc-a' ).on( "mouseenter", function(e) {
+    $(document).on( "mouseenter", '.hc-a' , function() {  // catches dynamially created nodes
+    // $( '.hc-a' ).on( "mouseenter", function(e) {       // only so far created nodes
         var obj = $(this);
         ShowPop(obj);
     });

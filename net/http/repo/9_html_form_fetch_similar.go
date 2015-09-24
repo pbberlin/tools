@@ -23,31 +23,34 @@ const htmlForm = `
 
 	<form>
 		<div style='margin:8px;'>
-			<span class='ib' style='width:40px'>Count </span>
+			<span class='ib' style='width:50px'>Count </span>
 			<input id='inp1' name="cnt"                      size="3"  value="2"><br/>
 
-			<span class='ib' style='width:40px'>URL </span>
+			<span class='ib' style='width:50px'>Protocol </span>
+			<input id='inp1' name="prot"                      size="6"  value="http"><br/>
+
+			<span class='ib' style='width:50px'>URL </span>
 			<input id='inp2' name="{{.fieldname}}"           size="120"  value="{{.val}}"><br/>
 			
-			<span class='ib' style='width:40px' ></span> 
+			<span class='ib' style='width:50px' ></span> 
 			<span class='ib' tabindex='11'> 
 			www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html
 			</span>
 			<br/>
 
-			<span class='ib' style='width:40px' ></span> 
+			<span class='ib' style='width:50px' ></span> 
 			<span class='ib' tabindex='11'> 
 			www.economist.com/news/britain/21663648-hard-times-hard-hats-making-britain-make-things-again-proving-difficult  
 			</span>
 			<br/>
 
-			<span class='ib' style='width:40px' ></span> 
+			<span class='ib' style='width:50px' ></span> 
 			<span class='ib' tabindex='12'> 
 			www.economist.com/news/americas/21661804-gender-equality-good-economic-growth-girl-power  
 			</span>
 			<br/>
 
-			<span class='ib' style='width:40px'> </span>
+			<span class='ib' style='width:50px'> </span>
 			<input type="submit" value="Get similar (shit+alt+f)" accesskey='f'>
 		</div>
 	</form>
@@ -111,8 +114,8 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	} else {
 
-		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s", r.Host, routes.FetchSimilarURI,
-			routes.URLParamKey, rURL, r.FormValue("cnt"))
+		fullURL := fmt.Sprintf("https://%s%s?%s=%s&cnt=%s&prot=%s", r.Host, routes.FetchSimilarURI,
+			routes.URLParamKey, rURL, r.FormValue("cnt"), r.FormValue("prot"))
 		lg("lo - sending to URL 1: %v", fullURL)
 
 		fo := fetch.Options{}

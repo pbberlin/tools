@@ -20,16 +20,18 @@ import (
 
 var MsgNoRdirects = "redirect cancelled"
 var ErrCancelRedirects = fmt.Errorf(MsgNoRdirects)
+var ErrNoContext = fmt.Errorf("gaeReq did not yield a context; deadline exceeded?")
 
 type Options struct {
 	Req *http.Request
 
 	URL string
 
-	HttpsOnly        bool
 	RedirectHandling int // 1 => call off upon redirects
 
 	LogLevel int
+
+	KnownProtocol string
 }
 
 // Response info
@@ -78,8 +80,14 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 	r := options.Req
 
-	if options.HttpsOnly {
-		r.URL.Scheme = "https"
+	if len(options.KnownProtocol) > 1 {
+		if strings.HasSuffix(options.KnownProtocol, ":") {
+			options.KnownProtocol = strings.TrimSuffix(options.KnownProtocol, ":")
+		}
+		if options.KnownProtocol == "http" || options.KnownProtocol == "https" {
+			r.URL.Scheme = options.KnownProtocol
+			inf.Msg += fmt.Sprintf("Using known protocol %q\n", options.KnownProtocol)
+		}
 	}
 
 	//
@@ -98,6 +106,8 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			// thus
 			tr = urlfetch.Transport{Context: c, AllowInvalidServerCertificate: false}
 			client.Transport = &tr
+		} else {
+			return nil, inf, ErrNoContext
 		}
 
 		// appengine dev server => always fallback to http
@@ -115,7 +125,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	}
 
 	if options.LogLevel > 0 {
-		inf.Msg += fmt.Sprintf("standardized to %q  %q %q \n", r.URL.Scheme, r.URL.Host, r.URL.RequestURI())
+		inf.Msg += fmt.Sprintf("url standardized to %q  %q %q \n", r.URL.Scheme, r.URL.Host, r.URL.RequestURI())
 	}
 
 	//

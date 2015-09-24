@@ -43,10 +43,7 @@ func condenseTrailingDir(uri string, n int) (ret string) {
 }
 
 // Adding preconfigured settings to a fetch command
-func addDefaults(w http.ResponseWriter, r *http.Request, in FetchCommand) FetchCommand {
-
-	lg, lge := loghttp.Logger(w, r)
-	_, _ = lg, lge
+func addDefaults(in FetchCommand) FetchCommand {
 
 	var preset FetchCommand
 

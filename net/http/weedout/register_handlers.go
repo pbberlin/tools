@@ -53,15 +53,6 @@ func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{
 	err := r.ParseForm()
 	lg(err)
 
-	// countSimilar := 3
-	// sCountSimilar := r.FormValue("cnt")
-	// if sCountSimilar != "" {
-	// 	i, err := strconv.Atoi(strings.TrimSpace(sCountSimilar))
-	// 	if err == nil {
-	// 		countSimilar = i
-	// 	}
-	// }
-
 	surl := r.FormValue(routes.URLParamKey)
 	ourl, err := fetch.URLFromString(surl)
 	lg(err)
@@ -73,11 +64,16 @@ func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{
 		return
 	}
 
+	knownProtocol := ""
+	if r.FormValue("prot") != "" {
+		knownProtocol = r.FormValue("prot")
+	}
+
 	lg("%v, %v", ourl.Host, ourl.Path)
 
 	fs := GetFS(appengine.NewContext(r), 0)
 
-	least3Files := FetchAndDecodeJSON(r, ourl.String(), lg, fs)
+	least3Files := FetchAndDecodeJSON(r, ourl.String(), knownProtocol, lg, fs)
 
 	lg("Fetched and decoded; found %v", len(least3Files))
 	if len(least3Files) > 0 {

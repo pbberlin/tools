@@ -9,7 +9,7 @@
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
 // @match        *://www.welt.de/*
-// // @match        *://www.handelsblatt.com/*  // irritates the image gallery progress arrows
+// @match        *://www.handelsblatt.com/*  
 // @match        *://www.focus.de/*
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 // // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js

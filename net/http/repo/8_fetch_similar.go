@@ -78,6 +78,8 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
+	start := time.Now()
+
 	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Find similar HTML URLs"}))
 	defer wpf(b, tplx.Foot)
 
@@ -141,6 +143,8 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 		return
 	}
 
+	lg("\t\t%4.2v secs so far 1", time.Now().Sub(start).Seconds())
+
 	var treePath string
 	treePath = "/news"
 	treePath = "/blogs"
@@ -162,6 +166,8 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	var subtree *DirTree
 	links := []FullArticle{}
 
+	alreadyCrawled := map[string]struct{}{}
+
 MarkOuter:
 	for j := 0; j < srcDepth; j++ {
 		treePath = path.Dir(ourl.Path)
@@ -172,6 +178,11 @@ MarkOuter:
 
 			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
+			if _, ok := alreadyCrawled[treePath]; ok {
+				lg("\t already digested %v", treePath)
+				continue
+			}
+
 			m2 := new(MyWorker)
 			m2.r = r
 			m2.lg = lg
@@ -180,6 +191,7 @@ MarkOuter:
 			m2.Protocol = knownProtocol
 
 			btsPar, _, usedExisting, err := fetchSave(m2)
+			alreadyCrawled[treePath] = struct{}{}
 			if usedExisting {
 				addAnchors(lg, cmd.Host, btsPar, dirTree)
 			}
@@ -227,8 +239,9 @@ MarkOuter:
 	//
 	//
 	//
+	lg("\t\t%4.2v secs so far 2", time.Now().Sub(start).Seconds())
 
-	lg("\nNow reading/fetching actual similar files - not just the links\n")
+	lg("\nNow reading/fetching actual similar files - not just the links")
 	//
 	tried := 0
 	selecteds := []FullArticle{}
@@ -297,7 +310,7 @@ MarkOuter:
 		}
 
 	}
-	lg("tried %v links - yielding %v existing similars; %v were requested.\n",
+	lg("tried %v links - yielding %v existing similars; %v were requested.",
 		tried, len(selecteds), countSimilar)
 
 	if len(selecteds) < countSimilar {
@@ -317,9 +330,12 @@ MarkOuter:
 		opt.TimeOutDur = 3500 * time.Millisecond
 		opt.Want = int32(countSimilar - len(selecteds) + 4) // get some more, in case we have "redirected" bodies
 		opt.NumWorkers = int(opt.Want)                      // 5s query limit; => hurry; spawn as many as we want
-		opt.CollectRemainder = false                        // 5s query limit; => hurry; dont wait for stragglers
+		lg("Preparing %v simultaneous fetches at %4.2v secs.", opt.Want, time.Now().Sub(start).Seconds())
+		opt.CollectRemainder = false // 5s query limit; => hurry; dont wait for stragglers
 
 		ret, msg := distrib.Distrib(jobs, opt)
+		lg("Distrib returned at %4.2v secs with %v results.", time.Now().Sub(start).Seconds(), len(ret))
+
 		lg("\n" + msg.String())
 		for _, v := range ret {
 			v1, _ := v.Worker.(*MyWorker)
@@ -338,7 +354,7 @@ MarkOuter:
 			}
 		}
 
-		lg("tried %v links - yielding %v fetched - jobs %v\n", len(nonExisting), len(nonExistFetched), len(jobs))
+		lg("tried %v links - yielding %v fetched - jobs %v", len(nonExisting), len(nonExistFetched), len(jobs))
 		selecteds = append(selecteds, nonExistFetched...)
 
 		//
@@ -356,6 +372,8 @@ MarkOuter:
 		lg("saving accumulated (new) links to digest")
 		saveDigest(w, r, fs1, fnDigest, dirTree)
 	}
+
+	lg("\t\t%4.2v secs so far 3", time.Now().Sub(start).Seconds())
 
 	mp := map[string][]byte{}
 	mp["msg"] = b.Bytes()

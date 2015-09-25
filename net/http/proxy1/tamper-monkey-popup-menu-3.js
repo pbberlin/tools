@@ -33,9 +33,12 @@ if (typeof jQuery === 'undefined') {
         console.log("about to add hover popups; " + $.fn.jquery + " Version");
 
 
-var vPaddingOffs = 25 ;
-var vShadowOffs  = 6 ;
-var hOffs  = 12 ;  // horizontal offset
+var hOffs  = 10 ;  // horizontal offset
+
+var vPaddingOffs = 5 ; // invisible padded ridge
+var vShadowOffs  = 6 ; // 
+
+
 
 function PopupContent(obj){
 
@@ -67,8 +70,9 @@ function PopupContent(obj){
     var formHtml = "";
     var prox01 = "http://localhost:8085/weedout";
     var prox02 = "https://libertarian-islands.appspot.com/weedout";
-
-    formHtml += "<form action='"+prox01+"' method='post' ";
+    var proxURL = prox02;
+    
+    formHtml += "<form action='"+proxURL+"' method='post' ";
     formHtml += "    target='proxy-window' >";
     formHtml += "<input type='hidden'  name='prot'  value='"+protocolY+"' >";
     formHtml += "<input type='hidden'  name='url-x' value='"+href+"' >";
@@ -76,7 +80,7 @@ function PopupContent(obj){
     formHtml += "</form>";
 
     var html = "";
-    html += "<a target='proxy-window'  href='"+prox01 + "?url-x="+ href+"&prot="+protocolY+"' >" + text + "</a>";
+    html += "<a target='proxy-window'  href='"+proxURL + "?url-x="+ href+"&prot="+protocolY+"' >" + text + "</a>";
     html += formHtml;
 
     return html;
@@ -97,12 +101,13 @@ function AddCSS(){
         s += '    left:-10px;   top:-10px;';
         s += '    width:  240px;  ';
         s += '    /* dont fix the height - use jQuery.outerHeight() for computations */ ';
-        s += '    height: auto ';
+        s += '    height: auto ;';
         s += '';
-        s += '    /* alternating upon top-bottom, adapt vPaddingOffs accordingly */ ';
         // s += '    border-left: solid 2px #d22; ';
         // s += '    border-right:solid 2px #d22; ';
+        // s += '    border: 1px solid #d22; ';
         s += '    margin:         0px !important; ' ;
+        s += '    /* alternating upon top-bottom, adapt vPaddingOffs accordingly */ ';
         s += '    padding:        0px; ';
         s += '    padding-left:   0px !important; ';
         s += '    padding-right:  0px !important;' ;
@@ -159,7 +164,16 @@ function HidePop(obj){
 //          anchor.css("zIndex", "100");
 //          popup.css("zIndex", "50");
 // And resetting the all to zero on mouseleave.
-// This would only look good with align right-or-left.
+// 
+// But this does not work, when both are children of different z-index-layers.
+// Hovercard binds popup and anchor together.
+// But this destroys parent-child links for instance in image gallery plugins.
+// It also prevents popup from floating above all layers,
+// since anchor might be locked into a lower layer.
+// 
+// We therefore take the global approach.
+// There remains the problem of syncing mouseenter-mouseleave
+// but we solved that by mediating timer.
 function ShowPop(obj){
     
 
@@ -168,6 +182,22 @@ function ShowPop(obj){
 
     var html = PopupContent(obj);
     inner.html(html); // setting content => force sizing
+
+
+    if ( obj.outerWidth() <= 240 ) {
+        popup.css({
+            width: 240 + 'px',
+        });
+    } else if ( obj.outerWidth() > 480 ) {
+        popup.css({
+            width: 480 + 'px',
+        });
+    } else {
+        popup.css({
+            width: obj.outerWidth() + 2*hOffs + 'px',
+        });
+    }
+
 
 
     var objAbsTL = obj.offset();
@@ -199,7 +229,7 @@ function ShowPop(obj){
         });
         popup.css({
             left: objAbsTL.left - hOffs + 'px',
-            top:  -20 + objAbsTL.top   +  obj.outerHeight()  + 'px',
+            top:  objAbsTL.top   +  obj.outerHeight() + 'px',
         });
 
     } else {
@@ -211,16 +241,17 @@ function ShowPop(obj){
         });
         popup.css({
             left: objAbsTL.left  - hOffs + 'px',
-            top:  objAbsTL.top   - popup.outerHeight() + vPaddingOffs - + vShadowOffs  + 'px',
+            top:  objAbsTL.top   - popup.outerHeight() + vPaddingOffs - vShadowOffs + 'px',
         });
-
-
         // popup.css({
         //     top:     'auto',
         //     bottom:  $( document ).height() -  objAbsTL.top  - vPaddingOffs + 'px',
         // });
-
     }
+
+
+
+
 
     inner.css({
         'text-align':  'left',
@@ -237,22 +268,10 @@ function ShowPop(obj){
     }
 
 
-    if ( obj.outerWidth() <= 240 ) {
-        popup.css({
-            width: 240 + 'px',
-        });
-    } else if ( obj.outerWidth() > 480 ) {
-        popup.css({
-            width: 480 + 'px',
-        });
-    } else {
-        popup.css({
-            width: obj.outerWidth() + 2*hOffs + 'px',
-        });
-    }
 
     inner.show();
-    popup.stop(true, true).delay(1).fadeIn(500);
+
+    popup.stop(true, true).delay(10).fadeIn(500);
 
 
 }
@@ -269,9 +288,21 @@ $( document ).ready(function() {
     console.log("height window - doc:",wh,dh," sctp:", scrollVert , " offs1",os1.top, " offs2", os2.top);
     // console.log("offs1-l", os1.left, " offs2-l",  os2.left);
 
-
-
     AddCSS();
+
+
+    // We have to couple mouseenter-mouseleave
+    // for anchor and popup.
+    // 
+    // This is fun, since both have a GAP between.
+    //
+    // We choose an event driven mediation    
+    // 
+    // anchor-mouseenter => showPop
+    // anchor-mouseleave-popup-mouseenter => keep going
+    // anchor-mouseleave, popup-mouseleave => hidePop
+
+    var hidingCountdownID = 0;
 
 
     $( 'a' ).on( "mouseenter", function(evt) {
@@ -279,6 +310,21 @@ $( document ).ready(function() {
         ShowPop(obj);
     });
 
+    $( 'a' ).on( "mouseleave", function(evt) {
+        hidingCountdownID = setTimeout( function(){
+                var obj = $(evt.target);
+                HidePop(obj);
+                hidingCountdownID = 0;
+            }, 400);
+    });
+
+
+    $( '#popup1' ).on( "mouseenter", function(evt) {
+        if (hidingCountdownID > 0){
+            clearTimeout(hidingCountdownID); // cancel
+            hidingCountdownID = 0;
+        }
+    });
     $( '#popup1' ).on( "mouseleave", function(evt) {
         var obj = $(evt.target);
         HidePop(obj);
@@ -298,9 +344,9 @@ $( document ).ready(function() {
 
     console.log( "document ready completed" );
 });
-
         
-
+        
+        
         console.log("hover popups handler added");
         //isolated jQuery end;
     });

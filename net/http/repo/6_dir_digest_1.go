@@ -185,6 +185,7 @@ func addAnchors(lg loghttp.FuncBufUniv, host string, bts []byte, dirTree *DirTre
 	}
 	fr(doc)
 	path2DirTree(lg, dirTree, anchors, host, false)
+	lg("\t\tadded %v anchors", len(anchors))
 	dirTree.LastFound = time.Now() // Marker for later accumulated saving
 
 }

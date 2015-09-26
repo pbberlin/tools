@@ -147,7 +147,8 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 		opt.NumWorkers = len(packets)
 		lpf("num workers curtailed to |%v|", opt.NumWorkers)
 	}
-	lpf("num workers |%v| for |%v| jobs  |%v| packets", opt.NumWorkers, len(jobs), len(packets))
+	lpf("want |%v| with num workers |%v| from |%v|%v| jobs|packets",
+		opt.Want, opt.NumWorkers, len(jobs), len(packets))
 
 	//
 	// stage 1

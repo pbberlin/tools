@@ -135,7 +135,7 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	dirTree := &DirTree{Name: "/", Dirs: map[string]DirTree{}, EndPoint: true}
 	fnDigest := path.Join(docRoot, cmd.Host, "digest2.json")
 	loadDigest(w, r, lg, fs1, fnDigest, dirTree) // previous
-	lg("dirtree 400 chars is %v end of dirtree\n", stringspb.ToLen(dirTree.String(), 400))
+	lg("dirtree 400 chars is %v end of dirtree\t\t", stringspb.ToLen(dirTree.String(), 400))
 
 	m1 := new(MyWorker)
 	m1.r = r
@@ -144,7 +144,7 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	m1.SURL = path.Join(cmd.Host, ourl.Path)
 	m1.Protocol = knownProtocol
 	btsSrc, modSrc, usedExisting, err := fetchSave(m1)
-	if usedExisting {
+	if !usedExisting {
 		addAnchors(lg, cmd.Host, btsSrc, dirTree)
 	}
 	lg(err)
@@ -155,8 +155,6 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 	lg("\t\t%4.2v secs so far 1", time.Now().Sub(start).Seconds())
 
 	var treePath string
-	treePath = "/news"
-	treePath = "/blogs"
 	treePath = "/blogs/freeexchange"
 	treePath = "/news/europe"
 	treePath = path.Dir(ourl.Path)
@@ -186,10 +184,10 @@ MarkOuter:
 
 			subtree, treePath = DiveToDeepestMatch(dirTree, treePath)
 
-			lg("\nLooking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
+			lg("Looking from height %v to level %v  - %v", srcDepth-i, srcDepth-j, treePath)
 
 			if _, ok := alreadyCrawled[treePath]; ok {
-				lg("\t already digested %v", treePath)
+				// lg("\t already digested %v", treePath)
 				continue
 			}
 
@@ -202,9 +200,8 @@ MarkOuter:
 
 			btsPar, _, usedExisting, err := fetchSave(m2)
 			alreadyCrawled[treePath] = struct{}{}
-			if usedExisting {
+			if !usedExisting {
 				addAnchors(lg, cmd.Host, btsPar, dirTree)
-				lg("\t\t anchors added")
 			}
 			lg(err)
 			if err != nil {
@@ -250,9 +247,10 @@ MarkOuter:
 	//
 	//
 	//
-	lg("Links %v  after %4.2v secs", len(links), time.Now().Sub(start).Seconds())
+	lg("%v links after %4.2v secs", len(links), time.Now().Sub(start).Seconds())
 
-	lg("\nNow reading/fetching actual similar files - not just the links")
+	lg("============================")
+	lg("Now reading/fetching actual similar files - not just the links")
 	//
 	tried := 0
 	selecteds := []FullArticle{}
@@ -321,10 +319,9 @@ MarkOuter:
 		}
 
 	}
-	lg("tried %v links - yielding %v existing similars; %v were requested.",
-		tried, len(selecteds), countSimilar)
-
-	lg("\t%v links, non existing in datastore.", len(nonExisting))
+	lg("============================")
+	lg("tried %v links - yielding %v existing similars; not existing in datastore: %v, %v were requested.",
+		tried, len(selecteds), len(nonExisting), countSimilar)
 
 	if len(selecteds) < countSimilar {
 		jobs := make([]distrib.Worker, 0, len(nonExisting))

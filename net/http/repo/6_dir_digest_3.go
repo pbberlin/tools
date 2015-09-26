@@ -96,11 +96,10 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 	// 	return bts, inf.Mod, false, fmt.Errorf("req timed out")
 	// }
 
-	m.lg("retrivd %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
+	m.lg("retrivd+saved %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
 	//
 	//
-	m.lg("saved   %q crawled file", fn)
 	dir := path.Dir(fn)
 	err = m.fs1.MkdirAll(dir, 0755)
 	m.lg(err)

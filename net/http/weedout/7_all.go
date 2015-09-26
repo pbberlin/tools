@@ -158,8 +158,8 @@ func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.
 	// fullURL = fmt.Sprintf("%s%s?%s=%s&cnt=%v", r.URL.Host, repo.routes.FetchSimilarURI,
 	// 	routes.URLParamKey, surl, numTotal-1)
 
-	lg("lo sending to URL 2:")
-	lg("lo %v", fullURL)
+	lg("lo fetching %v", fullURL)
+	start := time.Now()
 
 	fo := fetch.Options{}
 	fo.URL = fullURL
@@ -174,6 +174,8 @@ func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.
 		lg("empty bJSON")
 		return nil
 	}
+
+	lg("\t\tfetch resp complete after %4.2v secs", time.Now().Sub(start).Seconds())
 
 	var mp map[string][]byte
 	err = json.Unmarshal(bJSON, &mp)
@@ -242,7 +244,7 @@ func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.
 
 	}
 
-	lg("found %v similar", maxFound)
+	lg("found %v similar; decoding complete after 4.2v secs", maxFound, time.Now().Sub(start).Seconds())
 
 	for _, v := range least3Files {
 		lg("%v %v", v.Url, len(v.Body))

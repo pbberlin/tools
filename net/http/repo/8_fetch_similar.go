@@ -116,6 +116,15 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 		knownProtocol = r.FormValue("prot")
 	}
 
+	numWorkers := 0
+	sNumWorkers := r.FormValue("numworkers")
+	if sNumWorkers != "" {
+		i, err := strconv.Atoi(strings.TrimSpace(sNumWorkers))
+		if err == nil {
+			numWorkers = i
+		}
+	}
+
 	srcDepth := strings.Count(ourl.Path, "/")
 
 	cmd := FetchCommand{}
@@ -330,7 +339,10 @@ MarkOuter:
 		opt.TimeOutDur = 3500 * time.Millisecond
 		opt.Want = int32(countSimilar - len(selecteds) + 4) // get some more, in case we have "redirected" bodies
 		opt.NumWorkers = int(opt.Want)                      // 5s query limit; => hurry; spawn as many as we want
-		lg("Preparing %v simultaneous fetches at %4.2v secs.", opt.Want, time.Now().Sub(start).Seconds())
+		if numWorkers > 0 {
+			opt.NumWorkers = numWorkers
+		}
+		lg("Preparing %v simultaneous, wanting %v fetches; at %4.2v secs.", opt.NumWorkers, opt.Want, time.Now().Sub(start).Seconds())
 		opt.CollectRemainder = false // 5s query limit; => hurry; dont wait for stragglers
 
 		ret, msg := distrib.Distrib(jobs, opt)
@@ -402,6 +414,8 @@ MarkOuter:
 
 	b.Reset()             // this keeps the  buf pointer intact; outgoing defers are still heeded
 	b = new(bytes.Buffer) // creates a *new* buf pointer; outgoing defers write into the *old* buf
+
+	lg("\t\t%4.2v secs so far 4 (json resp written as []byte)", time.Now().Sub(start).Seconds())
 
 	return
 

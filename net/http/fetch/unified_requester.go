@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 	"time"
 
@@ -105,6 +106,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			tr := urlfetch.Transport{Context: c, AllowInvalidServerCertificate: true}
 			// thus
 			tr = urlfetch.Transport{Context: c, AllowInvalidServerCertificate: false}
+			tr.Deadline = 20 * time.Second
 			client.Transport = &tr
 		} else {
 			return nil, inf, ErrNoContext
@@ -137,7 +139,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	// The actual call
 	// =============================
+
+	runtime.Gosched()
 	resp, err := client.Do(r)
+	runtime.Gosched()
 
 	// Swallow redirect errors
 	if err != nil {

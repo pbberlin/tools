@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"runtime"
 	"time"
 
 	"appengine"
@@ -77,7 +78,10 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 
 	//
 	// Fetch
+	runtime.Gosched()
 	bts, inf, err := fetch.UrlGetter(m.r, fetch.Options{URL: m.SURL, KnownProtocol: m.Protocol, RedirectHandling: 1})
+	runtime.Gosched()
+
 	m.lg(err)
 	if err != nil {
 		m.lg("tried to fetch %v, %v", m.SURL, inf.URL)

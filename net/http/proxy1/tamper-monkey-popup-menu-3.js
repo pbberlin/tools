@@ -8,9 +8,10 @@
 // @downloadURL  http://localhost:8085/mnt01/tamper-monkey-popup-menu.js
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-popup-menu.js //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
-// @match        *://www.welt.de/*
-// @match        *://www.handelsblatt.com/*  
-// @match        *://www.focus.de/*
+// @match        *://*.welt.de/*
+// @match        *://*.handelsblatt.com/*  
+// @match        *://*.focus.de/*
+// @match        *://*.economist.com/*
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 // // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js
@@ -80,6 +81,7 @@ function PopupContent(obj){
     formHtml += "</form>";
 
     var html = "";
+    html += "<a target='proxy-window'  href='"+prox01 + "?url-x="+ href+"&prot="+protocolY+"' >" + "localhost" + "</a><br>";
     html += "<a target='proxy-window'  href='"+proxURL + "?url-x="+ href+"&prot="+protocolY+"' >" + text + "</a>";
     html += formHtml;
 
@@ -295,9 +297,9 @@ $( document ).ready(function() {
     // for anchor and popup.
     // 
     // This is fun, since both have a GAP between.
-    //
-    // We choose an event driven mediation    
-    // 
+	//
+	// We choose an event driven mediation    
+	// 
     // anchor-mouseenter => showPop
     // anchor-mouseleave-popup-mouseenter => keep going
     // anchor-mouseleave, popup-mouseleave => hidePop
@@ -311,18 +313,18 @@ $( document ).ready(function() {
     });
 
     $( 'a' ).on( "mouseleave", function(evt) {
-        hidingCountdownID = setTimeout( function(){
-                var obj = $(evt.target);
-                HidePop(obj);
-                hidingCountdownID = 0;
-            }, 400);
+    	hidingCountdownID = setTimeout( function(){
+		        var obj = $(evt.target);
+		        HidePop(obj);
+		        hidingCountdownID = 0;
+			}, 400);
     });
 
 
     $( '#popup1' ).on( "mouseenter", function(evt) {
         if (hidingCountdownID > 0){
-            clearTimeout(hidingCountdownID); // cancel
-            hidingCountdownID = 0;
+        	clearTimeout(hidingCountdownID); // cancel
+	        hidingCountdownID = 0;
         }
     });
     $( '#popup1' ).on( "mouseleave", function(evt) {

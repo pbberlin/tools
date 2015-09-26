@@ -4,12 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
-	"runtime"
 	"time"
 
-	"appengine"
-
-	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/fetch"
 )
 
@@ -63,7 +59,7 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 			return fmt.Errorf("too old: %v", fn)
 		}
 
-		m.lg("\t\t file only %4.2v hours old, skipping", age.Hours())
+		m.lg("\t\t file only %4.2v hours old, take %4.2vkB from datastore", age.Hours(), fi.Size()/1024)
 		bts, err = ioutil.ReadAll(file1)
 		if err != nil {
 			return err
@@ -78,9 +74,7 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 
 	//
 	// Fetch
-	runtime.Gosched()
 	bts, inf, err := fetch.UrlGetter(m.r, fetch.Options{URL: m.SURL, KnownProtocol: m.Protocol, RedirectHandling: 1})
-	runtime.Gosched()
 
 	m.lg(err)
 	if err != nil {
@@ -95,12 +89,12 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 	//
 	//
 	// main request still exists?
-	var cx appengine.Context
-	cx = util_appengine.SafelyExtractGaeContext(m.r)
-	if cx == nil {
-		m.lg("timed out - returning")
-		return bts, inf.Mod, false, fmt.Errorf("req timed out")
-	}
+	// var cx appengine.Context
+	// cx = util_appengine.SafelyExtractGaeContext(m.r)
+	// if cx == nil {
+	// 	m.lg("timed out - returning")
+	// 	return bts, inf.Mod, false, fmt.Errorf("req timed out")
+	// }
 
 	m.lg("retrivd %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 

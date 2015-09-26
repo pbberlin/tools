@@ -62,6 +62,8 @@ import (
 	"log"
 	"sync/atomic"
 	"time"
+
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 // Worker interface is a narrow interface
@@ -88,6 +90,8 @@ type Options struct {
 	TimeOutDur       time.Duration // Max duration of Work() before timeout + abandonment.
 	CollectRemainder bool          // Upon exit: Wait for remaining packets to reach stage3, or flush them where they are.
 	TailingSleep     bool          // Upon exit: Wait a short while, checking the return of all goroutines.
+
+	Logger loghttp.FuncBufUniv // not thread safe, but for debugging appeninge
 }
 
 var defaultOptions = Options{
@@ -107,8 +111,10 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 
 	var b = new(bytes.Buffer)
 	// var lnp = log.New(os.Stderr, "", 0) // logger no prefix; os.Stderr shows up in appengine devserver; os.Stdout does not
+
 	var lnp = log.New(b, "", 0)
 	var lpf = lnp.Printf // shortcut
+	// var lpf = opt.Logger
 
 	inn := make(chan *Packet) // stage1 => stage2
 	out := make(chan *Packet) // stage2 => stage3
@@ -124,6 +130,11 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 
 	var returns = make([]*Packet, 0, int(opt.Want)+5)
 
+	if len(jobs) < 1 {
+		lpf("empty jobs slice")
+		return returns, b
+	}
+
 	packets := make([]*Packet, 0, len(jobs))
 	for i, job := range jobs {
 		pack := &Packet{}
@@ -131,6 +142,12 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 		pack.TaskID = i
 		packets = append(packets, pack)
 	}
+
+	if opt.NumWorkers > len(packets) && len(packets) > 0 {
+		opt.NumWorkers = len(packets)
+		lpf("num workers curtailed to |%v|", opt.NumWorkers)
+	}
+	lpf("num workers |%v| for |%v| jobs  |%v| packets", opt.NumWorkers, len(jobs), len(packets))
 
 	//
 	// stage 1
@@ -140,7 +157,7 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 			idx := int(atomic.LoadInt32(&lcnt))
 
 			if idx > len(packets)-1 { // signal to stage3
-				lpf("=== input packets exhausted ===")
+				lpf("=== input packets exhausted at %v ===", idx)
 				atomic.StoreInt32(&opt.Want, int32(0))
 				return
 			}
@@ -212,6 +229,17 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 		for {
 			select {
 
+			// case <-time.After(22 * time.Second):
+			// 	lpf("=== TOTAL TIMEOUT  ===")
+			// 	func() {
+			// 		defer func() {
+			// 			recover()
+			// 		}()
+			// 		close(fin)
+
+			// 	}()
+			// 	return
+
 			case <-tick:
 				// Exit after collecting remainder
 				// Sent might be decremented in timed out works
@@ -219,6 +247,7 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 					recv >= atomic.LoadInt32(&opt.Want) &&
 					recv >= atomic.LoadInt32(&sent) &&
 					true {
+					lpf("=== enough on tick ===")
 					return
 				}
 
@@ -234,7 +263,7 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 				if recv >= atomic.LoadInt32(&opt.Want) {
 
 					if recv == atomic.LoadInt32(&opt.Want) {
-						lpf("=== enough ===")
+						lpf("=== enough on receive ===")
 					}
 
 					// inn = nil  // race detector objected to this line

@@ -88,7 +88,8 @@ function PopupContent(obj){
     formHtml += "</form>";
 
     var html = "";
-    html += "<a target='proxy-window'  href='"+prox01 + "?url-x="+ href+"&prot="+protocolY+"' >" + text + "</a>";
+    html += "<a target='proxy-window'  href='"+prox01 + "?url-x="+ href+"&prot="+protocolY+"' >" + "localhost" + "</a><br>";
+    html += "<a target='proxy-window'  href='"+proxURL + "?url-x="+ href+"&prot="+protocolY+"' >" + text + "</a>";
     html += formHtml;
 
     return html;

@@ -181,7 +181,8 @@ MarkOuter:
 	for j := 0; j < srcDepth; j++ {
 		treePath = path.Dir(ourl.Path)
 	MarkInner:
-		for i := 1; i < srcDepth; i++ {
+		// for i := 1; i < srcDepth; i++ {
+		for i := 1; i < (srcDepth + 5); i++ {
 
 			subtree, treePath = DiveToDeepestMatch(dirTree, treePath)
 
@@ -203,6 +204,7 @@ MarkOuter:
 			alreadyCrawled[treePath] = struct{}{}
 			if usedExisting {
 				addAnchors(lg, cmd.Host, btsPar, dirTree)
+				lg("\t\t anchors added")
 			}
 			lg(err)
 			if err != nil {
@@ -248,7 +250,7 @@ MarkOuter:
 	//
 	//
 	//
-	lg("\t\t%4.2v secs so far 2", time.Now().Sub(start).Seconds())
+	lg("Links %v  after %4.2v secs", len(links), time.Now().Sub(start).Seconds())
 
 	lg("\nNow reading/fetching actual similar files - not just the links")
 	//
@@ -321,6 +323,8 @@ MarkOuter:
 	}
 	lg("tried %v links - yielding %v existing similars; %v were requested.",
 		tried, len(selecteds), countSimilar)
+
+	lg("\t%v links, non existing in datastore.", len(nonExisting))
 
 	if len(selecteds) < countSimilar {
 		jobs := make([]distrib.Worker, 0, len(nonExisting))

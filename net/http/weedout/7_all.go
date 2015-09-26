@@ -244,7 +244,7 @@ func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.
 
 	}
 
-	lg("found %v similar; decoding complete after 4.2v secs", maxFound, time.Now().Sub(start).Seconds())
+	lg("found %v similar; decoding complete after %4.2v secs", maxFound, time.Now().Sub(start).Seconds())
 
 	for _, v := range least3Files {
 		lg("%v %v", v.Url, len(v.Body))

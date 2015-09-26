@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strings"
 	"time"
 
@@ -122,7 +121,18 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 
 	if options.RedirectHandling == 1 {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			return ErrCancelRedirects
+
+			if len(via) == 1 && req.URL.Path == via[0].URL.Path+"/" {
+				// allow redirect from /gesundheit to /gesundheit/
+				return nil
+			}
+
+			spath := "\n"
+			for _, v := range via {
+				spath += v.URL.Path + "\n"
+			}
+			spath += req.URL.Path + "\n"
+			return fmt.Errorf("%v %v", MsgNoRdirects, spath)
 		}
 	}
 
@@ -140,9 +150,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	// The actual call
 	// =============================
 
-	runtime.Gosched()
 	resp, err := client.Do(r)
-	runtime.Gosched()
 
 	// Swallow redirect errors
 	if err != nil {

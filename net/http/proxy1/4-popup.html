@@ -315,6 +315,10 @@ $( document ).ready(function() {
 
 
     $( 'a' ).on( "mouseenter", function(evt) {
+        if (hidingCountdownID > 0){
+        	clearTimeout(hidingCountdownID); // cancel
+	        hidingCountdownID = 0;
+        }
         var obj = $(evt.target);
         ShowPop(obj);
     });

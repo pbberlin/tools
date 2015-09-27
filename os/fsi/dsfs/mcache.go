@@ -1,6 +1,7 @@
 package dsfs
 
 import (
+	"strings"
 	"time"
 
 	"appengine/memcache"
@@ -32,7 +33,8 @@ func (d *DsDir) MemCacheGet(name string) error {
 
 	unparsedjson, err := memcache.JSON.Get(d.fSys.c, name, d)
 	_ = unparsedjson
-	if err != nil && err != memcache.ErrCacheMiss {
+	if err != nil && err != memcache.ErrCacheMiss &&
+		!strings.Contains(err.Error(), "invalid security ticket") {
 		panic(err)
 		// d.fSys.Ctx().Errorf("%v", err)
 	} else if err == memcache.ErrCacheMiss {

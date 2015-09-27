@@ -275,9 +275,9 @@ MarkOuter:
 		f, err := fs1.Open(p)
 		// lg(err) // its no error if file does not exist
 		if err != nil {
-			lg("!nstore %q", semanticUri)
+			// lg("!nstore %q", semanticUri)
 		} else {
-			lg("reading %q", semanticUri)
+			// lg("reading %q", semanticUri)
 
 			// lets put this into a func, so that f.close it called at the end of this func
 			// otherwise defer f.close() spans the entire func and prevents

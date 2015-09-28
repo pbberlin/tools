@@ -237,7 +237,6 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 			// 			recover()
 			// 		}()
 			// 		close(fin)
-
 			// 	}()
 			// 	return
 
@@ -256,7 +255,7 @@ func Distrib(jobs []Worker, opt Options) ([]*Packet, *bytes.Buffer) {
 
 				recv++
 
-				lpf("rcv%-2v of %-2v snt%-2v  %v", recv, atomic.LoadInt32(&opt.Want), atomic.LoadInt32(&sent), packet)
+				lpf("rcv%-2v of %-2v snt%-2v  %v  %v", recv, atomic.LoadInt32(&opt.Want), atomic.LoadInt32(&sent), packet, time.Now().Format("05.000"))
 				// lpf("  %v", stringspb.IndentedDump(packet.Workload))
 
 				returns = append(returns, packet)

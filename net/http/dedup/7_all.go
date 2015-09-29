@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"bytes"
@@ -20,7 +20,12 @@ import (
 )
 
 // Puttting it all together
-func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSystem) *html.Node {
+func Dedup(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSystem) *html.Node {
+
+	opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
+	// opts.FNamer = fNamer
+	opts.AddOutline = true
+	opts.RemoteHost = fetch.HostFromStringUrl(least3Files[0].Url)
 
 	//
 	// domclean
@@ -32,10 +37,6 @@ func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.File
 		lg("cleaning %4.1fkB from %v", float64(len(least3Files[i].Body))/1024,
 			stringspb.ToLenR(least3Files[i].Url, 60))
 
-		opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
-		// opts.FNamer = fNamer
-		opts.AddOutline = true
-		opts.RemoteHost = fetch.HostFromStringUrl(least3Files[i].Url)
 		doc, err := domclean2.DomClean(least3Files[i].Body, opts)
 		lg(err)
 
@@ -134,7 +135,7 @@ func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.File
 	}
 
 	//
-	// Apply weedout
+	// Apply dedup
 	fNamer := domclean2.FileNamer(logDir, 0)
 	fNamer() // first call yields key
 
@@ -143,9 +144,20 @@ func WeedOut(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.File
 	doc, err := html.Parse(bytes.NewReader(bts))
 	lg(err)
 
-	weedoutApply(doc, skipPrefixes)
+	dedupApply(doc, skipPrefixes)
 
-	domclean2.DomFormat(doc)
+	if false {
+		// does not add value
+		var b7 bytes.Buffer
+		err := html.Render(&b7, doc)
+		lg(err)
+
+		doc, err = domclean2.DomClean(b7.Bytes(), opts)
+		lg(err)
+
+	} else {
+		domclean2.DomFormat(doc)
+	}
 
 	return doc
 }

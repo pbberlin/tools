@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 type SortEl struct {
 	Outl string

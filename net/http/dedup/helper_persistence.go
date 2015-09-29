@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"bytes"
@@ -15,7 +15,7 @@ import (
 	"appengine"
 )
 
-var logDir = "c:/tmp/weedout2/"
+var logDir = "c:/tmp/dedup/"
 
 var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
 

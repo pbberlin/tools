@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"github.com/pbberlin/tools/net/http/dom"

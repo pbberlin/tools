@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"bytes"
@@ -16,8 +16,6 @@ import (
 var opt = levenshtein.Options{1, 1, 1} // cheap substitution
 
 var levelsToProcess = map[int]bool{1: true}
-
-// var levelsToProcess = map[int]bool{1: true, 2: true, 3: true, 4: true}
 
 var levelsTolerance = 0
 

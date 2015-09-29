@@ -1,7 +1,7 @@
-// +build weed2
-// go test -tags=weed2
+// +build dedup2
+// go test -tags=dedup2
 
-package weedout
+package dedup
 
 import (
 	"testing"
@@ -42,7 +42,7 @@ func Test2(t *testing.T) {
 
 	lg("took2 %4.2v secs", time.Now().Sub(start).Seconds())
 
-	doc := WeedOut(least3Files, lg, fs)
+	doc := Dedup(least3Files, lg, fs)
 
 	fNamer := domclean2.FileNamer(logDir, 0)
 	fNamer() // first call yields key

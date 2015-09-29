@@ -9,13 +9,13 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
+	"github.com/pbberlin/tools/net/http/dedup"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/repo"
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/net/http/upload"
-	"github.com/pbberlin/tools/net/http/weedout"
 	// _ "github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/webapi"
 	"github.com/pbberlin/tools/stringspb"
@@ -31,7 +31,7 @@ func init() {
 	upload.InitHandlers()
 	webapi.InitHandlers()
 	repo.InitHandlers()
-	weedout.InitHandlers()
+	dedup.InitHandlers()
 }
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -106,8 +106,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	uiFetch := repo.BackendUIRendered()
 	b1.Write(uiFetch.Bytes())
 
-	uiWeedOut := weedout.BackendUIRendered()
-	b1.Write(uiWeedOut.Bytes())
+	uidedup := dedup.BackendUIRendered()
+	b1.Write(uidedup.Bytes())
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

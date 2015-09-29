@@ -1,6 +1,6 @@
-// Package weedout takes multiple dom instances,
+// package dedup takes multiple dom instances,
 // computing similar subtrees measured by levenshtein distance.
-package weedout
+package dedup
 
 import "fmt"
 

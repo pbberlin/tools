@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"bytes"

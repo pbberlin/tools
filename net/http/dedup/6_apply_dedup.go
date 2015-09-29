@@ -1,18 +1,18 @@
-package weedout
+package dedup
 
 import "golang.org/x/net/html"
 
-func weedoutApply(n *html.Node, weedouts map[string]bool) {
+func dedupApply(n *html.Node, dedups map[string]bool) {
 
 	// Children
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		weedoutApply(c, weedouts)
+		dedupApply(c, dedups)
 	}
 
 	if n.Type == html.ElementNode {
 		outline := attrX(n.Attr, "ol") + "."
 
-		if weedouts[outline] {
+		if dedups[outline] {
 			n.Type = html.CommentNode
 			n.Data = n.Data + " replaced"
 		}

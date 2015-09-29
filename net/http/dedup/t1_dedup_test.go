@@ -1,7 +1,7 @@
-// +build weed1
-// go test -tags=weed1
+// +build dedup1
+// go test -tags=dedup1
 
-package weedout
+package dedup
 
 import (
 	"path"
@@ -99,7 +99,7 @@ func Test1(t *testing.T) {
 
 	}
 
-	doc := WeedOut(least3Files, lg, fs)
+	doc := Dedup(least3Files, lg, fs)
 
 	fNamer := domclean2.FileNamer(logDir, 0)
 	fNamer() // first call yields key
@@ -110,9 +110,3 @@ func Test1(t *testing.T) {
 	pf("correct finish\n")
 
 }
-
-// func weedoutFilename(articleId, weedoutStage int) (string, string) {
-// 	stagedFn := fmt.Sprintf("outp_%03v_%v.html", articleId, weedoutStage)
-// 	prefix := fmt.Sprintf("outp_%03v", articleId)
-// 	return stagedFn, prefix
-// }

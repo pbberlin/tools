@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import "golang.org/x/net/html"
 
@@ -8,7 +8,7 @@ import "golang.org/x/net/html"
 const cScaffoldLvls = 2
 
 const numTotal = 3 // comparable html docs, including base doc
-const stageMax = 3 // weedstages
+const stageMax = 4 // weedstages
 
 var URLs = []string{
 	"www.welt.de/politik/ausland/article146154432/Tuerkische-Bodentruppen-marschieren-im-Nordirak-ein.html",

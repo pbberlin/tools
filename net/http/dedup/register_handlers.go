@@ -1,4 +1,4 @@
-package weedout
+package dedup
 
 import (
 	"bytes"
@@ -19,22 +19,22 @@ import (
 // InitHandlers is called from outside,
 // and makes the EndPoints available.
 func InitHandlers() {
-	http.HandleFunc(routes.WeedOutURI, loghttp.Adapter(weedOutHTTP))
+	http.HandleFunc(routes.DedupURI, loghttp.Adapter(dedupHTTP))
 }
 
 // BackendUIRendered returns a userinterface rendered to HTML
 func BackendUIRendered() *bytes.Buffer {
 	var b1 = new(bytes.Buffer)
-	htmlfrag.Wb(b1, "Weed Out", "")
+	// htmlfrag.Wb(b1, "Deduplicate", "")
 
-	fullURL := fmt.Sprintf("%s?%s=%s&cnt=%v", routes.WeedOutURI, routes.URLParamKey, URLs[0], numTotal-1)
-	htmlfrag.Wb(b1, "Weed out", fullURL)
+	fullURL := fmt.Sprintf("%s?%s=%s&cnt=%v", routes.DedupURI, routes.URLParamKey, URLs[0], numTotal-1)
+	htmlfrag.Wb(b1, "Deduplicate", fullURL)
 
 	return b1
 }
 
-// weedOutHTTP wraps WeedOut()
-func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+// dedupHTTP wraps Dedup()
+func dedupHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
 	closureOverBuf := func(bUnused *bytes.Buffer) {
@@ -44,7 +44,7 @@ func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
-	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Weedout redundant stuff"}))
+	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Deduplicating redundant stuff"}))
 	defer wpf(b, tplx.Foot)
 
 	wpf(b, "<pre>")
@@ -77,7 +77,7 @@ func weedOutHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{
 
 	lg("Fetched and decoded; found %v", len(least3Files))
 	if len(least3Files) > 0 {
-		doc := WeedOut(least3Files, lg, fs)
+		doc := Dedup(least3Files, lg, fs)
 
 		fNamer := domclean2.FileNamer(logDir, 0)
 		fNamer() // first call yields key

@@ -146,6 +146,25 @@ func Dedup(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSy
 
 	dedupApply(doc, skipPrefixes)
 
+	// A special after dedup cleaning:
+	// Remove ol and cfrm attributes
+	var fr func(*html.Node)
+	fr = func(n *html.Node) {
+		if n.Type == html.ElementNode {
+			attr2 := make([]html.Attribute, 0, len(n.Attr))
+			for _, attr := range n.Attr {
+				if attr.Key != "ol" && attr.Key != "cfrm" {
+					attr2 = append(attr2, attr)
+				}
+			}
+			n.Attr = attr2
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			fr(c)
+		}
+	}
+	fr(doc)
+
 	if false {
 		// does not add value
 		var b7 bytes.Buffer

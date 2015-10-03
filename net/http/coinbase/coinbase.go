@@ -157,6 +157,8 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 	defer closureOverBuf(b) // the argument is ignored,
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
+	htmlfrag.SetNocacheHeaders(w)
+
 	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Payment confirmation"}))
 	defer wpf(b, tplx.Foot)
 

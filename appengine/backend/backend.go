@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/conv"
+	"github.com/pbberlin/tools/net/http/blchain"
 	"github.com/pbberlin/tools/net/http/dedup"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -32,6 +33,7 @@ func init() {
 	webapi.InitHandlers()
 	repo.InitHandlers()
 	dedup.InitHandlers()
+	blchain.InitHandlers()
 }
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -108,6 +110,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	uidedup := dedup.BackendUIRendered()
 	b1.Write(uidedup.Bytes())
+
+	b1.Write(blchain.BackendUIRendered().Bytes())
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

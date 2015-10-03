@@ -185,6 +185,13 @@ func BuffLoggerUniversal(w http.ResponseWriter, r *http.Request) (FuncBufUniv, *
 					Pf(b, r, t, a[1:]...)
 				}
 
+			case []byte:
+				if len(a) == 1 {
+					Pf(b, r, string(t))
+				} else {
+					Pf(b, r, string(t), a[1:]...)
+				}
+
 			case interface{}:
 				if err, ok := t.(error); ok {
 					if err != nil {

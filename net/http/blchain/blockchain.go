@@ -119,7 +119,11 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 }
 
-/**/
+/*
+
+
+
+*/
 func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	/*

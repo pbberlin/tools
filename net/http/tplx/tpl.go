@@ -86,7 +86,7 @@ const Head = `<!DOCTYPE html>
       body {font-family:tahoma; font-size: 15px;}
     </style>
     <span class='body'></span>
-  `
+      `
 
 // <span class='body'></span> is to parse out the body by splitting it.
 const Foot = `

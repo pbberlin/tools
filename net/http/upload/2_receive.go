@@ -14,6 +14,7 @@ import (
 	"archive/zip"
 
 	"appengine"
+	"appengine/memcache"
 )
 
 func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -163,6 +164,13 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 			}
 
 		}
+
+		errMc := memcache.Flush(appengine.NewContext(r))
+		if errMc != nil {
+			lg("Error flushing memache: %v", errMc)
+			return
+		}
+
 		lg("--------------------\n")
 
 	}

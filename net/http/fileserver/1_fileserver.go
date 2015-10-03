@@ -130,17 +130,24 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 	w.Header().Set("Content-Type", tp)
 
-	if strings.Contains(fullP, "tamper-monkey") {
-		htmlfrag.SetNocacheHeaders(w)
-	} else {
-		if false ||
-			ext == ".css" || ext == ".js" ||
-			ext == ".jpg" || ext == ".gif" ||
-			ext == "css" || ext == "js" ||
-			ext == "jpg" || ext == "gif" ||
-			false {
+	//
+	// caching
+	// either explicitly discourage
+	// or     explicitly  encourage
+	if false ||
+		ext == ".css" || ext == ".js" ||
+		ext == "css" || ext == "js" ||
+		ext == ".jpg" || ext == ".gif" ||
+		ext == "jpg" || ext == "gif" ||
+		false {
+
+		if strings.Contains(fullP, "tamper-monkey") {
+			htmlfrag.SetNocacheHeaders(w)
+		} else {
 			htmlfrag.CacheHeaders(w)
 		}
+	} else {
+		htmlfrag.SetNocacheHeaders(w)
 	}
 
 	w.Write(bts1)

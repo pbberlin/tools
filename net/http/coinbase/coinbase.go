@@ -5,10 +5,6 @@ package coinbase
 https://developers.coinbase.com/docs/merchants/payment-buttons
 
 
-
-
-
-
 app tec-news:
 	https://www.coinbase.com/oauth/applications/560fbcaca4221973720002c7
 
@@ -30,6 +26,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 
@@ -38,7 +35,6 @@ import (
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
-	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/stringspb"
 )
 
@@ -144,12 +140,6 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 */
 func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	/*
-
-
-	   http://abc.de/ef?input_transaction_hash=46178baf7de078954b5aebb71c12120b33d998faac1c165af195eae90f19b25c&shared=false&address=18tpXf8WWuhJP95JbDASbZvavmZJbrydut&destination_address=18tpXf8WWuhJP95JbDASbZvavmZJbrydut&input_address=1ZTnjSdknZvur9Gc73gvB8XBTWL7nV1m6&test=true&anonymous=false&confirmations=0&value=82493362&transaction_hash=46178baf7de078954b5aebb71c12120b33d998faac1c165af195eae90f19b25c
-	*/
-
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
 	closureOverBuf := func(bUnused *bytes.Buffer) {
 		loghttp.Pf(w, r, b.String())
@@ -159,27 +149,56 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 	htmlfrag.SetNocacheHeaders(w)
 
-	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Payment confirmation"}))
-	defer wpf(b, tplx.Foot)
+	//____________________________________________________________________
 
-	wpf(b, "<pre>")
-	defer wpf(b, "</pre>")
+	bts, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		lg("cannot read resp body: %v", err)
+		return
+	}
+	defer r.Body.Close()
 
-	err := r.ParseForm()
+	// lg("bytes are -%s-", stringspb.ToLen(string(bts), 20))
+
+	var mp map[string]interface{}
+	err = json.Unmarshal(bts, &mp)
 	lg(err)
 
-	custSecret := ""
-	if r.FormValue("customsecret") != "" {
-		custSecret = r.FormValue("customsecret")
-	}
-	lg("custom secret is %q", custSecret)
+	mpOrder := submap(mp, "order", lg)
+	lg("lo " + stringspb.IndentedDump(mpOrder))
 
-	val := ""
-	if r.FormValue("value") != "" {
-		val = r.FormValue("value")
-	}
-	lg("value is %q", val)
+	mpBTC := submap(mpOrder, "total_btc", lg)
+	lg("lo " + stringspb.IndentedDump(mpBTC))
+
+	// if branchTemp, ok := mp["order"]; ok {
+	// 	var okConv bool
+	// 	mp, okConv = branchTemp.(map[string]interface{})
+	// 	if !okConv {
+	// 		lg(" mp[order] of type %T ", branchTemp)
+	// 	}
+
+	// } else {
+	// 	lg("mp[order] not present")
+	// }
 
 	w.WriteHeader(http.StatusOK)
 
+}
+
+func submap(mpArg map[string]interface{}, key string, lg loghttp.FuncBufUniv) map[string]interface{} {
+
+	var mp map[string]interface{}
+
+	if branchTemp, ok := mpArg[key]; ok {
+		var okConv bool
+		mp, okConv = branchTemp.(map[string]interface{})
+		if !okConv {
+			lg(" mp[%v] of type %T ", key, branchTemp)
+		}
+
+	} else {
+		lg("mp[%v] not present", key)
+	}
+
+	return mp
 }

@@ -11,6 +11,8 @@
 // @match        *://*.handelsblatt.com/*
 // @match        *://*.focus.de/*
 // @match        *://*.economist.com/*
+// @exclude      *://*/*.png
+// @exclude      *://*/*.jpg
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 
 //  // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js

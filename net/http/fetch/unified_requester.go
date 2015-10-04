@@ -231,8 +231,11 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			dmp = ""
 			dmp += stringspb.IndentedDump(r.URL)
 
+			bts, errRd := ioutil.ReadAll(resp.Body)
+			if errRd != nil {
+				return nil, inf, fmt.Errorf("cannot read resp body: %v", errRd)
+			}
 			defer resp.Body.Close()
-			bts, _ := ioutil.ReadAll(resp.Body)
 
 			err2 := fmt.Errorf("resp %v: %v \n%v \n<pre>%s</pre>", resp.StatusCode, r.URL.String(), dmp, bts)
 
@@ -254,12 +257,11 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		}
 	}
 
-	defer resp.Body.Close()
 	bts, err := ioutil.ReadAll(resp.Body)
-
 	if err != nil {
 		return nil, inf, fmt.Errorf("cannot read resp body: %v", err)
 	}
+	defer resp.Body.Close()
 
 	// time stamp
 	var tlm time.Time // time last modified

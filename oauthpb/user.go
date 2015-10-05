@@ -24,14 +24,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello, %v, %v, %v, %v!", u, u.ID, u.Email, u.FederatedIdentity)
 }
 
-func Auth(r *http.Request) (bool, string) {
+func Auth(r *http.Request) (bool, *user.User, string) {
 
 	msg := ""
 	c := appengine.NewContext(r)
 
 	u := user.Current(c)
 	if appengine.IsDevAppServer() {
-		return true, "Logon always shines on DEV system."
+		return true, u, "Logon always shines on DEV system."
 	}
 	// var err error
 	// u, err = user.Current()
@@ -41,14 +41,14 @@ func Auth(r *http.Request) (bool, string) {
 
 	if u == nil {
 		msg += "google oauth required"
-		return false, msg
+		return false, nil, msg
 	}
 	if u.ID != "108853175242330402880" && u.ID != "S-1-5-21-2175189548-897864986-1736798499-1000" {
 		msg += "you need to be me; not " + u.ID
-		return false, msg
+		return false, u, msg
 	}
 
-	return true, msg
+	return true, u, msg
 
 }
 

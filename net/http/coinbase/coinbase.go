@@ -11,6 +11,7 @@ import (
 
 	"appengine"
 
+	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -213,6 +214,16 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 		lg("customer %#v  ", mpOrder["customer"])
 
 	}
+
+	blob := dsu.WrapBlob{
+		Name:  mpOrder["custom"].(string),
+		S:     mpOrder["status"].(string),
+		VByte: stringspb.IndentedDumpBytes(mpOrder),
+	}
+	// blob.VVByte, _ = conv.String_to_VVByte(b1.String())
+
+	_, err = dsu.BufPut(appengine.NewContext(r), blob, mpOrder["custom"].(string))
+	lg(err)
 
 	w.WriteHeader(http.StatusOK)
 	b = new(bytes.Buffer)

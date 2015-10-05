@@ -29,7 +29,7 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		return
 	}
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Receive an Upload"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Receive an Upload"}))
 	defer wpf(w, tplx.Foot)
 	wpf(w, "<pre>")
 	defer wpf(w, "</pre>")

@@ -2,7 +2,7 @@
 // @name         rightclick-menu
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.130
+// @version      0.131
 // @author       iche
 // @downloadURL  http://localhost:8085/mnt01/tamper-monkey-rightclick-menu.js
 // @updateURL    http://localhost:8085/mnt01/tamper-monkey-rightclick-menu.js //serving the head with possibly new version
@@ -10,9 +10,8 @@
 // @match        *://*.welt.de/*
 // @match        *://*.handelsblatt.com/*
 // @match        *://*.focus.de/*
-// @match        *://*.economist.com/*
-// @exclude      *://*/*.png
-// @exclude      *://*/*.jpg
+// @exclude        *://*/*.png
+// @exclude        *://*/*.jpg
 // // @include     /^https?:\/\/www.flickr.com\/.*/
 
 //  // @require      http://cdn.jsdelivr.net/jquery/2.1.3/jquery.min.js

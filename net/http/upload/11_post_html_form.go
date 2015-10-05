@@ -49,7 +49,7 @@ func sendUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 	lg, _ := loghttp.Logger(w, r)
 	// c := appengine.NewContext(r)
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Post an Upload"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Post an Upload"}))
 	defer wpf(w, tplx.Foot)
 
 	tData := map[string]string{"Url": UrlUploadReceive}

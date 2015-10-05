@@ -65,7 +65,7 @@ func BackendUIRendered() *bytes.Buffer {
 
 func lastMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "last Mountpoint"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "last Mountpoint"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>\n")
@@ -76,7 +76,7 @@ func lastMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 }
 func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint reset"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Mountpoint reset"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>\n")
@@ -88,7 +88,7 @@ func resetMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interf
 
 func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint increment"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Mountpoint increment"}))
 	defer wpf(w, "\n</pre>")
 
 	wpf(w, "<pre>\n")
@@ -103,7 +103,7 @@ func incrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 func decrMountPoint(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Mountpoint decrement"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Mountpoint decrement"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>\n")

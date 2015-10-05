@@ -26,7 +26,7 @@ var whichType = 0
 
 func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Set filesystem type"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Set filesystem type"}))
 	defer wpf(w, tplx.Foot)
 
 	stp := r.FormValue("type")
@@ -83,7 +83,7 @@ func runTestX(
 	f2 func(fsi.FileSystem) (*bytes.Buffer, string),
 ) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Run a test"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Run a test"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>\n")

@@ -7,7 +7,7 @@ import "appengine"
 const URLParamKey = "url-x"
 
 const ProxifyURI = "/prox"
-const DedupURI = "/weedout"
+const DedupURI = "/dedup"
 const FetchSimilarURI = "/fetch/similar"
 
 const FormRedirector = "/blob2/form-redirector"

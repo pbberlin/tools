@@ -51,7 +51,7 @@ func DeleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 	err := r.ParseForm()
 	lge(err)
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete Subtree for curr FS"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Delete Subtree for curr FS"}))
 	defer wpf(w, tplx.Foot)
 
 	if r.Method == "POST" {
@@ -95,7 +95,7 @@ func DeleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Delete all filesystem data"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Delete all filesystem data"}))
 	defer wpf(w, tplx.Foot)
 
 	confirm := r.FormValue("confirm")

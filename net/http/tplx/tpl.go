@@ -254,8 +254,7 @@ func FuncTplBuilder(w http.ResponseWriter, r *http.Request) (f1 func(string, str
 // must match key in data map[string]string{"ParamX":"Val"}
 // No panic
 // Returns the unexecuted template on error
-func ExecTplHelper(templateString string, data map[string]string) string {
-
+func ExecTplHelper(templateString string, data map[string]interface{}) string {
 	tplBase, err := tt.New("tplName").Parse(templateString) // tplName is irrelevant, only for inner reference if multiple templates were compiled into one
 	if err != nil {
 		return fmt.Sprintf("%v - tpl compilation failed: %v", templateString, err)

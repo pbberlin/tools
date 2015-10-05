@@ -1,27 +1,6 @@
 // Implements  coinbase.com integration
 package coinbase
 
-/*
-https://developers.coinbase.com/docs/merchants/payment-buttons
-
-
-app tec-news:
-	https://www.coinbase.com/oauth/applications/560fbcaca4221973720002c7
-
-	Developer access token
-	https://api.coinbase.com/v1/users/self/
-	?access_token=84a201e56a55185a785e707f952f8f5456f0ac6ec8f93465f12443ac0377a2ca
-
-
-	https://www.coinbase.com/oauth/authorize
-	?client_id=ca67d4b8b0fcfda6de7801cc225e03702d98a0e5a6e76d3d7478a9f08367fd3d
-	&redirect_uri=https%3A%2F%2Ftec-news.appspot.com%2Fcoinbase-integr%2Fconfirm
-	&response_type=code&scope=wallet%3Auser%3Aread
-
-
-
-*/
-
 import (
 	"bytes"
 	"encoding/json"
@@ -69,6 +48,19 @@ func BackendUIRendered() *bytes.Buffer {
 	return b1
 }
 
+/*
+
+requestPay is unused.
+
+We use payment buttons instead.
+https://developers.coinbase.com/docs/merchants/payment-buttons
+
+
+Oauth is also not used.
+Look here for a preconfigured app with oauth:
+	https://www.coinbase.com/oauth/applications/560fbcaca4221973720002c7
+
+*/
 func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
@@ -135,6 +127,23 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 /*
 
+https://developers.coinbase.com/docs/merchants/callbacks
+
+
+id				Order number used to uniquely identify an order on Coinbase
+completed_at	ISO 8601 timestamp when the order completed
+status			[completed, mispaid, expired]
+event			[completed, mispayment]. If mispayment => check key mispayment_id. Distinction from status ...
+total_btc		Total amount of the order in ‘satoshi’ (1 BTC = 100,000,000 Satoshi). Note the use of the word ‘cents’ in the callback really means satoshi in this context. The btc amount will be calculated at the current exchange rate at the time the order is placed (current to within 15 minutes).
+total_native	Units of local currency. 1 unit = 100 cents. Equal to the price from creating the button.
+total_payout	Units of local currency deposited using instant payout.
+custom			Custom parameter from data-custom attribute of button. Usually an Order, User, or Product ID
+receive_address	Bitcoin address associated with this order. This is where the payment was sent.
+button			Button details. ID matches the data-code parameter in your embedded HTML code.
+transaction		Hash and number of confirmations of underlying transaction.
+				Number of confirmations typically zero at the time of the first callback.
+customer		Customer information from order form. Can include email xor shipping address.
+refund_address	Experimental parameter that is subject to change.
 
 
 */
@@ -160,28 +169,53 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 	// lg("bytes are -%s-", stringspb.ToLen(string(bts), 20))
 
+	if len(bts) < 1 {
+		lg("lo empty post body")
+		w.WriteHeader(http.StatusOK)
+		b = new(bytes.Buffer)
+		return
+	}
+
 	var mp map[string]interface{}
 	err = json.Unmarshal(bts, &mp)
 	lg(err)
 
+	mpPayout := submap(mp, "payout", lg)
+	if len(mpPayout) > 0 {
+		lg("lo " + stringspb.IndentedDump(mpPayout))
+	}
+	mpAddress := submap(mp, "address", lg)
+	if len(mpAddress) > 0 {
+		lg("lo " + stringspb.IndentedDump(mpAddress))
+	}
+
 	mpOrder := submap(mp, "order", lg)
-	lg("lo " + stringspb.IndentedDump(mpOrder))
+	if len(mpOrder) > 0 {
+		lg("lo " + stringspb.IndentedDump(mpOrder))
 
-	mpBTC := submap(mpOrder, "total_btc", lg)
-	lg("lo " + stringspb.IndentedDump(mpBTC))
+		mpBTC := submap(mpOrder, "total_btc", lg)
+		// lg("lo " + stringspb.IndentedDump(mpBTC))
 
-	// if branchTemp, ok := mp["order"]; ok {
-	// 	var okConv bool
-	// 	mp, okConv = branchTemp.(map[string]interface{})
-	// 	if !okConv {
-	// 		lg(" mp[order] of type %T ", branchTemp)
-	// 	}
+		var cents float64
+		if icents, ok := mpBTC["cents"]; ok {
+			cents, ok = icents.(float64)
+			if !ok {
+				lg(" mpBTC[cents] is of type %T ", mpBTC["cents"])
+			}
 
-	// } else {
-	// 	lg("mp[order] not present")
-	// }
+		} else {
+			lg(" mpBTC[cents] not present")
+		}
+		lg("received %18.2f satoshi, %2.9v BTC ", cents, cents/(1000*1000*10))
+
+		lg("status    %v  ", mpOrder["status"])
+		lg("custom   %#v  ", mpOrder["custom"])
+		lg("customer %#v  ", mpOrder["customer"])
+
+	}
 
 	w.WriteHeader(http.StatusOK)
+	b = new(bytes.Buffer)
 
 }
 
@@ -197,7 +231,7 @@ func submap(mpArg map[string]interface{}, key string, lg loghttp.FuncBufUniv) ma
 		}
 
 	} else {
-		lg("mp[%v] not present", key)
+		// lg("mp[%v] not present", key)
 	}
 
 	return mp

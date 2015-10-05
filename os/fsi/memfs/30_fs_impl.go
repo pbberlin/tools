@@ -179,6 +179,8 @@ func (m *memMapFs) lookupUnderlyingFS(
 	origName string, // orig name has no mountname prefix á la mnt02
 ) (fsi.File, error) {
 
+	// log.Printf("check shadowFS  %q %q\n", nameMemFS, origName)
+
 	if m.shadow == nil { // no underlying filesystem
 		return nil, fsi.ErrFileNotFound
 	}
@@ -188,6 +190,8 @@ func (m *memMapFs) lookupUnderlyingFS(
 		return nil, fsi.ErrFileNotFound
 	}
 	defer fshad.Close()
+
+	// log.Printf("found in shadoFS  %q %q\n", nameMemFS, origName)
 
 	inf, err := fshad.Stat()
 	if err != nil {

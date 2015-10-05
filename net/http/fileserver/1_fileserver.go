@@ -46,7 +46,7 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	}
 	defer fclose()
 
-	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Half-Static-File-Server"}))
+	wpf(b1, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Half-Static-File-Server"}))
 	wpf(b1, "<pre>")
 
 	err := r.ParseForm()

@@ -8,10 +8,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"time"
 
 	"appengine"
 
-	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
@@ -253,10 +253,11 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 			blob.S = values.Get("productID")
 			blob.Desc = status
 			blob.F = BTC
+			blob.I = int(time.Now().Unix())
 
-			blob.VVByte, _ = conv.String_to_VVByte(string(blob.VByte)) // just to make it readable
+			// blob.VVByte, _ = conv.String_to_VVByte(string(blob.VByte)) // just to make it readable
 
-			newKey, err := dsu.BufPut(appengine.NewContext(r), blob, blob.Name)
+			newKey, err := dsu.BufPut(appengine.NewContext(r), blob, blob.Name+blob.S)
 			lg("key is %v", newKey)
 			lg(err)
 

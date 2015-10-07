@@ -11,6 +11,7 @@ import (
 
 	"appengine"
 
+	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
@@ -152,7 +153,7 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
 	closureOverBuf := func(bUnused *bytes.Buffer) {
-		loghttp.Pf(w, r, b.String())
+		// loghttp.Pf(w, r, b.String())
 	}
 	defer closureOverBuf(b) // the argument is ignored,
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
@@ -190,41 +191,86 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 		lg("lo " + stringspb.IndentedDump(mpAddress))
 	}
 
+	var cents, BTC float64
+	var status string
+
 	mpOrder := submap(mp, "order", lg)
-	if len(mpOrder) > 0 {
+	if len(mpOrder) < 1 {
+		w.WriteHeader(http.StatusLengthRequired)
+		lg("mpOrder not present %v", status)
+		return
+	} else {
 		lg("lo " + stringspb.IndentedDump(mpOrder))
 
 		mpBTC := submap(mpOrder, "total_btc", lg)
 		// lg("lo " + stringspb.IndentedDump(mpBTC))
 
-		var cents float64
 		if icents, ok := mpBTC["cents"]; ok {
 			cents, ok = icents.(float64)
 			if !ok {
-				lg(" mpBTC[cents] is of type %T ", mpBTC["cents"])
+				lg(" mpBTC[cents] is of unexpected type %T ", mpBTC["cents"])
 			}
+			BTC = cents / (1000 * 1000 * 100)
 
 		} else {
 			lg(" mpBTC[cents] not present")
 		}
-		lg("received %18.2f satoshi, %2.9v BTC ", cents, cents/(1000*1000*10))
+		lg("received %18.2f satoshi, %2.9v BTC ", cents, BTC)
 
-		lg("status    %v  ", mpOrder["status"])
+		if _, ok := mpOrder["status"]; ok {
+			status, ok = mpOrder["status"].(string)
+			if !ok {
+				lg(" mpOrder[status] is of unexpected type %T ", mpOrder["status"])
+			}
+		}
+
+		lg("status    %v  ", status)
 		lg("custom   %#v  ", mpOrder["custom"])
-		lg("customer %#v  ", mpOrder["customer"])
+		lg("customer %#v - mostly empty", mpOrder["customer"])
+
+		var values url.Values
+		if _, ok := mpOrder["custom"]; ok {
+			var err error
+			values, err = url.ParseQuery(mpOrder["custom"].(string))
+			lg(err)
+			if err != nil {
+				w.WriteHeader(http.StatusLengthRequired)
+				lg("unsatisfactory query in custom string %v", mpOrder["custom"])
+				return
+			}
+		} else {
+			w.WriteHeader(http.StatusLengthRequired)
+			lg("custom string not present")
+			return
+		}
+
+		//  save
+		if status == "completed" {
+			blob := dsu.WrapBlob{
+				VByte: stringspb.IndentedDumpBytes(mpOrder),
+			}
+			blob.Name = values.Get("uID")
+			blob.S = values.Get("productID")
+			blob.Desc = status
+			blob.F = BTC
+
+			blob.VVByte, _ = conv.String_to_VVByte(string(blob.VByte)) // just to make it readable
+
+			newKey, err := dsu.BufPut(appengine.NewContext(r), blob, blob.Name)
+			lg("key is %v", newKey)
+			lg(err)
+
+			retrieveAgain, err := dsu.BufGet(appengine.NewContext(r), "dsu.WrapBlob__"+blob.Name)
+			lg(err)
+			lg("retrieved %v %v %v", retrieveAgain.Name, retrieveAgain.Desc, retrieveAgain.F)
+
+		} else {
+			w.WriteHeader(http.StatusLengthRequired)
+			lg("unsatisfactory status %v", status)
+			return
+		}
 
 	}
-
-	blob := dsu.WrapBlob{
-		Name:  mpOrder["custom"].(string),
-		S:     mpOrder["status"].(string),
-		VByte: stringspb.IndentedDumpBytes(mpOrder),
-	}
-	// blob.VVByte, _ = conv.String_to_VVByte(b1.String())
-
-	_, err = dsu.BufPut(appengine.NewContext(r), blob, mpOrder["custom"].(string))
-	lg(err)
-
 	w.WriteHeader(http.StatusOK)
 	b = new(bytes.Buffer)
 

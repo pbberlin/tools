@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/pbberlin/tools/vendor/jwt-go"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 
@@ -17,8 +17,25 @@ import (
 func login(w http.ResponseWriter, r *http.Request) {
 
 	c := appengine.NewContext(r)
+	uType := ""
+
 	u := user.Current(c)
-	// u, _ := user.CurrentOAuth(c, scope)
+	if u != nil {
+		uType += "Normal "
+	}
+
+	u2, err := user.CurrentOAuth(c, "")
+	if err != nil {
+		uType += fmt.Sprintf("OAuth failed %v", err)
+	}
+	if u2 != nil {
+		uType += "OAuth2 "
+	}
+
+	// Replace
+	if u == nil {
+		u = u2
+	}
 
 	if u == nil {
 		url, err := user.LoginURL(c, r.URL.String())
@@ -32,6 +49,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// this gets never executed on dev server
 		fmt.Fprintf(w, "Hello, %v, %v, %v, %v!<br>\n", u, u.ID, u.Email, u.FederatedIdentity)
+		fmt.Fprintf(w, "Login type %v<br>\n", uType)
 		url2, err := user.LogoutURL(c, r.URL.String())
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -46,12 +64,11 @@ func Auth(r *http.Request) (bool, *user.User, string) {
 	msg := ""
 	c := appengine.NewContext(r)
 
-	u1 := user.Current(c)
+	u := user.Current(c)
 	u2, err := user.CurrentOAuth(c, "")
 	if err != nil {
-		log.Printf("oauth user err %v", err)
+		msg += fmt.Sprintf("oauth user err %v", err)
 	}
-	u := u1
 	if u == nil {
 		u = u2
 	}
@@ -85,6 +102,9 @@ func myLookupKey(k interface{}) (interface{}, error) {
 	return k, nil
 }
 
+//
+//	https://developers.google.com/identity/choose-auth
+//  https://developers.google.com/identity/sign-in/web/backend-auth
 func TokenSignin(w http.ResponseWriter, r *http.Request) {
 
 	lg, _ := loghttp.BuffLoggerUniversal(w, r)
@@ -147,7 +167,13 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 		if _, ok := token.Claims["sub"]; ok {
 			sb = token.Claims["sub"].(string)
 		}
-		w.Write([]byte("ID is " + sb + "\n"))
+		w.Write([]byte("ID from PWT is " + sb + "\n"))
+
+		_, usr, msg1 := Auth(r)
+		if usr != nil {
+			w.Write([]byte("ID from SRV is " + usr.ID + "\n"))
+		}
+		w.Write([]byte(msg1 + "\n"))
 
 	} else {
 		w.Write([]byte("tokensignin; INVALID. \n"))

@@ -1,11 +1,13 @@
 package oauthpb
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/vendor/jwt-go"
@@ -13,10 +15,6 @@ import (
 
 func init() {
 	http.HandleFunc("/tokensignin", TokenSignin)
-}
-
-func myLookupKey(k interface{}) (interface{}, error) {
-	return k, nil
 }
 
 //
@@ -50,10 +48,46 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return myLookupKey(token.Header["kid"])
+		return token.Header["kid"], nil
 	}
 
 	token, err := jwt.Parse(myToken, fc1)
+
+	if err != nil && strings.Contains(err.Error(), "mapping to PEM key is obsolete") {
+
+		currentPEMsURL := "https://www.googleapis.com/oauth2/v1/certs"
+		// fo := fetch.Options{URL: currentPEMsURL}
+
+		req, err := http.NewRequest("GET", currentPEMsURL, nil)
+		if err != nil {
+			lg("creation of pem request failed")
+			return
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		fo := fetch.Options{Req: req}
+		fo.KnownProtocol = "https"
+		fo.ForceHTTPSEvenOnDevelopmentServer = true
+		bts, inf, err := fetch.UrlGetter(r, fo)
+		lg(err)
+		if err != nil {
+			lg("tried to fetch %v, %v", currentPEMsURL, inf.URL)
+			lg("msg %v", inf.Msg)
+			return
+		}
+		if len(bts) > 200 {
+			var data1 map[string]string
+			err = json.Unmarshal(bts, &data1)
+			lg(err)
+			// lg(stringspb.IndentedDumpBytes(data1))
+			// w.Write(stringspb.IndentedDumpBytes(data1))
+			if len(data1) > 1 {
+				jwt.MappingToPEM = data1
+			}
+		}
+	}
+
+	token, err = jwt.Parse(myToken, fc1)
 
 	if err != nil && strings.Contains(err.Error(), jwt.ErrInvalidKey.Error()) {
 		w.Write([]byte("The submitted RSA Key was somehow unparseable. We still accept the token.\n"))

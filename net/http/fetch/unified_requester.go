@@ -31,7 +31,8 @@ type Options struct {
 
 	LogLevel int
 
-	KnownProtocol string
+	KnownProtocol                     string
+	ForceHTTPSEvenOnDevelopmentServer bool
 }
 
 // Response info
@@ -112,7 +113,7 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 		}
 
 		// appengine dev server => always fallback to http
-		if c != nil && appengine.IsDevAppServer() {
+		if c != nil && appengine.IsDevAppServer() && !options.ForceHTTPSEvenOnDevelopmentServer {
 			r.URL.Scheme = "http"
 		}
 	}

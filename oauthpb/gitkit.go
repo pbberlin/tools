@@ -16,11 +16,11 @@ import (
 )
 
 func init() {
-	http.HandleFunc("/auth", AuthIndex)
-	http.HandleFunc("/auth/authorized-redirect", AuthorizedRedirect)
-	http.HandleFunc("/auth/signin-success", SigninSuccess)
-	http.HandleFunc("/auth/signout", Signout)
-	http.HandleFunc("/auth/send-email", SendEmail)
+	// http.HandleFunc("/auth", AuthIndex)
+	// http.HandleFunc("/auth/authorized-redirect", AuthorizedRedirect)
+	// http.HandleFunc("/auth/signin-success", SigninSuccess)
+	// http.HandleFunc("/auth/signout", Signout)
+	// http.HandleFunc("/auth/send-email", SendEmail)
 }
 
 //
@@ -33,16 +33,6 @@ func init() {
 var CodeBaseDirectory = "/not-initialized"
 
 var client *gitkit.Client
-
-// Provide configuration. gitkit.LoadConfig() can also be used to load
-// the configuration from a JSON file.
-var gitkit_server_config_json = `{
-  "clientId": "153437159745-cong6hlqenujf9o8fvl0gvum5gb9np1t.apps.googleusercontent.com",
-  "widgetUrl": "https://tec-news.appspot.com/auth/authorized-redirect",
-  "serviceAccountPrivateKeyFile": "[CodeBaseDirectory]appaccess-only/tec-news-49bc2267287d.p12",
-  "cookieName": "gtoken"
-  "serviceAccountEmail": "153437159745-c79ndj0k7csi118tj489v14jkm7iln1f@developer.gserviceaccount.com",
-}`
 
 var config = &gitkit.Config{
 	ClientID:     "153437159745-cong6hlqenujf9o8fvl0gvum5gb9np1t.apps.googleusercontent.com",
@@ -99,7 +89,7 @@ func AuthIndex(w http.ResponseWriter, r *http.Request) {
 	w.Write(bts)
 
 	w.Write([]byte("<pre>\n"))
-	w.Write([]byte(gitkit_server_config_json))
+	w.Write([]byte(fmt.Sprintf("%#v", config)))
 	w.Write([]byte("</pre>\n"))
 	w.Write([]byte("<br>\n"))
 
@@ -123,7 +113,7 @@ func AuthorizedRedirect(w http.ResponseWriter, r *http.Request) {
   "signOutUrl": "https://tec-news.appspot.com/auth/signout",
   "oobActionUrl": "https://tec-news.appspot.com/auth/send-email",
   "apiKey": "AIzaSyAnarmnl8f0nHkGSqyU6CUdZxeN9e_5LhM",
-  "siteName": "this site",
+  "siteName": "tec-news-site-name",
   "signInOptions": ["password","google","facebook"]
 }`
 

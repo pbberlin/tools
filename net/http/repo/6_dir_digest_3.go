@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"path"
@@ -10,6 +11,8 @@ import (
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/fetch"
+	"github.com/pbberlin/tools/net/http/loghttp"
+	"golang.org/x/net/html"
 )
 
 // Fetches URL if local file is outdated.
@@ -103,6 +106,11 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 
 	m.lg("retrivd+saved %q; %vkB ", inf.URL.Host+inf.URL.Path, len(bts)/1024)
 
+	if len(bts) > 1024*1024-1 {
+		bts = removeScriptsAndComments(m.lg, bts)
+		m.lg("size reduzed to %vkB ", len(bts)/1024)
+	}
+
 	//
 	//
 	dir := path.Dir(fn)
@@ -117,4 +125,36 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 
 	return bts, inf.Mod, false, nil
 
+}
+
+func removeScriptsAndComments(lg loghttp.FuncBufUniv, bts []byte) []byte {
+	doc, err := html.Parse(bytes.NewReader(bts))
+	lg(err)
+	if err != nil {
+		return []byte{}
+	}
+	var fr func(*html.Node) // function recursive
+	fr = func(n *html.Node) {
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			fr(c)
+		}
+		removeUnwanted(n)
+
+	}
+	fr(doc)
+	var b bytes.Buffer
+	err = html.Render(&b, doc)
+	return b.Bytes()
+}
+
+func removeUnwanted(n *html.Node) {
+	cc := []*html.Node{}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		cc = append(cc, c)
+	}
+	for _, c := range cc {
+		if n.Type == html.ElementNode && n.Data == "script" || n.Type == html.CommentNode {
+			n.RemoveChild(c)
+		}
+	}
 }

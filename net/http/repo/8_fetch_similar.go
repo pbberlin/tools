@@ -80,7 +80,7 @@ func FetchSimilar(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 	start := time.Now()
 
-	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Find similar HTML URLs"}))
+	wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Find similar HTML URLs"}))
 	defer wpf(b, tplx.Foot)
 
 	wpf(b, "<pre>")

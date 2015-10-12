@@ -74,7 +74,7 @@ func FetchHTML(w http.ResponseWriter, r *http.Request, fcs []FetchCommand) {
 	fs := GetFS(appengine.NewContext(r))
 	// fs = fsi.FileSystem(memMapFileSys)
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Requesting files"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Requesting files"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>")

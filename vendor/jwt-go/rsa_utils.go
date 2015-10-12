@@ -49,6 +49,8 @@ var MappingToPEM = map[string]string{
 	"9015759ea37707cb6d325cca00e6299231b7f72f": "-----BEGIN CERTIFICATE-----\nMIIDJjCCAg6gAwIBAgIIF6DTc3dfzIQwDQYJKoZIhvcNAQEFBQAwNjE0MDIGA1UE\nAxMrZmVkZXJhdGVkLXNpZ25vbi5zeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbTAe\nFw0xNTEwMDgwNDI4MzRaFw0xNTEwMDkxNzI4MzRaMDYxNDAyBgNVBAMTK2ZlZGVy\nYXRlZC1zaWdub24uc3lzdGVtLmdzZXJ2aWNlYWNjb3VudC5jb20wggEiMA0GCSqG\nSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDerjHE9ShSDpOToUhwphHqgCCCUaFmqv4H\npanLmHicb/GRvYbzgnTx3fhVERTziiajR05kh0/6cZuzmKaqiDKJV4EMUI3LzbNc\nR3b38q2ZNhUjUR2xBoLnp1qN2+HI5fDrh3DpWjv5h8MAz+w8w94ZzfQlsONd3iCg\n3GUD4XXX0A88aqEj9ioW5CXXiMz644iopu3uWecvYKf2oyf0knR/S+EHz449k9Gd\n2Ao9Bz3kwWhGi1/Dj5Zbn1sbxY9pCVGLfZHyFHER6yZSe1XzFxCnyI3UZIl/kmM8\nIeAIf5fcrsHKzVHnVD2gUIRbtfmIwOmwfkWJ8j8VS+ctg3TWIIzhAgMBAAGjODA2\nMAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBYGA1UdJQEB/wQMMAoGCCsG\nAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4IBAQCewKRGFViLC94Dnhc9YUZWE1oatp2F\nw1El7EHMbSR1fTWo7hcZIdiPc1bewHrkW+mMHnKx8zYKiFagRk6sZdoGvBHeu2Oz\nLWtcnzEdj51z8/piLDfkZD3FZaCZlF66NnekGs1vq+2zmJRBGRSCuM5X18/OQKkz\nkyKIM36OQXzlpsMCoep3BRyKUgBUV6zCMOIpsVNzOj2sPIxZGguNYUMk899eDrFe\nEdvL1K92XOJPtteQW2a7yD2tA5ln3wdBbLkiZqpumGa55SobCB0tXCMUlhlcgAXv\n5ChR4JyWZ88gHRXiRpxR+9rYVnSChMw8I8suonfTus/CqLc152FGMory\n-----END CERTIFICATE-----\n",
 }
 
+var ErrPEMMappingObsolete = fmt.Errorf("mapping to PEM key is obsolete")
+
 // Parse PEM encoded PKCS1 or PKCS8 public key
 func ParseRSAPublicKeyFromPEM(key []byte) (*rsa.PublicKey, error) {
 	var err error
@@ -63,7 +65,7 @@ func ParseRSAPublicKeyFromPEM(key []byte) (*rsa.PublicKey, error) {
 			log.Printf("\n=====================\nreplaced %v with %v", len(skey), len(MappingToPEM[skey]))
 			log.Printf("%v", skey)
 		} else {
-			return nil, fmt.Errorf("mapping to PEM key is obsolete")
+			return nil, ErrPEMMappingObsolete
 		}
 	}
 

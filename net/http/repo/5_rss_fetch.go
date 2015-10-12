@@ -20,7 +20,7 @@ func rssDoc2DirTree(w http.ResponseWriter, r *http.Request, treeX *DirTree, rssD
 	_ = lg
 
 	if treeX == nil {
-		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now()}
+		treeX = &DirTree{Name: "root1", Dirs: map[string]DirTree{}, LastFound: time.Now().Truncate(time.Minute)}
 	}
 
 	articleList := []FullArticle{}

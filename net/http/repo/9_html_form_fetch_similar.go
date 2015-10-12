@@ -102,7 +102,7 @@ func fetchSimForm(w http.ResponseWriter, r *http.Request, m map[string]interface
 	}
 	if len(rURL) == 0 {
 
-		wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Find similar HTML URLs"}))
+		wpf(b, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Find similar HTML URLs"}))
 		defer wpf(b, tplx.Foot)
 
 		tm := map[string]string{

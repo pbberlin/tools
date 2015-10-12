@@ -96,6 +96,19 @@ func E(w http.ResponseWriter, r *http.Request,
 
 func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 
+	for idx, v := range vs {
+		switch v := v.(type) {
+		case []byte:
+			if len(v) > 1024*5 {
+				vs[idx] = v[:1024*5]
+			}
+		case string:
+			if len(v) > 1024*5 {
+				vs[idx] = v[:1024*5]
+			}
+		}
+	}
+
 	// Prepare the string
 	var s string
 	if len(vs) > 0 {

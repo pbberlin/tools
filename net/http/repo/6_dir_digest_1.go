@@ -117,7 +117,7 @@ func path2DirTree(lg loghttp.FuncBufUniv, treeX *DirTree, articles []FullArticle
 				if lvl > 0 {
 					trLp.Name = dir // lvl==0 => root
 				}
-				trLp.LastFound = art.Mod
+				trLp.LastFound = art.Mod.Truncate(time.Minute)
 
 				// lg("   %v, %v", dir, remainder)
 
@@ -133,7 +133,7 @@ func path2DirTree(lg loghttp.FuncBufUniv, treeX *DirTree, articles []FullArticle
 				// We "cannot assign" to map struct directly:
 				// trLp.Dirs[dir].LastFound = art.Mod   // fails with "cannot assign"
 				addressable := trLp.Dirs[dir]
-				addressable.LastFound = art.Mod
+				addressable.LastFound = art.Mod.Truncate(time.Minute)
 
 				// We can rely that the *last* dir or html is an endpoint.
 				// We cannot tell about higher paths, unless explicitly linked somewhere

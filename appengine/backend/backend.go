@@ -42,7 +42,7 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	w.WriteHeader(http.StatusOK)
 
 	b1 := new(bytes.Buffer)
-	b1.WriteString(tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Backend V1"}))
+	b1.WriteString(tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Backend V1"}))
 
 	htmlfrag.Wb(b1, "Debug pprof", "/debug/pprof")
 

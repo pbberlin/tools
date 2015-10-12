@@ -38,9 +38,6 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 	myToken := r.Form.Get("idtoken")
 	tokSize := fmt.Sprintf("Len of Tok was %v. \n", len(myToken))
 
-	// we can also verify the token from here:
-	// https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=XYZ123
-
 	fc1 := func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 
@@ -53,11 +50,10 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 
 	token, err := jwt.Parse(myToken, fc1)
 
-	if err != nil && strings.Contains(err.Error(), "mapping to PEM key is obsolete") {
+	// No direct error comparison possible; since err is wrapped in another struct
+	if err != nil && strings.Contains(err.Error(), jwt.ErrPEMMappingObsolete.Error()) {
 
 		currentPEMsURL := "https://www.googleapis.com/oauth2/v1/certs"
-		// fo := fetch.Options{URL: currentPEMsURL}
-
 		req, err := http.NewRequest("GET", currentPEMsURL, nil)
 		if err != nil {
 			lg("creation of pem request failed")
@@ -82,9 +78,13 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 			// lg(stringspb.IndentedDumpBytes(data1))
 			// w.Write(stringspb.IndentedDumpBytes(data1))
 			if len(data1) > 1 {
+				lg("PEM mappings updated")
 				jwt.MappingToPEM = data1
+			} else {
+				lg("PEM mapping response contained only %v records; bytes length %v", len(data1), len(bts))
 			}
 		}
+
 	}
 
 	token, err = jwt.Parse(myToken, fc1)
@@ -99,7 +99,7 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		w.Write([]byte(err.Error() + ".\n"))
+		w.Write([]byte("--- " + err.Error() + ".\n"))
 	}
 
 	if err == nil && token.Valid {
@@ -130,6 +130,9 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("tokensignin; INVALID. \n"))
 		w.Write([]byte(tokSize))
 		w.Write([]byte(stringspb.ToLen(myToken, 30)))
+
+		vrf := fmt.Sprintf("\nhttps://www.googleapis.com/oauth2/v3/tokeninfo?id_token=%v \n", myToken)
+		w.Write([]byte(vrf))
 	}
 
 }

@@ -23,7 +23,7 @@ func staticFetchViaPosting2Receiver(w http.ResponseWriter, r *http.Request, m ma
 
 	lg, lge := loghttp.Logger(w, r)
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "JSON Post"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "JSON Post"}))
 	defer wpf(w, tplx.Foot)
 
 	wpf(w, "<pre>")

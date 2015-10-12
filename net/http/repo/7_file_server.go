@@ -42,7 +42,7 @@ func GetFS(c appengine.Context) (fs fsi.FileSystem) {
 // should be used. Default is dsfs.
 func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]string{"HtmlTitle": "Set fetcher reservoir filesystem type"}))
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Set fetcher reservoir filesystem type"}))
 	defer wpf(w, tplx.Foot)
 
 	stp := r.FormValue("type")

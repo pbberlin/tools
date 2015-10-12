@@ -71,8 +71,8 @@ function PopupContent(obj){
     }
     
     var formHtml = "";
-    var prox01 = "http://localhost:8085/weedout";
-    var prox02 = "https://libertarian-islands.appspot.com/weedout";
+    var prox01 = "http://localhost:8085/dedup";
+    var prox02 = "https://libertarian-islands.appspot.com/dedup";
 
     formHtml += "<form action='"+prox01+"' method='post' ";
     formHtml += "    target='proxy-window' >";

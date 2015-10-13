@@ -1,5 +1,14 @@
 // Taken from
 // https://github.com/googlesamples/identity-toolkit-go/tree/master/favweekday
+//
+// The complete concept is expained here:
+// https://developers.google.com/identity/toolkit/web/federated-login
+// https://developers.google.com/identity/choose-auth
+// https://developers.google.com/identity/toolkit/web/configure-service
+//
+//
+//
+// https://developers.facebook.com/apps/942324259171809/dashboard
 package oauthpb
 
 import (
@@ -10,14 +19,16 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/adg/xsrftoken"
+	"github.com/adg/xsrftoken" // issues certificates (tokens) for possible http requests, making other requests impossible
+
 	"github.com/google/identity-toolkit-go-client/gitkit"
-	"github.com/gorilla/mux"
+	gorillaContext "github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 
 	"google.golang.org/appengine"
@@ -28,25 +39,18 @@ import (
 
 // Templates file path.
 const (
-	homeTemmplatePath  = "home.tmpl"
-	gitkitTemplatePath = "gitkit.tmpl"
+	homeTplPath   = "home.tmpl"
+	gitkitTplPath = "gitkit.tmpl"
 )
 
 // Action URLs.
 const (
-	homeAndSigninSuccessURL = "/auth"
-	widgetURL               = "/auth/authorized-redirect"
-	signOutURL              = "/auth/signout"
-	oobActionURL            = "/auth/send-email"
-	updateURL               = "/auth/update"
-	deleteAccountURL        = "/auth/deleteAccount"
-)
-
-const (
-// homeAndSigninSuccessURL = "/gitkit-example"
-// widgetURL        = "/gitkit-example/gitkit"
-// signOutURL       = "/gitkit-example/signOut"
-// oobActionURL     = "/gitkit-example/oobAction"
+	homeAndSigninSuccessURL           = "/auth"
+	widgetSigninAuthorizedRedirectURL = "/auth/authorized-redirect"
+	signOutURL                        = "/auth/signout"
+	oobActionURL                      = "/auth/send-email"
+	updateURL                         = "/auth/update"
+	deleteAccountURL                  = "/auth/deleteAccount"
 )
 
 // Identity toolkit configurations.
@@ -58,9 +62,16 @@ const (
 	serviceAccount = "153437159745-c79ndj0k7csi118tj489v14jkm7iln1f@developer.gserviceaccount.com"
 )
 
+// The pseudo absolute path to the pem keyfile
 var privateKeyPath = "[CodeBaseDirectory]appaccess-only/tec-news-49bc2267287d.pem"
 
 func init() {
+	var err error
+	CodeBaseDirectory, err = os.Getwd()
+	if err != nil {
+		panic("could not call the code base directory: " + err.Error() + "<br>\n")
+	}
+	// Make the path working
 	CodeBaseDirectory = path.Clean(CodeBaseDirectory) // remove trailing slash
 	if !strings.HasSuffix(CodeBaseDirectory, "/") {
 		CodeBaseDirectory += "/"
@@ -76,7 +87,8 @@ const (
 	favoriteName     = "favorite"
 )
 
-// Email templates.
+// Email templates for OOB action
+// OOB is "out of band"
 const (
 	emailTemplateResetPassword = `<p>Dear user,</p>
 <p>
@@ -108,8 +120,8 @@ To change your account email address, click on the link below (or copy and paste
 )
 
 var (
-	homeTemplate   = template.Must(template.ParseFiles("templates/" + homeTemmplatePath))
-	gitkitTemplate = template.Must(template.ParseFiles("templates/" + gitkitTemplatePath))
+	homeTemplate   = template.Must(template.ParseFiles("templates/" + homeTplPath))
+	gitkitTemplate = template.Must(template.ParseFiles("templates/" + gitkitTplPath))
 
 	weekdays = []time.Weekday{
 		time.Sunday,
@@ -134,28 +146,28 @@ type User struct {
 	EmailVerified bool
 }
 
+// Key used to store the user information in the current session.
 type SessionUserKey int
 
-// Key used to store the user information in the current session.
 const sessionUserKey SessionUserKey = 0
 
+//
 // currentUser extracts the user information stored in current session.
 //
-// If there is no existing session, identity toolkit token is checked. If the
-// token is valid, a new session is created.
+// If there is no existing session, identity toolkit token is checked.
+// If the token is valid, a new session is created.
 //
 // If any error happens, nil is returned.
 func currentUser(r *http.Request) *User {
 	c := appengine.NewContext(r)
-	s, _ := cookieStore.Get(r, sessionName)
-	if s.IsNew {
+	sess, _ := cookieStore.Get(r, sessionName)
+	if sess.IsNew {
 		// Create an identity toolkit client associated with the GAE context.
 		client, err := gitkit.NewWithContext(c, gitkitClient)
 		if err != nil {
 			aelog.Errorf(c, "Failed to create a gitkit.Client with a context: %s", err)
 			return nil
 		}
-
 		// Extract the token string from request.
 		ts := client.TokenFromRequest(r)
 		if ts == "" {
@@ -186,7 +198,7 @@ func currentUser(r *http.Request) *User {
 		}
 	} else {
 		// Extracts user from current session.
-		v, ok := s.Values[sessionUserKey]
+		v, ok := sess.Values[sessionUserKey]
 		if !ok {
 			aelog.Errorf(c, "no user found in current session")
 		}
@@ -199,9 +211,9 @@ func saveCurrentUser(r *http.Request, w http.ResponseWriter, u *User) {
 	if u == nil {
 		return
 	}
-	s, _ := cookieStore.Get(r, sessionName)
-	s.Values[sessionUserKey] = *u
-	err := s.Save(r, w)
+	sess, _ := cookieStore.Get(r, sessionName)
+	sess.Values[sessionUserKey] = *u
+	err := sess.Save(r, w)
 	if err != nil {
 		aelog.Errorf(appengine.NewContext(r), "Cannot save session: %s", err)
 	}
@@ -252,19 +264,30 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		xf = xsrftoken.Generate(xsrfKey, u.ID, updateURL)
 		xd = xsrftoken.Generate(xsrfKey, u.ID, deleteAccountURL)
 	}
-	homeTemplate.Execute(
-		w,
-		struct {
-			WidgetURL              string
-			SignOutURL             string
-			User                   *User
-			WeekdayIndex           int
-			Weekdays               []time.Weekday
-			UpdateWeekdayURL       string
-			UpdateWeekdayXSRFToken string
-			DeleteAccountURL       string
-			DeleteAccountXSRFToken string
-		}{widgetURL, signOutURL, u, int(d), weekdays, updateURL, xf, deleteAccountURL, xd})
+	// homeTemplate.Execute(
+	// 	w,
+	// 	struct {
+	// 		widgetURL              string
+	// 		SignOutURL             string
+	// 		User                   *User
+	// 		WeekdayIndex           int
+	// 		Weekdays               []time.Weekday
+	// 		UpdateWeekdayURL       string
+	// 		UpdateWeekdayXSRFToken string
+	// 		DeleteAccountURL       string
+	// 		DeleteAccountXSRFToken string
+	// 	}{widgetSigninAuthorizedRedirectURL, signOutURL, u, int(d), weekdays, updateURL, xf, deleteAccountURL, xd})
+	homeTemplate.Execute(w, map[string]interface{}{
+		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
+		"SignOutURL":             signOutURL,
+		"User":                   u,
+		"WeekdayIndex":           d,
+		"Weekdays":               weekdays,
+		"UpdateWeekdayURL":       updateURL,
+		"UpdateWeekdayXSRFToken": xf,
+		"DeleteAccountURL":       deleteAccountURL,
+		"DeleteAccountXSRFToken": xd,
+	})
 }
 
 func handleWidget(w http.ResponseWriter, r *http.Request) {
@@ -273,21 +296,21 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 	b, _ := ioutil.ReadAll(r.Body)
 	body, _ := url.QueryUnescape(string(b))
 	gitkitTemplate.Execute(
-		w,
-		struct {
+		w, struct {
 			BrowserAPIKey    string
 			SignInSuccessUrl string
+			SignOutURL       string
 			OOBActionURL     string
 			POSTBody         string
-		}{browserAPIKey, homeAndSigninSuccessURL, oobActionURL, body})
+		}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL, body})
 }
 
 func handleSignOut(w http.ResponseWriter, r *http.Request) {
-	s, _ := cookieStore.Get(r, sessionName)
-	s.Options = &sessions.Options{
+	sess, _ := cookieStore.Get(r, sessionName)
+	sess.Options = &sessions.Options{
 		MaxAge: -1, // MaxAge<0 means delete session cookie.
 	}
-	err := s.Save(r, w)
+	err := sess.Save(r, w)
 	if err != nil {
 		aelog.Errorf(appengine.NewContext(r), "Cannot save session: %s", err)
 	}
@@ -372,6 +395,17 @@ out:
 	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
 }
 
+/*
+
+Failed to delete user {ID:14423325142879445183 Email:peter.buchmann.68@gmail.com
+Name:Peter Buchmann EmailVerified:true}:
+googleapi: Error 400: INVALID_LOCAL_ID, invalid
+
+Failed to delete 00880189686365773816
+
+
+Failed to delete user {ID: }: googleapi: Error 400: INVALID_LOCAL_ID, invalid
+*/
 func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	var (
@@ -398,11 +432,13 @@ func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 	// Delete account.
 	err = client.DeleteUser(&gitkit.User{LocalID: u.ID})
 	if err != nil {
-		aelog.Errorf(c, "Failed to delete user %+v: %s", *u, err)
+		aelog.Errorf(c, "Failed to delete user %v %v: %s", u.ID, u.Email, err)
 		goto out
 	}
-	// Account deletion succeeded. Call sign out to clear session and identity
-	// toolkit token.
+	// Account deletion succeeded.
+	// Call sign out to clear session and identity toolkit token.
+	aelog.Infof(c, "Account deletion succeeded")
+
 	handleSignOut(w, r)
 	return
 out:
@@ -422,7 +458,7 @@ func init() {
 		[]byte("My very secure authentication key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:64],
 		[]byte("My very secure encryption key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:32])
 	cookieStore.Options = &sessions.Options{
-		MaxAge:   86400 * 7, // Session valid for one week.
+		MaxAge:   3600 * 2, // Session valid for tow hours.
 		HttpOnly: true,
 	}
 
@@ -430,7 +466,7 @@ func init() {
 	c := &gitkit.Config{
 		ServerAPIKey: serverAPIKey,
 		ClientID:     clientID,
-		WidgetURL:    widgetURL,
+		WidgetURL:    widgetSigninAuthorizedRedirectURL,
 	}
 	// Service account and private key are not required in GAE Prod.
 	// GAE App Identity API is used to identify the app.
@@ -444,18 +480,19 @@ func init() {
 		log.Fatal(err)
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc(homeAndSigninSuccessURL, handleHome)
-	r.HandleFunc(widgetURL, handleWidget)
-	r.HandleFunc(signOutURL, handleSignOut)
-	r.HandleFunc(oobActionURL, handleOOBAction)
-	r.HandleFunc(updateURL, handleUpdate)
-	r.HandleFunc(deleteAccountURL, handleDeleteAccount)
+	// The gorilla sessions use gorilla request context
+	ClearHandler := func(fc http.HandlerFunc) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer gorillaContext.Clear(r)
+			fc(w, r)
+		})
+	}
+
 	// http.Handle(homeAndSigninSuccessURL, r)
-	http.Handle(homeAndSigninSuccessURL, r)
-	http.Handle(widgetURL, r)
-	http.Handle(signOutURL, r)
-	http.Handle(oobActionURL, r)
-	http.Handle(updateURL, r)
-	http.Handle(deleteAccountURL, r)
+	http.Handle(homeAndSigninSuccessURL, ClearHandler(handleHome))
+	http.Handle(widgetSigninAuthorizedRedirectURL, ClearHandler(handleWidget))
+	http.Handle(signOutURL, ClearHandler(handleSignOut))
+	http.Handle(oobActionURL, ClearHandler(handleOOBAction))
+	http.Handle(updateURL, ClearHandler(handleUpdate))
+	http.Handle(deleteAccountURL, ClearHandler(handleDeleteAccount))
 }

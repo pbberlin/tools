@@ -30,7 +30,6 @@ func init() {
 
 //
 // Server configuration
-var CodeBaseDirectory = "/not-initialized"
 
 var client *gitkit.Client
 
@@ -39,6 +38,8 @@ var config = &gitkit.Config{
 	WidgetURL:    "[protoc_host]/auth/authorized-redirect",
 	ServerAPIKey: "AIzaSyCnFQTG9WlS-y-eDpv3GtCUQhsUy61q8B8",
 }
+
+var CodeBaseDirectory = "/not-initialized"
 
 func init() {
 	var err error
@@ -108,13 +109,13 @@ func AuthorizedRedirect(w http.ResponseWriter, r *http.Request) {
 
 	// JavaScript init:
 	str := `{
-  "widgetUrl": "https://tec-news.appspot.com/auth/authorized-redirect",
+  "widgetUrl":        "https://tec-news.appspot.com/auth/authorized-redirect",
   "signInSuccessUrl": "https://tec-news.appspot.com/auth/signin-success",
-  "signOutUrl": "https://tec-news.appspot.com/auth/signout",
-  "oobActionUrl": "https://tec-news.appspot.com/auth/send-email",
-  "apiKey": "AIzaSyAnarmnl8f0nHkGSqyU6CUdZxeN9e_5LhM",
-  "siteName": "tec-news-site-name",
-  "signInOptions": ["password","google","facebook"]
+  "signOutUrl":       "https://tec-news.appspot.com/auth/signout",
+  "oobActionUrl":     "https://tec-news.appspot.com/auth/send-email",
+  "apiKey":           "AIzaSyAnarmnl8f0nHkGSqyU6CUdZxeN9e_5LhM",
+  "siteName":         "tec-news-site-name",
+  "signInOptions":   ["password","google","facebook"]
 }`
 
 	w.Write([]byte(str))

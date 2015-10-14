@@ -4,11 +4,14 @@
 // The complete concept is expained here:
 // https://developers.google.com/identity/toolkit/web/federated-login
 // https://developers.google.com/identity/choose-auth
-// https://developers.google.com/identity/toolkit/web/configure-service
 //
+// https://developers.google.com/identity/toolkit/web/configure-service
+// https://developers.google.com/identity/toolkit/web/setup-frontend
 //
 //
 // https://developers.facebook.com/apps/942324259171809/dashboard
+// peter.buchmann.68@gmail.com => 14952300052240127534
+// peter.buchmann@web.de       => 14119357422359180555
 package oauthpb
 
 import (
@@ -39,8 +42,8 @@ import (
 
 // Templates file path.
 const (
-	homeTplPath   = "home.tmpl"
-	gitkitTplPath = "gitkit.tmpl"
+	homeTplPath   = "home.html"
+	gitkitTplPath = "gitkit.html"
 )
 
 // Action URLs.
@@ -51,6 +54,7 @@ const (
 	oobActionURL                      = "/auth/send-email"
 	updateURL                         = "/auth/update"
 	deleteAccountURL                  = "/auth/deleteAccount"
+	accountChooserBrandingURL         = "/auth/accountChooserBranding.html"
 )
 
 // Identity toolkit configurations.
@@ -445,6 +449,29 @@ out:
 	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
 }
 
+// dynamic execution required because of Access-Control header ...
+func accountChooserBranding(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	str := `<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body>
+    <div style="width:256px;margin:auto">
+      <img src="/img/house-of-cards-mousepointer-03-04.gif" 
+      	style="display:block;height:120px;margin:auto">
+      <p style="font-size:14px;opacity:.54;margin-top:20px;text-align:center">
+        Welcome to tec-news insights.
+      </p>
+    </div>
+  </body>
+</html>`
+
+	w.Write([]byte(str))
+
+}
+
 func init() {
 	// Register datatypes such that it can be saved in the session.
 	gob.Register(SessionUserKey(0))
@@ -495,4 +522,5 @@ func init() {
 	http.Handle(oobActionURL, ClearHandler(handleOOBAction))
 	http.Handle(updateURL, ClearHandler(handleUpdate))
 	http.Handle(deleteAccountURL, ClearHandler(handleDeleteAccount))
+	http.HandleFunc(accountChooserBrandingURL, accountChooserBranding)
 }

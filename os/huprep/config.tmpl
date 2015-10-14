@@ -1,0 +1,153 @@
+# theme to use (located in /themes/THEMENAME/)
+#theme = "angels-ladder"	# no graphics garbage
+#theme = "bootie-docs"  	# categories and tags in header, content outline right
+#theme = "hugo-bootswatch"	# section menu, pages, total scrolldown
+#theme = "hugo-incorporated"# rss
+#theme = "hugoscroll"		# flashy modern - total scrolldown
+#theme = "hyde"				# nice left bar, nice outline, nothing else
+#theme = "hyde-x"			# categories, x-minute read
+#theme = "hugo-uno"  		# no tags, 
+#theme = "journal"			# categories, tags, bad outline, nice colors
+#theme = "material-design"  # three column homepage, non-aligned
+#theme = "nofancy"			# really nice
+#theme = "polymer"			# blocks for the blind
+#theme = "redlounge"		# contents block at the right, FAVOIRTE
+#theme = "vienna"       	# older-newer navigation, FAVOIRTE
+
+
+theme = "journal" 
+
+#contentdir = ["cnt_econ", "cnt_tec", "cnt_psych"]
+contentdir = "{{ .ContentDir }}"
+
+#title = ["An econ perspective on technology", "Psychology and Sociology"]
+title = "{{ .SiteTitle }}"
+
+
+
+#baseurl = "http://libertarian-islands.appspot.com/"
+#baseurl = "/mnt02/"
+#baseurl = ""
+baseurl = "/"
+
+# if true  - causes absolute urls
+# if false - the subdirectory of baseURL is not always respected
+canonifyurls = true
+
+# if true, use /filename.html instead of /filename/
+uglyURLs = false
+
+# see permalinks section
+
+# main mnuSections contains page types
+SectionPagesMenu = "mnuSections"  
+
+
+languageCode = "en-us"
+copyright = "All rights reserved - 2015"
+
+builddrafts  = false
+buildfutures = true
+
+
+footnoteAnchorPrefix = 		  ""
+footnoteReturnLinkContents =  ""
+
+
+# "yaml", "toml", "json"
+metaDataFormat = "toml"
+
+paginate     = 5
+paginatePath = "page"
+
+
+# color-codes for highlighting derived from this style
+pygmentsStyle = "monokai"
+# true = use pygments-css or false = color-codes directly
+pygmentsUseClasses = false
+
+
+
+
+# ====================================
+# Enable Logging
+log = true
+# Log File path (if set, logging enabled automatically)
+logFile = "./hugo1.log"
+# verbose output
+verbose    = false
+verboseLog = true
+# display memory and timing of different steps of the program
+stepAnalysis = true
+
+# Pluralize titles in lists using inflect
+pluralizeListTitles = false
+
+
+
+#    :year :month :monthname :day :weekday :weekdayname :yearday 
+#    :section 		the content’s section
+#    :title 		the content’s title
+#    :slug 			the content’s slug (or title if no slug)
+#    :filename 		the content’s filename (without extension)
+
+[permalinks]
+	page = "/:section/:filename/"
+	#post = "/:year/:month/:title/"
+	post = "/:section/:slug/"
+	hurt = "/:section/:title/"
+
+
+[taxonomies]
+	category = "categories"
+	tag = "tags"
+
+
+[[menu.mn01]]
+	name = "Grow from fear"
+	pre = "<i class='fa fa-road'></i>"
+	weight = 100
+	url = "www.libertarian-islands.appspot.com"
+
+[[menu.mn01]]
+	name = "Surviving losses"
+	pre = "<i class='fa fa-road'></i>"
+	weight = 100
+	url = "www.libertarian-islands.appspot.com"
+
+
+# becomes => .Site.Params.AuthorName
+[params]
+	#ContentGroup = ["economics", "other"]
+	ContentGroup = "{{ .ContentGroup }}"
+
+	description = "It's no conspiracy when union members all want higher pay"
+	Subtitle = "Resist Kafka's castle"
+	author = "pbberlin"
+	AuthorName = "Peter Buchmann"
+
+	SidebarRecentLimit = 5
+
+	# disqusShortname = As configured sitename at disqus.com, i.e. "tec-news"
+	disqusShortname = "{{ .DisqusShortname }}"
+
+	GitHubUser  = "pbberlin"
+	facebook    = "pbberlin"
+	twitter     = "peter_buchmann" 
+	twitterName = "peter_buchmann"
+	github      = "pbberlin"
+	githubName  = "pbberlin"
+
+	profile   = "https://pbs.twimg.com/profile_images/487225427178434562/Yyb2hiOm_400x400.jpeg" 
+	analytics = "32168" 
+
+	[[params.social]]
+	    title = "twitter"
+	    url = "https://twitter.com/peter_buchmann"
+	[[params.social]]
+	    title = "github"
+	    url = "https://github.com/pbberlin"
+
+
+
+

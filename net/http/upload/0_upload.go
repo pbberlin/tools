@@ -1,6 +1,5 @@
 // Package upload posts, receives, unpacks and serves zipped files;
-// It also provides quasi static fileservers
-//
+// It also provides a quasi static fileservers
 package upload
 
 import (

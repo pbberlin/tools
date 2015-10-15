@@ -1,3 +1,6 @@
+// hugoprep is a utility to customize a hugo-config.toml,
+// to statify, to replace strings, to zip-compress,
+// to upload.
 package main
 
 import (
@@ -9,8 +12,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/pbberlin/tools/net/http/upload"
@@ -257,6 +262,12 @@ func prepareConfigToml(name, arg2 string) {
 
 		}
 
+	}
+	log.Printf("====== upload completed ==============\n")
+
+	for {
+		time.Sleep(100 * time.Millisecond)
+		runtime.Gosched()
 	}
 
 }

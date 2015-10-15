@@ -7,8 +7,11 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/pbberlin/tools/os/fsi/common"
+
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 
 	"archive/zip"
@@ -144,7 +147,9 @@ func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interfac
 						return
 					}
 
-					err = fs1.WriteFile(path.Join(dir, bname), bts.Bytes(), 0777)
+					err = common.WriteFile(fsi.FileSystem(fs1), path.Join(dir, bname), bts.Bytes())
+
+					// err = fs1.WriteFile(path.Join(dir, bname), bts.Bytes(), 0777)
 					if err != nil {
 						lg("WriteFile of zipped file %v failed: %v", newFilename, err)
 						return

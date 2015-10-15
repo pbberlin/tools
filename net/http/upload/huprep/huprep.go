@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -84,7 +85,7 @@ func prepareConfigToml(name, arg2 string) {
 		log.Printf("did not find or too tiny file %v - %v\n", name+".json", err)
 		os.Exit(1)
 	}
-	var data1 map[string]string
+	var data1 map[string]interface{}
 	err = json.Unmarshal(bts, &data1)
 	if err != nil {
 		log.Printf("unmarshalling failed %v - %v\n", name+".json", err)
@@ -152,7 +153,7 @@ func prepareConfigToml(name, arg2 string) {
 	}
 	log.Printf("statified...\n")
 
-	paths := []string{}
+	paths1 := []string{}
 
 	//
 	//
@@ -160,8 +161,8 @@ func prepareConfigToml(name, arg2 string) {
 	type WalkFunc func(path string, info os.FileInfo, err error) error
 	fc := func(path string, info os.FileInfo, err error) error {
 
-		if !info.IsDir() {
-			paths = append(paths, path)
+		if !info.IsDir() || true {
+			paths1 = append(paths1, path)
 		}
 
 		if ext := filepath.Ext(path); ext == ".html" {
@@ -198,16 +199,64 @@ func prepareConfigToml(name, arg2 string) {
 	curdir, _ = os.Getwd()
 	log.Printf("curdir now %v\n", curdir)
 
-	for idx, path := range paths {
+	paths2 := make([]string, 0, len(paths1))
+	for _, path := range paths1 {
+		if path == "./cnt_statified" {
+			continue
+		}
 		pathAfter := strings.TrimPrefix(path, "cnt_statified")
 		if strings.HasPrefix(pathAfter, "/") || strings.HasPrefix(pathAfter, "\\") {
 			pathAfter = pathAfter[1:]
 		}
-		paths[idx] = pathAfter
+		paths2 = append(paths2, pathAfter)
 		// log.Printf("%-54v %-54v", path, pathAfter)
 	}
 
-	osutilpb.CreateZipFile(paths, "cnt_statified.zip")
+	osutilpb.CreateZipFile(paths2, "cnt_statified.zip")
 	log.Printf("=========zip-file-created=============\n")
+
+	if tgs, ok := data1["targets"]; ok {
+		log.Printf("\t found targets ...")
+		if tgs1, ok := tgs.(map[string]interface{}); ok {
+			log.Printf("\t   ... %v urls - map[string]interface{} \n", len(tgs1))
+
+			for _, v := range tgs1 {
+				v1 := v.(string)
+				// curl --verbose -F mountname=mnt02 -F filefield=@cnt_statified.zip subdm.appspot.com/filesys/post-upload-receive
+				//                -F, --form CONTENT  Specify HTTP multipart POST data
+
+				// We could also use
+				// req, err := upload.CreateFilePostRequest(effUpUrl, "filefield", filePath, extraParams)
+				// and client.Do(req)
+
+				log.Printf("\t trying upload %v\n", v1)
+				if ok := osutilpb.ExecCmdWithExitCode("curl", "--verbose",
+					"-F", "mountname=mnt02",
+					"-F", "filefield=@cnt_statified.zip",
+					v1); !ok {
+					return
+				}
+
+				// Prepend a protocol for url.Parse to behave as desired
+				if !strings.HasPrefix(v1, "http://") && !strings.HasPrefix(v1, "https://") {
+					v1 = "https://" + v1
+				}
+				url2, err := url.Parse(v1)
+				if err != nil {
+					log.Printf("could not parse url: %q - %v\n", v1, err)
+					return
+				}
+
+				url2.Path = "/reset-memfs"
+				log.Printf("\t trying reset memfs %v\n", url2.Host+url2.Path)
+				if ok := osutilpb.ExecCmdWithExitCode("curl", "--verbose", url2.Host+url2.Path); !ok {
+					return
+				}
+
+			}
+
+		}
+
+	}
 
 }

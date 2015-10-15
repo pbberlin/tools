@@ -1,5 +1,8 @@
-// Package osutilpb reads and writes files with maximum convenience.
 package osutilpb
+
+/*
+	use fsi/common/convenience funcs instead
+*/
 
 import (
 	"bytes"

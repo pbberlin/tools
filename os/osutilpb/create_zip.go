@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 func CreateZipFile(files []string, archiveName string) {
@@ -14,18 +15,30 @@ func CreateZipFile(files []string, archiveName string) {
 
 	// Add some files to the archive.
 	for _, fn := range files {
-		f, err := w.Create(fn)
+
+		fi, err := os.Stat(fn)
 		if err != nil {
 			log.Fatal(err)
 		}
-		bts, err := ioutil.ReadFile(fn)
-		if err != nil {
-			log.Fatal(err)
+
+		if !fi.IsDir() {
+			bts, err := ioutil.ReadFile(fn)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			f, err := w.Create(fn)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			_, err = f.Write(bts)
+			if err != nil {
+				log.Fatal(err)
+			}
+
 		}
-		_, err = f.Write(bts)
-		if err != nil {
-			log.Fatal(err)
-		}
+
 	}
 
 	err := w.Close()

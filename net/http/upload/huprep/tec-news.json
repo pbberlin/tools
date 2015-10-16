@@ -2,5 +2,9 @@
   "ContentDir": "cnt_tec",
   "SiteTitle": "An econ perspective on technology",
   "ContentGroup": "other",
-  "DisqusShortname": "tec-news"
+  "DisqusShortname": "tec-news",
+  "targets": {
+	  "url1": "localhost:8087/filesys/post-upload-receive",
+	  "url2": "tec-news.appspot.com/filesys/post-upload-receive"
+	}
 }

@@ -92,7 +92,3 @@ func templatesCompileDemo(w http.ResponseWriter, r *http.Request, m map[string]i
 	// loghttp.E(w, r, err, false)
 
 }
-
-func init() {
-	http.HandleFunc("/tpl/demo1", loghttp.Adapter(templatesCompileDemo))
-}

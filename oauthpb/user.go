@@ -9,26 +9,34 @@ import (
 	"appengine/user"
 )
 
-func init() {
-	http.HandleFunc("/login", login)
-}
-
-func login(w http.ResponseWriter, r *http.Request) {
+func TryUser(r *http.Request) (*user.User, string) {
 
 	c := appengine.NewContext(r)
 	uType := ""
 
+	//
+	//
 	u := user.Current(c)
-	if u != nil {
-		uType += "Normal "
+	if u == nil {
+		uType += "OAuth1 fail "
+	} else {
+		uType += "OAuth1 succ "
 	}
+	uType += "\n"
 
+	//
+	//
 	u2, err := user.CurrentOAuth(c, "")
 	if err != nil {
-		uType += fmt.Sprintf("OAuth failed %v", err)
+		uType += fmt.Sprintf("OAuth2 fail: %v", err)
 	}
 	if u2 != nil {
-		uType += "OAuth2 "
+		uType += "OAuth2 succ"
+	}
+	uType += "\n"
+
+	if appengine.IsDevAppServer() {
+		uType += "Logon always shines on DEV system."
 	}
 
 	// Replace
@@ -36,7 +44,43 @@ func login(w http.ResponseWriter, r *http.Request) {
 		u = u2
 	}
 
+	return u, uType
+}
+
+func Auth(r *http.Request) (bool, *user.User, string) {
+
+	u, msg := TryUser(r)
+
+	// var err error
+	// u, err = user.Current()
+	// if err != nil {
+	// 	msg += "user.Current() returned error :" + err.Error()
+	// 	return
+
 	if u == nil {
+		msg += "google oauth required"
+		return false, nil, msg
+	}
+
+	log.Printf("is admin: %v", u.Admin)
+
+	// if u.ID != "108853175242330402880" && u.ID != "S-1-5-21-2175189548-897864986-1736798499-1000" {
+	// 	msg += "you need to be me; not " + u.ID
+	// 	return false, u, msg
+	// }
+
+	return true, u, msg
+
+}
+
+// Show status and show login/logut url
+func login(w http.ResponseWriter, r *http.Request) {
+
+	c := appengine.NewContext(r)
+	u, uType := TryUser(r)
+
+	if u == nil {
+		fmt.Fprintf(w, "%v<br>\n", uType)
 		url, err := user.LoginURL(c, r.URL.String())
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -58,41 +102,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Auth(r *http.Request) (bool, *user.User, string) {
-
-	msg := ""
-	c := appengine.NewContext(r)
-
-	u := user.Current(c)
-	u2, err := user.CurrentOAuth(c, "")
-	if err != nil {
-		msg += fmt.Sprintf("oauth user err %v", err)
-	}
-	if u == nil {
-		u = u2
-	}
-
-	if appengine.IsDevAppServer() {
-		return true, u, "Logon always shines on DEV system."
-	}
-	// var err error
-	// u, err = user.Current()
-	// if err != nil {
-	// 	msg += "user.Current() returned error :" + err.Error()
-	// 	return
-
-	if u == nil {
-		msg += "google oauth required"
-		return false, nil, msg
-	}
-
-	log.Printf("is admin: %v", u.Admin)
-
-	// if u.ID != "108853175242330402880" && u.ID != "S-1-5-21-2175189548-897864986-1736798499-1000" {
-	// 	msg += "you need to be me; not " + u.ID
-	// 	return false, u, msg
-	// }
-
-	return true, u, msg
-
+func init() {
+	http.HandleFunc("/login", login)
 }

@@ -24,6 +24,9 @@ import (
 
 var urlUp []string
 
+const dirStat = "cnt_statified"
+const dirStatPref = "./cnt_statified"
+
 func init() {
 	urlUp = []string{
 		"http://localhost:8085" + upload.UrlUploadReceive,
@@ -133,24 +136,23 @@ func prepareConfigToml(name, arg2 string) {
 
 	log.Printf("=========fine-new-config.toml=======\n")
 
-	if ok := osutilpb.ExecCmdWithExitCode("cp", "config.toml", "../statify.toml"); !ok {
-		return
-	}
-	log.Printf("copied to statify.toml...\n")
+	// if ok := osutilpb.ExecCmdWithExitCode("cp", "config.toml", "../statify.toml"); !ok {
+	// 	return
+	// }
+	// log.Printf("copied to statify.toml...\n")
 
-	// hugo    --destination="cnt_statified"  --config="statify.toml"  --disableRSS=true  --disableSitemap=true
-	os.Chdir("./..")
-	curdir, _ := os.Getwd()
-	log.Printf("curdir now %v\n", curdir)
+	// os.Chdir("./..")
+	// curdir, _ := os.Getwd()
+	// log.Printf("curdir now %v\n", curdir)
 
-	// rm -rf  ./cnt_statified/*
-	if ok := osutilpb.ExecCmdWithExitCode("rm", "-rf", "./cnt_statified/*"); !ok {
+	if ok := osutilpb.ExecCmdWithExitCode("rm", "-rf", dirStatPref+"/*"); !ok {
 		return
 	}
 	log.Printf("cnt_statify cleaned up...\n")
 
+	// hugo    --destination="cnt_statified"  --config="statify.toml"  --disableRSS=true  --disableSitemap=true
 	if ok := osutilpb.ExecCmdWithExitCode("hugo",
-		`--destination=cnt_statified`,
+		`--destination=`+dirStat,
 		`--config=statify.toml`,
 		`--disableRSS=true`,
 		`--disableSitemap=true`); !ok {
@@ -179,7 +181,7 @@ func prepareConfigToml(name, arg2 string) {
 			}
 			bef := len(bts)
 			bts = bytes.Replace(bts, []byte("http://localhost:1313"), []byte("/"), -1)
-			bts = bytes.Replace(bts, []byte("&copy;2015 Peter Buchmann"), []byte("&copy;2015"), -1)
+			// bts = bytes.Replace(bts, []byte("&copy;2015 Peter Buchmann"), []byte("&copy;2015"), -1)
 			aft := len(bts)
 			err = ioutil.WriteFile(path, bts, 0777)
 			if err != nil {
@@ -194,22 +196,26 @@ func prepareConfigToml(name, arg2 string) {
 		return nil
 	}
 
-	filepath.Walk("./cnt_statified", fc)
+	filepath.Walk(dirStatPref, fc)
 	log.Printf("replacements finished...\n")
 
 	log.Printf("=========fine-new-statification=======\n")
 
 	//
-	os.Chdir("./cnt_statified")
-	curdir, _ = os.Getwd()
+	err = os.Chdir(dirStatPref)
+	if err != nil {
+		log.Printf("could not change dir: %v\n", err)
+		return
+	}
+	curdir, _ := os.Getwd()
 	log.Printf("curdir now %v\n", curdir)
 
 	paths2 := make([]string, 0, len(paths1))
 	for _, path := range paths1 {
-		if path == "./cnt_statified" {
+		if path == dirStatPref {
 			continue
 		}
-		pathAfter := strings.TrimPrefix(path, "cnt_statified")
+		pathAfter := strings.TrimPrefix(path, dirStat)
 		if strings.HasPrefix(pathAfter, "/") || strings.HasPrefix(pathAfter, "\\") {
 			pathAfter = pathAfter[1:]
 		}
@@ -217,7 +223,7 @@ func prepareConfigToml(name, arg2 string) {
 		// log.Printf("%-54v %-54v", path, pathAfter)
 	}
 
-	osutilpb.CreateZipFile(paths2, "cnt_statified.zip")
+	osutilpb.CreateZipFile(paths2, dirStat+".zip")
 	log.Printf("=========zip-file-created=============\n")
 
 	if tgs, ok := data1["targets"]; ok {
@@ -237,7 +243,7 @@ func prepareConfigToml(name, arg2 string) {
 				log.Printf("\t trying upload %v\n", v1)
 				if ok := osutilpb.ExecCmdWithExitCode("curl", "--verbose",
 					"-F", "mountname=mnt02",
-					"-F", "filefield=@cnt_statified.zip",
+					"-F", "filefield=@"+dirStat+".zip",
 					v1); !ok {
 					return
 				}
@@ -258,12 +264,19 @@ func prepareConfigToml(name, arg2 string) {
 					return
 				}
 
+				url2.Path = "/tpl/reset"
+				log.Printf("\t trying reset templates %v\n", url2.Host+url2.Path)
+				if ok := osutilpb.ExecCmdWithExitCode("curl", "--verbose", url2.Host+url2.Path); !ok {
+					return
+				}
+
 			}
 
 		}
 
 	}
 	log.Printf("====== upload completed ==============\n")
+	log.Printf("CTRC+C to exit\n")
 
 	for {
 		time.Sleep(100 * time.Millisecond)

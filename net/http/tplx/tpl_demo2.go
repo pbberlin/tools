@@ -1,10 +1,6 @@
 package tplx
 
-import (
-	"net/http"
-
-	"github.com/pbberlin/tools/net/http/loghttp"
-)
+import "net/http"
 
 type GBEntry struct {
 	Author  string
@@ -40,8 +36,4 @@ func templatesDemo2(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 	myTplExec(w, r)
 
-}
-
-func init() {
-	http.HandleFunc("/tpl/demo2", loghttp.Adapter(templatesDemo2))
 }

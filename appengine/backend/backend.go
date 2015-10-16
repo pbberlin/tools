@@ -34,6 +34,7 @@ func init() {
 	repo.InitHandlers()
 	dedup.InitHandlers()
 	coinbase.InitHandlers()
+	tplx.InitHandlers()
 }
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
@@ -51,8 +52,6 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Schreib-Methoden", "/write-methods")
 	htmlfrag.Wb(b1, "Letzte Email", "/email-view")
 	htmlfrag.Wb(b1, "Blob List", "/blob2")
-	htmlfrag.Wb(b1, "Template Demo 1", "/tpl/demo1")
-	htmlfrag.Wb(b1, "Template Demo 2", "/tpl/demo2")
 
 	htmlfrag.Wb(b1, "fetch via proxy", routes.ProxifyURI)
 	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
@@ -102,16 +101,15 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.WriteString("<hr>\n")
 
-	uiUpload := upload.BackendUIRendered()
-	b1.Write(uiUpload.Bytes())
+	b1.Write(upload.BackendUIRendered().Bytes())
 
-	uiFetch := repo.BackendUIRendered()
-	b1.Write(uiFetch.Bytes())
+	b1.Write(repo.BackendUIRendered().Bytes())
 
-	uidedup := dedup.BackendUIRendered()
-	b1.Write(uidedup.Bytes())
+	b1.Write(dedup.BackendUIRendered().Bytes())
 
 	b1.Write(coinbase.BackendUIRendered().Bytes())
+
+	b1.Write(tplx.BackendUIRendered().Bytes())
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

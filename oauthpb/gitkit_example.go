@@ -44,6 +44,9 @@ import (
 const (
 	homeTplPath   = "home.html"
 	gitkitTplPath = "gitkit.html"
+
+	Headers = "\t" + `<script type="text/javascript"            src="//www.gstatic.com/authtoolkit/js/gitkit.js"></script>
+	<link   type="text/css" rel="stylesheet" href="//www.gstatic.com/authtoolkit/css/gitkit.css">`
 )
 
 // Action URLs.

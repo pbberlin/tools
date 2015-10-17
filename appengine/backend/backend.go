@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/pbberlin/tools/appengine/login"
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/net/http/coinbase"
 	"github.com/pbberlin/tools/net/http/dedup"
@@ -35,12 +36,19 @@ func init() {
 	dedup.InitHandlers()
 	coinbase.InitHandlers()
 	tplx.InitHandlers()
+	login.InitHandlers()
+
 }
 
 func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	w.Header().Set("Content-type", "text/html; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
+
+	if ok, _, msg := login.CheckForAdminUser(r); !ok {
+		w.Write([]byte(msg))
+		return
+	}
 
 	b1 := new(bytes.Buffer)
 	b1.WriteString(tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Backend V1"}))
@@ -110,6 +118,8 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	b1.Write(coinbase.BackendUIRendered().Bytes())
 
 	b1.Write(tplx.BackendUIRendered().Bytes())
+
+	b1.Write(login.BackendUIRendered().Bytes())
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")

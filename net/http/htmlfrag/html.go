@@ -185,3 +185,12 @@ func CacheHeaders(w http.ResponseWriter) {
 	// w.Header().Set("Date", tns)
 
 }
+
+func CookieDump(r *http.Request) string {
+	str := ""
+	c := r.Cookies()
+	for _, v := range c {
+		str += fmt.Sprintf("%v<br><br>\n\n", v)
+	}
+	return str
+}

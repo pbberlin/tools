@@ -1,4 +1,8 @@
-package oauthpb
+// package googlesignin offers a login completely based on client javascript;
+// signin-signout being messaged accross devices;
+// installation of apps can be triggered;
+// it has no server side login comparable to appengine/login or appengine/login/gitkit.
+package googlesignin
 
 import (
 	"encoding/json"
@@ -7,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/pbberlin/tools/appengine/login"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
@@ -120,7 +125,7 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write([]byte("ID from PWT is " + sb + "\n"))
 
-		_, usr, msg1 := Auth(r)
+		_, usr, msg1 := login.CheckForNormalUser(r)
 		if usr != nil {
 			w.Write([]byte("ID from SRV is " + usr.ID + "\n"))
 		}

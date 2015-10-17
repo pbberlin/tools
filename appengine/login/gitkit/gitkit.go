@@ -1,3 +1,8 @@
+// package gitkit expends the google identity toolkit;
+// wrapping a user inside cookie SESSIONID;
+// as opposed to appengine login cookie SACSID.
+package gitkit
+
 // Taken from
 // https://github.com/googlesamples/identity-toolkit-go/tree/master/favweekday
 //
@@ -9,10 +14,6 @@
 // https://developers.google.com/identity/toolkit/web/setup-frontend
 //
 //
-// https://developers.facebook.com/apps/942324259171809/dashboard
-// peter.buchmann.68@gmail.com => 14952300052240127534
-// peter.buchmann@web.de       => 14119357422359180555
-package oauthpb
 
 import (
 	"encoding/gob"
@@ -28,7 +29,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adg/xsrftoken" // issues certificates (tokens) for possible http requests, making other requests impossible
+	"github.com/adg/xsrftoken"
+	"github.com/pbberlin/tools/net/http/htmlfrag" // issues certificates (tokens) for possible http requests, making other requests impossible
 
 	"github.com/google/identity-toolkit-go-client/gitkit"
 	gorillaContext "github.com/gorilla/context"
@@ -50,6 +52,10 @@ const (
 )
 
 // Action URLs.
+// These need to be updated
+// in https://console.developers.google.com/project/tec-news/apiui/credential
+// in https://console.developers.google.com/project/tec-news/apiui/apiview/identitytoolkit/identity_toolkit
+// and on facebook
 const (
 	homeAndSigninSuccessURL           = "/auth"
 	widgetSigninAuthorizedRedirectURL = "/auth/authorized-redirect"
@@ -70,60 +76,31 @@ const (
 )
 
 // The pseudo absolute path to the pem keyfile
+var CodeBaseDirectory = "/not-initialized"
 var privateKeyPath = "[CodeBaseDirectory]appaccess-only/tec-news-49bc2267287d.pem"
-
-func init() {
-	var err error
-	CodeBaseDirectory, err = os.Getwd()
-	if err != nil {
-		panic("could not call the code base directory: " + err.Error() + "<br>\n")
-	}
-	// Make the path working
-	CodeBaseDirectory = path.Clean(CodeBaseDirectory) // remove trailing slash
-	if !strings.HasSuffix(CodeBaseDirectory, "/") {
-		CodeBaseDirectory += "/"
-	}
-	privateKeyPath = strings.Replace(privateKeyPath, "[CodeBaseDirectory]", CodeBaseDirectory, -1)
-}
 
 // Cookie/Form input names.
 const (
+
+	// contains jws from appengine/user.CurrentUser() ...;
+	// not used here
+	aeUserSessName = "SACSID"
+
+	// = cookie name;
+	// contains jwt from google/facebook/twitter;
+	// remains, even when "signed out"
+	// remains, even when logging out of google/twitter
+	// cannot be overwritten by "eraser"
+	sessionName = "SESSIONID"
+
+	// Created on top of sessionName on "signin"
+	// Remains
 	gtokenCookieName = "gtoken"
-	sessionName      = "SESSIONID"
-	xsrfTokenName    = "xsrftoken"
-	favoriteName     = "favorite"
-)
 
-// Email templates for OOB action
-// OOB is "out of band"
-const (
-	emailTemplateResetPassword = `<p>Dear user,</p>
-<p>
-Forgot your password?<br>
-FavWeekday received a request to reset the password for your account <b>%[1]s</b>.<br>
-To reset your password, click on the link below (or copy and paste the URL into your browser):<br>
-<a href="%[2]s">%[2]s</a><br>
-</p>
-<p>FavWeekday Support</p>`
+	xsrfTokenName = "xsrftoken"
+	favoriteName  = "favorite"
 
-	emailTemplateChangeEmail = `<p>Dear user,</p>
-
-<p>
-Want to use another email address to sign into FavWeekday?<br>
-FavWeekday received a request to change your account email address from %[1]s to <b>%[2]s</b>.<br>
-To change your account email address, click on the link below (or copy and paste the URL into your browser):<br>
-<a href="%[3]s">%[3]s</a><br>
-</p>
-<p>FavWeekday Support</p>`
-
-	emailTemplateVerifyEmail = `Dear user,
-
-<p>Thank you for creating an account on FavWeekday.</p>
-<p>To verify your account email address, click on the link below (or copy and paste the URL into your browser):</p>
-<p><a href="%[1]s">%[1]s</a></p>
-
-<br>
-<p>FavWeekday Support</p>`
+	maxAgeSessionAndToken = 1800
 )
 
 var (
@@ -187,7 +164,7 @@ func currentUser(r *http.Request) *User {
 			aelog.Errorf(c, "Invalid token %s: %s", ts, err)
 			return nil
 		}
-		if time.Now().Sub(token.IssueAt) > 15*time.Minute {
+		if time.Now().Sub(token.IssueAt) > maxAgeSessionAndToken*time.Second {
 			aelog.Infof(c, "Token %s is too old. Issused at: %s", ts, token.IssueAt)
 			return nil
 		}
@@ -260,6 +237,7 @@ func updateWeekdayForUser(r *http.Request, u *User, d time.Weekday) {
 }
 
 func handleHome(w http.ResponseWriter, r *http.Request) {
+
 	u := currentUser(r)
 	var d time.Weekday
 	if u != nil {
@@ -271,20 +249,8 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		xf = xsrftoken.Generate(xsrfKey, u.ID, updateURL)
 		xd = xsrftoken.Generate(xsrfKey, u.ID, deleteAccountURL)
 	}
-	// homeTemplate.Execute(
-	// 	w,
-	// 	struct {
-	// 		widgetURL              string
-	// 		SignOutURL             string
-	// 		User                   *User
-	// 		WeekdayIndex           int
-	// 		Weekdays               []time.Weekday
-	// 		UpdateWeekdayURL       string
-	// 		UpdateWeekdayXSRFToken string
-	// 		DeleteAccountURL       string
-	// 		DeleteAccountXSRFToken string
-	// 	}{widgetSigninAuthorizedRedirectURL, signOutURL, u, int(d), weekdays, updateURL, xf, deleteAccountURL, xd})
 	homeTemplate.Execute(w, map[string]interface{}{
+		"CookieDump":             template.HTML(htmlfrag.CookieDump(r)),
 		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
 		"SignOutURL":             signOutURL,
 		"User":                   u,
@@ -309,7 +275,9 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 			SignOutURL       string
 			OOBActionURL     string
 			POSTBody         string
-		}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL, body})
+		}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL,
+			body,
+		})
 }
 
 func handleSignOut(w http.ResponseWriter, r *http.Request) {
@@ -321,6 +289,15 @@ func handleSignOut(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		aelog.Errorf(appengine.NewContext(r), "Cannot save session: %s", err)
 	}
+
+	if false {
+		// The above deletion does not remove SESSIONID cookie.
+		// This also does not remove SESSIONID.
+		eraser := &http.Cookie{Name: sessionName, MaxAge: -1}
+		eraser.Value = "erased"
+		http.SetCookie(w, eraser)
+	}
+
 	// Also clear identity toolkit token.
 	http.SetCookie(w, &http.Cookie{Name: gtokenCookieName, MaxAge: -1})
 	// Redirect to home page for sign in again.
@@ -475,7 +452,25 @@ func accountChooserBranding(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func initCodeBaseDir() {
+	var err error
+	CodeBaseDirectory, err = os.Getwd()
+	if err != nil {
+		panic("could not call the code base directory: " + err.Error() + "<br>\n")
+	}
+	// Make the path working
+	CodeBaseDirectory = path.Clean(CodeBaseDirectory) // remove trailing slash
+	if !strings.HasSuffix(CodeBaseDirectory, "/") {
+		CodeBaseDirectory += "/"
+	}
+	privateKeyPath = strings.Replace(privateKeyPath, "[CodeBaseDirectory]", CodeBaseDirectory, -1)
+
+}
+
 func init() {
+
+	initCodeBaseDir()
+
 	// Register datatypes such that it can be saved in the session.
 	gob.Register(SessionUserKey(0))
 	gob.Register(&User{})
@@ -487,8 +482,9 @@ func init() {
 	cookieStore = sessions.NewCookieStore(
 		[]byte("My very secure authentication key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:64],
 		[]byte("My very secure encryption key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:32])
+
 	cookieStore.Options = &sessions.Options{
-		MaxAge:   3600 * 2, // Session valid for tow hours.
+		MaxAge:   maxAgeSessionAndToken, // Session valid for two hours.
 		HttpOnly: true,
 	}
 

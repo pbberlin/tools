@@ -43,6 +43,7 @@ func TemplateFromHugoPage(w http.ResponseWriter, r *http.Request) string {
 
 	mp.Lock()
 	if _, ok := mp.mp[pathToTmpl]; ok {
+		mp.Unlock()
 		return mp.mp[pathToTmpl]
 	}
 	mp.Unlock()

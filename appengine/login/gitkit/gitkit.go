@@ -17,7 +17,6 @@ package gitkit
 
 import (
 	"encoding/gob"
-	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -37,18 +36,7 @@ import (
 	"github.com/gorilla/sessions"
 
 	"google.golang.org/appengine"
-	"google.golang.org/appengine/datastore"
 	aelog "google.golang.org/appengine/log"
-	"google.golang.org/appengine/mail"
-)
-
-// Templates file path.
-const (
-	homeTplPath   = "home.html"
-	gitkitTplPath = "gitkit.html"
-
-	Headers = "\t" + `<script type="text/javascript"            src="//www.gstatic.com/authtoolkit/js/gitkit.js"></script>
-	<link   type="text/css" rel="stylesheet" href="//www.gstatic.com/authtoolkit/css/gitkit.css">`
 )
 
 // Action URLs.
@@ -62,7 +50,6 @@ const (
 	signOutURL                        = "/auth/signout"
 	oobActionURL                      = "/auth/send-email"
 	updateURL                         = "/auth/update"
-	deleteAccountURL                  = "/auth/deleteAccount"
 	accountChooserBrandingURL         = "/auth/accountChooserBranding.html"
 )
 
@@ -104,19 +91,6 @@ const (
 )
 
 var (
-	homeTemplate   = template.Must(template.ParseFiles("templates/" + homeTplPath))
-	gitkitTemplate = template.Must(template.ParseFiles("templates/" + gitkitTplPath))
-
-	weekdays = []time.Weekday{
-		time.Sunday,
-		time.Monday,
-		time.Tuesday,
-		time.Wednesday,
-		time.Thursday,
-		time.Friday,
-		time.Saturday,
-	}
-
 	xsrfKey      string
 	cookieStore  *sessions.CookieStore
 	gitkitClient *gitkit.Client
@@ -203,39 +177,6 @@ func saveCurrentUser(r *http.Request, w http.ResponseWriter, u *User) {
 	}
 }
 
-type FavWeekday struct {
-	// User ID. Serves as primary key in datastore.
-	ID string
-	// 0 is Sunday.
-	Weekday time.Weekday
-}
-
-// weekdayForUser fetches the favorite weekday for the user from the datastore.
-// Sunday is returned if no such data is found.
-func weekdayForUser(r *http.Request, u *User) time.Weekday {
-	c := appengine.NewContext(r)
-	k := datastore.NewKey(c, "FavWeekday", u.ID, 0, nil)
-	d := FavWeekday{}
-	err := datastore.Get(c, k, &d)
-	if err != nil {
-		if err != datastore.ErrNoSuchEntity {
-			aelog.Errorf(c, "Failed to fetch the favorite weekday for user %+v: %s", *u, err)
-		}
-		return time.Sunday
-	}
-	return d.Weekday
-}
-
-// updateWeekdayForUser updates the favorite weekday for the user.
-func updateWeekdayForUser(r *http.Request, u *User, d time.Weekday) {
-	c := appengine.NewContext(r)
-	k := datastore.NewKey(c, "FavWeekday", u.ID, 0, nil)
-	_, err := datastore.Put(c, k, &FavWeekday{u.ID, d})
-	if err != nil {
-		aelog.Errorf(c, "Failed to update the favorite weekday for user %+v: %s", *u, err)
-	}
-}
-
 func handleHome(w http.ResponseWriter, r *http.Request) {
 
 	u := currentUser(r)
@@ -244,11 +185,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		d = weekdayForUser(r, u)
 	}
 	saveCurrentUser(r, w, u)
-	var xf, xd string
+	var xf string
 	if u != nil {
 		xf = xsrftoken.Generate(xsrfKey, u.ID, updateURL)
-		xd = xsrftoken.Generate(xsrfKey, u.ID, deleteAccountURL)
 	}
+
+	homeTemplate := getHomeTpl(w, r)
 	homeTemplate.Execute(w, map[string]interface{}{
 		"CookieDump":             template.HTML(htmlfrag.CookieDump(r)),
 		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
@@ -258,8 +200,6 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		"Weekdays":               weekdays,
 		"UpdateWeekdayURL":       updateURL,
 		"UpdateWeekdayXSRFToken": xf,
-		"DeleteAccountURL":       deleteAccountURL,
-		"DeleteAccountXSRFToken": xd,
 	})
 }
 
@@ -268,16 +208,27 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 	// Extract the POST body if any.
 	b, _ := ioutil.ReadAll(r.Body)
 	body, _ := url.QueryUnescape(string(b))
-	gitkitTemplate.Execute(
-		w, struct {
-			BrowserAPIKey    string
-			SignInSuccessUrl string
-			SignOutURL       string
-			OOBActionURL     string
-			POSTBody         string
-		}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL,
-			body,
-		})
+
+	gitkitTemplate := getWidgetTpl(w, r)
+
+	// gitkitTemplate.Execute(
+	// 	w, struct {
+	// 		BrowserAPIKey    string
+	// 		SignInSuccessUrl string
+	// 		SignOutURL       string
+	// 		OOBActionURL     string
+	// 		POSTBody         string
+	// 	}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL,
+	// 		body,
+	// 	})
+	gitkitTemplate.Execute(w, map[string]interface{}{
+		"BrowserAPIKey":    browserAPIKey,
+		"SignInSuccessUrl": homeAndSigninSuccessURL,
+		"SignOutURL":       signOutURL,
+		"OOBActionURL":     oobActionURL,
+		"POSTBody":         body,
+	})
+
 }
 
 func handleSignOut(w http.ResponseWriter, r *http.Request) {
@@ -302,46 +253,6 @@ func handleSignOut(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{Name: gtokenCookieName, MaxAge: -1})
 	// Redirect to home page for sign in again.
 	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
-}
-
-func handleOOBAction(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	// Create an identity toolkit client associated with the GAE context.
-	client, err := gitkit.NewWithContext(c, gitkitClient)
-	if err != nil {
-		aelog.Errorf(c, "Failed to create a gitkit.Client with a context: %s", err)
-		w.Write([]byte(gitkit.ErrorResponse(err)))
-		return
-	}
-	resp, err := client.GenerateOOBCode(r)
-	if err != nil {
-		aelog.Errorf(c, "Failed to get an OOB code: %s", err)
-		w.Write([]byte(gitkit.ErrorResponse(err)))
-		return
-	}
-	msg := &mail.Message{
-		Sender: "FavWeekday Support <support@favweekday.appspot.com>",
-	}
-	switch resp.Action {
-	case gitkit.OOBActionResetPassword:
-		msg.Subject = "Reset your FavWeekday account password"
-		msg.HTMLBody = fmt.Sprintf(emailTemplateResetPassword, resp.Email, resp.OOBCodeURL.String())
-		msg.To = []string{resp.Email}
-	case gitkit.OOBActionChangeEmail:
-		msg.Subject = "FavWeekday account email address change confirmation"
-		msg.HTMLBody = fmt.Sprintf(emailTemplateChangeEmail, resp.Email, resp.NewEmail, resp.OOBCodeURL.String())
-		msg.To = []string{resp.NewEmail}
-	case gitkit.OOBActionVerifyEmail:
-		msg.Subject = "FavWeekday account registration confirmation"
-		msg.HTMLBody = fmt.Sprintf(emailTemplateVerifyEmail, resp.OOBCodeURL.String())
-		msg.To = []string{resp.Email}
-	}
-	if err := mail.Send(c, msg); err != nil {
-		aelog.Errorf(c, "Failed to send %s message to user %s: %s", resp.Action, resp.Email, err)
-		w.Write([]byte(gitkit.ErrorResponse(err)))
-		return
-	}
-	w.Write([]byte(gitkit.SuccessResponse()))
 }
 
 func handleUpdate(w http.ResponseWriter, r *http.Request) {
@@ -379,57 +290,8 @@ out:
 	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
 }
 
-/*
-
-Failed to delete user {ID:14423325142879445183 Email:peter.buchmann.68@gmail.com
-Name:Peter Buchmann EmailVerified:true}:
-googleapi: Error 400: INVALID_LOCAL_ID, invalid
-
-Failed to delete 00880189686365773816
-
-
-Failed to delete user {ID: }: googleapi: Error 400: INVALID_LOCAL_ID, invalid
-*/
-func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	var (
-		client *gitkit.Client
-		err    error
-	)
-	// Check if there is a signed in user.
-	u := currentUser(r)
-	if u == nil {
-		aelog.Errorf(c, "No signed in user for updating")
-		goto out
-	}
-	// Validate XSRF token first.
-	if !xsrftoken.Valid(r.PostFormValue(xsrfTokenName), xsrfKey, u.ID, deleteAccountURL) {
-		aelog.Errorf(c, "XSRF token validation failed")
-		goto out
-	}
-	// Create an identity toolkit client associated with the GAE context.
-	client, err = gitkit.NewWithContext(c, gitkitClient)
-	if err != nil {
-		aelog.Errorf(c, "Failed to create a gitkit.Client with a context: %s", err)
-		goto out
-	}
-	// Delete account.
-	err = client.DeleteUser(&gitkit.User{LocalID: u.ID})
-	if err != nil {
-		aelog.Errorf(c, "Failed to delete user %v %v: %s", u.ID, u.Email, err)
-		goto out
-	}
-	// Account deletion succeeded.
-	// Call sign out to clear session and identity toolkit token.
-	aelog.Infof(c, "Account deletion succeeded")
-
-	handleSignOut(w, r)
-	return
-out:
-	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
-}
-
-// dynamic execution required because of Access-Control header ...
+// Is called by AccountChooser to retrieve some layout.
+// Dynamic execution required because of Access-Control header ...
 func accountChooserBranding(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	str := `<!DOCTYPE html>
@@ -520,6 +382,5 @@ func init() {
 	http.Handle(signOutURL, ClearHandler(handleSignOut))
 	http.Handle(oobActionURL, ClearHandler(handleOOBAction))
 	http.Handle(updateURL, ClearHandler(handleUpdate))
-	http.Handle(deleteAccountURL, ClearHandler(handleDeleteAccount))
 	http.HandleFunc(accountChooserBrandingURL, accountChooserBranding)
 }

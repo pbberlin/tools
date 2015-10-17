@@ -190,7 +190,7 @@ func CookieDump(r *http.Request) string {
 	str := ""
 	c := r.Cookies()
 	for _, v := range c {
-		str += fmt.Sprintf("%v<br><br>\n\n", v)
+		str += fmt.Sprintf("%v<br>\n", v)
 	}
 	return str
 }

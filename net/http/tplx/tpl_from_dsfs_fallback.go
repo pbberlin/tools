@@ -1,5 +1,7 @@
 package tplx
 
+// When there is not template file in the google datastore
+// then use THIS:
 var hugoTplFallback = []byte(`<!DOCTYPE html>
 <html class="no-js" lang="en-US">
 <head>
@@ -21,6 +23,7 @@ var hugoTplFallback = []byte(`<!DOCTYPE html>
 		Fallback template!
 		=============================================
 	-->
+	<span  id="FALLBACK when ds has no templates available" ></span>
 
 	<div class="container">
 		<div class="row" style='margin-top:12px'>

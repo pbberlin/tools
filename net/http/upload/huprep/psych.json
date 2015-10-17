@@ -1,0 +1,10 @@
+{
+  "ContentDir": "cnt_psych",
+  "SiteTitle": "Psychology and Sociology",
+  "ContentGroup": "other",
+  "DisqusShortname": "",
+  "targets": {
+	  "url1": "localhost:8085/filesys/post-upload-receive",
+	  "url2": "libertarian-islands.appspot.com/filesys/post-upload-receive"
+	}
+}

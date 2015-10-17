@@ -70,24 +70,20 @@ var hugoTplFallback = []byte(`<!DOCTYPE html>
 	<div class="container">
 	  <div class="row col-md-12">
         <footer>
+ 			[REPLACE_FOOTER]
           <div>
                 <p>
                     &copy;2015 
                     &nbsp; &nbsp; &nbsp; 
+                    <!--
 					<a href="/tech-news">Tech-News</a>  
+					-->
                 </p>
             </div>
             </footer>
         </div>
     </div>
 
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="/js/jquery-min-2.1.1.js">\x3C/script>')</script>    
-
-    <script src="/js/bootstrap.min-3.1.1.js"></script>
-    <script>
-        console.log("end of page " + $.fn.jquery + " Version")
-    </script> 
 
     </body>
 </html>`)

@@ -51,8 +51,8 @@ func getWidgetTpl(w http.ResponseWriter, r *http.Request) *template.Template {
 
 	lg, _ := loghttp.BuffLoggerUniversal(w, r)
 
-	// bstpl := tplx.TemplateFromHugoPage(w, r)  // the jQuery irritates
-	bstpl := tplx.HugoTplNoScript
+	bstpl := tplx.TemplateFromHugoPage(w, r) // the jQuery irritates
+	// bstpl := tplx.HugoTplNoScript
 
 	b := new(bytes.Buffer)
 

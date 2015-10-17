@@ -212,9 +212,19 @@ func prepareConfigToml(name, arg2 string) {
 
 	paths2 := make([]string, 0, len(paths1))
 	for _, path := range paths1 {
+
 		if path == dirStatPref {
 			continue
 		}
+
+		ext := filepath.Ext(path)
+		ext = strings.ToLower(ext)
+		if ext != ".html" && ext != ".css" && ext != ".js" &&
+			ext != ".jpg" && ext != ".gif" && ext != ".png" && ext != ".ico" {
+			log.Printf("\t skipping %v", path)
+			continue
+		}
+
 		pathAfter := strings.TrimPrefix(path, dirStat)
 		if strings.HasPrefix(pathAfter, "/") || strings.HasPrefix(pathAfter, "\\") {
 			pathAfter = pathAfter[1:]

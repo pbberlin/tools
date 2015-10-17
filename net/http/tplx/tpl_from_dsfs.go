@@ -70,6 +70,7 @@ func TemplateFromHugoPage(w http.ResponseWriter, r *http.Request) string {
 	bts = bytes.Replace(bts, []byte("</head>"), []byte("{{ .HtmlHeaders }}\n</head>"), -1)
 	bts = bytes.Replace(bts, []byte("<p>[REPLACE_CONTENT]</p>"), []byte("{{ .HtmlContent }}"), -1)
 	bts = bytes.Replace(bts, []byte("[REPLACE_CONTENT]"), []byte("{{ .HtmlContent }}"), -1)
+	bts = bytes.Replace(bts, []byte("[REPLACE_FOOTER]"), []byte("{{ .HtmlFooter }}"), -1)
 
 	mp.Lock()
 	mp.mp[pathToTmpl] = string(bts)

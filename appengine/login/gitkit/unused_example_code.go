@@ -29,7 +29,10 @@ const home3 = `{{if .User}}
   </form>
 {{end}}`
 
-const deleteAccountURL = "/auth/deleteAccount"
+const (
+	deleteAccountURL = "/auth/deleteAccount"
+	oobActionURL     = "/auth/send-email"
+)
 
 func UNUSEDinit() {
 
@@ -42,6 +45,7 @@ func UNUSEDinit() {
 	}
 
 	http.Handle(deleteAccountURL, ClearHandler(handleDeleteAccount))
+	http.Handle(oobActionURL, ClearHandler(handleOOBAction))
 }
 
 func UNUSEDhandleHome(w http.ResponseWriter, r *http.Request) {
@@ -161,5 +165,5 @@ func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 	handleSignOut(w, r)
 	return
 out:
-	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
+	http.Redirect(w, r, signinSuccessAndHomeURL, http.StatusFound)
 }

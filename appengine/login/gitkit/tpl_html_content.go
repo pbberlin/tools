@@ -1,5 +1,21 @@
 package gitkit
 
+const signedInCode = `
+  <script type=text/javascript>
+    function getCookie(name) {
+        name = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ')   c = c.substring(1);
+            if (c.indexOf(name) == 0)  return name + " is present";
+        }
+        return "";
+    }
+    console.log( "cukis:", getCookie("gtoken") );
+  </script>
+`
+
 const home1 = `{{if not .User}}
 <!-- 
   We could just as easy do automatic forwarding if not signed on:
@@ -15,6 +31,7 @@ const home1 = `{{if not .User}}
 
 -->
 
+
   <div id="navbar"></div>
   <script type=text/javascript>
     google.identitytoolkit.signInButton(
@@ -25,6 +42,9 @@ const home1 = `{{if not .User}}
       }
     );
   </script>
+
+
+
 
 {{else}}
 

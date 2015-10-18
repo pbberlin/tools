@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/pbberlin/tools/stringspb"
 )
 
 var sp func(format string, a ...interface{}) string = fmt.Sprintf
@@ -190,7 +192,9 @@ func CookieDump(r *http.Request) string {
 	str := ""
 	c := r.Cookies()
 	for _, v := range c {
-		str += fmt.Sprintf("%v<br>\n", v)
+		s := fmt.Sprintf("%v", v)
+		s = stringspb.Ellipsoider(s, 50)
+		str += fmt.Sprintf("%v<br>\n", s)
 	}
 	return str
 }

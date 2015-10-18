@@ -3,21 +3,23 @@
 // as opposed to appengine login cookie SACSID.
 package gitkit
 
-// Taken from
+// Code taken from
 // https://github.com/googlesamples/identity-toolkit-go/tree/master/favweekday
 //
 // The complete concept is expained here:
-// https://developers.google.com/identity/toolkit/web/federated-login
 // https://developers.google.com/identity/choose-auth
+// https://developers.google.com/identity/toolkit/web/federated-login
 //
 // https://developers.google.com/identity/toolkit/web/configure-service
 // https://developers.google.com/identity/toolkit/web/setup-frontend
 //
 //
+// Remove apps:
+// https://security.google.com/settings/security/permissions
+// https://www.facebook.com/settings?tab=applications
 
 import (
 	"encoding/gob"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -28,8 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/adg/xsrftoken"
-	"github.com/pbberlin/tools/net/http/htmlfrag" // issues certificates (tokens) for possible http requests, making other requests impossible
+	"github.com/adg/xsrftoken" // issues certificates (tokens) for possible http requests, making other requests impossible
 
 	"github.com/google/identity-toolkit-go-client/gitkit"
 	gorillaContext "github.com/gorilla/context"
@@ -41,14 +42,14 @@ import (
 
 // Action URLs.
 // These need to be updated
-// in https://console.developers.google.com/project/tec-news/apiui/credential
-// in https://console.developers.google.com/project/tec-news/apiui/apiview/identitytoolkit/identity_toolkit
-// and on facebook
+// https://console.developers.google.com/project/tec-news/apiui/credential
+// https://console.developers.google.com/project/tec-news/apiui/apiview/identitytoolkit/identity_toolkit
+// https://developers.facebook.com/apps/942324259171809/settings/advanced/
+
 const (
-	homeAndSigninSuccessURL           = "/auth"
+	signinSuccessAndHomeURL           = "/auth"
 	widgetSigninAuthorizedRedirectURL = "/auth/authorized-redirect"
 	signOutURL                        = "/auth/signout"
-	oobActionURL                      = "/auth/send-email"
 	updateURL                         = "/auth/update"
 	accountChooserBrandingURL         = "/auth/accountChooserBranding.html"
 )
@@ -87,7 +88,9 @@ const (
 	xsrfTokenName = "xsrftoken"
 	favoriteName  = "favorite"
 
-	maxAgeSessionAndToken = 1800
+	maxTokenAge = 1200 // 20 minutes
+
+	maxSessionIDAge = 1800
 )
 
 var (
@@ -138,10 +141,11 @@ func currentUser(r *http.Request) *User {
 			aelog.Errorf(c, "Invalid token %s: %s", ts, err)
 			return nil
 		}
-		if time.Now().Sub(token.IssueAt) > maxAgeSessionAndToken*time.Second {
+		if time.Now().Sub(token.IssueAt) > maxTokenAge*time.Second {
 			aelog.Infof(c, "Token %s is too old. Issused at: %s", ts, token.IssueAt)
 			return nil
 		}
+
 		// Fetch user info.
 		u, err := client.UserByLocalID(token.LocalID)
 		if err != nil {
@@ -180,6 +184,23 @@ func saveCurrentUser(r *http.Request, w http.ResponseWriter, u *User) {
 func handleHome(w http.ResponseWriter, r *http.Request) {
 
 	u := currentUser(r)
+	if u == nil {
+		http.Redirect(w, r, widgetSigninAuthorizedRedirectURL+"?mode=select&user=wasNil", http.StatusFound)
+	}
+
+	isSignedIn := false
+	cks := r.Cookies()
+	for _, ck := range cks {
+		if ck.Name == gtokenCookieName {
+			isSignedIn = true
+			break
+		}
+	}
+	if !isSignedIn {
+		u = nil
+	}
+
+	//
 	var d time.Weekday
 	if u != nil {
 		d = weekdayForUser(r, u)
@@ -192,7 +213,6 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 	homeTemplate := getHomeTpl(w, r)
 	homeTemplate.Execute(w, map[string]interface{}{
-		"CookieDump":             template.HTML(htmlfrag.CookieDump(r)),
 		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
 		"SignOutURL":             signOutURL,
 		"User":                   u,
@@ -200,10 +220,13 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 		"Weekdays":               weekdays,
 		"UpdateWeekdayURL":       updateURL,
 		"UpdateWeekdayXSRFToken": xf,
+
+		// "CookieDump": template.HTML(htmlfrag.CookieDump(r)),
 	})
 }
 
 func handleWidget(w http.ResponseWriter, r *http.Request) {
+
 	defer r.Body.Close()
 	// Extract the POST body if any.
 	b, _ := ioutil.ReadAll(r.Body)
@@ -211,83 +234,103 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 
 	gitkitTemplate := getWidgetTpl(w, r)
 
-	// gitkitTemplate.Execute(
-	// 	w, struct {
-	// 		BrowserAPIKey    string
-	// 		SignInSuccessUrl string
-	// 		SignOutURL       string
-	// 		OOBActionURL     string
-	// 		POSTBody         string
-	// 	}{browserAPIKey, homeAndSigninSuccessURL, signOutURL, oobActionURL,
-	// 		body,
-	// 	})
 	gitkitTemplate.Execute(w, map[string]interface{}{
 		"BrowserAPIKey":    browserAPIKey,
-		"SignInSuccessUrl": homeAndSigninSuccessURL,
+		"SignInSuccessUrl": signinSuccessAndHomeURL,
 		"SignOutURL":       signOutURL,
-		"OOBActionURL":     oobActionURL,
+		"OOBActionURL":     oobActionURL, // unnecessary, since we don't offer "home account", but kept
 		"POSTBody":         body,
 	})
 
 }
 
 func handleSignOut(w http.ResponseWriter, r *http.Request) {
+
 	sess, _ := cookieStore.Get(r, sessionName)
-	sess.Options = &sessions.Options{
-		MaxAge: -1, // MaxAge<0 means delete session cookie.
-	}
+	sess.Options = &sessions.Options{MaxAge: -1} // MaxAge<0 means delete session cookie.
 	err := sess.Save(r, w)
 	if err != nil {
 		aelog.Errorf(appengine.NewContext(r), "Cannot save session: %s", err)
 	}
 
+	// NONE of this has any effect
 	if false {
+
+		w.Header().Del("Set-Cookie")
+
 		// The above deletion does not remove SESSIONID cookie.
 		// This also does not remove SESSIONID.
-		eraser := &http.Cookie{Name: sessionName, MaxAge: -1}
-		eraser.Value = "erased"
+		eraser := &http.Cookie{Name: sessionName, MaxAge: -1, Value: "erased",
+			Expires: time.Now().Add(-240 * time.Hour), HttpOnly: true}
 		http.SetCookie(w, eraser)
+		eraser.Name = "SESSIONID"
+		http.SetCookie(w, eraser)
+
+		//
+		w.Header().Del("Set-Cookie")
+		ck := `set-cookie: SESSIONID=WEEEEGMITDIIIIER; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=1800; HttpOnly`
+		ck = `set-cookie: SESSIONID=WEEEEGMITDIIIIER; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+		w.Header().Add("Set-Cookie", ck)
+
 	}
 
 	// Also clear identity toolkit token.
 	http.SetCookie(w, &http.Cookie{Name: gtokenCookieName, MaxAge: -1})
+
 	// Redirect to home page for sign in again.
-	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
+	http.Redirect(w, r, signinSuccessAndHomeURL+"?logout=true", http.StatusFound)
+	// w.Write([]byte("<a href='" + signinSuccessAndHomeURL + "'>Home<a>"))
+
 }
 
 func handleUpdate(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
+
+	outFunc := func() {
+		http.Redirect(w, r, signinSuccessAndHomeURL, http.StatusFound)
+	}
+
 	var (
 		d   int
 		day time.Weekday
 		err error
 	)
+
+	// Generic
+	c := appengine.NewContext(r)
 	// Check if there is a signed in user.
 	u := currentUser(r)
 	if u == nil {
 		aelog.Errorf(c, "No signed in user for updating")
+		outFunc()
 		goto out
 	}
 	// Validate XSRF token first.
 	if !xsrftoken.Valid(r.PostFormValue(xsrfTokenName), xsrfKey, u.ID, updateURL) {
 		aelog.Errorf(c, "XSRF token validation failed")
+		outFunc()
 		goto out
 	}
+
+	//
+	// Specific
 	// Extract the new favorite weekday.
 	d, err = strconv.Atoi(r.PostFormValue(favoriteName))
 	if err != nil {
 		aelog.Errorf(c, "Failed to extract new favoriate weekday: %s", err)
+		outFunc()
 		goto out
 	}
 	day = time.Weekday(d)
 	if day < time.Sunday || day > time.Saturday {
 		aelog.Errorf(c, "Got wrong value for favorite weekday: %d", d)
+		outFunc()
+		goto out
 	}
 	// Update the favorite weekday.
 	updateWeekdayForUser(r, u, day)
+
 out:
-	// Redirect to home page to show the update result.
-	http.Redirect(w, r, homeAndSigninSuccessURL, http.StatusFound)
+	// outFunc()
 }
 
 // Is called by AccountChooser to retrieve some layout.
@@ -338,15 +381,18 @@ func init() {
 	gob.Register(&User{})
 
 	// Initialize XSRF token key.
-	xsrfKey = "My very secure XSRF token key"
+	xsrfKey = "My personal very secure XSRF token key"
+
+	sessKey := []byte("secure-key-234002395432-wsasjasfsfsfsaa-234002395432-wsasjasfsfsfsaa-234002395432-wsasjasfsfsfsaa")
 
 	// Create a session cookie store.
 	cookieStore = sessions.NewCookieStore(
-		[]byte("My very secure authentication key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:64],
-		[]byte("My very secure encryption key for cookie store or generate one using securecookies.GenerateRamdonKey()")[:32])
+		sessKey[:64],
+		sessKey[:32],
+	)
 
 	cookieStore.Options = &sessions.Options{
-		MaxAge:   maxAgeSessionAndToken, // Session valid for two hours.
+		MaxAge:   maxSessionIDAge, // Session valid for 30 Minutes.
 		HttpOnly: true,
 	}
 
@@ -376,11 +422,10 @@ func init() {
 		})
 	}
 
-	// http.Handle(homeAndSigninSuccessURL, r)
-	http.Handle(homeAndSigninSuccessURL, ClearHandler(handleHome))
+	// http.Handle(signinSuccessAndHomeURL, r)
+	http.Handle(signinSuccessAndHomeURL, ClearHandler(handleHome))
 	http.Handle(widgetSigninAuthorizedRedirectURL, ClearHandler(handleWidget))
 	http.Handle(signOutURL, ClearHandler(handleSignOut))
-	http.Handle(oobActionURL, ClearHandler(handleOOBAction))
 	http.Handle(updateURL, ClearHandler(handleUpdate))
 	http.HandleFunc(accountChooserBrandingURL, accountChooserBranding)
 }

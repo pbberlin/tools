@@ -219,7 +219,8 @@ func prepareConfigToml(name, arg2 string) {
 
 		ext := filepath.Ext(path)
 		ext = strings.ToLower(ext)
-		if ext != ".html" && ext != ".css" && ext != ".js" &&
+		if ext != "" && // directory
+			ext != ".html" && ext != ".css" && ext != ".js" &&
 			ext != ".jpg" && ext != ".gif" && ext != ".png" && ext != ".ico" {
 			log.Printf("\t skipping %v", path)
 			continue

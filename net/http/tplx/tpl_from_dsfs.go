@@ -31,20 +31,21 @@ var mp = SyncedMap{mp: map[string]string{}}
 func TemplateFromHugoReset(w http.ResponseWriter, r *http.Request, mapOnerous map[string]interface{}) {
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
-	mp.Lock()
+	mpOld := mp
+	mpOld.Lock()
 	if _, ok := mp.mp[pathToTmpl]; ok {
 		mp = SyncedMap{mp: map[string]string{}}
 	}
-	mp.Unlock()
+	mpOld.Unlock()
 	w.Write([]byte("reset successful"))
 }
 
 func TemplateFromHugoPage(w http.ResponseWriter, r *http.Request) string {
 
 	mp.Lock()
-	if _, ok := mp.mp[pathToTmpl]; ok {
+	if tpl, ok := mp.mp[pathToTmpl]; ok {
 		mp.Unlock()
-		return mp.mp[pathToTmpl]
+		return tpl
 	}
 	mp.Unlock()
 

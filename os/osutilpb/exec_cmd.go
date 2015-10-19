@@ -18,7 +18,7 @@ func ExecCmdWithExitCode(name string, args ...string) (success bool) {
 
 	if err := command.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
-			log.Printf("exit err: %v", exiterr)
+			log.Printf("exit err: %v  - %v %v", exiterr, name, args)
 			// The program has exited with an exit code != 0
 			success = false
 		} else {

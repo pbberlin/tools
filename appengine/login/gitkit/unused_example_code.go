@@ -165,5 +165,5 @@ func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 	handleSignOut(w, r)
 	return
 out:
-	http.Redirect(w, r, signinSuccessAndHomeURL, http.StatusFound)
+	http.Redirect(w, r, successLandingURL, http.StatusFound)
 }

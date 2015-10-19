@@ -19,21 +19,18 @@ package gitkit
 // https://www.facebook.com/settings?tab=applications
 
 import (
-	"encoding/gob"
+	"fmt"
+	"html/template"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"path"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/adg/xsrftoken" // issues certificates (tokens) for possible http requests, making other requests impossible
+	"github.com/adg/xsrftoken"
+	"github.com/pbberlin/tools/net/http/tplx" // issues certificates (tokens) for possible http requests, making other requests impossible
 
 	"github.com/google/identity-toolkit-go-client/gitkit"
-	gorillaContext "github.com/gorilla/context"
 	"github.com/gorilla/sessions"
 
 	"google.golang.org/appengine"
@@ -47,11 +44,18 @@ import (
 // https://developers.facebook.com/apps/942324259171809/settings/advanced/
 
 const (
-	signinSuccessAndHomeURL           = "/auth"
-	widgetSigninAuthorizedRedirectURL = "/auth/authorized-redirect"
+	homeURL = "/auth"
+
+	widgetSigninAuthorizedRedirectURL = "/auth/authorized-redirect" // THIS one needs to be registered all over
+	successLandingURL_X               = "SHOULD BE DYNAMIC"
 	signOutURL                        = "/auth/signout"
 	updateURL                         = "/auth/update"
 	accountChooserBrandingURL         = "/auth/accountChooserBranding.html"
+)
+
+var (
+	successLandingURL = "/auth/signin-landing"
+	signoutLandingURL = "/auth/signout-landing"
 )
 
 // Identity toolkit configurations.
@@ -85,8 +89,8 @@ const (
 	// Remains
 	gtokenCookieName = "gtoken"
 
-	xsrfTokenName = "xsrftoken"
-	favoriteName  = "favorite"
+	xsrfTokenName       = "xsrftoken"
+	fieldNameFavWeekDay = "favorite"
 
 	maxTokenAge = 1200 // 20 minutes
 
@@ -111,6 +115,21 @@ type User struct {
 type SessionUserKey int
 
 const sessionUserKey SessionUserKey = 0
+
+func isSignedIn(r *http.Request) bool {
+
+	signedIn := false
+	cks := r.Cookies()
+	for _, ck := range cks {
+		if ck.Name == gtokenCookieName {
+			signedIn = true
+			break
+		}
+	}
+
+	return signedIn
+
+}
 
 //
 // currentUser extracts the user information stored in current session.
@@ -181,23 +200,49 @@ func saveCurrentUser(r *http.Request, w http.ResponseWriter, u *User) {
 	}
 }
 
+func f_HANDLERS() {
+
+}
+
 func handleHome(w http.ResponseWriter, r *http.Request) {
 
+	format := `
+		<a href='%v?mode=select'>Signin with Redirect (Widget)</a><br> 
+		<a href='%v'>Signin Success Landing</a><br> 
+		<a href='%v'>Signout </a><br> 
+		<a href='%v'>Signout Landing</a><br> 
+		<a href='%v'>Update</a><br> 
+		<a href='%v'>Branding for Account Chooser</a><br> 
+	`
+
+	str := fmt.Sprintf(format,
+		widgetSigninAuthorizedRedirectURL,
+		successLandingURL,
+		signOutURL,
+		signoutLandingURL,
+		updateURL,
+		accountChooserBrandingURL,
+	)
+
+	bstpl := tplx.TemplateFromHugoPage(w, r) // the jQuery irritates
+	fmt.Fprintf(w, tplx.ExecTplHelper(bstpl, map[string]interface{}{
+		"HtmlTitle":       "Google Identity Toolkit Overview",
+		"HtmlDescription": "", // reminder
+		"HtmlContent":     template.HTML(str),
+	}))
+
+}
+
+func handleSuccess(w http.ResponseWriter, r *http.Request) {
+
 	u := currentUser(r)
-	if u == nil {
-		http.Redirect(w, r, widgetSigninAuthorizedRedirectURL+"?mode=select&user=wasNil", http.StatusFound)
+
+	if ok := isSignedIn(r); !ok {
+		u = nil
 	}
 
-	isSignedIn := false
-	cks := r.Cookies()
-	for _, ck := range cks {
-		if ck.Name == gtokenCookieName {
-			isSignedIn = true
-			break
-		}
-	}
-	if !isSignedIn {
-		u = nil
+	if u == nil {
+		http.Redirect(w, r, widgetSigninAuthorizedRedirectURL+"?mode=select&user=wasNil", http.StatusFound)
 	}
 
 	//
@@ -236,7 +281,7 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 
 	gitkitTemplate.Execute(w, map[string]interface{}{
 		"BrowserAPIKey":    browserAPIKey,
-		"SignInSuccessUrl": signinSuccessAndHomeURL,
+		"SignInSuccessUrl": successLandingURL,
 		"SignOutURL":       signOutURL,
 		"OOBActionURL":     oobActionURL, // unnecessary, since we don't offer "home account", but kept
 		"POSTBody":         body,
@@ -278,15 +323,34 @@ func handleSignOut(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{Name: gtokenCookieName, MaxAge: -1})
 
 	// Redirect to home page for sign in again.
-	http.Redirect(w, r, signinSuccessAndHomeURL+"?logout=true", http.StatusFound)
-	// w.Write([]byte("<a href='" + signinSuccessAndHomeURL + "'>Home<a>"))
+	http.Redirect(w, r, signoutLandingURL+"?logout=true", http.StatusFound)
+	// w.Write([]byte("<a href='" + signoutLandingURL + "'>Home<a>"))
+
+}
+
+func handleSignoutLanding(w http.ResponseWriter, r *http.Request) {
+
+	format := `
+		Signed out<br>
+		<a href='%v'>Home</a><br> 
+	`
+
+	str := fmt.Sprintf(format, homeURL)
+
+	bstpl := tplx.TemplateFromHugoPage(w, r) // the jQuery irritates
+	fmt.Fprintf(w, tplx.ExecTplHelper(bstpl, map[string]interface{}{
+		"HtmlTitle":       "Google Identity Toolkit Overview",
+		"HtmlDescription": "", // reminder
+		"HtmlContent":     template.HTML(str),
+	}))
 
 }
 
 func handleUpdate(w http.ResponseWriter, r *http.Request) {
 
+	operationResult := "failure"
 	outFunc := func() {
-		http.Redirect(w, r, signinSuccessAndHomeURL, http.StatusFound)
+		http.Redirect(w, r, successLandingURL+"?update="+operationResult, http.StatusFound)
 	}
 
 	var (
@@ -314,7 +378,7 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 	//
 	// Specific
 	// Extract the new favorite weekday.
-	d, err = strconv.Atoi(r.PostFormValue(favoriteName))
+	d, err = strconv.Atoi(r.PostFormValue(fieldNameFavWeekDay))
 	if err != nil {
 		aelog.Errorf(c, "Failed to extract new favoriate weekday: %s", err)
 		outFunc()
@@ -328,9 +392,10 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	// Update the favorite weekday.
 	updateWeekdayForUser(r, u, day)
+	operationResult = "success"
 
 out:
-	// outFunc()
+	outFunc()
 }
 
 // Is called by AccountChooser to retrieve some layout.
@@ -355,77 +420,4 @@ func accountChooserBranding(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(str))
 
-}
-
-func initCodeBaseDir() {
-	var err error
-	CodeBaseDirectory, err = os.Getwd()
-	if err != nil {
-		panic("could not call the code base directory: " + err.Error() + "<br>\n")
-	}
-	// Make the path working
-	CodeBaseDirectory = path.Clean(CodeBaseDirectory) // remove trailing slash
-	if !strings.HasSuffix(CodeBaseDirectory, "/") {
-		CodeBaseDirectory += "/"
-	}
-	privateKeyPath = strings.Replace(privateKeyPath, "[CodeBaseDirectory]", CodeBaseDirectory, -1)
-
-}
-
-func init() {
-
-	initCodeBaseDir()
-
-	// Register datatypes such that it can be saved in the session.
-	gob.Register(SessionUserKey(0))
-	gob.Register(&User{})
-
-	// Initialize XSRF token key.
-	xsrfKey = "My personal very secure XSRF token key"
-
-	sessKey := []byte("secure-key-234002395432-wsasjasfsfsfsaa-234002395432-wsasjasfsfsfsaa-234002395432-wsasjasfsfsfsaa")
-
-	// Create a session cookie store.
-	cookieStore = sessions.NewCookieStore(
-		sessKey[:64],
-		sessKey[:32],
-	)
-
-	cookieStore.Options = &sessions.Options{
-		MaxAge:   maxSessionIDAge, // Session valid for 30 Minutes.
-		HttpOnly: true,
-	}
-
-	// Create identity toolkit client.
-	c := &gitkit.Config{
-		ServerAPIKey: serverAPIKey,
-		ClientID:     clientID,
-		WidgetURL:    widgetSigninAuthorizedRedirectURL,
-	}
-	// Service account and private key are not required in GAE Prod.
-	// GAE App Identity API is used to identify the app.
-	if appengine.IsDevAppServer() {
-		c.ServiceAccount = serviceAccount
-		c.PEMKeyPath = privateKeyPath
-	}
-	var err error
-	gitkitClient, err = gitkit.New(c)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// The gorilla sessions use gorilla request context
-	ClearHandler := func(fc http.HandlerFunc) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			defer gorillaContext.Clear(r)
-			fc(w, r)
-		})
-	}
-
-	// http.Handle(signinSuccessAndHomeURL, r)
-	http.Handle(signinSuccessAndHomeURL, ClearHandler(handleHome))
-	http.Handle(widgetSigninAuthorizedRedirectURL, ClearHandler(handleWidget))
-	http.Handle(signOutURL, ClearHandler(handleSignOut))
-	http.Handle(updateURL, ClearHandler(handleUpdate))
-	http.HandleFunc(accountChooserBrandingURL, accountChooserBranding)
 }

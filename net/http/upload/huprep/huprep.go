@@ -153,7 +153,7 @@ func prepareConfigToml(name, arg2 string) {
 	// hugo    --destination="cnt_statified"  --config="statify.toml"  --disableRSS=true  --disableSitemap=true
 	if ok := osutilpb.ExecCmdWithExitCode("hugo",
 		`--destination=`+dirStat,
-		`--config=statify.toml`,
+		`--config=config.toml`,
 		`--disableRSS=true`,
 		`--disableSitemap=true`); !ok {
 		return

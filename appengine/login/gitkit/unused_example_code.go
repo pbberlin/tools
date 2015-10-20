@@ -50,7 +50,7 @@ func UNUSEDinit() {
 
 func UNUSEDhandleHome(w http.ResponseWriter, r *http.Request) {
 
-	u := currentUser(r)
+	u := CurrentUser(r)
 	var d time.Weekday
 	if u != nil {
 		d = weekdayForUser(r, u)
@@ -136,7 +136,7 @@ func handleDeleteAccount(w http.ResponseWriter, r *http.Request) {
 		err    error
 	)
 	// Check if there is a signed in user.
-	u := currentUser(r)
+	u := CurrentUser(r)
 	if u == nil {
 		aelog.Errorf(c, "No signed in user for updating")
 		goto out

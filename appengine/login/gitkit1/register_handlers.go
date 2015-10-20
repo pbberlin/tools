@@ -1,4 +1,4 @@
-package gitkit
+package gitkit1
 
 import (
 	"bytes"
@@ -58,14 +58,14 @@ func InitHandlers() {
 
 	// Create identity toolkit client.
 	c := &gitkit.Config{
-		ServerAPIKey: serverAPIKey,
-		ClientID:     clientID,
-		WidgetURL:    widgetSigninAuthorizedRedirectURL,
+		ServerAPIKey: getConfig(siteName, "serverAPIKey"),
+		ClientID:     getConfig(siteName, "clientID"),
+		WidgetURL:    WidgetSigninAuthorizedRedirectURL,
 	}
 	// Service account and private key are not required in GAE Prod.
 	// GAE App Identity API is used to identify the app.
 	if appengine.IsDevAppServer() {
-		c.ServiceAccount = serviceAccount
+		c.ServiceAccount = getConfig(siteName, "serviceAccount")
 		c.PEMKeyPath = privateKeyPath
 	}
 	var err error
@@ -84,13 +84,11 @@ func InitHandlers() {
 
 	http.Handle(homeURL, ClearHandler(handleHome))
 
-	http.Handle(widgetSigninAuthorizedRedirectURL, ClearHandler(HandleWidget))
-	http.Handle(successLandingURL, ClearHandler(HandleSuccess))
-
+	http.Handle(WidgetSigninAuthorizedRedirectURL, ClearHandler(handleWidget))
 	http.Handle(signOutURL, ClearHandler(handleSignOut))
-	http.Handle(signoutLandingURL, ClearHandler(handleSignoutLanding))
 
-	http.Handle(updateURL, ClearHandler(handleUpdate))
+	http.Handle(signinLandingDefaultURL, ClearHandler(handleSigninSuccessLanding))
+	http.Handle(signoutLandingDefaultURL, ClearHandler(handleSignOutLanding))
 
 	http.HandleFunc(accountChooserBrandingURL, accountChooserBranding)
 }
@@ -100,9 +98,8 @@ func BackendUIRendered() *bytes.Buffer {
 	var b1 = new(bytes.Buffer)
 
 	htmlfrag.Wb(b1, "Login GitKit", homeURL, "opposite of appengine login")
-	htmlfrag.Wb(b1, "Signin", widgetSigninAuthorizedRedirectURL+"?mode=select", "")
-	htmlfrag.Wb(b1, "Success Landing", successLandingURL, "")
+	htmlfrag.Wb(b1, "Signin", WidgetSigninAuthorizedRedirectURL+"?mode=select", "")
+	htmlfrag.Wb(b1, "Success Landing", signinLandingDefaultURL, "")
 	htmlfrag.Wb(b1, "Signout", signOutURL, "")
-	htmlfrag.Wb(b1, "Signout Landing", signoutLandingURL, "")
 	return b1
 }

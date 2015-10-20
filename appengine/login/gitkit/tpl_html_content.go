@@ -1,5 +1,6 @@
 package gitkit
 
+// client side javascript to measure signin status
 const signedInCode = `
   <script type=text/javascript>
     function getCookie(name) {

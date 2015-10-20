@@ -116,7 +116,7 @@ type SessionUserKey int
 
 const sessionUserKey SessionUserKey = 0
 
-func isSignedIn(r *http.Request) bool {
+func IsSignedIn(r *http.Request) bool {
 
 	signedIn := false
 	cks := r.Cookies()
@@ -132,13 +132,13 @@ func isSignedIn(r *http.Request) bool {
 }
 
 //
-// currentUser extracts the user information stored in current session.
+// CurrentUser extracts the user information stored in current session.
 //
 // If there is no existing session, identity toolkit token is checked.
 // If the token is valid, a new session is created.
 //
 // If any error happens, nil is returned.
-func currentUser(r *http.Request) *User {
+func CurrentUser(r *http.Request) *User {
 	c := appengine.NewContext(r)
 	sess, _ := cookieStore.Get(r, sessionName)
 	if sess.IsNew {
@@ -233,44 +233,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handleSuccess(w http.ResponseWriter, r *http.Request) {
-
-	u := currentUser(r)
-
-	if ok := isSignedIn(r); !ok {
-		u = nil
-	}
-
-	if u == nil {
-		http.Redirect(w, r, widgetSigninAuthorizedRedirectURL+"?mode=select&user=wasNil", http.StatusFound)
-	}
-
-	//
-	var d time.Weekday
-	if u != nil {
-		d = weekdayForUser(r, u)
-	}
-	saveCurrentUser(r, w, u)
-	var xf string
-	if u != nil {
-		xf = xsrftoken.Generate(xsrfKey, u.ID, updateURL)
-	}
-
-	homeTemplate := getHomeTpl(w, r)
-	homeTemplate.Execute(w, map[string]interface{}{
-		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
-		"SignOutURL":             signOutURL,
-		"User":                   u,
-		"WeekdayIndex":           d,
-		"Weekdays":               weekdays,
-		"UpdateWeekdayURL":       updateURL,
-		"UpdateWeekdayXSRFToken": xf,
-
-		// "CookieDump": template.HTML(htmlfrag.CookieDump(r)),
-	})
-}
-
-func handleWidget(w http.ResponseWriter, r *http.Request) {
+func HandleWidget(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 	// Extract the POST body if any.
@@ -287,6 +250,43 @@ func handleWidget(w http.ResponseWriter, r *http.Request) {
 		"POSTBody":         body,
 	})
 
+}
+
+func HandleSuccess(w http.ResponseWriter, r *http.Request) {
+
+	u := CurrentUser(r)
+
+	if ok := IsSignedIn(r); !ok {
+		u = nil
+	}
+
+	if u == nil {
+		http.Redirect(w, r, widgetSigninAuthorizedRedirectURL+"?mode=select&user=wasNil", http.StatusFound)
+	}
+
+	saveCurrentUser(r, w, u)
+	var xf string
+	if u != nil {
+		xf = xsrftoken.Generate(xsrfKey, u.ID, updateURL)
+	}
+
+	//
+	var d time.Weekday
+	if u != nil {
+		d = weekdayForUser(r, u)
+	}
+
+	homeTemplate := getHomeTpl(w, r)
+	homeTemplate.Execute(w, map[string]interface{}{
+		"WidgetURL":              widgetSigninAuthorizedRedirectURL,
+		"SignOutURL":             signOutURL,
+		"User":                   u,
+		"WeekdayIndex":           d,
+		"Weekdays":               weekdays,
+		"UpdateWeekdayURL":       updateURL,
+		"UpdateWeekdayXSRFToken": xf,
+		// "CookieDump": template.HTML(htmlfrag.CookieDump(r)),
+	})
 }
 
 func handleSignOut(w http.ResponseWriter, r *http.Request) {
@@ -313,8 +313,8 @@ func handleSignOut(w http.ResponseWriter, r *http.Request) {
 
 		//
 		w.Header().Del("Set-Cookie")
-		ck := `set-cookie: SESSIONID=WEEEEGMITDIIIIER; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=1800; HttpOnly`
-		ck = `set-cookie: SESSIONID=WEEEEGMITDIIIIER; expires=Thu, 01 Jan 1970 00:00:00 GMT`
+		ck := `set-cookie: SESSIONID=doesnthelp; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=1800; HttpOnly`
+		ck = `set-cookie: SESSIONID=doesnthelp; expires=Thu, 01 Jan 1970 00:00:00 GMT`
 		w.Header().Add("Set-Cookie", ck)
 
 	}
@@ -362,7 +362,7 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 	// Generic
 	c := appengine.NewContext(r)
 	// Check if there is a signed in user.
-	u := currentUser(r)
+	u := CurrentUser(r)
 	if u == nil {
 		aelog.Errorf(c, "No signed in user for updating")
 		outFunc()

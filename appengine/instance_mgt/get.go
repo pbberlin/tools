@@ -73,9 +73,17 @@ func GetByContext(c appengine.Context) *Instance {
 
 		if !util_appengine.IsLocalEnviron() {
 			ii.NumInstances, err = module.NumInstances(c, ii.ModuleName, ii.VersionMajor)
+
 			if err != nil {
-				c.Errorf("get num instances works only live and without autoscale; %v", err)
+				eStr := err.Error()
+				eCmp1, eCmp2, eCmp3 := "API error", "INVALID_VERSION)", "Could not find the given version"
+				if strings.Contains(eStr, eCmp1) && strings.Contains(eStr, eCmp2) && strings.Contains(eStr, eCmp3) {
+					c.Infof("get num instances works only live and without autoscale; %v", err)
+				} else {
+					c.Errorf("get num instances error; %v", err)
+				}
 			}
+
 		}
 
 	}
@@ -90,7 +98,7 @@ func GetByContext(c appengine.Context) *Instance {
 
 	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "")
 	if err != nil {
-		c.Errorf("%v", err)
+		c.Errorf("ModuleHostname1: %v", err)
 	}
 
 	ii.PureHostname = appengine.DefaultVersionHostname(c)
@@ -102,7 +110,7 @@ func GetByContext(c appengine.Context) *Instance {
 			err = nil
 		}
 		if err != nil {
-			c.Errorf("%v", err)
+			c.Errorf("ModuleHostname2: %v", err)
 		}
 
 		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "1")
@@ -111,12 +119,12 @@ func GetByContext(c appengine.Context) *Instance {
 			err = nil
 		}
 		if err != nil {
-			c.Errorf("%v", err)
+			c.Errorf("ModuleHostname3: %v", err)
 		}
 
 		ii.HostnameMod02, err = appengine.ModuleHostname(c, "mod02", "", "")
 		if err != nil {
-			c.Errorf("%v", err)
+			c.Infof("ModuleHostname4: %v", err)
 		}
 
 	}

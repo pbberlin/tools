@@ -20,9 +20,8 @@ const UserInfoHTML = `
 
 
 {{else}}
-  <br>
-  <br>
-  <p>Hello {{.User.Name}} ID: {{.User.ID}} <br>
+  <p>You are logged in as {{.User.Name}}<br>
+  ID: {{.User.ID}} <br>
   Email: {{.User.Email}}</p>
 
 {{end}}`

@@ -1,6 +1,21 @@
 // Implements  coinbase.com integration
 package coinbase
 
+/*
+
+requestPay is unused.
+
+We use payment buttons instead.
+See https://developers.coinbase.com/docs/merchants/payment-buttons
+
+
+
+Oauth is also not used.
+Look here for a preconfigured app with oauth:
+	https://www.coinbase.com/oauth/applications/560fbcaca4221973720002c7
+
+*/
+
 import (
 	"bytes"
 	"encoding/json"
@@ -21,6 +36,8 @@ import (
 
 const uriRequestPayment = "/coinbase-integr/request"
 const uriConfirmPayment = "/coinbase-integr/confirm"
+const uriRedirectSuccess1 = "/coinbase-integr/redir-success1"
+const uriRedirectSuccess2 = "/coinbase-integr/redir-success2"
 
 const coinbaseHost = "www.coinbase.com"
 
@@ -39,6 +56,8 @@ var wpf = fmt.Fprintf
 func InitHandlers() {
 	http.HandleFunc(uriRequestPayment, loghttp.Adapter(requestPay))
 	http.HandleFunc(uriConfirmPayment, loghttp.Adapter(confirmPay))
+	http.HandleFunc(uriRedirectSuccess1, loghttp.Adapter(success01))
+	http.HandleFunc(uriRedirectSuccess2, loghttp.Adapter(success02))
 }
 
 // BackendUIRendered returns a userinterface rendered to HTML
@@ -46,23 +65,29 @@ func BackendUIRendered() *bytes.Buffer {
 	var b1 = new(bytes.Buffer)
 	htmlfrag.Wb(b1, "Coinbase integration", uriRequestPayment, "request payment")
 	htmlfrag.Wb(b1, "Confirm", uriConfirmPayment, "")
-
 	return b1
 }
 
-/*
+const BtnTestFormat = `
+					<a class="coinbase-button"
+						data-code="0025d69ea925b48ba2b7adeb2a911ca2"
+						data-custom="productID=%v&uID=%v"
+						data-env="sandbox"
+						href="https://sandbox.coinbase.com/checkouts/0025d69ea925b48ba2b7adeb2a911ca2"
+					>Pay With Bitcoin</a>
+					<script src="https://sandbox.coinbase.com/assets/button.js" type="text/javascript"></script>
+					`
 
-requestPay is unused.
+const BtnLiveFormat = `
+					<a class="coinbase-button" 
+						data-code="aa4e03abbc5e2f5321d27df32756a932" 
+						data-custom="productID=%v&uID=%v" 
+						href="https://www.coinbase.com/checkouts/aa4e03abbc5e2f5321d27df32756a932" 
+					>Pay With Bitcoin</a>
+					<script src="https://www.coinbase.com/assets/button.js" type="text/javascript"></script>
 
-We use payment buttons instead.
-https://developers.coinbase.com/docs/merchants/payment-buttons
+				`
 
-
-Oauth is also not used.
-Look here for a preconfigured app with oauth:
-	https://www.coinbase.com/oauth/applications/560fbcaca4221973720002c7
-
-*/
 func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
@@ -95,7 +120,6 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 	}
 	bts, inf, err := fetch.UrlGetter(r, fetch.Options{Req: req})
 	bts = bytes.Replace(bts, []byte(`","`), []byte(`", "`), -1)
-
 	if err != nil {
 		lg(err)
 		lg(inf.Msg)
@@ -110,8 +134,9 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 	err = json.Unmarshal(bts, &data1)
 	lg(err)
 	lg(stringspb.IndentedDumpBytes(data1))
-	// lg("%#v", data1)
 
+	// Response body contains the suggested bitcoin address for payment.
+	// And the minimum recommended fee percentage
 	inputAddress, ok := data1["input_address"].(string)
 	if !ok {
 		lg("input address could not be casted to string; is type %T", data1["input_address"])
@@ -230,13 +255,20 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 		var values url.Values
 		if _, ok := mpOrder["custom"]; ok {
-			var err error
-			values, err = url.ParseQuery(mpOrder["custom"].(string))
-			lg(err)
-			if err != nil {
-				w.WriteHeader(http.StatusLengthRequired)
-				lg("unsatisfactory query in custom string %v", mpOrder["custom"])
-				return
+			if mpOrder["custom"] == "123456789" {
+				lg("test request recognized")
+				values = url.Values{}
+				values.Add("uID", "testUser123")
+				values.Add("productID", "/member/somearticle")
+			} else {
+				var err error
+				values, err = url.ParseQuery(mpOrder["custom"].(string))
+				lg(err)
+				if err != nil {
+					w.WriteHeader(http.StatusLengthRequired)
+					lg("unsatisfactory query in custom string %v", mpOrder["custom"])
+					return
+				}
 			}
 		} else {
 			w.WriteHeader(http.StatusLengthRequired)
@@ -246,6 +278,7 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 		//  save
 		if status == "completed" {
+			lg("status 'completed'")
 			blob := dsu.WrapBlob{
 				VByte: stringspb.IndentedDumpBytes(mpOrder),
 			}
@@ -261,7 +294,7 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 			lg("key is %v", newKey)
 			lg(err)
 
-			retrieveAgain, err := dsu.BufGet(appengine.NewContext(r), "dsu.WrapBlob__"+blob.Name)
+			retrieveAgain, err := dsu.BufGet(appengine.NewContext(r), "dsu.WrapBlob__"+blob.Name+blob.S)
 			lg(err)
 			lg("retrieved %v %v %v", retrieveAgain.Name, retrieveAgain.Desc, retrieveAgain.F)
 
@@ -293,4 +326,43 @@ func submap(mpArg map[string]interface{}, key string, lg loghttp.FuncBufUniv) ma
 	}
 
 	return mp
+}
+
+/*
+https://tec-news.appspot.com/coinbase-integr/redir-success1?
+order[button][description]=When and how Bitcoin decline will start.
+&order[button][id]=0025d69ea925b48ba2b7adeb2a911ca2&
+order[button][name]=Bitcoin Analysis&
+order[button][repeat]=&
+order[button][resource_path]=/v2/checkouts/4f1e5ecc-c8fc-56fc-926c-15a7eebd8314&
+order[button][subscription]=false&
+order[button][type]=buy_now&
+order[button][uuid]=4f1e5ecc-c8fc-56fc-926c-15a7eebd8314&
+order[created_at]=2015-10-26 08:03:17 -0700&
+order[custom]=productID=/member/tec-news/crypto-experts-neglect-one-vital-aspect&
+uID=14952300052240127534&
+order[event]=&
+order[id]=GAB5VN36&
+order[metadata]=&
+order[receive_address]=myL84ofiymQpzzmJ7Foc9F2wQ4GMuSuQ3f&
+order[refund_address]=mwaz3wxMbnZrBZUSZpVHr51xjQ6Swx756b&
+order[resource_path]=/v2/orders/9bbf6fde-530a-53a4-bf94-d54fc3f43d40&
+order[status]=completed&
+order[total_btc][cents]=5600.0&
+order[total_btc][currency_iso]=BTC&
+order[total_native][cents]=50.0&
+order[total_native][currency_iso]=EUR&
+order[total_payout][cents]=0.0&
+order[total_payout][currency_iso]=USD&
+order[transaction][confirmations]=0&
+order[transaction][hash]=ada26d75ff1e16b4febf539433d5260441171560c57adfff2ac968be37108112&
+order[transaction][id]=562e40dede472f26be000018&order[uuid]=9bbf6fde-530a-53a4-bf94-d54fc3f43d40
+*/
+func success01(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+	w.Write([]byte("success default"))
+}
+
+func success02(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+	w.Write([]byte("success custom"))
+
 }

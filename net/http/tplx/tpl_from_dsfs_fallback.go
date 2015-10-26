@@ -70,7 +70,7 @@ var hugoTplFallback = []byte(`<!DOCTYPE html>
 	<div class="container">
 	  <div class="row col-md-12">
         <footer>
- 			[REPLACE_FOOTER]
+ 			<span id='REPLACE_FOOTER'></span>
           <div>
                 <p>
                     &copy;2015 

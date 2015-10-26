@@ -26,19 +26,22 @@ func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosu
 	t := fmt.Sprintf("%T", wb)
 	mkk = t + "__" + skey // kombi key
 
-	errClosure = datastore.RunInTransaction(c,
-		func(c appengine.Context) error {
-			dskey1 := datastore.NewKey(c, t, skey, 0, nil)
-			_, err := datastore.Put(c, dskey1, &wb)
-			McacheSet(c, mkk, wb)
-			memoryInstanceStore[mkk] = &wb
-			multiCastInstanceCacheChange(c, mkk)
-			if ll > 2 {
-				c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
-			}
-			return err
-		}, nil)
-	c.Errorf("%v", errClosure)
+	fcTrans := func(c appengine.Context) error {
+		dskey1 := datastore.NewKey(c, t, skey, 0, nil)
+		_, err := datastore.Put(c, dskey1, &wb)
+		McacheSet(c, mkk, wb)
+		memoryInstanceStore[mkk] = &wb
+		multiCastInstanceCacheChange(c, mkk)
+		if ll > 2 {
+			c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
+		}
+		return err
+	}
+
+	errClosure = datastore.RunInTransaction(c, fcTrans, nil)
+	if errClosure != nil {
+		c.Errorf("%v", errClosure)
+	}
 
 	return
 }

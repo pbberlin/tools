@@ -283,6 +283,7 @@ func confirmPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 				VByte: stringspb.IndentedDumpBytes(mpOrder),
 			}
 			blob.Name = values.Get("uID")
+			blob.Category = "invoice"
 			blob.S = values.Get("productID")
 			blob.Desc = status
 			blob.F = BTC

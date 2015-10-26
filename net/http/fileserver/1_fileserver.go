@@ -29,11 +29,17 @@ var wpf = func(w io.Writer, format string, a ...interface{}) (int, error) {
 
 var spf = fmt.Sprintf
 
+type Options struct {
+	FS           fsi.FileSystem
+	Prefix       string
+	Replacements map[string][]byte
+}
+
 // We cannot use http.FileServer(http.Dir("./css/")
 // to dispatch our dsfs files.
 // We need the appengine context to initialize dsfs.
 // Thus we have to re-implement a serveFile method:
-func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *http.Request) {
+func FsiFileServer(w http.ResponseWriter, r *http.Request, opt Options) {
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
@@ -56,11 +62,11 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 	p := r.URL.Path
 
-	if strings.HasPrefix(p, prefix) {
+	if strings.HasPrefix(p, opt.Prefix) {
 		// p = p[len(prefix):]
-		p = strings.TrimPrefix(p, prefix)
+		p = strings.TrimPrefix(p, opt.Prefix)
 	} else {
-		wpf(b1, "route must start with prefix %v - but is %v", prefix, p)
+		wpf(b1, "route must start with prefix %v - but is %v", opt.Prefix, p)
 	}
 
 	if strings.HasPrefix(p, "/") {
@@ -71,7 +77,7 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 	// fullP := path.Join(docRootDataStore, p)
 	fullP := p
 
-	f, err := fs.Open(fullP)
+	f, err := opt.FS.Open(fullP)
 	if err != nil {
 		wpf(b1, "err opening file %v - %v", fullP, err)
 		return
@@ -90,7 +96,7 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 
 		fullP += "/index.html"
 
-		fIndex, err := fs.Open(fullP)
+		fIndex, err := opt.FS.Open(fullP)
 		if err == nil {
 			defer fIndex.Close()
 			inf, err = fIndex.Stat()
@@ -148,6 +154,10 @@ func FsiFileServer(fs fsi.FileSystem, prefix string, w http.ResponseWriter, r *h
 		}
 	} else {
 		htmlfrag.SetNocacheHeaders(w)
+	}
+
+	for k, v := range opt.Replacements {
+		bts1 = bytes.Replace(bts1, []byte(k), v, -1)
 	}
 
 	w.Write(bts1)

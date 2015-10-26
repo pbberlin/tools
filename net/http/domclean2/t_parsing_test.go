@@ -43,7 +43,7 @@ func prepare(t *testing.T) aetest.Context {
 
 	serveFile := func(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 		fs1 := repo.GetFS(c)
-		fileserver.FsiFileServer(fs1, repo.UriMountNameY, w, r)
+		fileserver.FsiFileServer(w, r, fileserver.Options{FS: fs1, Prefix: repo.UriMountNameY})
 	}
 	http.HandleFunc(repo.UriMountNameY, loghttp.Adapter(serveFile))
 

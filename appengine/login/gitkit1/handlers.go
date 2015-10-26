@@ -96,7 +96,7 @@ func HandleVariWidget(w http.ResponseWriter, r *http.Request, successLandingURL 
 func handleSigninSuccessLanding(w http.ResponseWriter, r *http.Request) {
 	HandleVariSuccess(w, r,
 		siteName+" member home",
-		UserInfoHTML+"<br> some body html<br>"+IDCardHTML,
+		UserInfoHTML+"<br><br>"+IDCardHTML+"<br><br>",
 	)
 }
 

@@ -79,6 +79,6 @@ func ServeDsFsFile(w http.ResponseWriter, r *http.Request, m map[string]interfac
 		dsfs.AeContext(appengine.NewContext(r)),
 	)
 
-	fileserver.FsiFileServer(fs2, prefix+"/", w, r)
+	fileserver.FsiFileServer(w, r, fileserver.Options{FS: fs2, Prefix: prefix + "/"})
 
 }

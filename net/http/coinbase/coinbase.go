@@ -37,7 +37,6 @@ import (
 const uriRequestPayment = "/coinbase-integr/request"
 const uriConfirmPayment = "/coinbase-integr/confirm"
 const uriRedirectSuccess1 = "/coinbase-integr/redir-success1"
-const uriRedirectSuccess2 = "/coinbase-integr/redir-success2"
 
 const coinbaseHost = "www.coinbase.com"
 
@@ -57,7 +56,6 @@ func InitHandlers() {
 	http.HandleFunc(uriRequestPayment, loghttp.Adapter(requestPay))
 	http.HandleFunc(uriConfirmPayment, loghttp.Adapter(confirmPay))
 	http.HandleFunc(uriRedirectSuccess1, loghttp.Adapter(success01))
-	http.HandleFunc(uriRedirectSuccess2, loghttp.Adapter(success02))
 }
 
 // BackendUIRendered returns a userinterface rendered to HTML
@@ -331,8 +329,8 @@ func submap(mpArg map[string]interface{}, key string, lg loghttp.FuncBufUniv) ma
 
 /*
 https://tec-news.appspot.com/coinbase-integr/redir-success1?
-order[button][description]=When and how Bitcoin decline will start.
-&order[button][id]=0025d69ea925b48ba2b7adeb2a911ca2&
+order[button][description]=When and how Bitcoin decline will start.&
+order[button][id]=0025d69ea925b48ba2b7adeb2a911ca2&
 order[button][name]=Bitcoin Analysis&
 order[button][repeat]=&
 order[button][resource_path]=/v2/checkouts/4f1e5ecc-c8fc-56fc-926c-15a7eebd8314&
@@ -340,8 +338,7 @@ order[button][subscription]=false&
 order[button][type]=buy_now&
 order[button][uuid]=4f1e5ecc-c8fc-56fc-926c-15a7eebd8314&
 order[created_at]=2015-10-26 08:03:17 -0700&
-order[custom]=productID=/member/tec-news/crypto-experts-neglect-one-vital-aspect&
-uID=14952300052240127534&
+order[custom]=productID=/member/tec-news/crypto-experts-neglect-one-vital-aspect&uID=14952300052240127534&
 order[event]=&
 order[id]=GAB5VN36&
 order[metadata]=&
@@ -357,13 +354,36 @@ order[total_payout][cents]=0.0&
 order[total_payout][currency_iso]=USD&
 order[transaction][confirmations]=0&
 order[transaction][hash]=ada26d75ff1e16b4febf539433d5260441171560c57adfff2ac968be37108112&
-order[transaction][id]=562e40dede472f26be000018&order[uuid]=9bbf6fde-530a-53a4-bf94-d54fc3f43d40
+order[transaction][id]=562e40dede472f26be000018&
+order[uuid]=9bbf6fde-530a-53a4-bf94-d54fc3f43d40
 */
 func success01(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	w.Write([]byte("success default"))
-}
 
-func success02(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
-	w.Write([]byte("success custom"))
+	r.Header.Set("X-Custom-Header-Counter", "nocounter")
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	custom := r.Form.Get("order[custom]")
+	// w.Write([]byte("custom=" + custom + "<br>\n"))
+
+	values, err := url.ParseQuery(custom)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	productID := values.Get("productID")
+	uID := values.Get("uID")
+
+	if productID != "" {
+		http.Redirect(w, r, productID+"?redirected-from=paymentsucc", http.StatusFound)
+		return
+	}
+
+	w.Write([]byte("productID=" + productID + " uID=" + uID + "<br>\n"))
 
 }

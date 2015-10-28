@@ -51,13 +51,18 @@ func GetHomeTpl(w http.ResponseWriter, r *http.Request, title, body string) *tem
 
 }
 
-func GetIDCardTpl(w http.ResponseWriter, r *http.Request, u *User) string {
+func GetIDCardTpl(w http.ResponseWriter, r *http.Request, u *User,
+	argSignoutURL string, argRedirectSuccess string) string {
 
 	b := new(bytes.Buffer)
 
+	if argRedirectSuccess != "" {
+		argRedirectSuccess = "?mode=select&user=wasNil&red=" + argRedirectSuccess
+	}
+
 	fmt.Fprintf(b, tplx.ExecTplHelper(IDCardHTML, map[string]interface{}{
-		"WidgetURL":  WidgetSigninAuthorizedRedirectURL,
-		"SignOutURL": signOutURL,
+		"WidgetURL":  WidgetSigninAuthorizedRedirectURL + argRedirectSuccess,
+		"SignOutURL": argSignoutURL,
 		"User":       u,
 		// "CookieDump": template.HTML(htmlfrag.CookieDump(r)),
 	}))

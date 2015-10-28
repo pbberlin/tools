@@ -33,6 +33,7 @@ type Options struct {
 	FS           fsi.FileSystem
 	Prefix       string
 	Replacements map[string][]byte
+	Cutout       bool
 }
 
 // We cannot use http.FileServer(http.Dir("./css/")
@@ -158,6 +159,19 @@ func FsiFileServer(w http.ResponseWriter, r *http.Request, opt Options) {
 
 	for k, v := range opt.Replacements {
 		bts1 = bytes.Replace(bts1, []byte(k), v, -1)
+	}
+	if opt.Cutout {
+		sep := []byte("<span id='CUTOUT'></span>")
+		spl := bytes.Split(bts1, sep)
+		if len(spl) > 1 {
+			bts2 := []byte{}
+			for i, part := range spl {
+				if i%2 == 0 {
+					bts2 = append(bts2, part...)
+				}
+			}
+			bts1 = bts2
+		}
 	}
 
 	w.Write(bts1)

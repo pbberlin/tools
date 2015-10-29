@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"appengine"
-
 	// sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 
 	"github.com/pbberlin/tools/appengine/instance_mgt"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"google.golang.org/appengine"
 )
 
 func view(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

@@ -6,12 +6,13 @@ import (
 
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/util"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/memcache"
 
 	"time"
 
-	"appengine"
-	"appengine/datastore"
-	"appengine/memcache"
+	aelog "google.golang.org/appengine/log"
 )
 
 var updateSamplingFrequency = map[string]int{}
@@ -68,17 +69,17 @@ func keySingleShard(valName string, shardKey int) string {
 
 // Count retrieves the value of the named counter.
 // Either from memcache - or from datastore
-func Count(c appengine.Context, valName string) (retVal int, err error) {
+func Count(c context.Context, valName string) (retVal int, err error) {
 
 	wi := dsu.WrapInt{}
 	errMc := dsu.McacheGet(c, mcKey(valName), &wi)
 	if errMc == false {
-		c.Errorf("%v", errMc)
+		aelog.Errorf(c, "%v", errMc)
 	}
 	retVal = wi.I
 	if retVal > 0 {
 		if ll > 2 {
-			c.Infof("found counter %s = %v in memcache; return", mcKey(valName), wi.I)
+			aelog.Infof(c, "found counter %s = %v in memcache; return", mcKey(valName), wi.I)
 		}
 		retVal = 0
 	}
@@ -108,12 +109,12 @@ Loop1:
 
 			if err == datastore.Done {
 				if ll > 2 {
-					c.Infof("       No Results (any more)  %v", err)
+					aelog.Infof(c, "       No Results (any more)  %v", err)
 				}
 				err = nil
 				if cntr == 0 {
 					if ll > 2 {
-						c.Infof("  Leaving Loop1")
+						aelog.Infof(c, "  Leaving Loop1")
 					}
 					break Loop1
 				}
@@ -122,11 +123,11 @@ Loop1:
 			cntr++
 			retVal += sd.I
 			if ll > 2 {
-				c.Infof("        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
+				aelog.Infof(c, "        %2vth shard: %v %v %4v - %4v", cntr, sd.Name, sd.ShardId, sd.I, retVal)
 			}
 		}
 		if ll > 2 {
-			c.Infof("   %2v shards found - sum %4v", cntr, retVal)
+			aelog.Infof(c, "   %2v shards found - sum %4v", cntr, retVal)
 		}
 
 	}
@@ -137,7 +138,7 @@ Loop1:
 }
 
 // Increment increments the named counter.
-func Increment(c appengine.Context, valName string) error {
+func Increment(c context.Context, valName string) error {
 
 	// Get counter config.
 	shardsTotal := dsu.WrapInt{}
@@ -145,7 +146,7 @@ func Increment(c appengine.Context, valName string) error {
 	if shardsTotal.I < 1 {
 		ckey := datastore.NewKey(c, dsKindNumShards, mcKeyShardsTotal(valName), 0, nil)
 		errTx := datastore.RunInTransaction(c,
-			func(c appengine.Context) error {
+			func(c context.Context) error {
 				err := datastore.Get(c, ckey, &shardsTotal)
 				if err == datastore.ErrNoSuchEntity {
 					shardsTotal.I = defaultNumShards
@@ -161,7 +162,7 @@ func Increment(c appengine.Context, valName string) error {
 
 	// pick random counter and increment it
 	errTx := datastore.RunInTransaction(c,
-		func(c appengine.Context) error {
+		func(c context.Context) error {
 			shardId := rand.Intn(shardsTotal.I)
 			dsKey := datastore.NewKey(c, dsKindShard, keySingleShard(valName, shardId), 0, nil)
 			var sd WrapShardData
@@ -175,7 +176,7 @@ func Increment(c appengine.Context, valName string) error {
 			sd.I++
 			_, err = datastore.Put(c, dsKey, &sd)
 			if ll > 2 {
-				c.Infof("ds put %v %v", dsKey, sd)
+				aelog.Infof(c, "ds put %v %v", dsKey, sd)
 			}
 			return err
 		}, nil)
@@ -198,9 +199,9 @@ func Increment(c appengine.Context, valName string) error {
 
 // AdjustShards increases the number of shards for the named counter to n.
 // It will never decrease the number of shards.
-func AdjustShards(c appengine.Context, valName string, n int) error {
+func AdjustShards(c context.Context, valName string, n int) error {
 	ckey := datastore.NewKey(c, dsKindNumShards, valName, 0, nil)
-	return datastore.RunInTransaction(c, func(c appengine.Context) error {
+	return datastore.RunInTransaction(c, func(c context.Context) error {
 		shardsTotal := dsu.WrapInt{}
 		mod := false
 		err := datastore.Get(c, ckey, &shardsTotal)

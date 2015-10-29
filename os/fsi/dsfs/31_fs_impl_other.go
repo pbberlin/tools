@@ -1,8 +1,8 @@
 package dsfs
 
 import (
-	"appengine/datastore"
-	"appengine/memcache"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/memcache"
 )
 
 // DeleteAll deletes across all roots

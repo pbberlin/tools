@@ -4,7 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"appengine/memcache"
+	aelog "google.golang.org/appengine/log"
+	"google.golang.org/appengine/memcache"
 )
 
 func (d *DsDir) MemCacheSet() {
@@ -16,7 +17,7 @@ func (d *DsDir) MemCacheSet() {
 	}
 	err := memcache.JSON.Set(d.fSys.Ctx(), miPut)
 	if err != nil {
-		d.fSys.Ctx().Errorf("memcache put dir %v => err %v", d.Dir+d.BName, err)
+		aelog.Errorf(d.fSys.Ctx(), "memcache put dir %v => err %v", d.Dir+d.BName, err)
 	} else {
 		// d.Fs.Ctx().Infof("fso memcachd - key %v", d.Dir+d.BName)
 	}
@@ -25,7 +26,7 @@ func (d *DsDir) MemCacheSet() {
 func (d *DsDir) MemCacheDelete() {
 	err := memcache.Delete(d.fSys.Ctx(), d.Dir+d.BName)
 	if err != nil {
-		d.fSys.Ctx().Errorf("memcache delete dir %v => err %v", d.Dir+d.BName, err)
+		aelog.Errorf(d.fSys.Ctx(), "memcache delete dir %v => err %v", d.Dir+d.BName, err)
 	}
 }
 
@@ -38,9 +39,9 @@ func (d *DsDir) MemCacheGet(name string) error {
 		!strings.Contains(err.Error(), "invalid security ticket") &&
 		!strings.Contains(err.Error(), "Canceled") &&
 		true {
-		d.fSys.Ctx().Errorf("%v", err)
+		aelog.Errorf(d.fSys.Ctx(), "%v", err)
 		// panic(err)
-		// d.fSys.Ctx().Errorf("%v", err)
+		// aelog.Errorf(fSys.Ctx(),"%v", err)
 	} else if err == memcache.ErrCacheMiss {
 		return err
 	}

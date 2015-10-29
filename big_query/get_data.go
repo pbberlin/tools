@@ -8,12 +8,15 @@ import (
 	"math/rand"
 	"time"
 
+	aelog "google.golang.org/appengine/log"
+
 	"fmt"
 	"net/http"
 
-	bq "code.google.com/p/google-api-go-client/bigquery/v2"
+	// bq "code.google.com/p/google-api-go-client/bigquery/v2"
+	bq "google.golang.org/api/bigquery/v2"
 
-	"appengine"
+	"google.golang.org/appengine"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/dsu"
@@ -23,7 +26,6 @@ import (
 	"github.com/pbberlin/tools/util"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
-	newappengine "google.golang.org/appengine" // https://github.com/golang/oauth2
 )
 
 // print it to http writer
@@ -75,7 +77,7 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 	// "https://www.googleapis.com/auth/devstorage.full_control"
 
 	// 2015-06: instead of oauth2.NoContext we get a new type of context
-	var ctx context.Context = newappengine.NewContext(r)
+	var ctx context.Context = appengine.NewContext(r)
 	oauthHttpClient, err := google.DefaultClient(
 		ctx, "https://www.googleapis.com/auth/bigquery")
 
@@ -105,7 +107,7 @@ func queryIntoDatastore(w http.ResponseWriter, r *http.Request, m map[string]int
 	rows := resp.Rows
 	var vVDest [][]byte = make([][]byte, len(rows))
 
-	c.Errorf("%#v", rows)
+	aelog.Errorf(c, "%#v", rows)
 
 	for i0, v0 := range rows {
 

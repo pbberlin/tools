@@ -6,16 +6,16 @@ import (
 
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
-
-	"appengine"
+	"google.golang.org/appengine"
 
 	"net/http"
 
 	"bytes"
 	"io"
 	"strings"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 func SaveImageToDatastore(w http.ResponseWriter, r *http.Request, i *image.RGBA, key string) string {
@@ -42,7 +42,7 @@ func GetImageFromDatastore(w http.ResponseWriter, r *http.Request, key string) *
 	s := string(dsObj.VByte)
 
 	img, whichFormat := conv.Base64_str_to_img(s)
-	c.Infof("retrieved img from base64: format %v - subtype %T\n", whichFormat, img)
+	aelog.Infof(c, "retrieved img from base64: format %v - subtype %T\n", whichFormat, img)
 
 	i, ok := img.(*image.RGBA)
 	loghttp.E(w, r, ok, false, "saved image needs to be reconstructible into a format png of subtype *image.RGBA")
@@ -54,6 +54,9 @@ func GetImageFromDatastore(w http.ResponseWriter, r *http.Request, key string) *
 // probably  efficient enough just to call
 // var bEnc []byte = []byte(sEnc)
 func StringToVByte(s string) (*bytes.Buffer, *bytes.Buffer) {
+
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
 
 	bMsg := new(bytes.Buffer)
 
@@ -67,7 +70,7 @@ func StringToVByte(s string) (*bytes.Buffer, *bytes.Buffer) {
 		if err == io.EOF {
 			break
 		}
-		logif.E(err)
+		lg(err)
 		if n1 < 1 {
 			break
 		}
@@ -75,7 +78,7 @@ func StringToVByte(s string) (*bytes.Buffer, *bytes.Buffer) {
 		independentCopy := make([]byte, n1)
 		copy(independentCopy, lb)
 		n2, err := bDst.Write(independentCopy)
-		logif.E(err)
+		lg(err)
 
 		bMsg.WriteString(fmt.Sprintln("reading", n1, "bytes - writing", n2, "bytes: \n"))
 		bMsg.WriteString(fmt.Sprint(" --", string(independentCopy), "--<br>\n"))

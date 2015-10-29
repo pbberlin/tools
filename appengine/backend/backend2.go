@@ -6,8 +6,7 @@ import (
 	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
-
-	"appengine"
+	"google.golang.org/appengine"
 )
 
 type link struct {

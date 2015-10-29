@@ -1,0 +1,11 @@
+{
+  "ContentDir": "cnt_cred_exp",
+  "ShortName": "credit-expansion",
+  "SiteTitle": "100 years of credit expansion",
+  "ContentGroup": "credit-expansion",
+  "DisqusShortname": "",
+  "targets": {
+	  "url1": "localhost:8086/filesys/post-upload-receive",
+	  "url2": "credit-expansion.appspot.com/filesys/post-upload-receive"
+	}
+}

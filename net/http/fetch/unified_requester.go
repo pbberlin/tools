@@ -13,9 +13,10 @@ import (
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/stringspb"
+	"google.golang.org/appengine"
 
-	"appengine"
-	"appengine/urlfetch"
+	oldAE "appengine"
+	oldFetch "appengine/urlfetch"
 )
 
 var MsgNoRdirects = "redirect cancelled"
@@ -99,15 +100,21 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 	} else {
 		c := util_appengine.SafelyExtractGaeContext(gaeReq)
 		if c != nil {
-			client = urlfetch.Client(c)
+
+			ctxOld := oldAE.NewContext(gaeReq)
+			client = oldFetch.Client(ctxOld)
 
 			// this does not prevent urlfetch: SSL_CERTIFICATE_ERROR
 			// it merely leads to err = "DEADLINE_EXCEEDED"
-			tr := urlfetch.Transport{Context: c, AllowInvalidServerCertificate: true}
+			tr := oldFetch.Transport{Context: ctxOld, AllowInvalidServerCertificate: true}
 			// thus
-			tr = urlfetch.Transport{Context: c, AllowInvalidServerCertificate: false}
-			tr.Deadline = 20 * time.Second
+			tr = oldFetch.Transport{Context: ctxOld, AllowInvalidServerCertificate: false}
+
+			tr.Deadline = 20 * time.Second // only possible on aeOld
+
 			client.Transport = &tr
+			// client.Timeout = 20 * time.Second // also not in google.golang.org/appengine/urlfetch
+
 		} else {
 			return nil, inf, ErrNoContext
 		}

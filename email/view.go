@@ -5,13 +5,14 @@ import (
 
 	"bytes"
 
-	"appengine"
+	aelog "google.golang.org/appengine/log"
 
 	// "github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
+	"google.golang.org/appengine"
 
 	"fmt"
 	"strings"
@@ -107,7 +108,7 @@ func parseFurther(w http.ResponseWriter, r *http.Request, saveImages bool) {
 					rE.b64Img = &s
 					Images[reservoirRevolver%reservoirSize] = rE
 					reservoirRevolver++
-					c.Infof("Put image into reservoir %v %v", fn, ctype)
+					aelog.Infof(c, "Put image into reservoir %v %v", fn, ctype)
 				}
 			}
 

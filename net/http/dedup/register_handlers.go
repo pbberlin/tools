@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
@@ -14,6 +12,7 @@ import (
 	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"golang.org/x/net/html"
+	"google.golang.org/appengine"
 )
 
 // InitHandlers is called from outside,

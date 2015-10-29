@@ -5,8 +5,7 @@ import (
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
-
-	"appengine"
+	"google.golang.org/appengine"
 
 	// "github.com/davecgh/go-spew/spew"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/util"
+	aelog "google.golang.org/appengine/log"
 )
 
 /*
@@ -139,7 +139,7 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 			if i2%myB0.VB1[i1].NCols == (myB0.VB1[i1].NCols - 1) {
 				myB0.VB1[i1].VB2[i2].IsLast = true
 			}
-			//c.Infof("first-last %v %v \n", i2, i2%myB0.VB1[i1].NCols)
+			//aelog.Infof(c,"first-last %v %v \n", i2, i2%myB0.VB1[i1].NCols)
 		}
 	}
 
@@ -163,12 +163,12 @@ func backend3(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 	for i1, _ := range myB0.VB1 {
 		sort.Sort(myB0.VB1[i1].BySize)
 		sort.Sort(myB0.VB1[i1].ByHeading)
-		c.Infof("-- Sorting %v", myB0.VB1[i1].Heading)
+		aelog.Infof(c, "-- Sorting %v", myB0.VB1[i1].Heading)
 		// for i, v := range myB0.VB1[i1].BySize {
-		// 	c.Infof("---- %v %v %v", i, v.IdxSrc, v.ByI)
+		// 	aelog.Infof(c,"---- %v %v %v", i, v.IdxSrc, v.ByI)
 		// }
 		// for i, v := range myB0.VB1[i1].ByHeading {
-		// 	c.Infof("---- %v %v %v", i, v.IdxSrc, v.ByS)
+		// 	aelog.Infof(c,"---- %v %v %v", i, v.IdxSrc, v.ByS)
 		// }
 	}
 

@@ -1,5 +1,6 @@
 {
   "ContentDir": "cnt_tec",
+  "ShortName": "tec-news",
   "SiteTitle": "An econ perspective on technology",
   "ContentGroup": "other",
   "DisqusShortname": "tec-news",

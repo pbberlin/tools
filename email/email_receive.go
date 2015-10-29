@@ -5,9 +5,8 @@ import (
 
 	go_mail "net/mail"
 
-	ae_mail "appengine/mail"
-
-	"appengine"
+	"google.golang.org/appengine"
+	ae_mail "google.golang.org/appengine/mail"
 
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
@@ -17,6 +16,8 @@ import (
 	"strings"
 
 	"bytes"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 /*
@@ -50,14 +51,14 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request, mx map[string]
 	msg, err := go_mail.ReadMessage(r.Body)
 	loghttp.E(w, r, err, false, "could not do ReadMessage")
 	if msg == nil {
-		c.Warningf("-empty msg- " + r.URL.Path)
+		aelog.Warningf(c, "-empty msg- "+r.URL.Path)
 		return
 	}
 
 	// see http://golang.org/pkg/net/mail/#Message
 	b1 := new(bytes.Buffer)
 	// for i, m1 := range msg.Header {
-	// 	c.Infof("--msg header %q : %v", i, m1)
+	// 	aelog.Infof(c,"--msg header %q : %v", i, m1)
 	// }
 
 	from := msg.Header.Get("from") + "\n"
@@ -74,20 +75,20 @@ func emailReceiveAndStore(w http.ResponseWriter, r *http.Request, mx map[string]
 	b1.WriteString("when: " + swhen)
 
 	ctype := msg.Header.Get("Content-Type")
-	c.Infof("content type header: %q", ctype)
+	aelog.Infof(c, "content type header: %q", ctype)
 	boundary := ""
 	// [multipart/mixed; boundary="------------060002090509030608020402"]
 	if strings.HasPrefix(ctype, "[multipart/mixed") ||
 		strings.HasPrefix(ctype, "multipart/mixed") {
 		vT1 := strings.Split(ctype, ";")
 		if len(vT1) > 1 {
-			c.Infof("substring 1: %q", vT1[1])
+			aelog.Infof(c, "substring 1: %q", vT1[1])
 			sT11 := vT1[1]
 			sT11 = strings.TrimSpace(sT11)
 			sT11 = strings.TrimPrefix(sT11, "boundary=")
 			sT11 = strings.Trim(sT11, `"`)
 			boundary = sT11
-			c.Infof("substring 2: %q", boundary)
+			aelog.Infof(c, "substring 2: %q", boundary)
 		}
 	}
 
@@ -125,10 +126,10 @@ func emailReceiveSimple(w http.ResponseWriter, r *http.Request, m map[string]int
 	*/
 	var b2 bytes.Buffer
 	if _, err := b2.ReadFrom(r.Body); err != nil {
-		c.Errorf("Error reading body: %v", err)
+		aelog.Infof(c, "Error reading body: %v", err)
 		return
 	}
-	c.Infof("\n\nb2: " + b2.String() + "--\n ")
+	aelog.Infof(c, "\n\nb2: "+b2.String()+"--\n ")
 
 }
 

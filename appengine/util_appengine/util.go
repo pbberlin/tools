@@ -11,7 +11,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"appengine"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 )
 
 import "os"
@@ -36,7 +37,7 @@ func IsLocalEnviron() bool {
 }
 
 //
-func SafelyExtractGaeCtxError(r *http.Request) (appengine.Context, error) {
+func SafelyExtractGaeCtxError(r *http.Request) (context.Context, error) {
 	if r == nil {
 		return nil, fmt.Errorf("Request is not appengine - request is nil")
 	}
@@ -49,7 +50,7 @@ func SafelyExtractGaeCtxError(r *http.Request) (appengine.Context, error) {
 }
 
 // Same as SafelyExtractGaeCtxError(), but without an error
-func SafelyExtractGaeContext(r *http.Request) appengine.Context {
+func SafelyExtractGaeContext(r *http.Request) context.Context {
 	if r == nil {
 		return nil
 	}
@@ -57,7 +58,7 @@ func SafelyExtractGaeContext(r *http.Request) appengine.Context {
 	return c
 }
 
-func checkPanicking(r *http.Request) appengine.Context {
+func checkPanicking(r *http.Request) context.Context {
 	defer func() {
 		recover()
 	}()

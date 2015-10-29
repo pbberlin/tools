@@ -8,6 +8,8 @@ import (
 	"path"
 
 	"github.com/pbberlin/tools/os/fsi/common"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/memcache"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
@@ -15,9 +17,6 @@ import (
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 
 	"archive/zip"
-
-	"appengine"
-	"appengine/memcache"
 )
 
 func receiveUpload(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

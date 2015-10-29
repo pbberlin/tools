@@ -7,11 +7,10 @@ import (
 	"path"
 	"time"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"golang.org/x/net/context"
 	"golang.org/x/net/html"
 )
 
@@ -96,7 +95,7 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 	//
 	// main request still exists?
 	if false {
-		var cx appengine.Context
+		var cx context.Context
 		cx = util_appengine.SafelyExtractGaeContext(m.r)
 		if cx == nil {
 			m.lg("timed out - returning")

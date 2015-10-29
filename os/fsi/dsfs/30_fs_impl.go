@@ -8,10 +8,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"appengine/datastore"
+	"google.golang.org/appengine/datastore"
 
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/common"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 func (fs dsFileSys) Name() string { return "dsfs" }
@@ -237,7 +239,7 @@ func (fs *dsFileSys) RemoveAll(path string) error {
 	walkRemove := func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			// do nothing; don't break the walk
-			fs.Ctx().Errorf("Error walking %v => %v", path, err)
+			aelog.Errorf(fs.Ctx(), "Error walking %v => %v", path, err)
 		} else {
 			if f != nil { // && f.IsDir() to constrain
 				paths = append(paths, path)
@@ -248,7 +250,7 @@ func (fs *dsFileSys) RemoveAll(path string) error {
 
 	err := common.Walk(fs, path, walkRemove)
 	if err != nil {
-		fs.Ctx().Errorf("Error removing %v => %v", path, err)
+		aelog.Errorf(fs.Ctx(), "Error removing %v => %v", path, err)
 	}
 
 	// Walk crawls directories first, files second.
@@ -257,10 +259,10 @@ func (fs *dsFileSys) RemoveAll(path string) error {
 		iRev := len(paths) - 1 - i
 		err := fs.Remove(paths[iRev])
 		if err != nil {
-			fs.Ctx().Errorf("Error removing %v => %v", paths[iRev], err)
+			aelog.Errorf(fs.Ctx(), "Error removing %v => %v", paths[iRev], err)
 			return err
 		}
-		fs.Ctx().Infof("removed path %v", paths[iRev])
+		aelog.Infof(fs.Ctx(), "removed path %v", paths[iRev])
 	}
 
 	return nil

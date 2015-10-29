@@ -5,16 +5,15 @@ import (
 	"sync"
 	"time"
 
-	"appengine"
-
-	ds "appengine/datastore"
+	"golang.org/x/net/context"
+	ds "google.golang.org/appengine/datastore"
 )
 
 // Filesystem
 type dsFileSys struct {
 	// w http.ResponseWriter `datastore:"-" json:"-"`
 	// r *http.Request       `datastore:"-" json:"-"`
-	c appengine.Context `datastore:"-" json:"-"`
+	c context.Context `datastore:"-" json:"-"`
 
 	mount string // name of mount point, for remount
 

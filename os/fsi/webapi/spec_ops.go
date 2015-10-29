@@ -8,11 +8,10 @@ import (
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/memcache"
 
 	tt "html/template"
-
-	"appengine"
-	"appengine/memcache"
 )
 
 var str = `

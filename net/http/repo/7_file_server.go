@@ -10,12 +10,12 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
-
-	"appengine"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 )
 
 // GetFS instantiates a filesystem, depending on whichtype
-func GetFS(c appengine.Context) (fs fsi.FileSystem) {
+func GetFS(c context.Context) (fs fsi.FileSystem) {
 	switch whichType {
 	case 0:
 		// must be re-instantiated for each request
@@ -82,5 +82,5 @@ func serveSingleRootFile(pattern string, filename string) {
 // a static fileserver.
 func serveFile(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	fs1 := GetFS(appengine.NewContext(r))
-	fileserver.FsiFileServer(fs1, UriMountNameY, w, r)
+	fileserver.FsiFileServer(w, r, fileserver.Options{FS: fs1, Prefix: UriMountNameY})
 }

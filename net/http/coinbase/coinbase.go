@@ -25,18 +25,17 @@ import (
 	"net/url"
 	"time"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
+	"google.golang.org/appengine"
 )
 
-const uriRequestPayment = "/coinbase-integr/request"
+const uriRequestPayment = "/coinbase-integr/request" // unused
 const uriConfirmPayment = "/coinbase-integr/confirm"
-const uriRedirectSuccess1 = "/coinbase-integr/redir-success1"
+const uriRedirectSuccess = "/coinbase-integr/redir-success1"
 
 const coinbaseHost = "www.coinbase.com"
 
@@ -55,7 +54,7 @@ var wpf = fmt.Fprintf
 func InitHandlers() {
 	http.HandleFunc(uriRequestPayment, loghttp.Adapter(requestPay))
 	http.HandleFunc(uriConfirmPayment, loghttp.Adapter(confirmPay))
-	http.HandleFunc(uriRedirectSuccess1, loghttp.Adapter(success01))
+	http.HandleFunc(uriRedirectSuccess, loghttp.Adapter(paymentSuccess))
 }
 
 // BackendUIRendered returns a userinterface rendered to HTML
@@ -86,6 +85,9 @@ const BtnLiveFormat = `
 
 				`
 
+//
+//
+// requestPay is unused
 func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	lg, b := loghttp.BuffLoggerUniversal(w, r)
@@ -357,7 +359,7 @@ order[transaction][hash]=ada26d75ff1e16b4febf539433d5260441171560c57adfff2ac968b
 order[transaction][id]=562e40dede472f26be000018&
 order[uuid]=9bbf6fde-530a-53a4-bf94-d54fc3f43d40
 */
-func success01(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+func paymentSuccess(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 

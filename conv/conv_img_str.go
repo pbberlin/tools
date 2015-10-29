@@ -11,16 +11,19 @@ import (
 	"image/png"
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 func Base64_str_to_img(base64_img string) (img image.Image, format string) {
+
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
 
 	pos := base64HeaderPosition(base64_img)
 
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(base64_img[pos:]))
 	img, format, err := image.Decode(reader)
-	logif.E(err)
+	lg(err)
 	return
 }
 
@@ -32,10 +35,13 @@ func Base64_str_to_img(base64_img string) (img image.Image, format string) {
 // because we only accept *image.RGBA and use image/png Encoder
 func Rgba_img_to_base64_str(img *image.RGBA) string {
 
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
+
 	// img to bytes
 	buf := new(bytes.Buffer)
 	err := png.Encode(buf, img)
-	logif.E(err)
+	lg(err)
 	imgBytes := buf.Bytes()
 
 	// binary bytes to base64 bytes
@@ -77,11 +83,14 @@ func base64HeaderPosition(s string) (pos int) {
 //func MimeFromBase64(b *bytes.Buffer)(mime string){
 func MimeFromBase64(b io.Reader) (mime string) {
 
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
+
 	// to avoid huge string allocation
 	//   we read the first 100 bytes
 	b1 := make([]byte, 100)
 	_, err := b.Read(b1)
-	logif.F(err)
+	lg(err)
 
 	s := string(b1)
 

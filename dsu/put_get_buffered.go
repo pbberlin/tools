@@ -1,46 +1,47 @@
 package dsu
 
 import (
-	"appengine"
-	"appengine/datastore"
-	"appengine/urlfetch"
-
 	"fmt"
 
 	"strings"
 
 	"github.com/pbberlin/tools/appengine/instance_mgt"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/urlfetch"
 
 	"io/ioutil"
 	"net/http"
 
 	"github.com/alexcesaro/mail/quotedprintable"
+	aelog "google.golang.org/appengine/log"
 )
 
 var ll = 0
 
 // BufPut - buffered put - saves its contents to memory, to memcache and the datastore
 //   Todo: Don't buffer in local memory.
-func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosure error) {
+func BufPut(c context.Context, wb WrapBlob, skey string) (mkk string, errClosure error) {
 
 	t := fmt.Sprintf("%T", wb)
 	mkk = t + "__" + skey // kombi key
 
-	fcTrans := func(c appengine.Context) error {
+	fcTrans := func(c context.Context) error {
 		dskey1 := datastore.NewKey(c, t, skey, 0, nil)
 		_, err := datastore.Put(c, dskey1, &wb)
 		McacheSet(c, mkk, wb)
 		memoryInstanceStore[mkk] = &wb
 		multiCastInstanceCacheChange(c, mkk)
 		if ll > 2 {
-			c.Infof("saved to ds and memcache and instance RAM - combikey is %v", mkk)
+			aelog.Infof(c, "saved to ds and memcache and instance RAM - combikey is %v", mkk)
 		}
 		return err
 	}
 
 	errClosure = datastore.RunInTransaction(c, fcTrans, nil)
 	if errClosure != nil {
-		c.Errorf("%v", errClosure)
+		aelog.Errorf(c, "%v", errClosure)
 	}
 
 	return
@@ -48,7 +49,7 @@ func BufPut(c appengine.Context, wb WrapBlob, skey string) (mkk string, errClosu
 
 // BufGet - buffered get - fetches value from memory, or from memcache or from the datastore
 //   todo: Paramter to reach "through" to datastore - without the buffer layers
-func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
+func BufGet(c context.Context, mkk string) (WrapBlob, error) {
 
 	wb1 := new(WrapBlob)
 
@@ -56,7 +57,7 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	wb1, ok := memoryInstanceStore[mkk]
 	if ok {
 		if ll > 2 {
-			c.Infof("received %q from static instance memory", mkk)
+			aelog.Infof(c, "received %q from static instance memory", mkk)
 		}
 		//util_err.StackTrace(6)
 		return *wb1, nil
@@ -67,7 +68,7 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	if ok && wb1 != nil && wb1.Name != "" {
 		// we could replenish memcache TTL here - instead we do that below
 		if ll > 2 {
-			c.Infof("retrieved from memcache - combi_key %v", mkk)
+			aelog.Infof(c, "retrieved from memcache - combi_key %v", mkk)
 		}
 		memoryInstanceStore[mkk] = wb1
 		return *wb1, nil
@@ -84,7 +85,7 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 
 	key := datastore.NewKey(c, t, skey, 0, nil)
 	err := datastore.Get(c, key, &wb2)
-	c.Errorf("%v", err)
+	aelog.Errorf(c, "%v", err)
 	// missing entity and a present entity will both work.
 	if err != nil && err != datastore.ErrNoSuchEntity {
 		return wb2, err
@@ -93,13 +94,13 @@ func BufGet(c appengine.Context, mkk string) (WrapBlob, error) {
 	memoryInstanceStore[mkk] = &wb2
 
 	if ll > 2 {
-		c.Infof("retrieved from ds - re-inserted into memcache + instance RAM - combi_key %v", mkk)
+		aelog.Infof(c, "retrieved from ds - re-inserted into memcache + instance RAM - combi_key %v", mkk)
 	}
 
 	return wb2, nil
 }
 
-func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
+func multiCastInstanceCacheChange(c context.Context, mkk string) {
 
 	ii := instance_mgt.GetByContext(c)
 
@@ -117,7 +118,7 @@ func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 			mkk, ii.InstanceID)
 		_ = url
 		if ll > 2 {
-			c.Infof(" url\n%v", url)
+			aelog.Infof(c, " url\n%v", url)
 		}
 
 		//response, err := http.Get(url)  // not available in gae
@@ -135,15 +136,15 @@ func multiCastInstanceCacheChange(c appengine.Context, mkk string) {
 		//    /_ah/xmpp/message/chat/
 
 		if err != nil {
-			c.Errorf("  could not launch get request; %v", err)
+			aelog.Errorf(c, "  could not launch get request; %v", err)
 		} else {
 			defer response.Body.Close()
 			contents, err := ioutil.ReadAll(response.Body)
 			if err != nil {
-				c.Errorf("  could not read response; %v", err)
+				aelog.Errorf(c, "  could not read response; %v", err)
 			}
 			if ll > 2 {
-				c.Infof("%s\n", string(contents))
+				aelog.Infof(c, "%s\n", string(contents))
 			}
 		}
 
@@ -161,7 +162,7 @@ func invalidate(w http.ResponseWriter, r *http.Request) {
 	sii := r.FormValue("senderInstanceId")
 
 	if ll > 2 {
-		c.Infof(" %s  ---------  %s\n", sii, mkk)
+		aelog.Infof(c, " %s  ---------  %s\n", sii, mkk)
 	}
 
 	w.WriteHeader(http.StatusOK)

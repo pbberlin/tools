@@ -13,11 +13,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mjibson/appstats"
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/dsu/distributed_unancestored"
-
-	"appengine" // mjibson
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
+	aelog "google.golang.org/appengine/log"
 )
 
 // added @ for /_ah/mail
@@ -27,7 +27,7 @@ var validRequestPath = regexp.MustCompile(`^([a-zA-Z0-9\.\-\_\/@]*)$`)
 type ExtendedHandler func(http.ResponseWriter, *http.Request, map[string]interface{})
 
 // mjibson.appengine handler
-type AppengineHandler func(appengine.Context, http.ResponseWriter, *http.Request)
+type AppengineHandler func(context.Context, http.ResponseWriter, *http.Request)
 
 /*
 
@@ -63,7 +63,7 @@ type AppengineHandler func(appengine.Context, http.ResponseWriter, *http.Request
 
 */
 
-var C appengine.Context
+var C context.Context
 
 // Adapter() checks the path, takes the time, precomputes values into a map
 // provides a global panic catcher
@@ -80,8 +80,16 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 		lge := log.Fatalf
 		if c != nil {
 			defer logServerTime(c, start)
-			lgi = c.Infof
-			lge = c.Errorf
+			// lgi = c.Infof
+			lgi = func(format string, v ...interface{}) {
+				aelog.Infof(c, format, v...)
+			}
+
+			// lge = c.Errorf
+			lge = func(format string, v ...interface{}) {
+				aelog.Errorf(c, format, v...)
+			}
+
 			C = c
 		}
 
@@ -153,7 +161,7 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 			given(w, r, mp)
 		} else {
 			var given1 AppengineHandler
-			given1 = func(c appengine.Context, w http.ResponseWriter, r *http.Request) {
+			given1 = func(c context.Context, w http.ResponseWriter, r *http.Request) {
 
 				given(w, r, mp)
 
@@ -174,11 +182,11 @@ func Adapter(given ExtendedHandler) http.HandlerFunc {
 				}
 			}
 
-			if false || appengine.IsDevAppServer() {
+			if true || appengine.IsDevAppServer() {
 				given1(c, w, r)
 			} else {
-				wrapped := appstats.NewHandler(given1)
-				wrapped.ServeHTTP(w, r)
+				// wrapped := appstats.NewHandler(given1) // mjibson
+				// wrapped.ServeHTTP(w, r)
 			}
 
 		}
@@ -190,11 +198,11 @@ func authenticate(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func logServerTime(c appengine.Context, start time.Time) {
+func logServerTime(c context.Context, start time.Time) {
 	age := time.Now().Sub(start)
 	if age.Seconds() < 0.01 {
-		c.Infof("  request took %v nano secs", age.Nanoseconds())
+		aelog.Infof(c, "  request took %v nano secs", age.Nanoseconds())
 	} else {
-		c.Infof("  request took %2.2v secs", age.Seconds())
+		aelog.Infof(c, "  request took %2.2v secs", age.Seconds())
 	}
 }

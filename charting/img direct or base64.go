@@ -5,8 +5,6 @@ import (
 	"image/png"
 	"strings"
 
-	"appengine"
-
 	// Package image/png ... imported for its initialization side-effect
 	// => image.Decode understands PNG formatted images.
 	_ "image/jpeg"
@@ -21,6 +19,8 @@ import (
 	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"google.golang.org/appengine"
+	aelog "google.golang.org/appengine/log"
 )
 
 // output static file as base64 string
@@ -40,7 +40,7 @@ func imagefileAsBase64(w http.ResponseWriter, r *http.Request, m map[string]inte
 
 	img, whichFormat, err := image.Decode(f)
 	loghttp.E(w, r, err, false)
-	c.Infof("format %v - subtype %T\n", whichFormat, img)
+	aelog.Infof(c, "format %v - subtype %T\n", whichFormat, img)
 
 	imgRGBA, ok := img.(*image.RGBA)
 	loghttp.E(w, r, ok, true, "source image was not convertible to image.RGBA - gifs or jpeg?")
@@ -78,7 +78,7 @@ func imagevariAsBase64(w http.ResponseWriter, r *http.Request, m map[string]inte
 
 	// here we could check integrity...
 	//img,whichFormat := conv.Base64_str_to_img(str_src)
-	//c.Infof( "retrieved img from base64: format %v - subtype %T\n" , whichFormat, img )
+	//aelog.Infof(c, "retrieved img from base64: format %v - subtype %T\n" , whichFormat, img )
 
 	rdr := strings.NewReader(str_src)
 	explicitMime := ""

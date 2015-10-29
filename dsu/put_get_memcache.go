@@ -1,14 +1,16 @@
 package dsu
 
-import "fmt"
-import "appengine"
-import "appengine/memcache"
+import (
+	"fmt"
+	"reflect"
+	"time"
 
-import "time"
+	"github.com/pbberlin/tools/util"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/memcache"
 
-import "github.com/pbberlin/tools/util"
-
-import "reflect"
+	aelog "google.golang.org/appengine/log"
+)
 
 // McacheSet is a generic memcache saving function.
 // It takes scalars as well as structs.
@@ -18,7 +20,7 @@ import "reflect"
 // Todo: types WrapString and WrapInt should be handled like string/int
 //
 // Scalars are tentatively saved using the CAS (compare and save) methods
-func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
+func McacheSet(c context.Context, skey string, str_int_struct interface{}) {
 
 	var err error
 	var val string
@@ -35,7 +37,7 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 		stMold != "*filesys.fso" {
 		// struct - save it with JSON encoder
 		if ll > 2 {
-			c.Infof("%v", stMold)
+			aelog.Infof(c, "%v", stMold)
 		}
 		n := tMold.NumField()
 		_ = n
@@ -47,7 +49,7 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 		}
 		memcache.JSON.Set(c, miPut)
 		if ll > 2 {
-			c.Infof("mcache set obj key %v[%s]  - err %v", skey, stMold, err)
+			aelog.Infof(c, "mcache set obj key %v[%s]  - err %v", skey, stMold, err)
 		}
 
 	} else {
@@ -111,7 +113,7 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 			}
 
 			if eput == memcache.ErrCASConflict {
-				c.Errorf("\t memcache CAS  FAILED - concurrent update?")
+				aelog.Errorf(c, "\t memcache CAS  FAILED - concurrent update?")
 				// we brutally fallback to set():
 				miCas := &memcache.Item{
 					Key:   skey,
@@ -119,18 +121,18 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 				}
 				eset := memcache.Set(c, miCas)
 				if ll > 2 {
-					c.Infof("%v", eset)
+					aelog.Infof(c, "%v", eset)
 				}
 				time.Sleep(10 * time.Millisecond)
 				continue
 			}
 			if eput == memcache.ErrNotStored {
-				c.Errorf("\t memcache save FAILED - no idea why it would")
+				aelog.Errorf(c, "\t memcache save FAILED - no idea why it would")
 				time.Sleep(10 * time.Millisecond)
 				continue
 			}
 			if ll > 2 {
-				c.Infof("mcache set scalar %v[%T]=%v - mode %v - eget/eput: %v/%v",
+				aelog.Infof(c, "mcache set scalar %v[%T]=%v - mode %v - eget/eput: %v/%v",
 					skey, str_int_struct, val, putMode, eget, eput)
 			}
 			break
@@ -157,7 +159,7 @@ func McacheSet(c appengine.Context, skey string, str_int_struct interface{}) {
 // For scalar values, the package has the types WrapString, WrapInt
 //
 // Todo:  WrapString, WrapInt could be saved without JSON
-func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool {
+func McacheGet(c context.Context, skey string, moldForReturn interface{}) bool {
 
 	tMold := reflect.TypeOf(moldForReturn)
 	stMold := tMold.Name()                    // strangely this is empty
@@ -168,7 +170,7 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 		stMold == "*dsu.WrapInt" ||
 		stMold == "*dsu.WrapString" {
 		if ll > 2 {
-			c.Infof("%s %s", "scalar", msg1)
+			aelog.Infof(c, "%s %s", "scalar", msg1)
 		}
 		miGet, err := memcache.Get(c, skey)
 		if err != nil && err != memcache.ErrCacheMiss {
@@ -200,14 +202,14 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 			tmp.S = string(miGet.Value)
 		}
 		if ll > 2 {
-			c.Infof(" mcache got scalar - key %v %v", skey, moldForReturn)
+			aelog.Infof(c, " mcache got scalar - key %v %v", skey, moldForReturn)
 		}
 
 		return true //xx
 
 	} else {
 		if ll > 2 {
-			c.Infof("%s %s", "objct", msg1)
+			aelog.Infof(c, "%s %s", "objct", msg1)
 		}
 
 		unparsedjson, err := memcache.JSON.Get(c, skey, &moldForReturn)
@@ -219,7 +221,7 @@ func McacheGet(c appengine.Context, skey string, moldForReturn interface{}) bool
 			return false //xx
 		}
 		if ll > 2 {
-			c.Infof(" mcache got obj - key %v", skey)
+			aelog.Infof(c, " mcache got obj - key %v", skey)
 		}
 		return true //xx
 

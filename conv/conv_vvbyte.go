@@ -3,7 +3,7 @@ package conv
 import (
 	"bytes"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/util"
 
 	"io"
@@ -11,6 +11,8 @@ import (
 )
 
 func String_to_VVByte(base64_img string) ([][]byte, *bytes.Buffer) {
+
+	lg, _ := loghttp.BuffLoggerUniversal(nil, nil)
 
 	bMsg := new(bytes.Buffer)
 
@@ -34,7 +36,7 @@ func String_to_VVByte(base64_img string) ([][]byte, *bytes.Buffer) {
 		if err == io.EOF {
 			break
 		}
-		logif.E(err)
+		lg(err)
 		if n < 1 {
 			break
 		}
@@ -54,13 +56,16 @@ func String_to_VVByte(base64_img string) ([][]byte, *bytes.Buffer) {
 // based on bytes.Buffer and Writing into it
 func VVByte_to_string(m [][]byte) (*bytes.Buffer, *bytes.Buffer) {
 
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
+
 	bRet := new(bytes.Buffer)
 	bMsg := new(bytes.Buffer)
 
 	//for i,v := range m {
 	for i := 0; i < len(m); i++ {
 		n, err := bRet.Write(m[i])
-		logif.E(err)
+		lg(err)
 		bMsg.WriteString(" lp" + util.Itos(i) + ": writing " + util.Itos(n) + " bytes: \n")
 	}
 	return bRet, bMsg

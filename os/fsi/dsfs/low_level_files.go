@@ -7,8 +7,9 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/common"
 	"github.com/pbberlin/tools/runtimepb"
+	"google.golang.org/appengine/datastore"
 
-	"appengine/datastore"
+	aelog "google.golang.org/appengine/log"
 )
 
 func (fs *dsFileSys) fileByPath(name string) (DsFile, error) {
@@ -27,7 +28,7 @@ func (fs *dsFileSys) fileByPath(name string) (DsFile, error) {
 	if err == datastore.ErrNoSuchEntity {
 		return fo, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for file %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error reading dir for file %v => %v", dir+bname, err)
 		return fo, err
 	}
 
@@ -38,7 +39,7 @@ func (fs *dsFileSys) fileByPath(name string) (DsFile, error) {
 		return fo, err
 	} else if err != nil {
 		s := fmt.Sprintf("%v", fileKey)
-		fs.Ctx().Errorf("Error reading file %v (%v) => %v", dir+bname, s, err)
+		aelog.Errorf(fs.Ctx(), "Error reading file %v (%v) => %v", dir+bname, s, err)
 	}
 
 	return fo, err
@@ -56,7 +57,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 	if err == datastore.ErrNoSuchEntity {
 		return files, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for files %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error reading dir for files %v => %v", dir+bname, err)
 		return files, err
 	}
 
@@ -65,7 +66,7 @@ func (fs *dsFileSys) filesByPath(name string) ([]DsFile, error) {
 	q := datastore.NewQuery(tfil).Ancestor(foDir.Key)
 	keys, err := q.GetAll(fs.Ctx(), &files)
 	if err != nil {
-		fs.Ctx().Errorf("Error fetching files children of %v => %v", foDir.Key, err)
+		aelog.Errorf(fs.Ctx(), "Error fetching files children of %v => %v", foDir.Key, err)
 		return files, err
 	}
 
@@ -110,7 +111,7 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 	if err == datastore.ErrNoSuchEntity {
 		return err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error reading dir for file %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error reading dir for file %v => %v", dir+bname, err)
 		return err
 	}
 
@@ -119,11 +120,11 @@ func (fs *dsFileSys) saveFileByPath(f *DsFile, name string) error {
 
 	effKey, err := datastore.Put(fs.Ctx(), suggKey, f)
 	if err != nil {
-		fs.Ctx().Errorf("Error saving file %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error saving file %v => %v", dir+bname, err)
 		return err
 	}
 	if !suggKey.Equal(effKey) {
-		fs.Ctx().Errorf("file keys unequal %v - %v; %v %s", suggKey, effKey, f.Dir+f.BName, f.Data)
+		aelog.Errorf(fs.Ctx(), "file keys unequal %v - %v; %v %s", suggKey, effKey, f.Dir+f.BName, f.Data)
 		runtimepb.StackTrace(6)
 	}
 

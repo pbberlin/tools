@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/distrib"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -19,6 +17,7 @@ import (
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/stringspb"
+	"google.golang.org/appengine"
 )
 
 type MyWorker struct {

@@ -8,8 +8,7 @@ import (
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
-
-	"appengine"
+	"google.golang.org/appengine"
 )
 
 const TplPrefix = "/mnt02"

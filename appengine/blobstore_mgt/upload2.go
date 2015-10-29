@@ -5,25 +5,23 @@ import (
 	"net/http"
 	"net/url"
 
-	"appengine"
-	"appengine/blobstore"
-
 	"fmt"
 	"path"
 
-	"appengine/image"
-
 	"github.com/pbberlin/tools/dsu"
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/stringspb"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/blobstore"
+	"google.golang.org/appengine/datastore"
+	"google.golang.org/appengine/image"
+	"google.golang.org/appengine/user"
 
 	"bytes"
 	"strings"
 	"time"
 
-	"appengine/datastore"
-	"appengine/user"
+	aelog "google.golang.org/appengine/log"
 )
 
 const upload2HTML = `
@@ -192,7 +190,7 @@ func blobList(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 		dsKey, err := t.Next(&bi)
 
 		if err == datastore.Done {
-			// c.Infof("   No Results (any more) blob-list %v", err)
+			// aelog.Infof(c,"   No Results (any more) blob-list %v", err)
 			break
 		}
 		// other err
@@ -270,6 +268,9 @@ func blobList(w http.ResponseWriter, r *http.Request, m map[string]interface{}) 
 
 func renameOrDelete(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	c := appengine.NewContext(r)
 
 	b1 := new(bytes.Buffer)
@@ -301,12 +302,12 @@ func renameOrDelete(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	for t := q.Run(c); ; {
 		_, err := t.Next(&bi)
 		if err == datastore.Done {
-			c.Infof("   No Results (any more), blob-rename-delete %v", err)
+			aelog.Infof(c, "   No Results (any more), blob-rename-delete %v", err)
 			break
 		}
 		// other err
 		if err != nil {
-			logif.E(err)
+			lg(err)
 			return
 		}
 		found = true
@@ -320,19 +321,19 @@ func renameOrDelete(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 			// first the binary data
 			keyBlob, err := blobstore.BlobKeyForFile(c, bi.Filename)
-			logif.E(err)
+			lg(err)
 
 			if err != nil {
 				b1.WriteString(fmt.Sprintf(" ... failed (1) %v", err))
 			} else {
 				err = blobstore.Delete(c, keyBlob)
-				logif.E(err)
+				lg(err)
 				if err != nil {
 					b1.WriteString(fmt.Sprintf(" ... failed (2) %v<br>", err))
 				} else {
 					// now the datastore record
 					err = datastore.Delete(c, dsKey)
-					logif.E(err)
+					lg(err)
 					if err != nil {
 						b1.WriteString(fmt.Sprintf(" ... failed (3) %v<br>%#v<br>", err, dsKey))
 					} else {
@@ -354,7 +355,7 @@ func renameOrDelete(w http.ResponseWriter, r *http.Request, m map[string]interfa
 			nfn = strings.ToLower(nfn)
 			bi.Filename = nfn
 			_, err := datastore.Put(c, dsKey, &bi)
-			logif.E(err)
+			lg(err)
 			if err != nil {
 				b1.WriteString(fmt.Sprintf(" ... failed. %v", err))
 			} else {

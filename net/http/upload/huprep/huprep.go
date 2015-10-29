@@ -289,7 +289,7 @@ func prepareConfigToml(name, arg2 string) {
 	log.Printf("====== upload completed ==============\n")
 	log.Printf("CTRC+C to exit\n")
 
-	for {
+	for i := 0; i < 300; i++ {
 		time.Sleep(100 * time.Millisecond)
 		runtime.Gosched()
 	}

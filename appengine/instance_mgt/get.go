@@ -4,15 +4,17 @@ package instance_mgt
 import (
 	"net/http"
 
-	"appengine"
-	"appengine/module"
-
 	"errors"
 	"strings"
 	"time"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/stringspb"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
+	"google.golang.org/appengine/module"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 var ii *Instance = new(Instance) // initialization check via ii.LastUpdated.IsZero()
@@ -28,7 +30,7 @@ func Get(r *http.Request) *Instance {
 
 // Todo: When c==nil we are in a non-appengine environment.
 // We still want to return at least ii.PureHostname
-func GetByContext(c appengine.Context) *Instance {
+func GetByContext(c context.Context) *Instance {
 
 	tstart := time.Now()
 
@@ -37,7 +39,7 @@ func GetByContext(c appengine.Context) *Instance {
 		age := tstart.Sub(ii.LastUpdated)
 
 		if age < 200*time.Millisecond {
-			c.Infof("instance info update too recently: %v, skipping.\n", age)
+			aelog.Infof(c, "instance info update too recently: %v, skipping.\n", age)
 			return ii
 		}
 
@@ -48,7 +50,7 @@ func GetByContext(c appengine.Context) *Instance {
 
 		}
 
-		c.Infof("instance info update too old: %v, recomputing.\n", age)
+		aelog.Infof(c, "instance info update too old: %v, recomputing.\n", age)
 	}
 
 	ii.ModuleName = appengine.ModuleName(c)
@@ -78,9 +80,9 @@ func GetByContext(c appengine.Context) *Instance {
 				eStr := err.Error()
 				eCmp1, eCmp2, eCmp3 := "API error", "INVALID_VERSION)", "Could not find the given version"
 				if strings.Contains(eStr, eCmp1) && strings.Contains(eStr, eCmp2) && strings.Contains(eStr, eCmp3) {
-					c.Infof("get num instances works only live and without autoscale; %v", err)
+					aelog.Infof(c, "get num instances works only live and without autoscale; %v", err)
 				} else {
-					c.Errorf("get num instances error; %v", err)
+					aelog.Errorf(c, "get num instances error; %v", err)
 				}
 			}
 
@@ -98,7 +100,7 @@ func GetByContext(c appengine.Context) *Instance {
 
 	ii.Hostname, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "")
 	if err != nil {
-		c.Errorf("ModuleHostname1: %v", err)
+		aelog.Errorf(c, "ModuleHostname1: %v", err)
 	}
 
 	ii.PureHostname = appengine.DefaultVersionHostname(c)
@@ -106,32 +108,32 @@ func GetByContext(c appengine.Context) *Instance {
 	if !appengine.IsDevAppServer() {
 		ii.HostnameInst0, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "0")
 		if err != nil && (err.Error() == autoScalingErr1 || err.Error() == autoScalingErr2) {
-			c.Infof("inst 0: " + autoScalingErrMsg)
+			aelog.Infof(c, "inst 0: "+autoScalingErrMsg)
 			err = nil
 		}
 		if err != nil {
-			c.Errorf("ModuleHostname2: %v", err)
+			aelog.Errorf(c, "ModuleHostname2: %v", err)
 		}
 
 		ii.HostnameInst1, err = appengine.ModuleHostname(c, ii.ModuleName, ii.VersionMajor, "1")
 		if err != nil && (err.Error() == autoScalingErr1 || err.Error() == autoScalingErr2) {
-			c.Infof("inst 1: " + autoScalingErrMsg)
+			aelog.Infof(c, "inst 1: "+autoScalingErrMsg)
 			err = nil
 		}
 		if err != nil {
-			c.Errorf("ModuleHostname3: %v", err)
+			aelog.Errorf(c, "ModuleHostname3: %v", err)
 		}
 
 		ii.HostnameMod02, err = appengine.ModuleHostname(c, "mod02", "", "")
 		if err != nil {
-			c.Infof("ModuleHostname4: %v", err)
+			aelog.Infof(c, "ModuleHostname4: %v", err)
 		}
 
 	}
 
 	ii.LastUpdated = time.Now()
 
-	c.Infof("collectInfo() completed, %v  - %v - %v - %v - %v, took %v",
+	aelog.Infof(c, "collectInfo() completed, %v  - %v - %v - %v - %v, took %v",
 		stringspb.Ellipsoider(ii.InstanceID, 4), ii.VersionMajor, ii.ModuleName,
 		ii.Hostname, ii.PureHostname, time.Now().Sub(tstart))
 

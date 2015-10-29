@@ -13,6 +13,7 @@ import (
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/runtimepb"
 	"github.com/pbberlin/tools/stringspb"
+	aelog "google.golang.org/appengine/log"
 )
 
 /*
@@ -77,14 +78,14 @@ func E(w http.ResponseWriter, r *http.Request,
 			if c == nil {
 				log.Printf(s)
 			} else {
-				c.Infof(s)
+				aelog.Infof(c, s)
 			}
 		} else {
 			c, _ := util_appengine.SafelyExtractGaeCtxError(r)
 			if c == nil {
 				log.Printf(s)
 			} else {
-				c.Errorf(s)
+				aelog.Errorf(c, s)
 			}
 			w.Header().Set("Content-Type", "text/plain")
 			http.Error(w, s, http.StatusInternalServerError)
@@ -148,7 +149,7 @@ func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 	if c == nil {
 		lnp.Printf(s)
 	} else {
-		c.Infof(s)
+		aelog.Infof(c, s)
 	}
 
 }

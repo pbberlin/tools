@@ -56,14 +56,12 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	htmlfrag.Wb(b1, "Debug pprof", "/debug/pprof")
 
 	htmlfrag.Wb(b1, "Diverse", "nobr")
-	htmlfrag.Wb(b1, "Login", "/login")
 	htmlfrag.Wb(b1, "Schreib-Methoden", "/write-methods")
 	htmlfrag.Wb(b1, "Letzte Email", "/email-view")
 	htmlfrag.Wb(b1, "Blob List", "/blob2")
 
 	htmlfrag.Wb(b1, "fetch via proxy", routes.ProxifyURI)
 	htmlfrag.Wb(b1, "Instance Info", "/instance-info/view")
-	htmlfrag.Wb(b1, "Gob encode decode", "/big-query/test-gob-codec")
 
 	htmlfrag.Wb(b1, "Fulltext put", "/fulltext-search/put")
 	htmlfrag.Wb(b1, "Fulltext get", "/fulltext-search/get")

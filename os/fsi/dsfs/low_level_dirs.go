@@ -6,7 +6,9 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi/common"
 
-	ds "appengine/datastore"
+	ds "google.golang.org/appengine/datastore"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 // Retrieves a directory in one go.
@@ -36,7 +38,7 @@ func (fs *dsFileSys) dirByPath(name string) (DsDir, error) {
 		// runtimepb.StackTrace(4)
 		return fo, err
 	} else if err != nil {
-		fs.Ctx().Errorf("Error getting dir %v => %v", dir+common.Filify(bname), err)
+		aelog.Errorf(fs.Ctx(), "Error getting dir %v => %v", dir+common.Filify(bname), err)
 	}
 
 	fo.MemCacheSet()
@@ -104,12 +106,12 @@ func (fs *dsFileSys) saveDirByPathExt(dirObj DsDir, name string) (DsDir, error) 
 
 	effKey, err := ds.Put(fs.c, preciseK, &fo)
 	if err != nil {
-		fs.Ctx().Errorf("Error saving dir %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error saving dir %v => %v", dir+bname, err)
 		return fo, err
 	}
 
 	if !preciseK.Equal(effKey) {
-		fs.Ctx().Errorf("dir keys unequal %v - %v", preciseK, effKey)
+		aelog.Errorf(fs.Ctx(), "dir keys unequal %v - %v", preciseK, effKey)
 	}
 
 	fo.MemCacheSet()

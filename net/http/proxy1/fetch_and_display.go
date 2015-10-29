@@ -12,7 +12,6 @@ import (
 	_ "html"
 
 	"github.com/pbberlin/tools/appengine/util_appengine"
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/domclean2"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
@@ -54,7 +53,8 @@ const c_formFetchUrl = `
 // or it returns the URL´s contents.
 func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
-	lg, lge := loghttp.Logger(w, r)
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
 
 	// on live server => always use https
 	if r.URL.Scheme != "https" && !util_appengine.IsLocalEnviron() {
@@ -73,7 +73,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	rURL := ""
 	urlAs := ""
 	err := r.ParseForm()
-	logif.E(err)
+	lg(err)
 	if r.PostFormValue(routes.URLParamKey) != "" {
 		urlAs += "url posted "
 		rURL = r.PostFormValue(routes.URLParamKey)
@@ -110,7 +110,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
 		bts, inf, err := fetch.UrlGetter(r, fetch.Options{URL: rURL})
-		lge(err)
+		lg(err)
 
 		tp := mime.TypeByExtension(path.Ext(inf.URL.Path))
 		if false {
@@ -141,7 +141,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 		var bufRend bytes.Buffer
 		err = html.Render(&bufRend, doc)
-		lge(err)
+		lg(err)
 		w.Write(bufRend.Bytes())
 
 	}

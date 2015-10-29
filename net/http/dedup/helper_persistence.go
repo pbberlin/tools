@@ -10,16 +10,15 @@ import (
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
+	"golang.org/x/net/context"
 	"golang.org/x/net/html"
-
-	"appengine"
 )
 
 var logDir = "c:/tmp/dedup/"
 
 var memMapFileSys = memfs.New(memfs.DirSort("byDateDesc")) // package variable required as "persistence"
 
-func GetFS(c appengine.Context, whichType int) (fs fsi.FileSystem) {
+func GetFS(c context.Context, whichType int) (fs fsi.FileSystem) {
 
 	switch whichType {
 	case 0:

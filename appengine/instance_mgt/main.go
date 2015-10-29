@@ -20,12 +20,14 @@ package instance_mgt
 import (
 	"net/http"
 
+	"google.golang.org/appengine"
+
 	"bytes"
 	"fmt"
 	"log"
 	"time"
 
-	"appengine"
+	aelog "google.golang.org/appengine/log"
 )
 
 type Instance struct {
@@ -77,7 +79,7 @@ func (i *Instance) String() string {
 
 func onStart(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	c.Infof("instance started by appengine")
+	aelog.Infof(c, "instance started by appengine")
 
 	// func() {
 	// 	time.Sleep(200 * time.Millisecond)
@@ -88,7 +90,7 @@ func onStart(w http.ResponseWriter, r *http.Request) {
 
 func onStop(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
-	c.Infof("instance stopped by appengine")
+	aelog.Infof(c, "instance stopped by appengine")
 }
 
 func init() {

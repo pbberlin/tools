@@ -6,12 +6,14 @@ import (
 
 	"github.com/pbberlin/tools/os/fsi"
 
-	"appengine"
-	"appengine/datastore"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine/datastore"
+
+	aelog "google.golang.org/appengine/log"
 )
 
 // AeContext is an option func, adding ae context to the filesystem
-func AeContext(c appengine.Context) func(fsi.FileSystem) {
+func AeContext(c context.Context) func(fsi.FileSystem) {
 	return func(fs fsi.FileSystem) {
 		fst := fs.(*dsFileSys)
 		fst.c = c
@@ -71,15 +73,13 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 	rt, err := fs.dirByPath(fs.mount)
 	_ = rt
 	if err == datastore.ErrNoSuchEntity {
-		// fs.Ctx().Infof("need to creat root %v", fs.mount)
 		rt, err = fs.saveDirByPath(fs.mount) // fine
 		if err != nil {
-			fs.c.Errorf("could not create mount %v => %v", fs.mount, err)
+			aelog.Errorf(fs.c, "could not create mount %v => %v", fs.mount, err)
 		} else {
-			// fs.Ctx().Infof("Creat rtdr %v  %v  %v ", rt.Dir, rt.BName, rt.Key)
 		}
 	} else if err != nil {
-		fs.c.Errorf("could read mount dir %v => %v", fs.mount, err)
+		aelog.Errorf(fs.c, "could read mount dir %v => %v", fs.mount, err)
 	} else {
 		// fs.Ctx().Infof("Found rtdr %v  %v  %v ", rt.Dir, rt.BName, rt.Key)
 	}
@@ -87,7 +87,7 @@ func New(options ...func(fsi.FileSystem)) *dsFileSys {
 	return &fs
 }
 
-func (fs *dsFileSys) Ctx() appengine.Context {
+func (fs *dsFileSys) Ctx() context.Context {
 	return fs.c
 }
 

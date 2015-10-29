@@ -6,7 +6,8 @@ import (
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/common"
 
-	"appengine/datastore"
+	"google.golang.org/appengine/datastore"
+	aelog "google.golang.org/appengine/log"
 )
 
 // subtreeByPath retrieves a subdirectories of a given directory.
@@ -52,7 +53,7 @@ func (fs *dsFileSys) SubtreeByPath(name string, onlyDirectChildren bool) ([]DsDi
 	var children []DsDir
 	keys, err := q.GetAll(fs.Ctx(), &children)
 	if err != nil {
-		fs.Ctx().Errorf("Error getting all children of %v => %v", dir+bname, err)
+		aelog.Errorf(fs.Ctx(), "Error getting all children of %v => %v", dir+bname, err)
 		return children, err
 	}
 

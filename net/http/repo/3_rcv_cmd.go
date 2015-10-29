@@ -7,11 +7,10 @@ import (
 	"net/http"
 	"path"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/stringspb"
+	"google.golang.org/appengine"
 )
 
 // fetchCommandReceiver takes http post requests, extracts the JSON commands

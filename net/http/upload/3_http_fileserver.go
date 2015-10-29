@@ -4,14 +4,14 @@ import (
 	"net/http"
 	"strings"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/net/http/fileserver"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/httpfs"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 )
 
-var cx appengine.Context
+var cx context.Context
 var mountPoint string
 
 func howIsContext(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {

@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"strconv"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/dsfs"
 	"github.com/pbberlin/tools/os/fsi/memfs"
 	"github.com/pbberlin/tools/os/fsi/osfs"
 	"github.com/pbberlin/tools/os/fsi/tests"
+	"golang.org/x/net/context"
+	"google.golang.org/appengine"
 )
 
 var memMapFileSys = memfs.New()
@@ -55,7 +55,7 @@ func setFSType(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 }
 
-func getFS(c appengine.Context, mnt string) fsi.FileSystem {
+func getFS(c context.Context, mnt string) fsi.FileSystem {
 
 	var fs fsi.FileSystem
 

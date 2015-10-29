@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 func HostFromReq(r *http.Request) string {
@@ -57,6 +57,9 @@ func HostFromUrl(u *url.URL) string {
 
 func splitPort(hp string) string {
 
+	lg, b := loghttp.BuffLoggerUniversal(nil, nil)
+	_ = b
+
 	host, port, err := net.SplitHostPort(hp)
 	_ = port
 
@@ -64,7 +67,7 @@ func splitPort(hp string) string {
 		if strings.Contains(err.Error(), "missing port in address") {
 			// normal
 		} else {
-			logif.E(err)
+			lg(err)
 		}
 		host = hp
 	}

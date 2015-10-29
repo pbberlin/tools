@@ -12,7 +12,7 @@ import (
 
 	"fmt"
 
-	"github.com/pbberlin/tools/logif"
+	"github.com/pbberlin/tools/net/http/loghttp"
 )
 
 type User struct {
@@ -24,6 +24,9 @@ type User struct {
 }
 
 func searchPut(w http.ResponseWriter, r *http.Request) {
+
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
 
 	id := "PA6-5001"
 	user := &User{
@@ -37,25 +40,28 @@ func searchPut(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 
 	index, err := search.Open("users")
-	logif.E(err)
+	lg(err)
 
 	ret_id, err := index.Put(c, id, user)
-	logif.E(err)
+	lg(err)
 
 	fmt.Fprint(w, "OK, saved "+ret_id+"\n\n")
 
 	var u2 User
 	err = index.Get(c, ret_id, &u2)
-	logif.E(err)
+	lg(err)
 	fmt.Fprint(w, "Retrieved document: ", u2)
 
 }
 
 func searchRetrieve(w http.ResponseWriter, r *http.Request) {
 
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	c := appengine.NewContext(r)
 	index, err := search.Open("users")
-	logif.E(err)
+	lg(err)
 
 	for t := index.Search(c, "Comment:riled", nil); ; {
 		var res User

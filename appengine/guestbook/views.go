@@ -4,11 +4,10 @@ package guestbook
 import (
 	"net/http"
 
-	"appengine"
-
-	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries" // guest book persistence
+	gbp "github.com/pbberlin/tools/dsu/ancestored_gb_entries"
 	sc "github.com/pbberlin/tools/dsu/distributed_unancestored"
 	"github.com/pbberlin/tools/net/http/tplx"
+	"google.golang.org/appengine" // guest book persistence
 )
 
 const c_view_gbe = `

@@ -6,10 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"appengine"
-
 	"github.com/pbberlin/tools/dsu"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"google.golang.org/appengine"
 )
 
 // Chart data

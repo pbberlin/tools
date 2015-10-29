@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/pbberlin/tools/logif"
 	"github.com/pbberlin/tools/net/http/loghttp"
 
 	"appengine"
@@ -63,6 +62,9 @@ func agnosticReadReset(c appengine.Context, doReset bool) (int64, error) {
 
 func readBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	var c1, c2 int64
 	var s1, s2 string
 	var err error
@@ -75,13 +77,13 @@ func readBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]int
 
 	c := appengine.NewContext(r)
 	c1, err = agnosticReadReset(c, reset)
-	logif.E(err)
+	lg(err)
 
 	{
 		c, err = appengine.Namespace(c, altNamespace)
-		logif.E(err)
+		lg(err)
 		c2, err = agnosticReadReset(c, reset)
-		logif.E(err)
+		lg(err)
 	}
 
 	s1 = fmt.Sprintf("%v", c1)
@@ -96,15 +98,18 @@ func readBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]int
 
 func incrementBothNamespaces(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	c := appengine.NewContext(r)
 	err := agnosticIncrement(c)
-	logif.E(err)
+	lg(err)
 
 	{
 		c, err := appengine.Namespace(c, altNamespace)
-		logif.E(err)
+		lg(err)
 		err = agnosticIncrement(c)
-		logif.E(err)
+		lg(err)
 	}
 
 	s := `counters updates für ns=''  and ns='ns01'.` + "\n"
@@ -115,6 +120,9 @@ func incrementBothNamespaces(w http.ResponseWriter, r *http.Request, m map[strin
 
 func queuePush(w http.ResponseWriter, r *http.Request, mx map[string]interface{}) {
 
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	c := appengine.NewContext(r)
 
 	m := map[string][]string{"counter_name": []string{nscStringKey}}
@@ -123,7 +131,7 @@ func queuePush(w http.ResponseWriter, r *http.Request, mx map[string]interface{}
 	taskqueue.Add(c, t, "")
 
 	c, err := appengine.Namespace(c, altNamespace)
-	logif.E(err)
+	lg(err)
 	taskqueue.Add(c, t, "")
 
 	io.WriteString(w, "tasks enqueued\n")
@@ -138,10 +146,14 @@ func queuePush(w http.ResponseWriter, r *http.Request, mx map[string]interface{}
 }
 
 func queuePop(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	lg, b := loghttp.BuffLoggerUniversal(w, r)
+	_ = b
+
 	c := appengine.NewContext(r)
 	err := agnosticIncrement(c)
 	c.Infof("qp")
-	logif.E(err)
+	lg(err)
 }
 
 func init() {

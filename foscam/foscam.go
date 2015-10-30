@@ -17,6 +17,7 @@ import (
 	"github.com/pbberlin/tools/appengine/util_appengine"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/stringspb"
 	"github.com/pbberlin/tools/util"
 
@@ -285,6 +286,31 @@ func foscamToggle(w http.ResponseWriter, r *http.Request, m map[string]interface
 
 }
 
+func foscamWatch(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
+
+	htmlfrag.SetNocacheHeaders(w)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Foscam live watch"}))
+
+	/*
+
+		There is no way to access a real video stream.
+		Thus we use this suggestion: http://foscam.us/forum/post43654.html#p43654
+
+	*/
+	str := `<img 
+	width='640' 
+	src="http://` + dns_cam + `/CGIProxy.fcgi?cmd=snapPicture2&usr=visitor&pwd=visitor&t=" 
+	onload='setTimeout(function() {src = src.substring(0, (src.lastIndexOf("t=")+2))+(new Date()).getTime()}, 1000)' 
+	onerror='setTimeout(function() {src = src.substring(0, (src.lastIndexOf("t=")+2))+(new Date()).getTime()}, 5000)' 
+	alt='' />`
+	w.Write([]byte(str))
+
+	w.Write([]byte(tplx.Foot))
+
+}
+
 func init() {
 
 	if util_appengine.IsLocalEnviron() {
@@ -297,5 +323,6 @@ func init() {
 
 	http.HandleFunc("/foscam-status", loghttp.Adapter(foscamStatus))
 	http.HandleFunc("/foscam-toggle", loghttp.Adapter(foscamToggle))
+	http.HandleFunc("/foscam-watch", loghttp.Adapter(foscamWatch))
 
 }

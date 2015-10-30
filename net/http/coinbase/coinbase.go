@@ -362,9 +362,11 @@ order[uuid]=9bbf6fde-530a-53a4-bf94-d54fc3f43d40
 func paymentSuccess(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
+	lg, _ := loghttp.BuffLoggerUniversal(w, r)
 
 	err := r.ParseForm()
 	if err != nil {
+		lg(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -374,6 +376,7 @@ func paymentSuccess(w http.ResponseWriter, r *http.Request, m map[string]interfa
 
 	values, err := url.ParseQuery(custom)
 	if err != nil {
+		lg(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -382,6 +385,7 @@ func paymentSuccess(w http.ResponseWriter, r *http.Request, m map[string]interfa
 	uID := values.Get("uID")
 
 	if productID != "" {
+		lg("about to redirect to %v", productID)
 		http.Redirect(w, r, productID+"?redirected-from=paymentsucc", http.StatusFound)
 		return
 	}

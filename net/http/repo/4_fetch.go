@@ -77,7 +77,7 @@ func FetchUsingRSS(w http.ResponseWriter, r *http.Request,
 			rssDoc2DirTree(w, r, dirTree, rssDoc, config.Host)
 		}
 
-		saveDigest(w, r, fs, fnDigest, dirTree)
+		saveDigest(lg, fs, fnDigest, dirTree)
 	}
 
 	// lg(dirTree.String())

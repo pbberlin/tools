@@ -18,6 +18,10 @@ func (fs *dsFileSys) DeleteAll() (string, error) {
 			msg += "could not get file keys\n"
 			return msg, err
 		}
+		if len(keys) >= 500 {
+			msg += "limited to 500 files. REPEAT operation.\n"
+			keys = keys[:500]
+		}
 
 		err = datastore.DeleteMulti(fs.Ctx(), keys)
 		if err != nil {
@@ -36,6 +40,10 @@ func (fs *dsFileSys) DeleteAll() (string, error) {
 		if err != nil {
 			msg += "could not get dir keys\n"
 			return msg, err
+		}
+		if len(keys) >= 500 {
+			msg += "limited to 500 directories. REPEAT operation.\n"
+			keys = keys[:500]
 		}
 
 		err = datastore.DeleteMulti(fs.Ctx(), keys)

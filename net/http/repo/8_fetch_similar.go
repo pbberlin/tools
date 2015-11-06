@@ -382,7 +382,7 @@ MarkOuter:
 	//
 	if time.Now().Sub(dirTree.LastFound).Seconds() < 10 {
 		lg("saving accumulated (new) links to digest")
-		saveDigest(w, r, fs1, fnDigest, dirTree)
+		saveDigest(lg, fs1, fnDigest, dirTree)
 	}
 
 	lg("\t\t%4.2v secs so far 3", time.Now().Sub(start).Seconds())

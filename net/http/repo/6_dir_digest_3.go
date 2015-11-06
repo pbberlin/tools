@@ -107,13 +107,13 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 
 	if len(bts) > 1024*1024-1 {
 		bts = removeScriptsAndComments(m.lg, bts)
-		m.lg("size reduzed to %vkB ", len(bts)/1024)
+		m.lg("size reduced_1 to %vkB ", len(bts)/1024)
 
-		if len(bts) > 1024*1024-1 {
-			bts = zipIt(m.lg, bts)
-			m.lg("size reduzed to %vkB ", len(bts)/1024)
-		}
-
+		// if len(bts) > 1024*1024-1 {
+		// 	bts = snappy.Encode(nil, bts)
+		// 	fn = strings.Replace(fn, ".html", ".snap.html", -1)
+		// 	m.lg("size reduced_2 to %vkB ", len(bts)/1024)
+		// }
 	}
 
 	//
@@ -162,9 +162,4 @@ func removeUnwanted(n *html.Node) {
 			n.RemoveChild(c)
 		}
 	}
-}
-
-func zipIt(lg loghttp.FuncBufUniv, bts []byte) []byte {
-	var b bytes.Buffer
-	return b.Bytes()
 }

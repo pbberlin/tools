@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/snappy"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/os/fsi"
@@ -192,9 +193,23 @@ func addAnchors(lg loghttp.FuncBufUniv, host string, bts []byte, dirTree *DirTre
 
 func loadDigest(w http.ResponseWriter, r *http.Request, lg loghttp.FuncBufUniv, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
 
-	bts, err := fs.ReadFile(fnDigest)
+	fnDigestSnappied := strings.Replace(fnDigest, ".json", ".json.snappy", -1)
+	bts, err := fs.ReadFile(fnDigestSnappied)
+	if err == nil {
+		btsDec := []byte{}
+		lg("encoded digest loaded, size %vkB", len(bts)/1024)
+		btsDec, err := snappy.Decode(nil, bts)
+		if err != nil {
+			lg(err)
+			return
+		}
+		lg("digest decoded from %vkB to %vkB", len(bts)/1024, len(btsDec)/1024)
+		bts = btsDec
+	} else {
+		bts, err = fs.ReadFile(fnDigest)
+		lg(err)
+	}
 
-	lg(err)
 	if err == nil {
 		err = json.Unmarshal(bts, &treeX)
 		lg(err)
@@ -238,20 +253,24 @@ func fetchDigest(hostWithPrefix, domain string) (*DirTree, error) {
 
 }
 
-func saveDigest(w http.ResponseWriter, r *http.Request, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
-
-	lg, lge := loghttp.Logger(w, r)
-	_ = lg
+func saveDigest(lg loghttp.FuncBufUniv, fs fsi.FileSystem, fnDigest string, treeX *DirTree) {
 
 	treeX.LastFound = time.Now()
 
 	b, err := json.MarshalIndent(treeX, "", "\t")
-	lge(err)
+	lg(err)
+
+	if len(b) > 1024*1024-1 || true {
+		b1 := snappy.Encode(nil, b)
+		lg("digest encoded from %vkB to %vkB ", len(b)/1024, len(b1)/1024)
+		b = b1
+		fnDigest = strings.Replace(fnDigest, ".json", ".json.snappy", -1)
+	}
 
 	err = fs.MkdirAll(path.Dir(fnDigest), 0755)
-	lge(err)
+	lg(err)
 
 	err = fs.WriteFile(fnDigest, b, 0755)
-	lge(err)
+	lg(err)
 
 }

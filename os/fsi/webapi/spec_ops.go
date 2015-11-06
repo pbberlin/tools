@@ -94,6 +94,11 @@ func DeleteSubtree(w http.ResponseWriter, r *http.Request, m map[string]interfac
 
 func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
+	lg, _ := loghttp.BuffLoggerUniversal(w, r)
+
+	err := r.ParseForm()
+	lg(err)
+
 	wpf(w, tplx.ExecTplHelper(tplx.Head, map[string]interface{}{"HtmlTitle": "Delete all filesystem data"}))
 	defer wpf(w, tplx.Foot)
 
@@ -101,6 +106,7 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 	if confirm != "yes" {
 		wpf(w, "All dsfs contents are deletes. All memfs contents are deleted<br>\n")
 		wpf(w, "Put a get param into the URL ?confirm - and set it to 'yes'<br>\n")
+		wpf(w, "Put a get param 'mountname' into url; i.e. mountname=mntftch<br>\n")
 		return
 	}
 
@@ -109,7 +115,19 @@ func deleteAll(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	//
 	//
-	fs := dsfs.New(dsfs.AeContext(appengine.NewContext(r)))
+	fs := dsfs.New(
+		dsfs.AeContext(appengine.NewContext(r)),
+	)
+
+	mountName := r.FormValue("mountname")
+	if mountName != "" {
+		wpf(w, "mountame = "+mountName+"\n")
+		fs = dsfs.New(
+			dsfs.AeContext(appengine.NewContext(r)),
+			dsfs.MountName(mountName),
+		)
+	}
+
 	wpf(w, "dsfs:\n")
 	msg, err := fs.DeleteAll()
 	if err != nil {

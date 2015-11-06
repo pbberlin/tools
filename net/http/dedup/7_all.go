@@ -206,7 +206,7 @@ func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.
 		return nil
 	}
 
-	lg("\t\tfetch resp complete after %4.2v secs", time.Now().Sub(start).Seconds())
+	lg("\t\tfetch resp complete after %4.2v secs; %vkB", time.Now().Sub(start).Seconds(), len(bJSON)/1024)
 
 	var mp map[string][]byte
 	err = json.Unmarshal(bJSON, &mp)

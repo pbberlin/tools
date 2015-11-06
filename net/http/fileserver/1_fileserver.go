@@ -14,7 +14,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/snappy"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
+	"github.com/pbberlin/tools/net/http/loghttp"
 	"github.com/pbberlin/tools/net/http/tplx"
 	"github.com/pbberlin/tools/os/fsi"
 	"github.com/pbberlin/tools/os/fsi/common"
@@ -44,7 +46,7 @@ func FsiFileServer(w http.ResponseWriter, r *http.Request, opt Options) {
 
 	r.Header.Set("X-Custom-Header-Counter", "nocounter")
 
-	b1 := new(bytes.Buffer)
+	lg, b1 := loghttp.BuffLoggerUniversal(w, r)
 
 	fclose := func() {
 		// Only upon error.
@@ -133,6 +135,20 @@ func FsiFileServer(w http.ResponseWriter, r *http.Request, opt Options) {
 
 	ext := path.Ext(fullP)
 	ext = strings.ToLower(ext)
+	if ext == ".snappy" {
+		btsDec, err := snappy.Decode(nil, bts1)
+		if err != nil {
+			wpf(b1, "err decoding snappy: "+err.Error())
+		} else {
+			lg("decoded from %vkB to %vkB", len(bts1)/1024, len(btsDec)/1024)
+			bts1 = btsDec
+		}
+		fullP = strings.TrimSuffix(fullP, path.Ext(fullP))
+		ext = path.Ext(fullP)
+		ext = strings.ToLower(ext)
+		lg("new extension is %v", ext)
+	}
+
 	tp := mime.TypeByExtension(ext)
 
 	w.Header().Set("Content-Type", tp)

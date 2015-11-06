@@ -28,7 +28,7 @@ const stageMax = 3 // weedstages
 
 const cTestHostOwn = "localhost:63222"
 
-var hostWithPref = routes.AppHost01 + repo.UriMountNameY
+var hostWithPref = routes.AppHost() + repo.UriMountNameY
 
 func prepare(t *testing.T) aetest.Context {
 

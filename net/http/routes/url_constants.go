@@ -1,4 +1,4 @@
-// Package routes contains route path constants,
+// Package routes contains hostname logic and path constants,
 // that would otherwise cause circular dependencies.
 package routes
 
@@ -12,10 +12,38 @@ const FetchSimilarURI = "/fetch/similar"
 
 const FormRedirector = "/blob2/form-redirector"
 
-var AppHost01 = "localhost:8085"
+var appID, devServerPort = "", ""
+var appHost = ""
 
-func init() {
-	if !appengine.IsDevAppServer() {
-		AppHost01 = "libertarian-islands.appspot.com"
+var devAdminPort = ""
+
+func InitAppHost(ID, port, adminPort string) {
+	appID = ID
+	devServerPort = port
+	devAdminPort = adminPort
+
+	if appengine.IsDevAppServer() {
+		appHost = "localhost" + ":" + devServerPort
+	} else {
+		appHost = appID + ".appspot.com"
 	}
+
+}
+
+func AppHostDev() string {
+	return "localhost" + ":" + devServerPort
+}
+func AppHostLive() string {
+	return appID + ".appspot.com"
+}
+
+func AppHost() string {
+	return appHost
+}
+func AppID() string {
+	return appID
+}
+
+func DevAdminPort() string {
+	return devAdminPort
 }

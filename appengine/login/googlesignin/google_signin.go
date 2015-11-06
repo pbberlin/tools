@@ -12,10 +12,11 @@ import (
 	"strings"
 
 	"github.com/pbberlin/tools/appengine/login"
+	"github.com/pbberlin/tools/appengine/login/googlesignin/jwt-go"
 	"github.com/pbberlin/tools/net/http/fetch"
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/stringspb"
-	"github.com/pbberlin/tools/vendor/jwt-go"
 )
 
 func init() {
@@ -31,7 +32,7 @@ func TokenSignin(w http.ResponseWriter, r *http.Request) {
 
 	// w.Header().Set("Access-Control-Allow-Origin", "http://localhost:1313")
 
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8087")
+	w.Header().Set("Access-Control-Allow-Origin", "http://"+routes.AppHostDev())
 
 	w.Header().Del("Access-Control-Allow-Origin")
 	w.Header().Set("Access-Control-Allow-Origin", "*")

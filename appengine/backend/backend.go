@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/pbberlin/tools/appengine/login"
-	"github.com/pbberlin/tools/conv"
 	"github.com/pbberlin/tools/net/http/coinbase"
 	"github.com/pbberlin/tools/net/http/dedup"
 	"github.com/pbberlin/tools/net/http/htmlfrag"
@@ -121,17 +120,22 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 
 	b1.WriteString("<br>\n")
 	b1.WriteString("<hr>\n")
-	b1.WriteString("<a target='_gae' href='https://console.developers.google.com/project/347979071940' ><b>global</b> developer console</a><br>\n")
-	b1.WriteString(" &nbsp; &nbsp; <a target='_gae' href='http://localhost:8000/mail' >app console local</a><br>\n")
-	b1.WriteString(" &nbsp; &nbsp; <a target='_gae' href='https://appengine.google.com/settings?&app_id=s~libertarian-islands' >app console online</a><br>\n")
+
+	urlLocalAdmin := fmt.Sprintf("http://localhost:%v/mail", routes.DevAdminPort())
+	ancLocalAdmin := fmt.Sprintf(" &nbsp; &nbsp; <a target='_gae' href='%v' >local app console</a><br>\n", urlLocalAdmin)
+	b1.WriteString(ancLocalAdmin)
+
+	urlConsole := fmt.Sprintf("https://console.developers.google.com/project/%v", routes.AppID())
+	ancConsole := fmt.Sprintf("<a target='_gae' href='%v' ><b>global</b> developer console</a>\n", urlConsole)
+	b1.WriteString(ancConsole)
+
+	urlOldAdmin := fmt.Sprintf("https://appengine.google.com/settings?&app_id=s~%v", routes.AppID())
+	ancOldAdmin := fmt.Sprintf(" &nbsp; &nbsp; <a target='_gae' href='%v' >old admin UI</a><br>\n ", urlOldAdmin)
+	b1.WriteString(ancOldAdmin)
 
 	b1.WriteString(` &nbsp; &nbsp; <a target='_gae' 
 			href='http://go-lint.appspot.com/github.com/pbberlin/tools/dsu' 
-			>lint package</a><br>`)
-
-	b1.WriteString("<br>\n")
-	b1.WriteString("<a target='_gae'   href='http://localhost:8085/' >app local</a><br>\n")
-	b1.WriteString("<a target='_gae_r' href='http://libertarian-islands.appspot.com/' >app online</a><br>\n")
+			>lint a package</a><br>`)
 
 	dir := m["dir"].(string)
 	base := m["base"].(string)
@@ -146,12 +150,6 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	// b1.WriteString(fmt.Sprintf("Temp dir is %s<br>\n", os.TempDir()))
 
 	b1.WriteString("<br>\n")
-	b2 := new(bytes.Buffer)
-	b2.WriteString("data:image/png;base64,...")
-	b1.WriteString(fmt.Sprintf("Mime from %q is %q<br>\n", b2.String(),
-		conv.MimeFromBase64(b2)))
-
-	b1.WriteString("<br>\n")
 
 	io.WriteString(b1, "Date: "+util.TimeMarker()+"  - ")
 	b1.WriteString(fmt.Sprintf("Last Month %q - 24 Months ago is %q<br>\n", util.MonthsBack(0),
@@ -161,11 +159,9 @@ func backend(w http.ResponseWriter, r *http.Request, m map[string]interface{}) {
 	x1 := " z" + stringspb.IncrementString("--z")
 	x2 := " Z" + stringspb.IncrementString("--Z")
 	x3 := " 9" + stringspb.IncrementString("--9")
-	x4 := " Peter" + stringspb.IncrementString("--Peter")
-	sEnc := "Theo - wir fahrn nach Łódź <  " + stringspb.IncrementString("Łódź") + x1 + x2 + x3 + x4
-	b1.WriteString(fmt.Sprint("restore string string(  []byte(sEnc) ): ", string([]byte(sEnc)), "<br>"))
-
-	// logif.E(fmt.Errorf("fictive error that is *now* logged to gae. "))
+	x4 := stringspb.IncrementString(" --Peter")
+	sEnc := "Łódź <  " + stringspb.IncrementString("Łódź") + x1 + x2 + x3 + x4
+	b1.WriteString(fmt.Sprint(string([]byte(sEnc)), "<br>"))
 
 	b1.WriteString(tplx.Foot)
 

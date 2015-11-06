@@ -183,7 +183,7 @@ func Dedup(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSy
 
 func FetchAndDecodeJSON(r *http.Request, surl, knownProtocol string, lg loghttp.FuncBufUniv, fs fsi.FileSystem) []repo.FullArticle {
 
-	fullURL := fmt.Sprintf("%s%s?%s=%s&cnt=%v&prot=%v", routes.AppHost01, routes.FetchSimilarURI,
+	fullURL := fmt.Sprintf("%s%s?%s=%s&cnt=%v&prot=%v", routes.AppHost(), routes.FetchSimilarURI,
 		routes.URLParamKey, surl, numTotal-1, knownProtocol)
 
 	// fullURL = fmt.Sprintf("%s%s?%s=%s&cnt=%v", r.URL.Host, repo.routes.FetchSimilarURI,

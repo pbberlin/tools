@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/pbberlin/tools/net/http/loghttp"
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/os/osutilpb"
 	"golang.org/x/net/html"
 )
@@ -104,7 +105,7 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 	//
 	if opt.Proxify {
 		if opt.ProxyHost == "" {
-			opt.ProxyHost = "localhost:8085"
+			opt.ProxyHost = routes.AppHost()
 		}
 
 		proxify(doc, opt.ProxyHost, &url.URL{Scheme: "http", Host: opt.RemoteHost})

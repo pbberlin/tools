@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/pbberlin/tools/net/http/routes"
 	"github.com/pbberlin/tools/net/http/upload"
 )
 
@@ -17,8 +18,8 @@ var urlUp []string
 
 func init() {
 	urlUp = []string{
-		"http://localhost:8085" + upload.UrlUploadReceive,
-		"https://libertarian-islands.appspot.com" + upload.UrlUploadReceive,
+		"http://" + routes.AppHostDev() + upload.UrlUploadReceive,
+		"https://" + routes.AppHostLive() + upload.UrlUploadReceive,
 	}
 }
 

@@ -71,7 +71,7 @@ func requestPay(w http.ResponseWriter, r *http.Request, m map[string]interface{}
 
 	host := appengine.DefaultVersionHostname(appengine.NewContext(r))
 	if appengine.IsDevAppServer() {
-		host = "not-localhost"
+		host = "not-loclhost"
 	}
 
 	confirmURL := fmt.Sprintf("%v%v%v", protoc, host, uriConfirmPayment)

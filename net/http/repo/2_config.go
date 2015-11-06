@@ -27,7 +27,7 @@ const UriMountNameY = "/" + mountName + "/serve-file/"
 const uriFetchCommandReceiver = "/fetch/command-receive"
 const uriFetchCommandSender = "/fetch/command-send"
 
-var RepoURL = routes.AppHost01 + UriMountNameY
+var RepoURL = routes.AppHost() + UriMountNameY
 
 var msg = []byte(`<p>This is an embedded static http server.</p>
 <p>

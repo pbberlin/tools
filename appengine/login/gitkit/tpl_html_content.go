@@ -1,5 +1,11 @@
 package gitkit
 
+import (
+	"fmt"
+
+	"github.com/pbberlin/tools/net/http/routes"
+)
+
 // client side javascript to measure signin status
 const signedInCode = `
   <script type=text/javascript>
@@ -86,12 +92,12 @@ const home2 = `{{if .User}}
   </form>
 {{end}}`
 
-const widget = `<div id="gitkitWidget"></div>
+const widget = fmt.Sprintf(`<div id="gitkitWidget"></div>
 <script type="text/javascript">
 
 
-  var brandingURL = "https://tec-news.appspot.com/auth/accountChooserBranding.html";
-  var faviconURL  = "https://tec-news.appspot.com/favicon.ico";
+  var brandingURL = "https://%v.appspot.com/auth/accountChooserBranding.html";
+  var faviconURL  = "https://%v.appspot.com/favicon.ico";
   var accountChooserConfig = {
     title:    'Sign in to tec-news',
     favicon:  faviconURL,
@@ -129,4 +135,4 @@ const widget = `<div id="gitkitWidget"></div>
 
       // siteName required for "manage account"
 </script>
-`
+`, routes.AppID(), routes.AppID())

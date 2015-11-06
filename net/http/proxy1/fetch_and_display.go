@@ -131,7 +131,7 @@ func handleFetchURL(w http.ResponseWriter, r *http.Request, m map[string]interfa
 		opts.Beautify = true // "<a> Linktext without trailing space"
 		opts.RemoteHost = fetch.HostFromStringUrl(rURL)
 
-		// opts.ProxyHost = routes.AppHost01
+		// opts.ProxyHost = routes.AppHost()
 		opts.ProxyHost = fetch.HostFromReq(r)
 		if !util_appengine.IsLocalEnviron() {
 			opts.ProxyHost = fetch.HostFromReq(r)

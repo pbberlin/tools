@@ -18,21 +18,11 @@ import (
 	"time"
 
 	"github.com/codegangsta/cli"
-	"github.com/pbberlin/tools/net/http/upload"
 	"github.com/pbberlin/tools/os/osutilpb"
 )
 
-var urlUp []string
-
 const dirStat = "cnt_statified"
 const dirStatPref = "./cnt_statified"
-
-func init() {
-	urlUp = []string{
-		"http://localhost:8085" + upload.UrlUploadReceive,
-		"https://libertarian-islands.appspot.com" + upload.UrlUploadReceive,
-	}
-}
 
 func main() {
 

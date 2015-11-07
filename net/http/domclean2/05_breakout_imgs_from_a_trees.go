@@ -1,7 +1,6 @@
 package domclean2
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"regexp"
@@ -123,7 +122,6 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 				a1 := dom.CloneNodeWithSubtree(n)
 				fc1 := closureDeleter(true)
 				fc1(n, 0, false)
-
 				if debugBreakOut {
 					b1 := dom.PrintSubtree(n)
 					log.Printf("\n%s\n", b1)
@@ -149,30 +147,11 @@ func breakoutImagesFromAnchorTrees(n *html.Node) {
 
 			}
 
-			// changing image to link:
-			img2Link(img)
+			// changing image to link later
 
 		} else {
 			// log.Printf("no img in a\n")
 		}
-	}
-
-}
-
-func img2Link(img *html.Node) {
-
-	if img.Data == "img" {
-
-		img.Data = "a"
-		for i := 0; i < len(img.Attr); i++ {
-			if img.Attr[i].Key == "src" {
-				img.Attr[i].Key = "href"
-			}
-		}
-		imgContent := fmt.Sprintf("[img] %v %v | ", attrX(img.Attr, "title"), urlBeautify(attrX(img.Attr, "href")))
-		img.Attr = attrSet(img.Attr, "cfrom", "img")
-		nd := dom.Nd("text", imgContent)
-		img.AppendChild(nd)
 	}
 
 }

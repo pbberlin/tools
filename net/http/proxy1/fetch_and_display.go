@@ -1,4 +1,5 @@
-// Package proxy1 forwards html pages and reduces their size.
+// Package proxy1 forwards html pages and reduces their size;
+// it largely uses domclean2 for actual proxification.
 package proxy1
 
 import (

@@ -106,10 +106,17 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 		if attr.Key == "href" {
 
 			if attrX(attributes, "cfrom") == "img" {
-				// dont proxif image links
+				// dont proxify image links
 			} else {
 				// proxify - v1
-				attr.Val = fmt.Sprintf("%v?%v=%v", routes.ProxifyURI, routes.URLParamKey, attr.Val)
+				// no rewrite to https-posted-form; urls remain visible
+				if false {
+					// only proxy
+					attr.Val = fmt.Sprintf("%v?%v=%v", routes.ProxifyURI, routes.URLParamKey, attr.Val)
+				} else {
+					// dedup
+					attr.Val = fmt.Sprintf("%v?%v=%v", routes.DedupURI, routes.URLParamKey, attr.Val)
+				}
 
 				if util_appengine.IsLocalEnviron() {
 					attr.Val = fmt.Sprintf("http://%v%v", proxyHostPort, attr.Val)

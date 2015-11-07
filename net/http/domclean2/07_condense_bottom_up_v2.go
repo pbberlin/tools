@@ -31,7 +31,7 @@ func flattenSubtreeV2(n *html.Node, b *bytes.Buffer, depth int, tpar *html.Node)
 		tpar.AppendChild(n)
 		// wpf(b, "[a] ")
 	case n.Type == html.ElementNode && n.Data == "img":
-		img2Link(n)
+		// img2Link(n)
 		n.Parent.RemoveChild(n)
 		tpar.AppendChild(n)
 	case n.Data == "em" || n.Data == "strong":

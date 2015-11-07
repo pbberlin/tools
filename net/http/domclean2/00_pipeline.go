@@ -86,6 +86,7 @@ func DomClean(b []byte, opt CleaningOptions) (*html.Node, error) {
 	//
 	removeCommentsAndIntertagWhitespace(NdX{doc, 0}) // prevent spacey textnodes around singl child images
 	breakoutImagesFromAnchorTrees(doc)
+	recurseImg2Link(doc)
 	fileDump(doc, opt.FNamer)
 
 	//

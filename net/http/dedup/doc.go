@@ -2,11 +2,6 @@
 // computing similar subtrees measured by levenshtein distance.
 package dedup
 
-//  Todo:
-//		Proxify still has online localhost:8085
-// 		Image alt texts are often doubled
-//
-
 import "fmt"
 
 var pf func(format string, a ...interface{}) (int, error) = fmt.Printf

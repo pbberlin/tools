@@ -8,7 +8,6 @@ import (
 // Now this third implementation finally condenses *selectively*.
 // Not all boats from each pond are lifted equally.
 // We achieve tremendous structural simplification.
-//
 // It also starts from top, pulling lower levels up.
 // Unlike implementation #1, that started from the middle.
 func topDownV3(l1 *html.Node, l2Types map[string]bool, l3Types map[string]bool) {

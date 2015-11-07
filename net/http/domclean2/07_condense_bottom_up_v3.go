@@ -56,7 +56,6 @@ func flattenSubtreeV3Inner(n, nClone *html.Node, lvl int) {
 			flattenSubtreeV3Inner(ch, chClone, lvl+1)
 
 		case ch.Type == html.ElementNode && ch.Data == "img":
-			img2Link(chClone)
 			nClone.AppendChild(chClone)
 
 		case ch.Data == "span":

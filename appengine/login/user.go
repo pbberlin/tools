@@ -81,11 +81,13 @@ func CheckForAdminUser(r *http.Request) (bool, *user.User, string) {
 	u, msg := UserFromReq(r)
 
 	if u == nil {
-		msg = "google appengine oauth required - admin rights - no login found\n" + msg
+		msg = "google appengine oauth required - admin rights - no login found \n" + msg
+		msg = "use /appengine/login\n" + msg
 		return false, nil, msg
 	}
 	if u != nil && !u.Admin {
-		msg = "google appengine oauth required - admin rights - login found without admin\n" + msg
+		msg = "google appengine oauth required - admin rights - login found without admin \n" + msg
+		msg = "use /appengine/login\n" + msg
 		return false, nil, msg
 	}
 

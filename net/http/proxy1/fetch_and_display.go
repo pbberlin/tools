@@ -1,5 +1,6 @@
-// Package proxy1 forwards html pages and reduces their size;
-// it largely uses domclean2 for actual proxification.
+// Package proxy1 forwards html pages, simplifying their dom structure;
+// it is a wrapper around domclean2 for actual cleansing and proxification;
+// containing tamper-monkey javascript popup code.
 package proxy1
 
 import (

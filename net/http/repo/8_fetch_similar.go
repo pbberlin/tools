@@ -198,13 +198,13 @@ MarkOuter:
 			m2.Protocol = knownProtocol
 
 			btsPar, _, usedExisting, err := fetchSave(m2)
-			alreadyCrawled[treePath] = struct{}{}
-			if !usedExisting {
-				addAnchors(lg, cmd.Host, btsPar, dirTree)
-			}
 			lg(err)
 			if err != nil {
 				return
+			}
+			alreadyCrawled[treePath] = struct{}{}
+			if !usedExisting {
+				addAnchors(lg, cmd.Host, btsPar, dirTree)
 			}
 
 			if subtree == nil {

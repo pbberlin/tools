@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"path"
 	"time"
 
@@ -80,12 +81,16 @@ func fetchSave(m *MyWorker) ([]byte, time.Time, bool, error) {
 	//
 	// Fetch
 	bts, inf, err := fetch.UrlGetter(m.r, fetch.Options{URL: m.SURL, KnownProtocol: m.Protocol, RedirectHandling: 1})
-
 	m.lg(err)
 	if err != nil {
-		m.lg("tried to fetch %v, %v", m.SURL, inf.URL)
-		m.lg("msg %v", inf.Msg)
-		return []byte{}, inf.Mod, false, err
+		if inf.Status != http.StatusNotFound {
+			m.lg("tried to fetch %v, %v", m.SURL, inf.URL)
+			m.lg("msg %v", inf.Msg)
+			return []byte{}, inf.Mod, false, err
+		}
+		// In our traversing upwards, we might encounter "directory links" that have no index.html.
+		// For a *derived* URL, this is no error.
+		bts = []byte(" ... not found ... ")
 	}
 	if inf.Mod.IsZero() {
 		inf.Mod = time.Now().Add(-75 * time.Minute)

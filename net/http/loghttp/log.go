@@ -101,11 +101,13 @@ func Pf(w io.Writer, r *http.Request, f string, vs ...interface{}) {
 		switch v := v.(type) {
 		case []byte:
 			if len(v) > 1024*5 {
-				vs[idx] = v[:1024*5]
+				appdx := append([]byte(" ...omitted... "), v[len(v)-100:]...)
+				vs[idx] = append(v[:1024*5], appdx...)
 			}
 		case string:
 			if len(v) > 1024*5 {
-				vs[idx] = v[:1024*5]
+				appdx := " ...omitted... " + v[len(v)-100:]
+				vs[idx] = v[:1024*5] + appdx
 			}
 		}
 	}

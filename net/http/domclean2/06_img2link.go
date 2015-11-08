@@ -2,7 +2,6 @@ package domclean2
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/pbberlin/tools/net/http/dom"
@@ -19,18 +18,19 @@ func closureTextNodeExists(img *html.Node) (found bool) {
 	txt = stringspb.NormalizeInnerWhitespace(txt)
 	txt = strings.TrimSpace(txt)
 
+	// We dont search entire document, but three levels above image subtree
 	grandParent := img
 	for i := 0; i < 4; i++ {
 		if grandParent.Parent != nil {
 			grandParent = grandParent.Parent
 		} else {
-			log.Printf("LevelsUp %v for %q", i, txt)
+			// log.Printf("LevelsUp %v for %q", i, txt)
 			break
 		}
 	}
 
-	var textifyBruteForce func(n *html.Node)
-	textifyBruteForce = func(n *html.Node) {
+	var recurseTextNodes func(n *html.Node)
+	recurseTextNodes = func(n *html.Node) {
 
 		if found {
 			return
@@ -41,15 +41,15 @@ func closureTextNodeExists(img *html.Node) (found bool) {
 			cc = append(cc, c)
 		}
 		for _, c := range cc {
-			textifyBruteForce(c)
+			recurseTextNodes(c)
 		}
 
 		if n.Type == html.TextNode {
 			n.Data = stringspb.NormalizeInnerWhitespace(n.Data)
 			if len(n.Data) >= len(txt) {
-				if strings.Contains(txt, "FDP") {
-					log.Printf("%25v     %v", stringspb.Ellipsoider(txt, 10), stringspb.Ellipsoider(n.Data, 10))
-				}
+				// if strings.Contains(txt, "FDP") {
+				// 	log.Printf("%25v     %v", stringspb.Ellipsoider(txt, 10), stringspb.Ellipsoider(n.Data, 10))
+				// }
 				fnd := strings.Contains(n.Data, txt)
 				if fnd {
 					found = true
@@ -58,7 +58,7 @@ func closureTextNodeExists(img *html.Node) (found bool) {
 			}
 		}
 	}
-	textifyBruteForce(grandParent)
+	recurseTextNodes(grandParent)
 
 	return
 }

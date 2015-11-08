@@ -38,9 +38,10 @@ type Options struct {
 
 // Response info
 type Info struct {
-	URL *url.URL
-	Mod time.Time
-	Msg string
+	URL    *url.URL
+	Mod    time.Time
+	Status int
+	Msg    string
 }
 
 // UrlGetter universal http getter for app engine and standalone go programs.
@@ -243,6 +244,10 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			if errRd != nil {
 				return nil, inf, fmt.Errorf("cannot read resp body: %v", errRd)
 			}
+			if len(bts) > 2*1024 {
+				btsApdx := append([]byte(" ...omitted... "), bts[len(bts)-100:]...)
+				bts = append(bts[2*1024:], btsApdx...)
+			}
 			defer resp.Body.Close()
 
 			err2 := fmt.Errorf("resp %v: %v \n%v \n<pre>%s</pre>", resp.StatusCode, r.URL.String(), dmp, bts)
@@ -252,8 +257,12 @@ func UrlGetter(gaeReq *http.Request, options Options) (
 			}
 			var err2nd error
 			resp, err2nd = client.Do(r)
-			if err2nd != nil || resp.StatusCode != http.StatusOK {
-				return nil, inf, fmt.Errorf("failed again %v %v \n%v", err2nd, resp.StatusCode, err2)
+			if err2nd != nil {
+				return nil, inf, fmt.Errorf("again error %v \n%v", err2nd, err2)
+			}
+			if resp.StatusCode != http.StatusOK {
+				inf.Status = resp.StatusCode
+				return nil, inf, fmt.Errorf("again Status NotOK %v \n%v", resp.StatusCode, err2)
 			}
 			log.Printf("successful retry with '/' to %v after %v\n", r.URL.String(), err)
 			err = nil // CLEAR error

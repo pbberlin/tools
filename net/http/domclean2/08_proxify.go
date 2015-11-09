@@ -106,7 +106,9 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 		if attr.Key == "href" {
 
 			if attrX(attributes, "cfrom") == "img" {
-				// dont proxify image links
+				// dont proxify image links, except they are relative
+				// we already absolutized them  above
+
 			} else {
 				// proxify - v1
 				// no rewrite to https-posted-form; urls remain visible

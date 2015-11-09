@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -20,12 +21,14 @@ import (
 )
 
 // Puttting it all together
-func Dedup(least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSystem) *html.Node {
+func Dedup(oURL *url.URL,
+	least3Files []repo.FullArticle, lg loghttp.FuncBufUniv, fs fsi.FileSystem) *html.Node {
 
 	opts := domclean2.CleaningOptions{Proxify: true, Beautify: true}
 	// opts.FNamer = fNamer
 	opts.AddOutline = true
-	opts.RemoteHost = fetch.HostFromStringUrl(least3Files[0].Url)
+	// opts.RemoteHost = fetch.HostFromStringUrl(least3Files[0].Url)
+	opts.RemoteHost = oURL.Host
 
 	//
 	// domclean

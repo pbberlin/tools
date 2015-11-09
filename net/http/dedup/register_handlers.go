@@ -68,7 +68,7 @@ func dedupHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 		knownProtocol = r.FormValue("prot")
 	}
 
-	lg("%v, %v", ourl.Host, ourl.Path)
+	lg("Host %q, Path %q", ourl.Host, ourl.Path)
 
 	fs := GetFS(appengine.NewContext(r), 0)
 
@@ -76,7 +76,7 @@ func dedupHTTP(w http.ResponseWriter, r *http.Request, m map[string]interface{})
 
 	lg("Fetched and decoded; found %v", len(least3Files))
 	if len(least3Files) > 0 {
-		doc := Dedup(least3Files, lg, fs)
+		doc := Dedup(ourl, least3Files, lg, fs)
 
 		fNamer := domclean2.FileNamer(logDir, 0)
 		fNamer() // first call yields key

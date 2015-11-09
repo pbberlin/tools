@@ -58,17 +58,17 @@ var ConfigDefaults = map[string]FetchCommand{
 		DepthTolerance:       1,
 		DesiredNumber:        5,
 	},
-	"www.handelsblatt.com": FetchCommand{
-		RssXMLURI: map[string]string{
-			"/":                      "/contentexport/feed/schlagzeilen",
-			"/politik":               "/contentexport/feed/schlagzeilen",
-			"/politik/international": "/contentexport/feed/schlagzeilen",
-			"/politik/deutschland":   "/contentexport/feed/schlagzeilen",
-		},
-		CondenseTrailingDirs: 2,
-		DepthTolerance:       1,
-		DesiredNumber:        5,
-	},
+	// "www.handelsblatt.com": FetchCommand{
+	// 	RssXMLURI: map[string]string{
+	// 		"/":                      "/contentexport/feed/schlagzeilen",
+	// 		"/politik":               "/contentexport/feed/schlagzeilen",
+	// 		"/politik/international": "/contentexport/feed/schlagzeilen",
+	// 		"/politik/deutschland":   "/contentexport/feed/schlagzeilen",
+	// 	},
+	// 	CondenseTrailingDirs: 2,
+	// 	DepthTolerance:       1,
+	// 	DesiredNumber:        5,
+	// },
 	"www.economist.com": FetchCommand{
 		RssXMLURI: map[string]string{
 			"/news/europe":               "/sections/europe/rss.xml",

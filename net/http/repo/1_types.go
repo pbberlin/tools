@@ -18,8 +18,10 @@ type FetchCommand struct {
 
 	RssXMLURI            map[string]string // SearchPrefix => RSS-URLs
 	DesiredNumber        int
-	CondenseTrailingDirs int // The last one or two directories might be article titles or ids
-	DepthTolerance       int
+	CondenseTrailingDirs int // The last one or two directories might be article titles or ids;
+	// we dont' care any longer - CondenseTrailingDirs is obsolete
+
+	DepthTolerance int
 }
 
 type DirTree struct {

@@ -5,8 +5,8 @@
 // @namespace    http://your.homepage/
 // @version      0.122
 // @author       iche
-// @downloadURL  https://github.com/pbberlin/tools/blob/master/net/http/proxy1/tamper-monkey-popup-menu-3.js
-// @updateURL    https://github.com/pbberlin/tools/blob/master/net/http/proxy1/tamper-monkey-popup-menu-3.js //serving the head with possibly new version
+// @downloadURL  https://raw.githubusercontent.com/pbberlin/tools/master/net/http/proxy1/tamper-monkey-popup-menu-3.js
+// @updateURL    https://raw.githubusercontent.com/pbberlin/tools/master/net/http/proxy1/tamper-monkey-popup-menu-3.js  //serving the head with possibly new version
 // // https://developer.chrome.com/extensions/match_patterns
 // @match        *://*.welt.de/*
 // @match        *://*.handelsblatt.com/*  

@@ -38,25 +38,40 @@ var undouble = strings.NewReplacer("\n\n\n", "\n", "\n\n", "\n")
 const c_formFetchUrl = `
 
 	<style> .ib { display:inline-block; }</style>
-    <form action="{{.protocol}}://{{.host}}{{.path}}" method="post" >
-      <div style='margin:8px;'>
+	<form action="{{.protocol}}://{{.host}}{{.path}}" method="post" >
+	  <div style='margin:8px;'>
 
-      	<span class='ib' style='width:90%'>URL </span>
-      	  <input id='i1' name="{{.name}}"    style='width:90%;height:96px;'    size="80"  
-      	  	xxvalue="{{.val}}"
-      	  	value=""
-      	  ><br/>
+	  	<span class='ib' style='width:99%'>
+	  		URL<br />
+	  		<input id='i1' name="{{.name}}"	style='width:90%;height:96px;'
+	  			size="80"  
+	  	  		xxvalue="{{.val}}"
+	  	  		value=""
+	  		>
+	  	 </span>
 
-		<span class='ib' style='width:90%'>&nbsp;</span>
+  		<br/>
+
+		<span class='ib' style='width:99%'>&nbsp;</span>
 		  <a href='#' onclick='document.getElementById("i1").value=""' style='font-size:42px;' 
-		  >Clear</a><br/>
+		  >Clear</a>
+		</span>
 
-		<span class='ib' style='width:90%'>Put into pre tags </span>
-		  <input name="renderInPre"    size="4"    value='' ><br/>
-		<span class='ib' style='width:90%'> </span>
+  		<br/>
+  		<br/>
+  		<br/>
+
+		<span class='ib' style='width:99%'>
+			Put into pre tags 
+			<input name="renderInPre"	size="4"	value='' ><br/>
+		</span>
+
+  		<br/>
 	
-		<input type="submit" value="Fetch" accesskey='f'  style='width:90%;height:96px;'></div>
-    </form>
+		<input type="submit" value="Fetch" accesskey='f'  style='width:90%;height:96px;'>
+
+	</div>
+	</form>
 
 `
 

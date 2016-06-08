@@ -41,21 +41,21 @@ const c_formFetchUrl = `
     <form action="{{.protocol}}://{{.host}}{{.path}}" method="post" >
       <div style='margin:8px;'>
 
-      	<span class='ib' style='width:140px'>URL </span>
-      	  <input id='i1' name="{{.name}}"    style='width:400px;height:42px;'    size="80"  
+      	<span class='ib' style='width:90%'>URL </span>
+      	  <input id='i1' name="{{.name}}"    style='width:90%;height:96px;'    size="80"  
       	  	xxvalue="{{.val}}"
       	  	value=""
       	  ><br/>
 
-		<span class='ib' style='width:140px'>&nbsp;</span>
-		  <a href='#' onclick='document.getElementById("i1").value=""' style='font-size:24px;' 
+		<span class='ib' style='width:90%'>&nbsp;</span>
+		  <a href='#' onclick='document.getElementById("i1").value=""' style='font-size:42px;' 
 		  >Clear</a><br/>
 
-		<span class='ib' style='width:140px'>Put into pre tags </span>
+		<span class='ib' style='width:90%'>Put into pre tags </span>
 		  <input name="renderInPre"    size="4"    value='' ><br/>
-		<span class='ib' style='width:140px'> </span>
+		<span class='ib' style='width:90%'> </span>
 	
-		<input type="submit" value="Fetch" accesskey='f'  style='width:400px;height:42px;'></div>
+		<input type="submit" value="Fetch" accesskey='f'  style='width:90%;height:96px;'></div>
     </form>
 
 `

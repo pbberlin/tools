@@ -69,8 +69,8 @@ function PopupContent(obj){
     }
     
     var formHtml = "";
-    var prox01 = "http://localhost:8085/dedup";
-    var prox02 = "https://libertarian-islands.appspot.com/dedup";
+    var prox01 = "http://localhost:8085/prox";
+    var prox02 = "https://dom-clean.appspot.com/prox";
     var proxURL = prox02;
     
     formHtml += "<form action='"+proxURL+"' method='post' ";

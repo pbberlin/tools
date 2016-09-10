@@ -80,6 +80,7 @@ var (
 	xsrfKey      string
 	cookieStore  *sessions.CookieStore
 	gitkitClient *gitkit.Client
+	client       *gitkit.Client
 )
 
 // User information.
@@ -121,19 +122,20 @@ func CurrentUser(r *http.Request) *User {
 	sess, _ := cookieStore.Get(r, sessionName)
 	if sess.IsNew {
 		// Create an identity toolkit client associated with the GAE context.
-		client, err := gitkit.NewWithContext(c, gitkitClient)
-		if err != nil {
-			aelog.Errorf(c, "Failed to create a gitkit.Client with a context: %s", err)
-			return nil
-		}
+		// client, err := gitkit.NewWithContext(c, gitkitClient)
+		// if err != nil {
+		// 	aelog.Errorf(c, "Failed to create a gitkit.Client with a context: %s", err)
+		// 	return nil
+		// }
 		// Extract the token string from request.
 		ts := client.TokenFromRequest(r)
 		if ts == "" {
 			return nil
 		}
 		// Check the token issue time. Only accept token that is no more than 15
-		// minitues old even if it's still valid.
-		token, err := client.ValidateToken(ts)
+		// minutes old even if it's still valid.
+		// token, err := client.ValidateToken(ts)
+		token, err := client.ValidateToken(appengine.NewContext(r), ts, []string{clientID})
 		if err != nil {
 			aelog.Errorf(c, "Invalid token %s: %s", ts, err)
 			return nil

@@ -112,7 +112,7 @@ func attrsAbsoluteAndProxified(attributes []html.Attribute, proxyHostPort, remot
 			} else {
 				// proxify - v1
 				// no rewrite to https-posted-form; urls remain visible
-				if false {
+				if true {
 					// only proxy
 					attr.Val = fmt.Sprintf("%v?%v=%v", routes.ProxifyURI, routes.URLParamKey, attr.Val)
 				} else {

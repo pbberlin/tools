@@ -3,7 +3,7 @@
 // @description  include jQuery and make sure window.$ is the content page's jQuery version, and this.$ is our jQuery version. 
 // @description  http://stackoverflow.com/questions/28264871/require-jquery-to-a-safe-variable-in-tampermonkey-script-and-console
 // @namespace    http://your.homepage/
-// @version      0.122
+// @version      0.123
 // @author       iche
 // @downloadURL  https://raw.githubusercontent.com/pbberlin/tools/master/net/http/proxy1/tamper-monkey-popup-menu-3.js
 // @updateURL    https://raw.githubusercontent.com/pbberlin/tools/master/net/http/proxy1/tamper-monkey-popup-menu-3.js  //serving the head with possibly new version
